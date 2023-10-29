@@ -1,0 +1,114 @@
+[tool.black]
+line-length = 140
+target-version = ['py39', 'py310', 'py311']
+
+[tool.poetry]
+name = "cfspopcon"
+version = "4.0.0"
+description = "Empirically-derived scoping of tokamak operational space."
+authors = ["Commonwealth Fusion Systems"]
+classifiers = [
+"Development Status :: 5 - Production/Stable",
+"Intended Audience :: Science/Research",
+"Programming Language :: Python :: 3",
+"Programming Language :: Python :: 3.9",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3 :: Only",
+"Topic :: Scientific/Engineering :: Physics",
+"License :: OSI Approved :: MIT License",
+]
+
+
+[tool.poetry.scripts]
+popcon = 'cfspopcon.cli:run_popcon_cli'
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+numpy = "^1.22.4"
+pandas = "^1.4"
+scipy = "^1.8"
+seaborn = "^0.12"
+pyyaml = "^6.0"
+toml = "^0.10.2"
+typing-extensions = "^4.0.1"
+pint = "^0.22"
+xarray = "^2023.4.1"
+pint-xarray = "^0.3"
+ipdb = "^0.13.13"
+click = "^8.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.20.0"
+black = "^22.10.0"
+pytest = "^7.2.0"
+coverage = "^6.5.0"
+pytest-cov = "^4.0.0"
+types-pyyaml = "^6.0.12.2"
+pandas-stubs = "^1.5.1.221024"
+mypy = "^1.4.1"
+sphinx = "^7.2.6"
+sphinx-rtd-theme = "^2.0.0rc2"
+sphinxcontrib-bibtex = "^2.6.1"
+sphinx-copybutton = "^0.5.2"
+ruff = "^0.0.292"
+nbmake = "^1.4.3"
+nbsphinx = "^0.9.3"
+
+[tool.coverage.report]
+fail_under = 82
+
+[tool.pytest.ini_options]
+addopts = "--cov=cfspopcon --cov-report term-missing --cov-report xml:coverage.xml --verbose -s --nbmake"
+testpaths = [
+  "tests",
+  "docs/doc_sources"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
+strict = true
+disallow_any_generics=false
+exclude = [
+    '^cfspopcon/plotting/.*\.py$',  # these need to fixed
+]
+
+[tool.ruff]
+select = [
+  "A", # avoid shadowing
+  "B", # flake8-bugbear
+  "C4", # comprehensions 
+  "D", #docstrings
+  "E", # pycodestyle Errors
+  "ERA", # no commented out code
+  "F", # pyflakes
+  "FLY", # flynt
+  "I001", # isort
+  "ISC", # implicit string concatenation
+  "PERF", # Perflint
+  "PIE", # flake8-pie
+  "PGH", # pygrep-hooks
+  "PL", # pylint
+  "Q", # flake8-quotes
+  "RUF", # ruff builtins e.g. noqa checking
+  "T10", # flake8-debugger (no breakpoint etc)
+  "TCH",# type-checking imports
+  "UP", # pyupgrade
+  "W", # pycodestyle warnings
+  ]
+
+ignore = [
+  "E501", # Never enforce line length violations, we have black for that.
+  "PLR0913", #ignore limit on number of args
+  "PLR2004", #ignore magic values warning, at least for now
+  "C408", # use {} instead of dict(), but we use dict heavily, for now leave it
+]
+pyupgrade.keep-runtime-typing=true
+pydocstyle.convention = "google"
+target-version = "py39"
+line-length = 140
+

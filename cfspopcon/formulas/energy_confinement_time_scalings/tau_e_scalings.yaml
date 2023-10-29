@@ -1,0 +1,342 @@
+# Power law scaling parameters
+
+# References
+# [1]: P. N. Yushmanov, T. Takizuka, K. S. Riedel, O. J. W. F. Kardaun, J. G. Cordey, S. M. Kaye,
+#     and D. E. Post, "Scalings for tokamak energy confinement" Nuclear Fusion, vol. 30,
+#     no. 10, pp. 4-6, 1990.
+# [2]: Verdoolaege, G., Kaye, S. M., Angioni, C., Kardaun, O. J. W. F., Ryter, F., Thomsen, K.,
+#     Maslov, M., &amp; Romanelli, M. (2018). (publication). First Analysis of the Updated ITPA
+#     Global H-mode Confinement Database. International Atomic Energy Agency.
+# [3]: Verdoolaege, G., Kaye, S. M., Angioni, C., Kardaun, O. J. W. F., Ryter, F., Thomsen, K.,
+#     Maslov, M., &amp; Romanelli, M. (2021). (publication). The Updated ITPA Global H-mode
+#     Confinement Database: Description and Analysis. International Atomic Energy Agency.
+# [4]: ITER Physics Expert Group on Confinement and Transport et al 1999 Nucl. Fusion 39 2175
+#      "ITER Physics Basis Chapter 2, Plasma confinement and transport" p. 2206
+# [5]: Petty, C.C., Deboo, J.C., La Haye, R.J., Luce, T.C., Politzer, P.A., Wong, C.P-C. (2003),
+#      Fusion Science and Technology, 43, "Feasibility Study of a Compact Ignition Tokamak Based
+#      Upon GyroBohm Scaling Physics."
+# [6]: J.E. Rice et al 2020 Nucl. Fusion 60 105001, "Understanding LOC/SOC phenomenology in tokamaks"
+# [7]: S.M. Kaye et al 1997 Nucl. Fusion 37 1303, "ITER L mode confinement database"
+
+IModey2:
+  metadata:
+    documentation: "Walk, J. R., Pedestal structure and stability in high-performance plasmas on Alcator C-Mod, https://dspace.mit.edu/handle/1721.1/95524, equation 5.2"
+    notes: "Coefficient C adjusted to account for ne in 1e19m^-3"
+    regime: "I-Mode"
+  params:
+    C: 0.01346
+    a_A: 0.0
+    a_B: 0.768
+    a_I: 0.685
+    a_P: -0.286
+    a_R: 0.0
+    a_d: 0.0
+    a_e: 0.0
+    a_ka: 0.0
+    a_ks: 0.0
+    a_n: 0.017
+    a_q: 0.0
+
+ITER89P:
+  metadata:
+    documentation: "From Yushmanov NF 1990, ref. [1] in tau_e_scalings.yaml"
+    notes: "For L-mode. C is corrected for average_electron_density convention. N.b. The different factor of a_R is because we use inverse_aspect_ratio=a/R instead of a. R^1.2 a^0.3 = R^1.5 inverse_aspect_ratio^0.3."
+    regime: "L-Mode"
+  params:
+    C: 0.03812775526676551
+    a_A: 0.5
+    a_B: 0.2
+    a_I: 0.85
+    a_P: -0.5
+    a_R: 1.5
+    a_d: 0.0
+    a_e: 0.3
+    a_ka: 0.0
+    a_ks: 0.5
+    a_n: 0.1
+    a_q: 0.0
+
+ITER89P_ka:
+  metadata:
+    documentation: "From Yushmanov NF 1990, ref. [1] in tau_e_scalings.yaml"
+    notes: "For L-mode. C is corrected for average_electron_density convention. Using kappa_A instead of separatrix_elongation, which is likely more accurate for double-nulls. N.b. The different factor of a_R is because we use inverse_aspect_ratio=a/R instead of a. R^1.2 a^0.3 = R^1.5 inverse_aspect_ratio^0.3."
+    regime: "L-Mode"
+  params:
+    C: 0.03812775526676551
+    a_A: 0.5
+    a_B: 0.2
+    a_I: 0.85
+    a_P: -0.5
+    a_R: 1.5
+    a_d: 0.0
+    a_e: 0.3
+    a_ka: 0.5
+    a_ks: 0.0
+    a_n: 0.1
+    a_q: 0.0
+
+ITER97L:
+  metadata:
+    documentation: "From Kaye NF 1997, ref. [7] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "L-Mode"
+  params:
+    C: 0.023
+    a_I: 0.96
+    a_B: 0.03
+    a_R: 1.83
+    a_e: -0.06 # inverse_aspect_ratio = (R / minor_radius)^-1
+    a_ka: 0.64
+    a_n: 0.40
+    a_A: 0.20 # M_eff
+    a_P: -0.73
+    a_d: 0.0
+    a_ks: 0.0
+    a_q: 0.0
+
+ITER98y2:
+  metadata:
+    documentation: "ITER98y2 scaling , ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.0562
+    a_A: 0.19
+    a_B: 0.15
+    a_I: 0.93
+    a_P: -0.69
+    a_R: 1.97
+    a_d: 0.0
+    a_e: 0.58
+    a_ka: 0.78
+    a_ks: 0.0
+    a_n: 0.41
+    a_q: 0.0
+
+ITERL96Pth:
+  metadata:
+    documentation: "ITERL96P(th) scaling, ref. [4] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "L-Mode"
+  params:
+    C: 0.023
+    a_A: 0.20
+    a_B: 0.03
+    a_I: 0.96
+    a_P: -0.73
+    a_R: 1.83
+    a_d: 0.0
+    a_e: -0.06
+    a_ka: 0.64
+    a_ks: 0.0
+    a_n: 0.40
+    a_q: 0.0
+
+ITPA_2018_STD5_GLS:
+  metadata:
+    documentation: "ITPA 2018 STD5-GLS (G. Verdoolaege et al, EX_P7- 1), ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.042
+    a_A: 0.47
+    a_B: 0.068
+    a_I: 1.2
+    a_P: -0.78
+    a_R: 1.6
+    a_d: 0.0
+    a_e: -0.052
+    a_ka: 0.88
+    a_ks: 0.0
+    a_n: 0.21
+    a_q: 0.0
+
+ITPA_2018_STD5_OLS:
+  metadata:
+    documentation: "ITPA 2018 STD5-OLS (G. Verdoolaege et al, EX_P7- 1), ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.049
+    a_A: 0.25
+    a_B: 0.085
+    a_I: 1.1
+    a_P: -0.71
+    a_R: 1.5
+    a_d: 0.0
+    a_e: -0.043
+    a_ka: 0.8
+    a_ks: 0.0
+    a_n: 0.19
+    a_q: 0.0
+
+ITPA_2018_STD5_SEL1_GLS:
+  metadata:
+    documentation: "ITPA 2018 STD5-SEL1-GLS (G. Verdoolaege et al, EX_P7- 1), ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.023
+    a_A: 0.33
+    a_B: -0.018
+    a_I: 1.3
+    a_P: -0.79
+    a_R: 1.5
+    a_d: 0.0
+    a_e: -0.38
+    a_ka: 1.9
+    a_ks: 0.0
+    a_n: 0.17
+    a_q: 0.0
+
+ITPA_2018_STD5_SEL1_OLS:
+  metadata:
+    documentation: "ITPA 2018 STD5-SEL1-OLS (G. Verdoolaege et al, EX_P7- 1), ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.045
+    a_A: 0.24
+    a_B: -0.1
+    a_I: 1.3
+    a_P: -0.71
+    a_R: 1.2
+    a_d: 0.0
+    a_e: -0.32
+    a_ka: 1.1
+    a_ks: 0.0
+    a_n: 0.13
+    a_q: 0.0
+
+ITPA_2018_STD5_SEL1_WLS:
+  metadata:
+    documentation: "ITPA 2018 STD5-SEL1-WLS (G. Verdoolaege et al, EX_P7- 1), ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.03
+    a_A: 0.094
+    a_B: -0.069
+    a_I: 1.3
+    a_P: -0.64
+    a_R: 1.3
+    a_d: 0.0
+    a_e: -0.46
+    a_ka: 1.3
+    a_ks: 0.0
+    a_n: 0.19
+    a_q: 0.0
+
+ITPA_2018_STD5_WLS:
+  metadata:
+    documentation: "ITPA 2018 STD5-WLS (G. Verdoolaege et al, EX_P7- 1), ref. [2] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.04
+    a_A: 0.25
+    a_B: 0.11
+    a_I: 0.99
+    a_P: -0.64
+    a_R: 1.7
+    a_d: 0.0
+    a_e: 0.093
+    a_ka: 0.79
+    a_ks: 0.0
+    a_n: 0.29
+    a_q: 0.0
+
+ITPA20_IL_HighZ:
+  metadata:
+    documentation: "ITER H20, DB5.2.3, High Z walls only, ref. [3] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.189
+    a_A: 0.312
+    a_B: -0.356
+    a_I: 1.485
+    a_P: -0.6077
+    a_R: 0.671
+    a_d: 0.0
+    a_e: 0.0
+    a_ka: 0.0
+    a_ks: 0.0
+    a_n: 0.018
+    a_q: 0.0
+
+ITPA20_IL:
+  metadata:
+    documentation: "ITER H20, DB5.2.3, ITER-like discharges, ref. [3] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.067
+    a_A: 0.3
+    a_B: -0.13
+    a_I: 1.29
+    a_P: -0.644
+    a_R: 1.19
+    a_d: 0.56
+    a_e: 0.0
+    a_ka: 0.67
+    a_ks: 0.0
+    a_n: 0.15
+    a_q: 0.0
+
+ITPA20_STD5:
+  metadata:
+    documentation: "ITER H20, DB5.2.3, STD5 discharges, ref. [3] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    C: 0.053
+    a_A: 0.2
+    a_B: 0.22
+    a_I: 0.98
+    a_P: -0.669
+    a_R: 1.71
+    a_d: 0.36
+    a_e: 0.35
+    a_ka: 0.80
+    a_ks: 0.0
+    a_n: 0.24
+    a_q: 0.0
+
+LOC:
+  metadata:
+    documentation: "Linear Ohmic Confinement, from page 2 of ref. [6] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "LOC"
+  params:
+    C: 0.0070
+    a_n: 1.0
+    a_q: 1.0
+    a_ka: 0.5
+    a_e: 1.0
+    a_R: 3.0
+    a_B: 0.0
+    a_I: 0.0
+    a_A: 0.0
+    a_P: 0.0
+    a_d: 0.0
+    a_ks: 0.0
+  
+H_DS03:
+  metadata:
+    documentation: "Electrostatic, GyroBohm-like confinement scaling, eqn 21 from ref. [5] in tau_e_scalings.yaml"
+    notes: ""
+    regime: "H-mode"
+  params:
+    C: 0.028
+    a_I: 0.83
+    a_B: 0.07
+    a_n: 0.49
+    a_P: -0.55
+    a_R: 2.11
+    a_e: 0.3 # (major_radius/a)^-0.3 = (a/major_radius)^0.3
+    a_ks: 0.75
+    a_A: 0.14 # a_M — isotope mass scaling
+    a_ka: 0.0
+    a_d: 0.0
+    a_q: 0.0

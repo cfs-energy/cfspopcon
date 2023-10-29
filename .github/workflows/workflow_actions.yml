@@ -1,0 +1,113 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: workflow_actions
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  pull_request: []
+  push:
+    branches:
+      - 'main'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    tag: "Manual run"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  radas:
+    runs-on: ubuntu-22.04
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'poetry'
+
+      - name: Cache radas results
+        id: radas
+        uses: actions/cache@v3
+        with:
+          path: radas
+          key: radas-${{ hashFiles('.github/workflows/make_radas_data.sh')}}
+
+      - name: Make radas data
+        if: steps.radas.outputs.cache-hit != 'true'
+        run: bash .github/workflows/make_radas_data.sh
+
+  build:
+    needs: radas
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']  # should test the versions we allow for in pyproject.toml
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install pandoc
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Setup
+        run: poetry install
+
+      - uses: actions/cache/restore@v3
+        id: radas
+        with:
+          path: radas
+          key: radas-${{ hashFiles('.github/workflows/make_radas_data.sh')}}
+
+      - name: Check cache hit
+        if: steps.radas.outputs.cache-hit != 'true'
+        run: exit 1
+
+      - name: Copy radas data
+        run: cp ./radas/cases/*/output/*.nc cfspopcon/atomic_data/
+
+      - name: Tests
+        run: MPLBACKEND=Agg poetry run pytest tests --nbmake example_cases
+
+      - name: Test package
+        run: |
+          poetry build -f wheel
+          python -m venv test_env
+          source ./test_env/bin/activate
+          pip install $(find ./dist -name "*.whl")
+          # enter tempdir so import cfspopcon doesn't find the cfspopcon directory
+          mkdir tmp_dir && cd tmp_dir
+          echo $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
+          cp ../radas/cases/*/output/*.nc $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
+          MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD/input.yaml -p ../example_cases/SPARC_PRD/plot_popcon.yaml --show
+
+      - name: Run pre-commit checks
+        run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files
+
+      - name: Test docs
+        # instead of make html we use sphinx-build directly to add more options
+        run: |
+          cd docs
+          poetry run sphinx-build --keep-going -Wnb html . _build/
+          poetry run make doctest
+          poetry run make linkcheck
+

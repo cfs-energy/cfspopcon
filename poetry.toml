@@ -1,0 +1,6 @@
+# This tells poetry to build the cfspopcon virtual environment 
+# in a .venv folder inside the cfspopcon repository. This makes
+# it easier to clean up afterwards (just delete the folder)
+# and to find the virtual environment to use with the Jupyter
+# notebooks.
+virtualenvs.in-project = true
