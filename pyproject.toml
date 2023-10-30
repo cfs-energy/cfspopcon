@@ -7,6 +7,7 @@ name = "cfspopcon"
 version = "4.0.0"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
+readme = "README.md"
 classifiers = [
 "Development Status :: 5 - Production/Stable",
 "Intended Audience :: Science/Research",

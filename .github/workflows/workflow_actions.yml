@@ -8,6 +8,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   pull_request: []
   push:
+    tags:
+      - '*'
     branches:
       - 'main'
   # Allows you to run this workflow manually from the Actions tab
@@ -111,3 +113,39 @@ jobs:
           poetry run make doctest
           poetry run make linkcheck
 
+
+  build_release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
+
+      - name: Poetry build
+        run: poetry build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pypi-build
+          path: ./dist
+
+  publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs: build_release
+    runs-on: ubuntu-22.04
+    environment:
+      name: pypi-publish
+      url: https://pypi.org/project/cfspopcon/
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v3
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: pypi-build/
