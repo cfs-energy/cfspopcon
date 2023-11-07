@@ -56,7 +56,7 @@ def run_calc_inductances(
         :term:`vertical_field_mutual_inductance`,
         :term:`vertical_magnetic_field`
     """
-    if custom_internal_inductivity == False:
+    if not custom_internal_inductivity:
         internal_inductivity = formulas.calc_internal_inductivity(plasma_current, major_radius, magnetic_field_on_axis, minor_radius, q_0)
 
     internal_inductance = formulas.calc_internal_inductance(

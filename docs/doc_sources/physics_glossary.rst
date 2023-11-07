@@ -19,13 +19,7 @@ Physics Glossary
     Fusion power released as alpha particles integrated over the plasma volume.
 
   P_external
-    External heating absorbed by the plasma (ohmic plus auxillary) integrated over the plasma volume.
-  
-  P_launched
-    External heating supplied to the plasma (entering the volume, but not necessarily absorbed — ohmic plus auxillary) integrated over the plasma volume.
-
-  fraction_of_external_power_coupled
-    Fraction of supplied external heating absorbed by the plasma: :math:`f_{coupled}=P_{external} / P_{launched}`.
+    External heating supplied to the plasma (ohmic plus auxillary) integrated over the plasma volume.
 
   P_radiation
     Power radiated from the confined region due to Bremmsstrahlung, synchrotron and impurity excitation-relaxation processes.
@@ -178,6 +172,9 @@ Physics Glossary
   plasma_volume
     Plasma volume inside the last-closed-flux-surface.
 
+  poloidal_circumference
+    Plasma poloidal circumference of the LCFS.
+
   normalized_inverse_temp_scale_length
     Inverse normalized electron temperature gradient scale length :math:`a / ( T_e / \nabla T_e )`, which defines the shape of the :class:`~cfspopcon.named_options.ProfileForm.prf` profiles.
 
@@ -192,6 +189,12 @@ Physics Glossary
 
   magnetic_field_on_axis
     Magnetic field at the geometric magnetic axis :math:`B_0 = BR / R0`.
+
+  vertical_magnetic_field
+    Vertical magnetic field derived from the necessary force to balance the hoop force :math:`B_V`
+
+  vertical_magnetic_field_eq
+    Which vertical magnetic field equation to select from :cite:`mit&taka`, :cite:`Barr_2018`, :cite:`Jean`, :cite:`MFEF`
 
   average_electron_density
     Volume-averaged electron density in the confined region :math:`\bar n_e`.
@@ -224,7 +227,7 @@ Physics Glossary
     Ratio of plasma pressure to magnetic pressure provided by the total magnetic field.
 
   beta_N
-    Ratio of plasma pressure to magnetic pressure provided by the total magnetic field, normalized to :math:`I_MA / a B_0`.
+    Ratio of plasma pressure to magnetic pressure provided by the total magnetic field, normalized to :math:`\beta_{max} = I_MA / a B_0` (Troyon limit).
 
   separatrix_elongation
     Elongation of the last-closed-flux-surface :math:`(Z_{max,LCFS} - Z_{min,LCFS}) / (R_{max,LCFS} - R_{min,LCFS})`.
@@ -282,9 +285,6 @@ Physics Glossary
 
   peak_ion_temp
     Peak ion temperature
-  
-  peak_fuel_ion_density
-    Peak fuel ion density (i.e. product of fuel dilution, ion peaking factor and average electron density).
 
   peak_electron_temp
     Peak electron temperature
@@ -293,10 +293,10 @@ Physics Glossary
     Peak electron density
 
   current_relaxation_time
-    Time constant for the radial current diffusion.
+    TODO
 
   trapped_particle_fraction
-    Global average of the fraction of trapped electrons used in the calculation of global plasma resistivity.
+    TODO
 
   minimum_core_radiated_fraction
     Minimum fraction of :math:`P_{in}` which should be radiated from the confined region, below which
@@ -323,9 +323,67 @@ Physics Glossary
 
   q_star
     Analytical approximation of safety factor at :math:`\rho=0.95`.
+  
+  q_0
+    On-axis safety factor
 
   loop_voltage
     inductive loop voltage
+
+  ejima_coefficient
+    Empirical linear scaling factor of the product of major radius and plasma current at flattop correlated with resistive flux at start of flattop :math:`C_E`.
+
+  resistive_flux
+    Usually this is the magnetic flux induced by the resistance of the plasma. However, given that POPCON calculates this with the emprical :math:`C_E`, it may also hold information about information about flux induced coupling with the wall. :math:`\psi_{res} = C_E\mu_0R_0I_p`.
+
+  internal_inductivity
+    Also known as normalized internal inductance, for a general geometry, is :math:`\frac{\langle B^2_{\theta} \rangle _V}{\langle B_{\theta}(r=LCFS) \rangle}` but is approximated in POPCON for a cylindrical plasma.
+
+  custom_internal_inductivity
+    A boolean which, if `True`, indicates that the user will supply their own internal inductivity (from simulation) or, if `False`, will use the cylindrical approximation calculated by POPCON 
+
+  internal_inductance_geometry
+    The assumed geometry of the plasma used to calculate the internal inductance:
+    1. NonCylindrical: A toroidal plasma whose geometric parameterization is arbitrary and depends on your definition of plasma volume and poloidal circumference.
+    2. Cylindrical: A toroidal plasma whose geometric parameterization is assumed to be described by a cylindrical torus.
+
+  internal_inductance
+    The self-inductance of the plasma from the center to the plasma edge.
+
+  internal_flux
+    The flux from the time integration of the voltage due to the internal inductance of the plasma. The general formula is the time integration of :math:`- L_i\frac{dI_p}{dt} - \frac{Ip}{2}\frac{dL_i}{dt}`
+    Note, time-independent POPCON makes the simplication that :math:`L_i` is constant over the ramp-up.
+
+  external_inductance
+    The self-inductance associated with the LCFS of the plasma.
+
+  external_flux
+    The flux from the time integration of the voltage due to the external inductance of the plasma. The general formula is the time integration of :math:`- L_e\frac{dI_p}{dt} - Ip\frac{dL_e}{dt}`
+    Note, time-independent POPCON makes the simplication that :math:`L_e` is constant over the ramp-up.
+
+  vertical_field_mutual_inductance
+    This unitless mutual-inductance quantity provides the coupling between the plasma surface and the vertical magnetic field.
+
+  PF_flux
+    The surface flux contribution from the vertical magnetic field required for radial force balance (which arises from the poloidal field coils).
+  
+  breakdown_flux_consumption
+    From a point model estimate given by :cite:`Sugihara`, this expression gives the required flux for ionization.
+
+  total_flux_available_from_CS
+    The amount of flux available from the central solenoid over the entire pulse.
+
+  flux_needed_from_CS_over_rampup
+    The amount of flux needed from the CS over ramp up. 
+
+  max_flux_for_flattop
+    The difference between the available flux from the CS for the whole pulse and the flux consumed over ramp up by the plasma; Represents the CS flux left over for flattop (i.e., doesn't include PF)
+
+  max_flattop_duration
+    Given the loop voltage at flattop, and how much flux from the CS has been consumed over the ramp-up, this defines how long your flattop can be.
+
+  surface_inductance_coefficients
+    The set of coefficients from Hirshman or Barr's paper on external flux [see references] which are used to fit analytic expressions, dependent on plasma geometry, to the external inductance and vertical field mutual inductance of the plasma.
 
   energy_confinement_scaling
   tau_e_scaling
@@ -344,12 +402,11 @@ Physics Glossary
     Power required to cross the L-H transition.
 
   SOC_LOC_ratio
-    Ratio of the energy confinement time from the chosen saturated ohmic confinement (SOC) scaling and the chosen linear ohmic confinement (LOC) scaling.
+    TODO
 
   P_LI_thresh
     Power required to cross the L-I transition.
 
-  P_ohmic
   P_Ohmic
     Power deposited in the plasma due to resistive ohmic heating.
 

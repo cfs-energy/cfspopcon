@@ -1,90 +1,627 @@
-"""Calculate the vertical magnetic field, as well as the plasma surface's mutual inductance with the vertical field, internal inductivity, external inductance and internal inductance."""
-from .. import formulas, named_options
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
+"""Resistive flux consumption, inductive flux consumption (internally and externally on the plasma surface) during purely ohmic ramp-up."""
+import numpy as np
+from scipy import constants  # type: ignore[import]
 
-RETURN_KEYS = [
-    "internal_inductivity",
-    "internal_inductance",
-    "external_inductance",
-    "vertical_field_mutual_inductance",
-    "vertical_magnetic_field",
-]
+from cfspopcon.named_options import InternalInductanceGeometry, SurfaceInductanceCoeffs, VertMagneticFieldEq
+
+from ..unit_handling import Unitfull, ureg, wraps_ufunc
 
 
-def run_calc_inductances(
-    major_radius: Unitfull,
-    plasma_volume: Unitfull,
-    poloidal_circumference: Unitfull,
-    custom_internal_inductivity: bool,
-    internal_inductance_geometry: named_options.InternalInductanceGeometry,
-    plasma_current: Unitfull,
-    magnetic_field_on_axis: Unitfull,
-    minor_radius: Unitfull,
-    q_0: Unitfull,
-    inverse_aspect_ratio: Unitfull,
-    areal_elongation: Unitfull,
-    beta_poloidal: Unitfull,
-    vertical_magnetic_field_eq: named_options.VertMagneticFieldEq,
-    surface_inductance_coefficients: named_options.SurfaceInductanceCoeffs,
-    internal_inductivity: Unitfull = 0.5,
-) -> dict[str, Unitfull]:
-    """Calculate the vertical magnetic field, as well as the plasma surface's mutual inductance with the vertical field, internal inductivity, external inductance and internal inductance.
+def select_coeffs(coeffs: SurfaceInductanceCoeffs) -> tuple:
+    """Choose which coefficients you want to use for the external flux calculation.
+
+    1. Barr's Coefficients cite:`Barr_2018`.
+    2. Hirshman's Coefficients cite:'hirshman'.
+
+    """
+    if coeffs == SurfaceInductanceCoeffs.Barr:
+        a = np.array([1.438, 2.139, 9.387, -1.939])
+        b = np.array([0.149, 1.068, -6.216, 4.126])
+        c = np.array([-0.293, -0.349, 0.098])
+        d = np.array([0.003, 0.334, -2.018])
+        e = np.array([0.080, -0.260, -0.267, 1.135])
+    elif coeffs == SurfaceInductanceCoeffs.Hirshman:
+        a = np.array([1.81, 2.05, 9.25, -1.21])
+        b = np.array([0.73, 2, -6.00, 3.70])
+        c = np.array([0.98, 0.49, 1.47])
+        d = np.array([0.25, 0.84, -1.44])
+        e = np.array([0, 0, 0, 0])  # N/A
+    else:
+        raise NotImplementedError(f"Unrecognised SurfaceInductanceCoeffs option {coeffs.name}")
+
+    return a, b, c, d, e
+
+
+@wraps_ufunc(
+    input_units=dict(
+        plasma_current=ureg.A, major_radius=ureg.m, magnetic_field_on_axis=ureg.T, minor_radius=ureg.m, q_0=ureg.dimensionless
+    ),
+    return_units=dict(internal_inductivity=ureg.dimensionless),
+)
+def calc_internal_inductivity(
+    plasma_current: float, major_radius: float, magnetic_field_on_axis: float, minor_radius: float, q_0: float = 1
+) -> Unitfull:
+    """Calculate the normalized internal inductance for an assumed circular plasma cross-section.
+
+    Tokamaks (pg.120): Physics :cite:`wesson_tokamaks_2011`
 
     Args:
-        plasma_current: :term:`glossary link<plasma_current>`
-        major_radius: :term:`glossary link<major_radius>`
-        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
-        separatrix_elongation: [~] :term:`glossary link<separatrix_elongation>`
-        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
-        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
-        vertical_magnetic_field_eq: [~] :term:`glossary link<vertical_magnetic_field_eq>`
-        plasma_volume: [m**3] :term:`glossary<plasma_volume>`
-        poloidal_circumference: [m] :term:`glossary<poloidal_circumference>`
-        custom_internal_inductivity: [~] :term:`glossary<custom_internal_inductivity>`
-        internal_inductance_geometry: [~] :term:`glossary<internal_inductance_geometry>`
-        internal_inductivity: [~] :term:`glossary<internal_inductivity>`
-        magnetic_field_on_axis: [T] :term:`glossary<magnetic_field_on_axis>`
-        minor_radius: [m] :term:`glossary<minor_radius>`
-        q_0: [~] :term:`glossary<q_0>`
-        areal_elongation: [~] :term:`glossary<areal_elongation>`
+        plasma_current: [A] :term:`glossary link<plasma_current>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
+        minor_radius: [m] :term:`glossary link<minor_radius>`
+        q_0: [~] :term:`glossary link<q_0>`
 
     Returns:
-        :term:`internal_inductivity`,
-        :term:`internal_inductance`,
-        :term:`external_inductance`,
-        :term:`vertical_field_mutual_inductance`,
-        :term:`vertical_magnetic_field`
+        [~] :term:`glossary link<internal_inductivity>`
     """
-    if custom_internal_inductivity == False:
-        internal_inductivity = formulas.calc_internal_inductivity(plasma_current, major_radius, magnetic_field_on_axis, minor_radius, q_0)
+    q_a = float(
+        2 * np.pi * minor_radius**2 * magnetic_field_on_axis / (constants.mu_0 * major_radius * plasma_current)
+    )  # safety-factor at edge of plasma assuming circular cross-section
 
-    internal_inductance = formulas.calc_internal_inductance(
-        major_radius, internal_inductivity, plasma_volume, poloidal_circumference, internal_inductance_geometry
-    )
-    external_inductance = formulas.calc_external_inductance(
-        inverse_aspect_ratio, areal_elongation, beta_poloidal, major_radius, internal_inductivity, surface_inductance_coefficients
-    )
-    vertical_field_mutual_inductance = formulas.calc_vertical_field_mutual_inductance(
-        inverse_aspect_ratio, areal_elongation, surface_inductance_coefficients
-    )
-    vertical_magnetic_field = formulas.calc_vertical_magnetic_field(
-        inverse_aspect_ratio,
-        areal_elongation,
-        beta_poloidal,
-        internal_inductivity,
-        external_inductance,
-        major_radius,
-        plasma_current,
-        vertical_magnetic_field_eq,
-        surface_inductance_coefficients,
-    )
-
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
+    return float(np.log(1.65 + 0.89 * ((q_a / q_0) - 1)))
 
 
-calc_inductances = Algorithm(
-    function=run_calc_inductances,
-    return_keys=RETURN_KEYS,
+@wraps_ufunc(
+    input_units=dict(
+        major_radius=ureg.m,
+        internal_inductivity=ureg.dimensionless,
+        plasma_volume=ureg.meter**3,
+        poloidal_circumference=ureg.meter,
+        internal_inductance_geometry=None,
+    ),
+    return_units=dict(internal_inductance=ureg.henry),
+    pass_as_kwargs=("internal_inductance_geometry",),
 )
+def calc_internal_inductance(
+    major_radius: float,
+    internal_inductivity: float,
+    plasma_volume: float = 0 * ureg.meter**3,
+    poloidal_circumference: float = 0 * ureg.meter,
+    internal_inductance_geometry: InternalInductanceGeometry = InternalInductanceGeometry.Cylindrical,
+) -> Unitfull:
+    """Calculate the internal inductance of the plasma (assuming a circular cross-section).
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        plasma_volume: [m^3] : term:`glossary link<plasma_volume>`
+        poloidal_circumference: [m] :term:`glossary link<poloidal_circumference>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        plasma_current: [A] :term:`glossary link<plasma_current>`
+        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
+        minor_radius: [m] :term:`glossary link<minor_radius>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
+        internal_inductance_geometry : [] :term:`glossary link<internal_inductance_geometry>`
+
+    Returns:
+        [henry] :term:`glossary link<internal_inductance>`
+    """
+    if internal_inductance_geometry == InternalInductanceGeometry.NonCylindrical:
+        internal_inductance = constants.mu_0 * internal_inductivity * plasma_volume / (poloidal_circumference**2)
+    elif internal_inductance_geometry == InternalInductanceGeometry.Cylindrical:
+        internal_inductance = constants.mu_0 * major_radius * internal_inductivity / 2
+
+    return float(internal_inductance)
+
+
+@wraps_ufunc(
+    input_units=dict(
+        inverse_aspect_ratio=ureg.dimensionless,
+        areal_elongation=ureg.dimensionless,
+        beta_poloidal=ureg.dimensionless,
+        major_radius=ureg.m,
+        internal_inductivity=ureg.dimensionless,
+        surface_inductance_coefficients=None,
+    ),
+    return_units=dict(external_inductance=ureg.henry),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_external_inductance(
+    inverse_aspect_ratio: float,
+    areal_elongation: float,
+    beta_poloidal: float,
+    major_radius: float,
+    internal_inductivity: float,
+    surface_inductance_coefficients: SurfaceInductanceCoeffs,
+) -> Unitfull:
+    """Calculate the external self-inductance of the plasma for which the current-induced surface flux of the plasma is generated from eq. 13 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+        [henry] :term:`glossary link<external_inductance>`
+    """
+    return float(
+        constants.mu_0
+        * major_radius
+        * calc_fa.__wrapped__(inverse_aspect_ratio, beta_poloidal, internal_inductivity, surface_inductance_coefficients)
+        * (1 - inverse_aspect_ratio)
+        / ((1 - inverse_aspect_ratio) + areal_elongation * calc_fb.__wrapped__(inverse_aspect_ratio, surface_inductance_coefficients))
+    )
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, areal_elongation=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(Mv=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_vertical_field_mutual_inductance(
+    inverse_aspect_ratio: float, areal_elongation: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
+) -> Unitfull:
+    """Calculate the mutual inductance linking the surface to the vertical field from eq. 15 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+        [~] :term:`glossary link<vertical_field_mutual_inductance>`
+    """
+    return float(
+        (1 - inverse_aspect_ratio) ** 2
+        / (
+            (1 - inverse_aspect_ratio) ** 2 * calc_fc.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)
+            + calc_fd.unitless_func(inverse_aspect_ratio, areal_elongation, surface_inductance_coefficients) * np.sqrt(areal_elongation)
+        )
+    )
+
+
+@wraps_ufunc(
+    input_units=dict(
+        inverse_aspect_ratio=ureg.dimensionless,
+        areal_elongation=ureg.dimensionless,
+        beta_poloidal=ureg.dimensionless,
+        internal_inductivity=ureg.dimensionless,
+        external_inductance=ureg.henry,
+        major_radius=ureg.m,
+        surface_inductance_coefficients=None,
+    ),
+    return_units=dict(invmu_0_dLedR=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_invmu_0_dLedR(
+    inverse_aspect_ratio: float,
+    areal_elongation: float,
+    beta_poloidal: float,
+    internal_inductivity: float,
+    external_inductance: float,
+    major_radius: float,
+    surface_inductance_coefficients: SurfaceInductanceCoeffs,
+) -> Unitfull:
+    """Calculate eq. 21 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
+        external_inductance: [henry] :term:`glossary link<external_inductance>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+        invmu_0_dLedR: product of (1/mu_0) and the rate of change of the external self-inductance with respect to the change in major_radius (eq.21 in cite:`Barr_2018`)
+    """
+    invmu_0_dLedR = float(
+        (1 / constants.mu_0)
+        * (
+            constants.mu_0
+            * inverse_aspect_ratio
+            * (1 - inverse_aspect_ratio)
+            * calc_fa.unitless_func(inverse_aspect_ratio, beta_poloidal, internal_inductivity, surface_inductance_coefficients)
+            * calc_fh.unitless_func(inverse_aspect_ratio, areal_elongation, surface_inductance_coefficients)
+            / (
+                (
+                    (1 - inverse_aspect_ratio)
+                    + areal_elongation * calc_fb.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)
+                )
+                ** 2
+            )
+            - constants.mu_0
+            * inverse_aspect_ratio
+            * (1 - inverse_aspect_ratio)
+            * calc_fg.unitless_func(inverse_aspect_ratio, beta_poloidal, internal_inductivity, surface_inductance_coefficients)
+            / ((1 - inverse_aspect_ratio) + areal_elongation * calc_fb.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients))
+            + (inverse_aspect_ratio)
+            * constants.mu_0
+            * calc_fa.unitless_func(inverse_aspect_ratio, beta_poloidal, internal_inductivity, surface_inductance_coefficients)
+            / ((1 - inverse_aspect_ratio) + areal_elongation * calc_fb.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients))
+            + external_inductance / major_radius
+        )
+    )
+
+    return invmu_0_dLedR
+
+
+@wraps_ufunc(
+    input_units=dict(
+        inverse_aspect_ratio=ureg.dimensionless,
+        areal_elongation=ureg.dimensionless,
+        beta_poloidal=ureg.dimensionless,
+        internal_inductivity=ureg.dimensionless,
+        external_inductance=ureg.henry,
+        major_radius=ureg.m,
+        plasma_current=ureg.A,
+        vertical_magnetic_field_eq=None,
+        surface_inductance_coefficients=None,
+    ),
+    return_units=dict(vertical_magnetic_field=ureg.T),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_vertical_magnetic_field(
+    inverse_aspect_ratio: float,
+    areal_elongation: float,
+    beta_poloidal: float,
+    internal_inductivity: float,
+    external_inductance: float,
+    major_radius: float,
+    plasma_current: float,
+    vertical_magnetic_field_eq: VertMagneticFieldEq = VertMagneticFieldEq.Barr,
+    surface_inductance_coefficients: SurfaceInductanceCoeffs = SurfaceInductanceCoeffs.Hirshman,
+) -> Unitfull:
+    """Calculate the mutual inductance linking the surface to the vertical field from eq. 16 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
+        external_inductance: [~] :term:`glossary link<external_inductance>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        plasma_current: [A] :term:`glossary link<plasma_current>`
+        vertical_magnetic_field_eq: [~] :term:`glossary link<vertical_magnetic_field_eq>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+        [T] :term:`glossary link<vertical_magnetic_field>`
+    """
+    if vertical_magnetic_field_eq == VertMagneticFieldEq.Barr:
+        vertical_magnetic_field = float(
+            constants.mu_0
+            * plasma_current
+            * (1 / (4 * np.pi * major_radius))
+            * (
+                calc_invmu_0_dLedR.unitless_func(
+                    inverse_aspect_ratio,
+                    areal_elongation,
+                    beta_poloidal,
+                    internal_inductivity,
+                    external_inductance,
+                    major_radius,
+                    surface_inductance_coefficients,
+                )
+                + (beta_poloidal + (internal_inductivity / 2))
+                - (1 / 2)
+            )
+        )
+    elif vertical_magnetic_field_eq == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
+        vertical_magnetic_field = float(
+            constants.mu_0
+            * plasma_current
+            * (1 / (4 * np.pi * major_radius))
+            * (np.log(8 / inverse_aspect_ratio) + beta_poloidal + (internal_inductivity / 2) - 1.5)
+        )
+    elif vertical_magnetic_field_eq == VertMagneticFieldEq.Mit_and_Taka_Eq13:
+        vertical_magnetic_field = float(
+            constants.mu_0
+            * plasma_current
+            * (1 / (4 * np.pi * major_radius))
+            * (
+                np.log(8 / (inverse_aspect_ratio * (np.sqrt((1 + areal_elongation**2) / 2))))
+                + beta_poloidal
+                + (internal_inductivity / 2)
+                - 1.5
+            )
+        )
+    elif vertical_magnetic_field_eq == VertMagneticFieldEq.Jean:
+        vertical_magnetic_field = float(
+            constants.mu_0
+            * plasma_current
+            * (1 / (4 * np.pi * major_radius))
+            * (np.log(8 / (inverse_aspect_ratio * (np.sqrt(areal_elongation)))) + beta_poloidal + (internal_inductivity / 2) - 1.5)
+        )
+
+    return vertical_magnetic_field
+
+
+### ANALYTIC FUNCTIONS FOR PLASMA EXTERNAL INDUCTANCE AND VERTICAL FIELD ###
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fa_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate a sum for eq. 17 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+    NOTE: Default values for for the coefficients 'N[a,d]' and '[a,e]' are taken from `Barr_2018` which are obtained
+    from fitting them to model flux_PF and flux_I obtained from over 330 model equilibria spanning 0<=delta<=0.5 whereas
+    SPARC is projected to have delta95 = 0.54
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
+    Na = 4
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    a = coeffs[0]
+
+    sum1 = 0
+    sum2 = 0
+    n = np.arange(Na // 2)
+    m = n + 1
+    sum1 = np.sum(a[n] * (np.sqrt(inverse_aspect_ratio)) ** m)
+    sum2 = np.sum(a[(Na // 2) + n] * (np.sqrt(inverse_aspect_ratio)) ** m)
+    return float(sum1), float(sum2)
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fa_Sum_Ne(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate a sum for eq. 17 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
+    Ne = 4
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    e = coeffs[4]
+
+    n = np.arange(0, Ne)
+    m = n + 1
+    return float(np.sum(e[n] * np.sqrt(inverse_aspect_ratio) ** m))
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fb_Sum_Nb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate the sum for eq. 18 on page 6 in..."""
+    Nb = 4
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    b = coeffs[1]
+
+    n = np.arange(1, Nb)
+    m = n + 1
+    return float(np.sum(b[n] * inverse_aspect_ratio ** (2 + m)))
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fc_Sum_Nc(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate the sum for eq. 18 on page 6 in..."""
+    Nc = 3
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    c = coeffs[2]
+
+    n = np.arange(Nc)
+    m = n + 1
+    return float(np.sum(c[n] * inverse_aspect_ratio ** (2 * m)))
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fd_Sum_Nd(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate the sum for eq. 20 on page 6 in..."""
+    Nd = 3
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    d = coeffs[3]
+
+    n = np.arange(Nd - 1)
+    m = n + 2
+    return float(np.sum(d[n + 1] * inverse_aspect_ratio ** (m - 1)))
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fg_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate sums for eq. 22 on page 6 in..."""
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    a = coeffs[0]
+
+    sum1 = (1 / 2) * a[0] * (np.sqrt(inverse_aspect_ratio) ** -1) + a[1]
+    sum2 = (a[0] + (1 / 2) * a[2]) * (1 / np.sqrt(inverse_aspect_ratio)) + (a[1] + a[3])
+    return float(sum1), float(sum2)
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fg_Sum_Ce(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate a sum for eq. 22 on page 6 in..."""
+    Ce = 4
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    e = coeffs[4]
+
+    n = np.arange(Ce)
+    m = n + 1
+    return float(np.sum((m / 2) * e[n] * np.sqrt(inverse_aspect_ratio) ** (m - 1)))
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fh_Sum_Cb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
+    """Calculate a sum for eq. 23 on page 6 in..."""
+    Cb = 4
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    b = coeffs[1]
+
+    n = np.arange(1, Cb)
+    m = n + 1
+    return float(np.sum((m + 2.5) * b[n] * inverse_aspect_ratio ** (m + 2)))
+
+
+@wraps_ufunc(
+    input_units=dict(
+        inverse_aspect_ratio=ureg.dimensionless,
+        beta_poloidal=ureg.dimensionless,
+        internal_inductivity=ureg.dimensionless,
+        surface_inductance_coefficients=None,
+    ),
+    return_units=dict(func=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fa(
+    inverse_aspect_ratio: float, beta_poloidal: float, internal_inductivity: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
+) -> float:
+    """Calculate eq. 17 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+    NOTE: ""
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
+    fa_Sums_ = calc_fa_Sums_Na.__wrapped__(inverse_aspect_ratio, surface_inductance_coefficients)
+
+    return float(
+        ((1 + fa_Sums_[0]) * np.log(8 / inverse_aspect_ratio))
+        - (2 + fa_Sums_[1])
+        + (beta_poloidal + internal_inductivity / 2) * calc_fa_Sum_Ne.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)
+    )
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
+    """Calculate eq. 18 on page 6 in..."""
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    b = coeffs[1]
+
+    return float(
+        b[0] * np.sqrt(inverse_aspect_ratio) * (1 + calc_fb_Sum_Nb.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients))
+    )
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fc(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
+    """Calculate eq. 19 on page 6 in :cite:`Barr_2018` or pg.72 in :cite:`mit&taka`."""
+    if surface_inductance_coefficients == SurfaceInductanceCoeffs.Barr or SurfaceInductanceCoeffs.Hirshman:
+        fc = float(1 + calc_fc_Sum_Nc.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients))
+    elif surface_inductance_coefficients == SurfaceInductanceCoeffs.Mitarai:
+        fc = float(
+            (
+                (0.905 / np.sqrt(inverse_aspect_ratio) + 2.05) * np.log(8 / inverse_aspect_ratio)
+                - (0.84 + (1 / inverse_aspect_ratio) + 6.435 / np.sqrt(inverse_aspect_ratio))
+            )
+            * (1 - inverse_aspect_ratio)
+            - calc_fa(inverse_aspect_ratio, 0, 0, surface_inductance_coefficients)
+        )
+
+    return fc
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, areal_elongation=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fd(inverse_aspect_ratio: float, areal_elongation: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
+    """Calculate eq. 20 on page 6 in :cite:`Barr_2018` or pg.72 in :cite:`mit&taka`."""
+    if surface_inductance_coefficients == SurfaceInductanceCoeffs.Barr or SurfaceInductanceCoeffs.Hirshman:
+        coeffs = select_coeffs(surface_inductance_coefficients)
+        d = coeffs[3]
+        fd = float(d[0] * inverse_aspect_ratio * (1 + calc_fd_Sum_Nd.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)))
+
+    return fd
+
+
+@wraps_ufunc(
+    input_units=dict(
+        inverse_aspect_ratio=ureg.dimensionless,
+        beta_poloidal=ureg.dimensionless,
+        internal_inductivity=ureg.dimensionless,
+        surface_inductance_coefficients=None,
+    ),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fg(
+    inverse_aspect_ratio: float, beta_poloidal: float, internal_inductivity: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
+) -> float:
+    """Calculate eq. 22 on page 6 in..."""
+    fg_Sums_ = calc_fg_Sums_Na.__wrapped__(inverse_aspect_ratio, surface_inductance_coefficients)
+
+    return float(
+        -(1 / inverse_aspect_ratio)
+        + np.log(8 / inverse_aspect_ratio) * fg_Sums_[0]
+        - fg_Sums_[1]
+        + (beta_poloidal + (internal_inductivity / 2)) * calc_fg_Sum_Ce.__wrapped__(inverse_aspect_ratio, surface_inductance_coefficients)
+    )
+
+
+@wraps_ufunc(
+    input_units=dict(inverse_aspect_ratio=ureg.dimensionless, areal_elongation=ureg.dimensionless, surface_inductance_coefficients=None),
+    return_units=dict(func_term=ureg.dimensionless),
+    pass_as_kwargs=("surface_inductance_coefficients",),
+)
+def calc_fh(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
+    """Calculate eq. 23 on page 6 in..."""
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    b = coeffs[1]
+
+    return float(
+        -1
+        + ((areal_elongation * b[0]) / np.sqrt(inverse_aspect_ratio))
+        * (1 / 2 + calc_fh_Sum_Cb.__wrapped__(inverse_aspect_ratio, surface_inductance_coefficients))
+    )

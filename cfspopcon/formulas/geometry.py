@@ -1,11 +1,11 @@
 """Plasma geometry (inside the last-closed-flux-surface)."""
 import numpy as np
 
-from ..unit_handling import Unitfull
+from ..unit_handling import Unitfull, ureg, wraps_ufunc
 
 
 def calc_plasma_volume(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull) -> Unitfull:
-    """Calculate the plasma volume inside the last-closed-flux-surface.
+    """Calculate the plasma volume inside an up-down symmetrical last-closed-flux-surface.
 
     Args:
         major_radius: [m] :term:`glossary link<major_radius>`
@@ -39,3 +39,19 @@ def calc_plasma_surface_area(major_radius: Unitfull, inverse_aspect_ratio: Unitf
     return (
         2.0 * np.pi * (major_radius**2.0) * inverse_aspect_ratio * areal_elongation * (np.pi + 2.0 - (np.pi - 2.0) * inverse_aspect_ratio)
     )
+
+
+@wraps_ufunc(input_units=dict(minor_radius=ureg.m, areal_elongation=ureg.dimensionless), return_units=dict(poloidal_circumference=ureg.m))
+def calc_plasma_poloidal_circumference(minor_radius: Unitfull, areal_elongation: Unitfull) -> Unitfull:
+    """Calculate the plasma poloidal circumference at the last-closed-flux-surface.
+
+    Args:
+        minor_radius: [m] :term:`glossary link<minor_radius>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+
+    Returns:
+         Cp [m]
+    """
+    Cp = 2 * np.pi * minor_radius * (1 + 0.55 * (areal_elongation - 1))  # Lp Basic
+
+    return Cp

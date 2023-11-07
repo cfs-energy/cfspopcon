@@ -1,63 +1,111 @@
-"""Calculate PF flux contribution and resistive, internal, and external flux consumed over the ramp-up."""
-from .. import formulas
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
+"""Resistive flux consumption, inductive flux consumption (internally and externally on the plasma surface) during purely ohmic ramp-up."""
+import numpy as np
+from scipy import constants  # type: ignore[import]
 
-RETURN_KEYS = [
-    "internal_flux",
-    "external_flux",
-    "resistive_flux",
-    "PF_flux",
-    "max_flux_for_flattop",
-    "max_flattop_duration",
-    "breakdown_flux_consumption",
-    "flux_needed_from_CS_over_rampup",
-]
+from ..unit_handling import Unitfull, ureg, wraps_ufunc
 
 
-def run_calc_fluxes(
-    plasma_current: Unitfull,
-    major_radius: Unitfull,
-    internal_inductance: Unitfull,
-    external_inductance: Unitfull,
-    ejima_coefficient: Unitfull,
-    vertical_field_mutual_inductance: Unitfull,
-    vertical_magnetic_field: Unitfull,
-    loop_voltage: Unitfull,
-    total_flux_available_from_CS: Unitfull,
-) -> dict[str, Unitfull]:
-    """Calculate PF flux contribution and resistive, internal, and external flux consumed over the ramp-up.
+@wraps_ufunc(
+    input_units=dict(plasma_current=ureg.A, major_radius=ureg.m, ejima_coefficient=ureg.dimensionless),
+    return_units=dict(flux_res=ureg.weber),
+)
+def calc_flux_res(plasma_current: float, major_radius: float, ejima_coefficient: float = 0.4) -> float:
+    """Calculate the resistive flux.
+
+    “PROCESS”: a systems code for fusion power plants - Part 1: Physics :cite:`process`
+    NOTE: CE, the Ejima coefficient, is chosen by default to be 0.4, See for example...
+    Chapter 8: Plasma operation and control: cite:`Gribov_2007`
+    Ohmic flux consumption during initial operation of the NSTX spherical torus :cite:`Menard_2001`
 
     Args:
-        plasma_current: :term:`glossary link<plasma_current>`
-        major_radius: :term:`glossary link<major_radius>`
-        internal_inductance: :term:`glossary link<internal_inductance>`
-        external_inductance: :term:`glossary link<external_inductance>`
-        vertical_field_mutual_inductance: :term:`glossary link<vertical_field_mutual_inductance>`
-        vertical_magnetic_field: :term:`glossary link<vertical_magnetic_field>`
-        ejima_coefficient: :term:`glossary link<ejima_coefficient>`
-        loop_voltage: :term:`glossary link<loop_voltage>`
-        total_flux_available_from_CS: :term:`glossary link<total_flux_available_from_CS>`
+        plasma_current: [A] :term:`glossary link<plasma_current>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+        ejima_coefficient: [~] :term:`glossary link<ejima_coefficient>`
+
 
     Returns:
-        :term:`resistive_flux`, :term:`internal_flux`, :term:`external_flux`, :term:`max_flattop_duration`, :term:`max_flux_for_flattop`, :term:`breakdown_flux_consumption`, :term:`glossary link<flux_needed_from_CS_over_rampup>`
+        [weber] :term:`glossary link<resistive_flux>`
     """
-    internal_flux = formulas.calc_flux_internal(plasma_current, internal_inductance)
-    external_flux = formulas.calc_flux_external(plasma_current, external_inductance)
-    resistive_flux = formulas.calc_flux_res(plasma_current, major_radius, ejima_coefficient)
-    PF_flux = formulas.calc_flux_PF(vertical_field_mutual_inductance, vertical_magnetic_field, major_radius)
-
-    flux_needed_from_CS_over_rampup = internal_flux + external_flux + resistive_flux - PF_flux
-    max_flux_for_flattop = total_flux_available_from_CS - internal_flux - external_flux - resistive_flux + PF_flux
-    max_flattop_duration = max_flux_for_flattop / loop_voltage
-
-    breakdown_flux_consumption = formulas.calc_breakdown_flux_consumption(major_radius)
-
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
+    return float(ejima_coefficient * constants.mu_0 * plasma_current * major_radius)
 
 
-calc_fluxes = Algorithm(
-    function=run_calc_fluxes,
-    return_keys=RETURN_KEYS,
+### COMPONENTS OF INDUCTIVE FLUX: INTERNAL AND EXTERNAL ###
+
+
+@wraps_ufunc(input_units=dict(plasma_current=ureg.A, internal_inductance=ureg.henry), return_units=dict(internal_flux=ureg.weber))
+def calc_flux_internal(plasma_current: float, internal_inductance: float) -> Unitfull:
+    """Calculate the flux due to the plasma current and internal inductance of the plasma (assuming a circular cross-section).
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+    NOTE: This is (plasma current times) equation 25 from Barr but applied to a plasma with a
+    circular cross-section and a non-cirular cross-section.
+
+    Args:
+        plasma_current: [A] :term:`glossary link<plasma_current>`
+        internal_inductance: [henry] :term:`glossary link<internal_inductance>`
+
+    Returns:
+        [weber] :term:`glossary link<internal_flux>`
+    """
+    internal_flux = plasma_current * internal_inductance
+
+    return float(internal_flux)
+
+
+@wraps_ufunc(
+    input_units=dict(
+        vertical_field_mutual_inductance=ureg.dimensionless,
+        vertical_magnetic_field=ureg.T,
+        major_radius=ureg.m,
+    ),
+    return_units=dict(flux_PF=ureg.weber),
 )
+def calc_flux_PF(vertical_field_mutual_inductance: float, vertical_magnetic_field: float, major_radius: float) -> Unitfull:
+    """Calculate the surface flux contribution from the vertical magnetic field required for radial force balance (which arises from the poloidal field coils).
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+    NOTE: ""
+
+    Args:
+        vertical_field_mutual_inductance: [~] :term:`glossary link<vertical_field_mutual_inductance>`
+        vertical_magnetic_field: [henry] :term:`glossary link<vertical_magnetic_field>`
+        major_radius: [m] :term:`glossary link<major_radius>`
+
+    Returns:
+        [weber] :term:`glossary link<PF_flux>`
+    """
+    return float(np.pi * major_radius**2 * vertical_field_mutual_inductance * vertical_magnetic_field)
+
+
+@wraps_ufunc(input_units=dict(plasma_current=ureg.A, external_inductance=ureg.henry), return_units=dict(external_flux=ureg.weber))
+def calc_flux_external(plasma_current: float, external_inductance: float) -> Unitfull:
+    """Calculate the surface flux generated by the plasma current.
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+    NOTE: ""
+
+    Args:
+        plasma_current: [A] :term:`glossary link<plasma_current>`
+        external_inductance: [henry] :term:`glossary link<external_inductance>`
+
+    Returns:
+        [weber] :term:`glossary link<external_flux>`
+    """
+    return float(plasma_current * external_inductance)
+
+
+@wraps_ufunc(input_units=dict(major_radius=ureg.m), return_units=dict(breakdown_flux_consumption=ureg.weber))
+def calc_breakdown_flux_consumption(major_radius: float) -> Unitfull:
+    """Calculate the resistive flux required for breakdown.
+
+    Plasma Design Considerations of Near Term Tokamak Fusion Experimental Reactor :cite:`Sugihara`
+    NOTE: given the way the ejima_coefficient is emprically derived in :cite:`Gribov_2007` (i.e., with an implicit assumption that the ramp is defined from Ip=0)
+    there is reason to believe a seperate calculation for flux consumed over breakdown is not necessary, but it is included here anyways.
+
+    Args:
+        major_radius: [m] :term:`glossary link<major_radius>`
+
+    Returns:
+        [weber] :term:`glossary link<breakdown_flux_consumption>`
+    """
+    return float(0.073 * major_radius - 0.00665)
