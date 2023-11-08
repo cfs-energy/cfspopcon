@@ -39,6 +39,9 @@ Physics Glossary
   intrinsic impurity
     An impurity which is assumed to be already in the plasma (without being injected by us).
 
+  invmu_0_dLedR
+    :math:`\frac{1}{\mu_0}\frac{\partial L_e}{\partial R}` (eq.21 in :cite:`Barr_2018`)
+    
   P_SOL
   power_crossing_separatrix
     Power crossing the separatrix and entering the scrape-off-layer.

@@ -7,6 +7,9 @@ from ..unit_handling import Unitfull, ureg, wraps_ufunc
 def calc_plasma_volume(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull) -> Unitfull:
     """Calculate the plasma volume inside an up-down symmetrical last-closed-flux-surface.
 
+    Geometric formulas for system codes including the effect of negative triangularity :cite: `sauter`
+    NOTE: There is a triangularity term missing here and therefore this equation assume a plasma without triangularity
+
     Args:
         major_radius: [m] :term:`glossary link<major_radius>`
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
@@ -45,6 +48,8 @@ def calc_plasma_surface_area(major_radius: Unitfull, inverse_aspect_ratio: Unitf
 def calc_plasma_poloidal_circumference(minor_radius: Unitfull, areal_elongation: Unitfull) -> Unitfull:
     """Calculate the plasma poloidal circumference at the last-closed-flux-surface.
 
+    Geometric formulas for system codes including the effect of negative triangularity :cite: `sauter`
+
     Args:
         minor_radius: [m] :term:`glossary link<minor_radius>`
         areal_elongation: [~] :term:`glossary link<areal_elongation>`
@@ -52,6 +57,5 @@ def calc_plasma_poloidal_circumference(minor_radius: Unitfull, areal_elongation:
     Returns:
          Cp [m]
     """
-    Cp = 2 * np.pi * minor_radius * (1 + 0.55 * (areal_elongation - 1))  # Lp Basic
 
-    return Cp
+    return 2 * np.pi * minor_radius * (1 + 0.55 * (areal_elongation - 1))

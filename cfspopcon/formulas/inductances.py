@@ -215,7 +215,7 @@ def calc_invmu_0_dLedR(
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
-        invmu_0_dLedR product of (1/mu_0) and the rate of change of the external self-inductance with respect to the change in major_radius (eq.21 in cite:`Barr_2018`)
+        [~] :term:`glossary link<invmu_0_dLedR>`
     """
     invmu_0_dLedR = float(
         (1 / constants.mu_0)
