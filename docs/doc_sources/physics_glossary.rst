@@ -21,6 +21,12 @@ Physics Glossary
   P_external
     External heating supplied to the plasma (ohmic plus auxillary) integrated over the plasma volume.
 
+  P_launched
+    External heating supplied to the plasma (entering the volume, but not necessarily absorbed — ohmic plus auxillary) integrated over the plasma volume.
+
+  fraction_of_external_power_coupled
+    Fraction of supplied external heating absorbed by the plasma: :math:`f_{coupled}=P_{external} / P_{launched}`.
+
   P_radiation
     Power radiated from the confined region due to Bremmsstrahlung, synchrotron and impurity excitation-relaxation processes.
 
@@ -285,6 +291,9 @@ Physics Glossary
 
   peak_ion_temp
     Peak ion temperature
+
+  peak_fuel_ion_density
+    Peak fuel ion density (i.e. product of fuel dilution, ion peaking factor and average electron density).
 
   peak_electron_temp
     Peak electron temperature
