@@ -109,6 +109,8 @@ triangularity_psi95: 0.3
 triangularity_ratio_sep_to_psi95: 1.8
 # Plasma current in Ampere
 plasma_current: 8.7e+6
+# Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
+fraction_of_external_power_coupled: 0.9
 
 # What fusion reaction are we using?
 fusion_reaction: DT
@@ -166,3 +168,18 @@ fraction_of_P_SOL_to_divertor: 0.6
 kappa_e0: 2600.0
 # Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
 target_electron_temp: 25.0
+
+# What set of fitting coefficients for the surface inductance?
+surface_inductance_coefficients: Barr
+# How much flux is availble from the CS for ramp-up and flattop? [Wb]
+total_flux_available_from_CS: 35
+# What is the scaling law factor for resistive flux consumption over the ramp-up?
+ejima_coefficient: 0.6
+# Which internal inductance geometry? Cylindrical approximation or a generalized geometry?
+internal_inductance_geometry: Cylindrical
+# safety-factor on axis
+q_0: 1
+# Which vertical magnetic field equation based on toroidal force balance?
+vertical_magnetic_field_eq: Barr
+# Will the internal inductivity be calculated by POPCON or input manually?
+custom_internal_inductivity: False

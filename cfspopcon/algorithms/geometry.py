@@ -10,6 +10,7 @@ RETURN_KEYS = [
     "vertical_minor_radius",
     "plasma_volume",
     "surface_area",
+    "poloidal_circumference",
 ]
 
 
@@ -43,6 +44,7 @@ def run_calc_geometry(
 
     plasma_volume = formulas.calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation)
     surface_area = formulas.calc_plasma_surface_area(major_radius, inverse_aspect_ratio, areal_elongation)
+    poloidal_circumference = formulas.calc_plasma_poloidal_circumference(minor_radius, areal_elongation)
 
     local_vars = locals()
     return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
