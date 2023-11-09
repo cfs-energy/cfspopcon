@@ -15,7 +15,6 @@ from typing_extensions import ParamSpec
 ureg = pint_xarray.setup_registry(
     pint.UnitRegistry(
         force_ndarray_like=True,
-        cache_folder=":auto:",
     )
 )
 
