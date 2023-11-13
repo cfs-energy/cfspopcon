@@ -41,7 +41,7 @@ Physics Glossary
 
   invmu_0_dLedR
     :math:`\frac{1}{\mu_0}\frac{\partial L_e}{\partial R}` (eq.21 in :cite:`Barr_2018`)
-    
+
   P_SOL
   power_crossing_separatrix
     Power crossing the separatrix and entering the scrape-off-layer.
@@ -305,10 +305,10 @@ Physics Glossary
     Peak electron density
 
   current_relaxation_time
-    TODO
+    Time constant for the radial current diffusion.
 
   trapped_particle_fraction
-    TODO
+    Global average of the fraction of trapped electrons used in the calculation of global plasma resistivity.
 
   minimum_core_radiated_fraction
     Minimum fraction of :math:`P_{in}` which should be radiated from the confined region, below which
@@ -414,7 +414,7 @@ Physics Glossary
     Power required to cross the L-H transition.
 
   SOC_LOC_ratio
-    TODO
+    Ratio of the energy confinement time from the chosen saturated ohmic confinement (SOC) scaling and the chosen linear ohmic confinement (LOC) scaling.
 
   P_LI_thresh
     Power required to cross the L-I transition.

@@ -106,6 +106,6 @@ def calc_breakdown_flux_consumption(major_radius: float) -> Unitfull:
         major_radius: [m] :term:`glossary link<major_radius>`
 
     Returns:
-        [weber] :term:`glossary link<breakdown_flux_consumption>`
+        [weber] :term:`breakdown_flux_consumption`
     """
     return float(0.073 * major_radius - 0.00665)

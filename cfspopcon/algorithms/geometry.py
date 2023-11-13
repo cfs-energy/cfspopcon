@@ -33,7 +33,7 @@ def run_calc_geometry(
         triangularity_ratio_sep_to_psi95: :term:`glossary link<triangularity_ratio_sep_to_psi95>`
 
     Returns:
-        :term:`separatrix_elongation`, :term:`separatrix_triangularity`, :term:`minor_radius`, :term:`vertical_minor_radius`, :term:`plasma_volume`, :term:`surface_area`
+        :term:`separatrix_elongation`, :term:`separatrix_triangularity`, :term:`minor_radius`, :term:`vertical_minor_radius`, :term:`plasma_volume`, :term:`surface_area`, :term:`poloidal_circumference`
     """
     separatrix_elongation = areal_elongation * elongation_ratio_sep_to_areal
 
