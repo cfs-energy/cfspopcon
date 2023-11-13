@@ -51,8 +51,8 @@ def test_calc_inductances():
 
 def test_calc_fluxes():
     fluxes.run_calc_fluxes(
-        8.7 * ureg.MA,
-        1.85 * ureg.m,
+        plasma_current=8.7 * ureg.MA,
+        major_radius=1.85 * ureg.m,
         internal_inductance=1e-6 * ureg.henry,
         external_inductance=2e-6 * ureg.henry,
         ejima_coefficient=0.4,

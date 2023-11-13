@@ -1,33 +1,34 @@
 """Resistive flux consumption, inductive flux consumption (internally and externally on the plasma surface) during purely ohmic ramp-up."""
 import numpy as np
+from numpy import float64
+from numpy.typing import NDArray
 from scipy import constants  # type: ignore[import]
 
 from cfspopcon.named_options import InternalInductanceGeometry, SurfaceInductanceCoeffs, VertMagneticFieldEq
 
 from ..unit_handling import Unitfull, ureg, wraps_ufunc
 
-
-def select_coeffs(coeffs: SurfaceInductanceCoeffs) -> tuple:
+def select_coeffs(surface_inductance_coefficients: SurfaceInductanceCoeffs) -> tuple:
     """Choose which coefficients you want to use for the external flux calculation.
 
     1. Barr's Coefficients cite:`Barr_2018`.
     2. Hirshman's Coefficients cite:'hirshman'.
 
     """
-    if coeffs == SurfaceInductanceCoeffs.Barr:
+    if surface_inductance_coefficients == SurfaceInductanceCoeffs.Barr:
         a = np.array([1.438, 2.139, 9.387, -1.939])
         b = np.array([0.149, 1.068, -6.216, 4.126])
         c = np.array([-0.293, -0.349, 0.098])
         d = np.array([0.003, 0.334, -2.018])
         e = np.array([0.080, -0.260, -0.267, 1.135])
-    elif coeffs == SurfaceInductanceCoeffs.Hirshman:
+    elif surface_inductance_coefficients == SurfaceInductanceCoeffs.Hirshman:
         a = np.array([1.81, 2.05, 9.25, -1.21])
         b = np.array([0.73, 2, -6.00, 3.70])
         c = np.array([0.98, 0.49, 1.47])
         d = np.array([0.25, 0.84, -1.44])
         e = np.array([0, 0, 0, 0])  # N/A
     else:
-        raise NotImplementedError(f"Unrecognised SurfaceInductanceCoeffs option {coeffs.name}")
+        raise NotImplementedError(f"Unrecognised SurfaceInductanceCoeffs option {surface_inductance_coefficients.name}")
 
     return a, b, c, d, e
 
@@ -97,10 +98,11 @@ def calc_internal_inductance(
     Returns:
         [henry] :term:`glossary link<internal_inductance>`
     """
+
+    internal_inductance = constants.mu_0 * major_radius * internal_inductivity / 2
+
     if internal_inductance_geometry == InternalInductanceGeometry.NonCylindrical:
         internal_inductance = constants.mu_0 * internal_inductivity * plasma_volume / (poloidal_circumference**2)
-    elif internal_inductance_geometry == InternalInductanceGeometry.Cylindrical:
-        internal_inductance = constants.mu_0 * major_radius * internal_inductivity / 2
 
     return float(internal_inductance)
 
@@ -292,8 +294,8 @@ def calc_vertical_magnetic_field(
     Returns:
         [T] :term:`glossary link<vertical_magnetic_field>`
     """
-    if vertical_magnetic_field_eq == VertMagneticFieldEq.Barr:
-        vertical_magnetic_field = float(
+
+    vertical_magnetic_field = float(
             constants.mu_0
             * plasma_current
             * (1 / (4 * np.pi * major_radius))
@@ -311,7 +313,7 @@ def calc_vertical_magnetic_field(
                 - (1 / 2)
             )
         )
-    elif vertical_magnetic_field_eq == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
+    if vertical_magnetic_field_eq == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
         vertical_magnetic_field = float(
             constants.mu_0
             * plasma_current
