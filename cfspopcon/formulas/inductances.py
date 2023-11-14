@@ -1,12 +1,11 @@
 """Resistive flux consumption, inductive flux consumption (internally and externally on the plasma surface) during purely ohmic ramp-up."""
 import numpy as np
-from numpy import float64
-from numpy.typing import NDArray
 from scipy import constants  # type: ignore[import]
 
 from cfspopcon.named_options import InternalInductanceGeometry, SurfaceInductanceCoeffs, VertMagneticFieldEq
 
 from ..unit_handling import Unitfull, ureg, wraps_ufunc
+
 
 def select_coeffs(surface_inductance_coefficients: SurfaceInductanceCoeffs) -> tuple:
     """Choose which coefficients you want to use for the external flux calculation.
@@ -98,7 +97,6 @@ def calc_internal_inductance(
     Returns:
         [henry] :term:`glossary link<internal_inductance>`
     """
-
     internal_inductance = constants.mu_0 * major_radius * internal_inductivity / 2
 
     if internal_inductance_geometry == InternalInductanceGeometry.NonCylindrical:
@@ -294,25 +292,24 @@ def calc_vertical_magnetic_field(
     Returns:
         [T] :term:`glossary link<vertical_magnetic_field>`
     """
-
     vertical_magnetic_field = float(
-            constants.mu_0
-            * plasma_current
-            * (1 / (4 * np.pi * major_radius))
-            * (
-                calc_invmu_0_dLedR.unitless_func(
-                    inverse_aspect_ratio,
-                    areal_elongation,
-                    beta_poloidal,
-                    internal_inductivity,
-                    external_inductance,
-                    major_radius,
-                    surface_inductance_coefficients,
-                )
-                + (beta_poloidal + (internal_inductivity / 2))
-                - (1 / 2)
+        constants.mu_0
+        * plasma_current
+        * (1 / (4 * np.pi * major_radius))
+        * (
+            calc_invmu_0_dLedR.unitless_func(
+                inverse_aspect_ratio,
+                areal_elongation,
+                beta_poloidal,
+                internal_inductivity,
+                external_inductance,
+                major_radius,
+                surface_inductance_coefficients,
             )
+            + (beta_poloidal + (internal_inductivity / 2))
+            - (1 / 2)
         )
+    )
     if vertical_magnetic_field_eq == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
         vertical_magnetic_field = float(
             constants.mu_0

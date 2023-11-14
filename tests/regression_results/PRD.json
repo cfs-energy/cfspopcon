@@ -315,6 +315,13 @@
             },
             "data": 55.536257947812175
         },
+        "poloidal_circumference": {
+            "dims": [],
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 5.058616445454268
+        },
         "f_shaping": {
             "dims": [],
             "attrs": {

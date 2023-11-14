@@ -57,5 +57,4 @@ def calc_plasma_poloidal_circumference(minor_radius: Unitfull, areal_elongation:
     Returns:
          Cp [m]
     """
-
     return 2 * np.pi * minor_radius * (1 + 0.55 * (areal_elongation - 1))
