@@ -96,14 +96,6 @@ def test_calc_internal_inductivity():
     np.testing.assert_allclose(internal_inductivity, 0.5814953402118008, rtol=5e-2, atol=0)
 
 
-# def test_calc_internal_inductance():
-#     calc_internal_inductance(1.85 * ureg.m,
-#                             internal_inductivity: float,
-#                             plasma_volume: float = 0 * ureg.meter ** 3,
-#                             poloidal_circumference: float = 0 * ureg.meter,
-#                             internal_inductance_geometry: InternalInductanceGeometry)
-
-
 def test_calc_vertical_field_mutual_inductance():
     coeffs = SurfaceInductanceCoeffs.Barr
     vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(0.3, 1.7, coeffs).item()

@@ -408,7 +408,18 @@ def calc_fa_Sum_Ne(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fb_Sum_Nb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate the sum for eq. 18 on page 6 in..."""
+    """Calculate the sum for eq. 18 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     Nb = 4
     coeffs = select_coeffs(surface_inductance_coefficients)
     b = coeffs[1]
@@ -424,7 +435,17 @@ def calc_fb_Sum_Nb(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fc_Sum_Nc(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate the sum for eq. 18 on page 6 in..."""
+    """Calculate the sum for eq. 18 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     Nc = 3
     coeffs = select_coeffs(surface_inductance_coefficients)
     c = coeffs[2]
@@ -440,7 +461,17 @@ def calc_fc_Sum_Nc(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fd_Sum_Nd(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate the sum for eq. 20 on page 6 in..."""
+    """Calculate the sum for eq. 20 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     Nd = 3
     coeffs = select_coeffs(surface_inductance_coefficients)
     d = coeffs[3]
@@ -456,7 +487,17 @@ def calc_fd_Sum_Nd(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fg_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate sums for eq. 22 on page 6 in..."""
+    """Calculate sums for eq. 22 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     coeffs = select_coeffs(surface_inductance_coefficients)
     a = coeffs[0]
 
@@ -471,7 +512,17 @@ def calc_fg_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fg_Sum_Ce(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate a sum for eq. 22 on page 6 in..."""
+    """Calculate a sum for eq. 22 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     Ce = 4
     coeffs = select_coeffs(surface_inductance_coefficients)
     e = coeffs[4]
@@ -487,7 +538,17 @@ def calc_fg_Sum_Ce(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fh_Sum_Cb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate a sum for eq. 23 on page 6 in..."""
+    """Calculate a sum for eq. 23 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     Cb = 4
     coeffs = select_coeffs(surface_inductance_coefficients)
     b = coeffs[1]
@@ -513,7 +574,6 @@ def calc_fa(
     """Calculate eq. 17 on page 6 in...
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
-    NOTE: ""
 
     Args:
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
@@ -539,7 +599,17 @@ def calc_fa(
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 18 on page 6 in..."""
+    """Calculate eq. 18 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     coeffs = select_coeffs(surface_inductance_coefficients)
     b = coeffs[1]
 
@@ -554,18 +624,18 @@ def calc_fb(inverse_aspect_ratio: float, surface_inductance_coefficients: Surfac
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fc(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 19 on page 6 in :cite:`Barr_2018` or pg.72 in :cite:`mit&taka`."""
-    if surface_inductance_coefficients == SurfaceInductanceCoeffs.Barr or SurfaceInductanceCoeffs.Hirshman:
-        fc = float(1 + calc_fc_Sum_Nc.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients))
-    elif surface_inductance_coefficients == SurfaceInductanceCoeffs.Mitarai:
-        fc = float(
-            (
-                (0.905 / np.sqrt(inverse_aspect_ratio) + 2.05) * np.log(8 / inverse_aspect_ratio)
-                - (0.84 + (1 / inverse_aspect_ratio) + 6.435 / np.sqrt(inverse_aspect_ratio))
-            )
-            * (1 - inverse_aspect_ratio)
-            - calc_fa(inverse_aspect_ratio, 0, 0, surface_inductance_coefficients)
-        )
+    """Calculate eq. 19 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
+    fc = float(1 + calc_fc_Sum_Nc.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients))
 
     return fc
 
@@ -576,11 +646,22 @@ def calc_fc(inverse_aspect_ratio: float, surface_inductance_coefficients: Surfac
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fd(inverse_aspect_ratio: float, areal_elongation: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 20 on page 6 in :cite:`Barr_2018` or pg.72 in :cite:`mit&taka`."""
-    if surface_inductance_coefficients == SurfaceInductanceCoeffs.Barr or SurfaceInductanceCoeffs.Hirshman:
-        coeffs = select_coeffs(surface_inductance_coefficients)
-        d = coeffs[3]
-        fd = float(d[0] * inverse_aspect_ratio * (1 + calc_fd_Sum_Nd.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)))
+    """Calculate eq. 20 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
+
+    coeffs = select_coeffs(surface_inductance_coefficients)
+    d = coeffs[3]
+    fd = float(d[0] * inverse_aspect_ratio * (1 + calc_fd_Sum_Nd.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)))
 
     return fd
 
@@ -598,7 +679,19 @@ def calc_fd(inverse_aspect_ratio: float, areal_elongation: float, surface_induct
 def calc_fg(
     inverse_aspect_ratio: float, beta_poloidal: float, internal_inductivity: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
 ) -> float:
-    """Calculate eq. 22 on page 6 in..."""
+    """Calculate eq. 22 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     fg_Sums_ = calc_fg_Sums_Na.__wrapped__(inverse_aspect_ratio, surface_inductance_coefficients)
 
     return float(
@@ -615,7 +708,18 @@ def calc_fg(
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fh(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 23 on page 6 in..."""
+    """Calculate eq. 23 on page 6 in...
+
+    A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
+
+    Args:
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+
+    Returns:
+         functional term [~]
+    """
     coeffs = select_coeffs(surface_inductance_coefficients)
     b = coeffs[1]
 
