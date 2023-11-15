@@ -53,7 +53,7 @@ def calc_internal_inductivity(
         q_0: [~] :term:`glossary link<q_0>`
 
     Returns:
-        [~] :term:`glossary link<internal_inductivity>`
+        [~] :term:`internal_inductivity`
     """
     q_a = float(
         2 * np.pi * minor_radius**2 * magnetic_field_on_axis / (constants.mu_0 * major_radius * plasma_current)
@@ -95,7 +95,7 @@ def calc_internal_inductance(
         internal_inductance_geometry : [] :term:`glossary link<internal_inductance_geometry>`
 
     Returns:
-        [henry] :term:`glossary link<internal_inductance>`
+        [henry] :term:`internal_inductance`
     """
     internal_inductance = constants.mu_0 * major_radius * internal_inductivity / 2
 
@@ -138,7 +138,7 @@ def calc_external_inductance(
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
-        [henry] :term:`glossary link<external_inductance>`
+        [henry] :term:`external_inductance`
     """
     return float(
         constants.mu_0
@@ -168,7 +168,7 @@ def calc_vertical_field_mutual_inductance(
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
-        [~] :term:`glossary link<vertical_field_mutual_inductance>`
+        [~] :term:`vertical_field_mutual_inductance`
     """
     return float(
         (1 - inverse_aspect_ratio) ** 2
@@ -215,7 +215,7 @@ def calc_invmu_0_dLedR(
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
-        [~] :term:`glossary link<invmu_0_dLedR>`
+        [~] :term:`invmu_0_dLedR`
     """
     invmu_0_dLedR = float(
         (1 / constants.mu_0)
@@ -290,7 +290,7 @@ def calc_vertical_magnetic_field(
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
-        [T] :term:`glossary link<vertical_magnetic_field>`
+        [T] :term:`vertical_magnetic_field`
     """
     vertical_magnetic_field = float(
         constants.mu_0

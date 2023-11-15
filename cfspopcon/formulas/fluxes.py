@@ -24,7 +24,7 @@ def calc_flux_res(plasma_current: float, major_radius: float, ejima_coefficient:
 
 
     Returns:
-        [weber] :term:`glossary link<resistive_flux>`
+        [weber] :term:`resistive_flux`
     """
     return float(ejima_coefficient * constants.mu_0 * plasma_current * major_radius)
 
@@ -45,7 +45,7 @@ def calc_flux_internal(plasma_current: float, internal_inductance: float) -> Uni
         internal_inductance: [henry] :term:`glossary link<internal_inductance>`
 
     Returns:
-        [weber] :term:`glossary link<internal_flux>`
+        [weber] :term:`internal_flux`
     """
     internal_flux = plasma_current * internal_inductance
 
@@ -72,7 +72,7 @@ def calc_flux_PF(vertical_field_mutual_inductance: float, vertical_magnetic_fiel
         major_radius: [m] :term:`glossary link<major_radius>`
 
     Returns:
-        [weber] :term:`glossary link<PF_flux>`
+        [weber] :term:`PF_flux`
     """
     return float(np.pi * major_radius**2 * vertical_field_mutual_inductance * vertical_magnetic_field)
 
@@ -89,7 +89,7 @@ def calc_flux_external(plasma_current: float, external_inductance: float) -> Uni
         external_inductance: [henry] :term:`glossary link<external_inductance>`
 
     Returns:
-        [weber] :term:`glossary link<external_flux>`
+        [weber] :term:`external_flux`
     """
     return float(plasma_current * external_inductance)
 

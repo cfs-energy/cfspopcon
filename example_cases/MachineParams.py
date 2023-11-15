@@ -20,16 +20,6 @@ q95SPARCV1 = Quantity(3.05, ureg.dimensionless)
 
 ASPARCV1 = Quantity(RSPARCV1 / aSPARCV1, ureg.dimensionless)
 epsilonSPARCV1 = Quantity(aSPARCV1 / RSPARCV1, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
-
-fSPARCV1 = Quantity((1 + kappaSPARCV1**2 * (1 + 2 * deltaSPARCV1**2 - 1.2 * deltaSPARCV1**3)) / 2.0, ureg.dimensionless)
-
-# IpSPARCV1 = calc_plasma_current(
-#     BSPARCV1 ,
-#     RSPARCV1 ,
-#     epsilonSPARCV1 ,
-#     q95SPARCV1 ,
-#     fSPARCV1 )
 
 IpSPARCV1 = Quantity(8.7, ureg.MA)
 
@@ -44,16 +34,6 @@ q95SPARCV0 = Quantity(3.02, ureg.dimensionless)
 
 ASPARCV0 = Quantity(RSPARCV0 / aSPARCV0, ureg.dimensionless)
 epsilonSPARCV0 = Quantity(aSPARCV0 / RSPARCV0, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
-
-fSPARCV0 = Quantity((1 + kappaSPARCV0**2 * (1 + 2 * deltaSPARCV0**2 - 1.2 * deltaSPARCV0**3)) / 2.0, ureg.dimensionless)
-
-# IpSPARCV0 = calc_plasma_current(
-#     BSPARCV0,
-#     RSPARCV0,
-#     epsilonSPARCV0,
-#     q95SPARCV0,
-#     fSPARCV0) # gives high value
 
 IpSPARCV0 = Quantity(7.5, ureg.MA)
 
@@ -68,16 +48,6 @@ q95JT = Quantity(3.05, ureg.dimensionless)
 
 AJT = Quantity(RJT / aJT, ureg.dimensionless)
 epsilonJT = Quantity(aJT / RJT, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
-
-fJT = (1 + kappaJT**2 * (1 + 2 * deltaJT**2 - 1.2 * deltaJT**3)) / 2.0
-
-# IpJT = calc_plasma_current(
-#     BJT,
-#     RJT,
-#     epsilonJT,
-#     q95JT,
-#     fJT)
 
 IpJT = Quantity(5.5, ureg.MA)
 
@@ -92,18 +62,7 @@ q95DIII = Quantity(3.05, ureg.dimensionless)
 
 ADIII = Quantity(RDIII / aDIII, ureg.dimensionless)
 epsilonDIII = Quantity(aDIII / RDIII, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
 
-fDIII = Quantity((1 + kappaDIII**2 * (1 + 2 * deltaDIII**2 - 1.2 * deltaDIII**3)) / 2.0, ureg.dimensionless)
-
-# IpDIII = calc_plasma_current(
-#     BDIII,
-#     RDIII,
-#     epsilonDIII,
-#     q95DIII,
-#     fDIII)
-
-# IpDIII=3.5e6
 IpDIII = Quantity(
     1.2, ureg.MA
 )  # https://escholarship.org/content/qt78k0v04v/qt78k0v04v_noSplash_c44c701847deffab65024dd9ceff9c59.pdf?t=p15pc5
@@ -119,16 +78,6 @@ q95IT = Quantity(3.05, ureg.dimensionless)
 
 AIT = Quantity(RIT / aIT, ureg.dimensionless)
 epsilonIT = Quantity(aIT / RIT, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
-
-fIT = Quantity((1 + kappaIT**2 * (1 + 2 * deltaIT**2 - 1.2 * deltaIT**3)) / 2.0, ureg.dimensionless)
-
-# IpIT = calc_plasma_current(
-#     BIT,
-#     RIT,
-#     epsilonIT,
-#     q95IT,
-#     fIT)
 
 IpIT = Quantity(15.0, ureg.MA)
 
@@ -143,16 +92,6 @@ q95K = Quantity(3.05, ureg.dimensionless)
 
 AK = Quantity(RK / aK, ureg.dimensionless)
 epsilonK = Quantity(aK / RK, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
-
-fK = Quantity((1 + kappaK**2 * (1 + 2 * deltaK**2 - 1.2 * deltaK**3)) / 2.0, ureg.dimensionless)
-
-# IpK = calc_plasma_current(
-#     BK,
-#     RK,
-#     epsilonK,
-#     q95K,
-#     fK)
 
 IpK = Quantity(2.0, ureg.MA)  # https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084
 
@@ -167,18 +106,7 @@ q95FIRE = Quantity(3.0, ureg.dimensionless)
 
 AFIRE = Quantity(RFIRE / aFIRE, ureg.dimensionless)
 epsilonFIRE = Quantity(aFIRE / RFIRE, ureg.dimensionless)
-# 3mu0=(4e-7)*np.pi
 
-fFIRE = Quantity((1 + kappaFIRE**2 * (1 + 2 * deltaFIRE**2 - 1.2 * deltaFIRE**3)) / 2.0, ureg.dimensionless)
-
-# IpFIRE = calc_plasma_current(
-#     BFIRE,
-#     RFIRE,
-#     epsilonFIRE,
-#     q95FIRE,
-#     fFIRE)
-
-# IpFIRE = Quantity(6.44, ureg.MA)
 IpFIRE = Quantity(6.5, ureg.MA)  # https://fire.pppl.gov/Snowmass_BP/FIRE.pdf
 
 # ASDEX Upgrade
@@ -193,16 +121,6 @@ q95ASDEX = Quantity(3.0, ureg.dimensionless)
 AASDEX = Quantity(RASDEX / aASDEX, ureg.dimensionless)
 epsilonASDEX = Quantity(aASDEX / RASDEX, ureg.dimensionless)
 
-fASDEX = Quantity((1 + kappaASDEX**2 * (1 + 2 * deltaASDEX**2 - 1.2 * deltaASDEX**3)) / 2.0, ureg.dimensionless)
-
-# IpASDEX = calc_plasma_current(
-#     BASDEX,
-#     RASDEX,
-#     epsilonASDEX,
-#     q95ASDEX,
-#     fASDEX)
-
-# Ip=6.44e6
 IpASDEX = Quantity(1.4, ureg.MA)  # https://www.ipp.mpg.de/16208/einfuehrung
 
 # JET
@@ -216,18 +134,7 @@ q95JET = Quantity(3.05, ureg.dimensionless)
 
 AJET = Quantity(RJET / aJET, ureg.dimensionless)
 epsilonJET = Quantity(aJET / RJET, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
 
-fJET = Quantity((1 + kappaJET**2 * (1 + 2 * deltaJET**2 - 1.2 * deltaJET**3)) / 2.0, ureg.dimensionless)
-
-# IpJET = calc_plasma_current(
-#     BJET,
-#     RJET,
-#     epsilonJET,
-#     q95JET,
-#     fJET)
-
-# Ip=4.8e6
 IpJET = Quantity(5, ureg.MA)  # https://www.ipp.mpg.de/16701/jet
 
 # EAST
@@ -242,15 +149,6 @@ q95EAST = Quantity(3.05, ureg.dimensionless)
 AEAST = Quantity(REAST / aEAST, ureg.dimensionless)
 epsilonEAST = Quantity(aEAST / REAST, ureg.dimensionless)
 
-fEAST = Quantity((1 + kappaEAST**2 * (1 + 2 * deltaEAST**2 - 1.2 * deltaEAST**3)) / 2.0, ureg.dimensionless)
-
-# IpEAST = calc_plasma_current(
-#     BEAST,
-#     REAST,
-#     epsilonEAST,
-#     q95EAST,
-#     fEAST)
-
 IpEAST = Quantity(1.0, ureg.MA)  # https://iopscience.iop.org/article/10.1088/1009-0630/13/1/01
 
 # Alcator C-Mod
@@ -264,18 +162,7 @@ q95ALC = Quantity(3.05, ureg.dimensionless)
 
 AALC = Quantity(RALC / aALC, ureg.dimensionless)
 epsilonALC = Quantity(aALC / RALC, ureg.dimensionless)
-# mu0=(4e-7)*np.pi
 
-fALC = Quantity((1 + kappaALC**2 * (1 + 2 * deltaALC**2 - 1.2 * deltaALC**3)) / 2.0, ureg.dimensionless)
-
-# IpALC = calc_plasma_current(
-#     BALC,
-#     RALC,
-#     epsilonALC,
-#     q95ALC,
-#     fALC)
-
-# Ip=3.7e6
 IpALC = Quantity(2.02, ureg.MA)  # https://www-internal.psfc.mit.edu/research/alcator/data/fst_cmod.pdf
 
 #### CREATE MACHINE NAMES ###
