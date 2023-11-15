@@ -419,6 +419,7 @@ Physics Glossary
   P_LI_thresh
     Power required to cross the L-I transition.
 
+  P_ohmic
   P_Ohmic
     Power deposited in the plasma due to resistive ohmic heating.
 
