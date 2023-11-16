@@ -85,13 +85,10 @@ def calc_internal_inductance(
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
     Args:
+        major_radius: [m] :term:`glossary link<major_radius>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
         plasma_volume: [m^3] : term:`glossary link<plasma_volume>`
         poloidal_circumference: [m] :term:`glossary link<poloidal_circumference>`
-        major_radius: [m] :term:`glossary link<major_radius>`
-        plasma_current: [A] :term:`glossary link<plasma_current>`
-        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
-        minor_radius: [m] :term:`glossary link<minor_radius>`
-        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
         internal_inductance_geometry : [] :term:`glossary link<internal_inductance_geometry>`
 
     Returns:
@@ -164,7 +161,6 @@ def calc_vertical_field_mutual_inductance(
     Args:
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
         areal_elongation: [~] :term:`glossary link<areal_elongation>`
-        major_radius: [m] :term:`glossary link<major_radius>`
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
