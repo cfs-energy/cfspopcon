@@ -67,7 +67,7 @@ def test_calc_flux_internal():
     shape = InternalInductanceGeometry.Cylindrical
     internal_inductance = calc_internal_inductance(1.85 * ureg.m, 0.8, 0 * ureg.m**3, 0 * ureg.m, shape)
     internal_flux = calc_flux_internal(8.7e6 * ureg.A, internal_inductance).item()
-    np.testing.assert_allclose(internal_flux.to('weber').magnitude, 8.090229405928559, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(internal_flux.to("weber").magnitude, 8.090229405928559, rtol=5e-2, atol=0)
 
 
 def test_calc_flux_external():
@@ -76,30 +76,30 @@ def test_calc_flux_external():
         0.3 * ureg.dimensionless, 1.7 * ureg.dimensionless, 0.3 * ureg.dimensionless, 1.85 * ureg.m, 0.8 * ureg.dimensionless, coeffs
     )
     external_flux = calc_flux_external(8.7e6 * ureg.A, external_inductance).item()
-    np.testing.assert_allclose(external_flux.to('weber').magnitude, 24.21256335948457, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(external_flux.to("weber").magnitude, 24.21256335948457, rtol=5e-2, atol=0)
 
 
 def test_calc_flux_PF():
     coeffs = SurfaceInductanceCoeffs.Barr
     vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(0.3, 1.7, coeffs)
     PF_flux = calc_flux_PF(vertical_field_mutual_inductance, 0.6 * ureg.T, 1.85 * ureg.m).item()
-    np.testing.assert_allclose(PF_flux.to('weber').magnitude, 6.629771312025196, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(PF_flux.to("weber").magnitude, 6.629771312025196, rtol=5e-2, atol=0)
 
 
 def test_calc_flux_resistive():
     resistive_flux = calc_flux_res(8.7e6 * ureg.A, 1.85 * ureg.m, 0.45).item()
-    np.testing.assert_allclose(resistive_flux.to('weber').magnitude, 9.10150808166963, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(resistive_flux.to("weber").magnitude, 9.10150808166963, rtol=5e-2, atol=0)
 
 
 def test_calc_internal_inductivity():
     internal_inductivity = calc_internal_inductivity(8.7e6 * ureg.A, 1.85 * ureg.m, 12.2 * ureg.T, 1.85 * ureg.m * 0.3, 1.01).item()
-    np.testing.assert_allclose(internal_inductivity.to('dimensionless').magnitude, 0.5814953402118008, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(internal_inductivity.to("dimensionless").magnitude, 0.5814953402118008, rtol=5e-2, atol=0)
 
 
 def test_calc_vertical_field_mutual_inductance():
     coeffs = SurfaceInductanceCoeffs.Barr
     vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(0.3, 1.7, coeffs).item()
-    np.testing.assert_allclose(vertical_field_mutual_inductance.to('dimensionless').magnitude, 1.027670685052496, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(vertical_field_mutual_inductance.to("dimensionless").magnitude, 1.027670685052496, rtol=5e-2, atol=0)
 
 
 def test_calc_vertical_magnetic_field():
@@ -111,31 +111,32 @@ def test_calc_vertical_magnetic_field():
     vertical_magnetic_field = calc_vertical_magnetic_field(
         0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, 8.7e6 * ureg.A, vertical_magnetic_field_eq, coeffs
     ).item()
-    np.testing.assert_allclose(vertical_magnetic_field.to('tesla').magnitude, 1.1286206938400316, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(vertical_magnetic_field.to("tesla").magnitude, 1.1286206938400316, rtol=5e-2, atol=0)
+
 
 def test_calc_external_inductance():
     coeffs = SurfaceInductanceCoeffs.Barr
     external_inductance = calc_external_inductance(0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs).item()
-    np.testing.assert_allclose(external_inductance.to('henry').magnitude, 2.78305325971087e-06, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(external_inductance.to("henry").magnitude, 2.78305325971087e-06, rtol=5e-2, atol=0)
 
 
 def test_calc_invmu_0_dLedR():
     coeffs = SurfaceInductanceCoeffs.Barr
     external_inductance = calc_external_inductance(0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs)
     invmu_0_dLedR = calc_invmu_0_dLedR(0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, coeffs).item()
-    np.testing.assert_allclose(invmu_0_dLedR.to('dimensionless').magnitude, 2.1999405545602646, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(invmu_0_dLedR.to("dimensionless").magnitude, 2.1999405545602646, rtol=5e-2, atol=0)
 
 
 def test_calc_fa():
     coeffs = SurfaceInductanceCoeffs.Barr
     fa = calc_fa(0.3, 0.3, 0.8, coeffs).item()
-    np.testing.assert_allclose(fa.to('dimensionless').magnitude, 1.4335756919903129, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fa.to("dimensionless").magnitude, 1.4335756919903129, rtol=5e-2, atol=0)
 
 
 def test_calc_fa_Sum_Ne():
     coeffs = SurfaceInductanceCoeffs.Barr
     fa_Sum_Ne = calc_fa_Sum_Ne(0.3, coeffs).item()
-    np.testing.assert_allclose(fa_Sum_Ne.to('dimensionless').magnitude, 0.024095227744249464, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fa_Sum_Ne.to("dimensionless").magnitude, 0.024095227744249464, rtol=5e-2, atol=0)
 
 
 def test_calc_fa_Sums_Na():
@@ -162,31 +163,31 @@ def test_calc_fc():
 def test_calc_fc_Sum_Nc():
     coeffs = SurfaceInductanceCoeffs.Barr
     fc_Sum_Nc = calc_fc_Sum_Nc(0.3, coeffs).item()
-    np.testing.assert_allclose(fc_Sum_Nc.to('dimensionless').magnitude, -0.029125457999999996, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fc_Sum_Nc.to("dimensionless").magnitude, -0.029125457999999996, rtol=5e-2, atol=0)
 
 
 def test_calc_fd():
     coeffs = SurfaceInductanceCoeffs.Barr
     fd = calc_fd(0.3, 1.7, coeffs).item()
-    np.testing.assert_allclose(fd.to('dimensionless').magnitude, 0.000826722, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fd.to("dimensionless").magnitude, 0.000826722, rtol=5e-2, atol=0)
 
 
 def test_calc_fd_Sum_Nd():
     coeffs = SurfaceInductanceCoeffs.Barr
     fd_Sum_Nd = calc_fd_Sum_Nd(0.3, coeffs).item()
-    np.testing.assert_allclose(fd_Sum_Nd.to('dimensionless').magnitude, -0.08141999999999998, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fd_Sum_Nd.to("dimensionless").magnitude, -0.08141999999999998, rtol=5e-2, atol=0)
 
 
 def test_calc_fg():
     coeffs = SurfaceInductanceCoeffs.Barr
     fg = calc_fg(0.3, 0.3, 0.8, coeffs).item()
-    np.testing.assert_allclose(fg.to('dimensionless').magnitude, -3.2891718339522056, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fg.to("dimensionless").magnitude, -3.2891718339522056, rtol=5e-2, atol=0)
 
 
 def test_calc_fg_Sum_Ne():
     coeffs = SurfaceInductanceCoeffs.Barr
     fg_Sum_Ce = calc_fg_Sum_Ce(0.3, coeffs).item()
-    np.testing.assert_allclose(fg_Sum_Ce.to('dimensionless').magnitude, 0.15044119670967493, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fg_Sum_Ce.to("dimensionless").magnitude, 0.15044119670967493, rtol=5e-2, atol=0)
 
 
 def test_calc_fg_Sums_Na():
@@ -198,13 +199,13 @@ def test_calc_fg_Sums_Na():
 def test_calc_fh():
     coeffs = SurfaceInductanceCoeffs.Barr
     fh = calc_fh(0.3, 1.7, coeffs).item()
-    np.testing.assert_allclose(fh.to('dimensionless').magnitude, -0.77315961077771, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fh.to("dimensionless").magnitude, -0.77315961077771, rtol=5e-2, atol=0)
 
 
 def test_calc_fh_Sum_Cb():
     coeffs = SurfaceInductanceCoeffs.Barr
     fh_Sum_Cb = calc_fh_Sum_Cb(0.3, coeffs).item()
-    np.testing.assert_allclose(fh_Sum_Cb.to('dimensionless').magnitude, -0.024597188999999988, rtol=5e-2, atol=0)
+    np.testing.assert_allclose(fh_Sum_Cb.to("dimensionless").magnitude, -0.024597188999999988, rtol=5e-2, atol=0)
 
 
 def test_functionals_against_hirshman():
@@ -212,23 +213,15 @@ def test_functionals_against_hirshman():
     kappa = 0  # N/A for Hirshman
     coeffs = SurfaceInductanceCoeffs.Hirshman
 
-    fa = calc_fa(epsilon, 0, 0, coeffs).data.to('dimensionless').magnitude
-    fb = calc_fb(epsilon, coeffs).data.to('dimensionless').magnitude
-    fc = calc_fc(epsilon, coeffs).data.to('dimensionless').magnitude
-    fd = calc_fd(epsilon, kappa, coeffs).data.to('dimensionless').magnitude
+    fa = calc_fa(epsilon, 0, 0, coeffs).data.to("dimensionless").magnitude
+    fb = calc_fb(epsilon, coeffs).data.to("dimensionless").magnitude
+    fc = calc_fc(epsilon, coeffs).data.to("dimensionless").magnitude
+    fd = calc_fd(epsilon, kappa, coeffs).data.to("dimensionless").magnitude
 
-    assert np.allclose(
-        fa, np.array([2.975, 2.285, 1.848, 1.507, 1.217, 0.957, 0.716, 0.487, 0.272]), rtol=5e-2
-    )
-    assert np.allclose(
-        fb, np.array([0.228, 0.325, 0.403, 0.465, 0.512, 0.542, 0.553, 0.538, 0.508]), rtol=5e-2
-    )
-    assert np.allclose(
-        fc, np.array([1.008, 1.038, 1.093, 1.177, 1.301, 1.486, 1.769, 2.223, 2.864]), rtol=5e-2
-    )
-    assert np.allclose(
-        fd, np.array([0.022, 0.056, 0.087, 0.113, 0.134, 0.148, 0.155, 0.152, 0.133]), rtol=2.2e-1
-    )
+    assert np.allclose(fa, np.array([2.975, 2.285, 1.848, 1.507, 1.217, 0.957, 0.716, 0.487, 0.272]), rtol=5e-2)
+    assert np.allclose(fb, np.array([0.228, 0.325, 0.403, 0.465, 0.512, 0.542, 0.553, 0.538, 0.508]), rtol=5e-2)
+    assert np.allclose(fc, np.array([1.008, 1.038, 1.093, 1.177, 1.301, 1.486, 1.769, 2.223, 2.864]), rtol=5e-2)
+    assert np.allclose(fd, np.array([0.022, 0.056, 0.087, 0.113, 0.134, 0.148, 0.155, 0.152, 0.133]), rtol=2.2e-1)
 
 
 def test_inductances_against_hirshman():
@@ -237,14 +230,12 @@ def test_inductances_against_hirshman():
     coeffs = SurfaceInductanceCoeffs.Hirshman
     kappa = 1.3
 
-    vertical_mutual_inductance     = calc_vertical_field_mutual_inductance(1 / A, kappa, coeffs).data.to('dimensionless').magnitude
-    normalized_external_inductance = (calc_external_inductance(1 / A, kappa, 0, R0, 0, coeffs) / (constants.mu_0 * A)).data.to('henry').magnitude
-
-    assert all(
-        np.isclose(
-            vertical_mutual_inductance, np.array([0.99, 0.96, 0.88, 0.83, 0.74, 0.52]), rtol=2e-2
-        )
+    vertical_mutual_inductance = calc_vertical_field_mutual_inductance(1 / A, kappa, coeffs).data.to("dimensionless").magnitude
+    normalized_external_inductance = (
+        (calc_external_inductance(1 / A, kappa, 0, R0, 0, coeffs) / (constants.mu_0 * A)).data.to("henry").magnitude
     )
+
+    assert all(np.isclose(vertical_mutual_inductance, np.array([0.99, 0.96, 0.88, 0.83, 0.74, 0.52]), rtol=2e-2))
     assert all(
         np.isclose(
             normalized_external_inductance,
@@ -287,4 +278,4 @@ def test_vertical_magnetic_field_against_Eq13():
         VertMagneticFieldEq.Mit_and_Taka_Eq13,
     )
 
-    np.testing.assert_allclose(Bv_Mitarai[17:-1].data.to('tesla').magnitude, Bv_Mit13[17:-1].data.to('tesla').magnitude, rtol=2e-2)
+    np.testing.assert_allclose(Bv_Mitarai[17:-1].data.to("tesla").magnitude, Bv_Mit13[17:-1].data.to("tesla").magnitude, rtol=2e-2)

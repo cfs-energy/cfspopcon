@@ -99,7 +99,7 @@ dataset["ejima_coefficient"] = 0.45
 dataset["total_flux_available_from_CS"] = 35.2 * ureg.weber  # N/A for these calcs
 
 dataset["custom_internal_inductivity"] = False
-#dataset["internal_inductivity"] = 0.91
+# dataset["internal_inductivity"] = 0.91
 
 import warnings
 
