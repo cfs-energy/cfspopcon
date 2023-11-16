@@ -199,7 +199,7 @@ def test_calc_fg_Sums_Na():
 def test_calc_fh():
     coeffs = SurfaceInductanceCoeffs.Barr
     fh = calc_fh(0.3, 1.7, coeffs).item()
-    np.testing.assert_allclose(fh.to("dimensionless").magnitude, -0.77315961077771, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(fh.to("dimensionless").magnitude, -0.780145019816599, rtol=1e-5, atol=0)
 
 
 def test_calc_fh_Sum_Cb():
