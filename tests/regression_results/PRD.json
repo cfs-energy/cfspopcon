@@ -286,6 +286,18 @@
             "data": 0.0,
             "dims": []
         },
+        "edge_impurity_concentration": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.08444947767817207,
+            "dims": []
+        },
+        "edge_impurity_species": {
+            "attrs": {},
+            "data": "Argon",
+            "dims": []
+        },
         "effective_collisionality": {
             "attrs": {
                 "units": "dimensionless"
@@ -707,6 +719,13 @@
             "data": "EichRegression15",
             "dims": []
         },
+        "lengyel_overestimation_factor": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 4.3,
+            "dims": []
+        },
         "loop_voltage": {
             "attrs": {
                 "units": "volt"
@@ -1062,6 +1081,13 @@
                 "units": "dimensionless"
             },
             "data": 1.8,
+            "dims": []
+        },
+        "upstream_electron_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 7.5,
             "dims": []
         },
         "upstream_electron_temp": {

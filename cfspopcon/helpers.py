@@ -33,6 +33,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
         return make_impurities_array(list(val.keys()), list(val.values()))
     elif key == "core_radiator":
         return Impurity[val]
+    elif key == "edge_impurity_species":
+        return Impurity[val]
     elif key == "lambda_q_scaling":
         return LambdaQScaling[val]
     elif key == "SOL_momentum_loss_function":
