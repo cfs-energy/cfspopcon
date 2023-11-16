@@ -658,7 +658,6 @@ def calc_fd(inverse_aspect_ratio: float, areal_elongation: float, surface_induct
     Returns:
          functional term [~]
     """
-
     coeffs = select_coeffs(surface_inductance_coefficients)
     d = coeffs[3]
     fd = float(d[0] * inverse_aspect_ratio * (1 + calc_fd_Sum_Nd.unitless_func(inverse_aspect_ratio, surface_inductance_coefficients)))
