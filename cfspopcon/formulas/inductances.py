@@ -130,8 +130,8 @@ def calc_external_inductance(
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
         areal_elongation: [~] :term:`glossary link<areal_elongation>`
         beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
-        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
         major_radius: [m] :term:`glossary link<major_radius>`
+        internal_inductivity: [~] :term:`glossary link<internal_inductivity>`
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
