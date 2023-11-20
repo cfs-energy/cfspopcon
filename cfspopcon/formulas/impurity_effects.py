@@ -25,8 +25,8 @@ def calc_impurity_charge_state(
     """Calculate the impurity charge state of the specified impurity species.
 
     Args:
-        average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
-        average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
+        average_electron_density: [m^-3] :term:`glossary link<average_electron_density>`
+        average_electron_temp: [eV] :term:`glossary link<average_electron_temp>`
         impurity_species: [] :term:`glossary link<impurity_species>`
         atomic_data: :term:`glossary link<atomic_data>`
 

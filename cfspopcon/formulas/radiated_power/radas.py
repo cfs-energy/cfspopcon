@@ -36,8 +36,8 @@ def calc_impurity_radiated_power_radas(
 
     Args:
         rho: [~] :term:`glossary link<rho>`
-        electron_temp_profile: [keV] :term:`glossary link<electron_temp_profile>`
-        electron_density_profile: [1e19 m^-3] :term:`glossary link<electron_density_profile>`
+        electron_temp_profile: [eV] :term:`glossary link<electron_temp_profile>`
+        electron_density_profile: [m^-3] :term:`glossary link<electron_density_profile>`
         impurity_species: [] :term:`glossary link<impurity_species>`
         impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
         plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
