@@ -8,7 +8,7 @@ def calc_plasma_volume(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, a
     """Calculate the plasma volume inside an up-down symmetrical last-closed-flux-surface.
 
     Geometric formulas for system codes including the effect of negative triangularity :cite: `sauter`
-    NOTE: There is a triangularity term missing here and therefore this equation assume a plasma without triangularity
+    NOTE: delta=1.0 is assumed since this was found to give a closer match to 2D equilibria from FreeGS.
 
     Args:
         major_radius: [m] :term:`glossary link<major_radius>`
