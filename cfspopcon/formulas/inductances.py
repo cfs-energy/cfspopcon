@@ -257,6 +257,7 @@ def calc_invmu_0_dLedR(
         external_inductance=ureg.henry,
         major_radius=ureg.m,
         plasma_current=ureg.A,
+        invmu_0_dLedR=ureg.dimensionless,
         vertical_magnetic_field_equation=None,
         surface_inductance_coefficients=None,
     ),
@@ -271,6 +272,7 @@ def calc_vertical_magnetic_field(
     external_inductance: float,
     major_radius: float,
     plasma_current: float,
+    invmu_0_dLedR: float = 0,
     vertical_magnetic_field_equation: VertMagneticFieldEq = VertMagneticFieldEq.Barr,
     surface_inductance_coefficients: SurfaceInductanceCoeffs = SurfaceInductanceCoeffs.Hirshman,
 ) -> Unitfull:
@@ -286,30 +288,20 @@ def calc_vertical_magnetic_field(
         external_inductance: [~] :term:`glossary link<external_inductance>`
         major_radius: [m] :term:`glossary link<major_radius>`
         plasma_current: [A] :term:`glossary link<plasma_current>`
+        invmu_0_dLedR: [~] :term:`glossary link<invmu_0_dLedR>`
         vertical_magnetic_field_equation: [~] :term:`glossary link<vertical_magnetic_field_equation>`
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
         [T] :term:`vertical_magnetic_field`
     """
-    vertical_magnetic_field = float(
-        constants.mu_0
-        * plasma_current
-        * (1 / (4 * np.pi * major_radius))
-        * (
-            calc_invmu_0_dLedR.unitless_func(
-                inverse_aspect_ratio,
-                areal_elongation,
-                beta_poloidal,
-                internal_inductivity,
-                external_inductance,
-                major_radius,
-                surface_inductance_coefficients,
-            )
-            + (beta_poloidal + (internal_inductivity / 2))
-            - (1 / 2)
+    if invmu_0_dLedR != 0:
+        vertical_magnetic_field = float(
+            constants.mu_0
+            * plasma_current
+            * (1 / (4 * np.pi * major_radius))
+            * (invmu_0_dLedR + (beta_poloidal + (internal_inductivity / 2)) - (1 / 2))
         )
-    )
     if vertical_magnetic_field_equation == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
         vertical_magnetic_field = float(
             constants.mu_0

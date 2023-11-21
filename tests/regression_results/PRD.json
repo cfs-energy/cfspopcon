@@ -259,6 +259,42 @@
             },
             "data": 25.0
         },
+        "surface_inductance_coefficients": {
+            "dims": [],
+            "attrs": {},
+            "data": "Barr"
+        },
+        "total_flux_available_from_CS": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 35
+        },
+        "ejima_coefficient": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6
+        },
+        "internal_inductance_geometry": {
+            "dims": [],
+            "attrs": {},
+            "data": "Cylindrical"
+        },
+        "safety_factor_on_axis": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1
+        },
+        "vertical_magnetic_field_equation": {
+            "dims": [],
+            "attrs": {},
+            "data": "Barr"
+        },
         "average_electron_density": {
             "dims": [],
             "attrs": {
@@ -935,6 +971,97 @@
                 "units": "megawatt"
             },
             "data": 7.702535294009003
+        },
+        "internal_inductivity": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6183490690329864
+        },
+        "internal_inductance": {
+            "dims": [],
+            "attrs": {
+                "units": "henry"
+            },
+            "data": 7.187623306636803e-07
+        },
+        "external_inductance": {
+            "dims": [],
+            "attrs": {
+                "units": "henry"
+            },
+            "data": 2.699200242616322e-06
+        },
+        "vertical_field_mutual_inductance": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0293853117575016
+        },
+        "vertical_magnetic_field": {
+            "dims": [],
+            "attrs": {
+                "units": "tesla"
+            },
+            "data": 1.0224064093287348
+        },
+        "internal_flux": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 6.2532322767740185
+        },
+        "external_flux": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 23.483042110762003
+        },
+        "resistive_flux": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 12.13534410889284
+        },
+        "poloidal_field_flux": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 11.316050056555605
+        },
+        "max_flux_for_flattop": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 4.444431560126745
+        },
+        "max_flattop_duration": {
+            "dims": [],
+            "attrs": {
+                "units": "second"
+            },
+            "data": 29.43878262324499
+        },
+        "breakdown_flux_consumption": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 0.12840000000000001
+        },
+        "flux_needed_from_CS_over_rampup": {
+            "dims": [],
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 30.555568439873255
         },
         "P_sol": {
             "dims": [],

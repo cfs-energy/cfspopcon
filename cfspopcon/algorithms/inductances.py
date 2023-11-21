@@ -31,21 +31,20 @@ def run_calc_inductances(
     """Calculate the vertical magnetic field, as well as the plasma surface's mutual inductance with the vertical field, internal inductivity, external inductance and internal inductance.
 
     Args:
-        plasma_current: :term:`glossary link<plasma_current>`
         major_radius: :term:`glossary link<major_radius>`
-        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
-        separatrix_elongation: [~] :term:`glossary link<separatrix_elongation>`
-        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
-        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
-        vertical_magnetic_field_equation: [~] :term:`glossary link<vertical_magnetic_field_equation>`
         plasma_volume: [m**3] :term:`glossary<plasma_volume>`
         poloidal_circumference: [m] :term:`glossary<poloidal_circumference>`
         internal_inductance_geometry: [~] :term:`glossary<internal_inductance_geometry>`
-        internal_inductivity: [~] :term:`glossary<internal_inductivity>`
+        plasma_current: :term:`glossary link<plasma_current>`
         magnetic_field_on_axis: [T] :term:`glossary<magnetic_field_on_axis>`
-        minor_radius: [m] :term:`glossary<minor_radius>`
+        minor_radius: :term:`glossary link<minor_radius>`
         safety_factor_on_axis: [~] :term:`glossary<safety_factor_on_axis>`
+        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
         areal_elongation: [~] :term:`glossary<areal_elongation>`
+        beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
+        vertical_magnetic_field_equation: [~] :term:`glossary link<vertical_magnetic_field_equation>`
+        surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
+        internal_inductivity: [~] :term:`glossary<internal_inductivity>`
 
     Returns:
         :term:`internal_inductivity`,
@@ -68,6 +67,15 @@ def run_calc_inductances(
     vertical_field_mutual_inductance = formulas.calc_vertical_field_mutual_inductance(
         inverse_aspect_ratio, areal_elongation, surface_inductance_coefficients
     )
+    invmu_0_dLedR = formulas.calc_invmu_0_dLedR(
+        inverse_aspect_ratio,
+        areal_elongation,
+        beta_poloidal,
+        internal_inductivity,
+        external_inductance,
+        major_radius,
+        surface_inductance_coefficients,
+    )
     vertical_magnetic_field = formulas.calc_vertical_magnetic_field(
         inverse_aspect_ratio,
         areal_elongation,
@@ -76,6 +84,7 @@ def run_calc_inductances(
         external_inductance,
         major_radius,
         plasma_current,
+        invmu_0_dLedR,
         vertical_magnetic_field_equation,
         surface_inductance_coefficients,
     )

@@ -63,6 +63,7 @@ DEFAULT_UNITS = dict(
     internal_inductance_geometry=None,
     internal_inductivity="",
     inverse_aspect_ratio="",
+    invmu_0_dLedR="",
     ion_density_peaking_offset="",
     ion_density_peaking="",
     ion_temp_profile="keV",

@@ -107,8 +107,9 @@ def test_calc_vertical_magnetic_field():
         0.3 * ureg.dimensionless, 1.7 * ureg.dimensionless, 0.3 * ureg.dimensionless, 1.85 * ureg.m, 0.8 * ureg.dimensionless, coeffs
     )
     vertical_magnetic_field_equation = VertMagneticFieldEq.Barr
+    invmu_0_dLedR = calc_invmu_0_dLedR(0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, coeffs)
     vertical_magnetic_field = calc_vertical_magnetic_field(
-        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, 8.7e6 * ureg.A, vertical_magnetic_field_equation, coeffs
+        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, 8.7e6 * ureg.A, invmu_0_dLedR, vertical_magnetic_field_equation, coeffs
     ).item()
     np.testing.assert_allclose(vertical_magnetic_field.to("tesla").magnitude, 1.1286206938400316, rtol=1e-5, atol=0)
 
@@ -254,6 +255,10 @@ def test_vertical_magnetic_field_against_Eq13():
         1 / np.linspace(1.4, 4), 3, 0.96, 2.8 * np.linspace(1.4, 4) * ureg.m, 0.5, SurfaceInductanceCoeffs.Hirshman
     )
 
+    invmu_0_dLedR = calc_invmu_0_dLedR(
+        1 / np.linspace(1.4, 4), 3, 0.96, 0.5, Le_Mitarai, 2.8 * np.linspace(1.4, 4) * ureg.m, SurfaceInductanceCoeffs.Hirshman
+    )
+
     Bv_Mitarai = calc_vertical_magnetic_field(
         1 / np.linspace(1.4, 4),
         3,
@@ -262,6 +267,7 @@ def test_vertical_magnetic_field_against_Eq13():
         Le_Mitarai,
         np.linspace(1.4, 4) * 2.8 * ureg.m,
         48e6 * ureg.A,
+        invmu_0_dLedR,
         VertMagneticFieldEq.Barr,
         SurfaceInductanceCoeffs.Hirshman,
     )
@@ -274,6 +280,7 @@ def test_vertical_magnetic_field_against_Eq13():
         Le_Mitarai,
         np.linspace(1.4, 4) * 2.8 * ureg.m,
         48e6 * ureg.A,
+        invmu_0_dLedR,
         VertMagneticFieldEq.Mit_and_Taka_Eq13,
     )
 
