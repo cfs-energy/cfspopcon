@@ -34,12 +34,16 @@ def select_coeffs(surface_inductance_coefficients: SurfaceInductanceCoeffs) -> t
 
 @wraps_ufunc(
     input_units=dict(
-        plasma_current=ureg.A, major_radius=ureg.m, magnetic_field_on_axis=ureg.T, minor_radius=ureg.m, q_0=ureg.dimensionless
+        plasma_current=ureg.A,
+        major_radius=ureg.m,
+        magnetic_field_on_axis=ureg.T,
+        minor_radius=ureg.m,
+        safety_factor_on_axis=ureg.dimensionless,
     ),
     return_units=dict(internal_inductivity=ureg.dimensionless),
 )
 def calc_internal_inductivity(
-    plasma_current: float, major_radius: float, magnetic_field_on_axis: float, minor_radius: float, q_0: float = 1
+    plasma_current: float, major_radius: float, magnetic_field_on_axis: float, minor_radius: float, safety_factor_on_axis: float = 1
 ) -> Unitfull:
     """Calculate the normalized internal inductance for an assumed circular plasma cross-section.
 
@@ -50,7 +54,7 @@ def calc_internal_inductivity(
         major_radius: [m] :term:`glossary link<major_radius>`
         magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
         minor_radius: [m] :term:`glossary link<minor_radius>`
-        q_0: [~] :term:`glossary link<q_0>`
+        safety_factor_on_axis: [~] :term:`glossary link<safety_factor_on_axis>`
 
     Returns:
         [~] :term:`internal_inductivity`
@@ -59,7 +63,7 @@ def calc_internal_inductivity(
         2 * np.pi * minor_radius**2 * magnetic_field_on_axis / (constants.mu_0 * major_radius * plasma_current)
     )  # safety-factor at edge of plasma assuming circular cross-section
 
-    return float(np.log(1.65 + 0.89 * ((q_a / q_0) - 1)))
+    return float(np.log(1.65 + 0.89 * ((q_a / safety_factor_on_axis) - 1)))
 
 
 @wraps_ufunc(
@@ -122,7 +126,7 @@ def calc_external_inductance(
     internal_inductivity: float,
     surface_inductance_coefficients: SurfaceInductanceCoeffs,
 ) -> Unitfull:
-    """Calculate the external self-inductance of the plasma for which the current-induced surface flux of the plasma is generated from eq. 13 in...
+    """Calculate the external self-inductance of the plasma for which the current-induced surface flux of the plasma is generated from eq. 13 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -154,7 +158,7 @@ def calc_external_inductance(
 def calc_vertical_field_mutual_inductance(
     inverse_aspect_ratio: float, areal_elongation: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
 ) -> Unitfull:
-    """Calculate the mutual inductance linking the surface to the vertical field from eq. 15 in...
+    """Calculate the mutual inductance linking the surface to the vertical field from eq. 15 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -197,7 +201,7 @@ def calc_invmu_0_dLedR(
     major_radius: float,
     surface_inductance_coefficients: SurfaceInductanceCoeffs,
 ) -> Unitfull:
-    """Calculate eq. 21 on page 6 in...
+    """Calculate eq. 21 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -253,7 +257,7 @@ def calc_invmu_0_dLedR(
         external_inductance=ureg.henry,
         major_radius=ureg.m,
         plasma_current=ureg.A,
-        vertical_magnetic_field_eq=None,
+        vertical_magnetic_field_equation=None,
         surface_inductance_coefficients=None,
     ),
     return_units=dict(vertical_magnetic_field=ureg.T),
@@ -267,10 +271,10 @@ def calc_vertical_magnetic_field(
     external_inductance: float,
     major_radius: float,
     plasma_current: float,
-    vertical_magnetic_field_eq: VertMagneticFieldEq = VertMagneticFieldEq.Barr,
+    vertical_magnetic_field_equation: VertMagneticFieldEq = VertMagneticFieldEq.Barr,
     surface_inductance_coefficients: SurfaceInductanceCoeffs = SurfaceInductanceCoeffs.Hirshman,
 ) -> Unitfull:
-    """Calculate the mutual inductance linking the surface to the vertical field from eq. 16 in...
+    """Calculate the mutual inductance linking the surface to the vertical field from eq. 16 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -282,7 +286,7 @@ def calc_vertical_magnetic_field(
         external_inductance: [~] :term:`glossary link<external_inductance>`
         major_radius: [m] :term:`glossary link<major_radius>`
         plasma_current: [A] :term:`glossary link<plasma_current>`
-        vertical_magnetic_field_eq: [~] :term:`glossary link<vertical_magnetic_field_eq>`
+        vertical_magnetic_field_equation: [~] :term:`glossary link<vertical_magnetic_field_equation>`
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
 
     Returns:
@@ -306,14 +310,14 @@ def calc_vertical_magnetic_field(
             - (1 / 2)
         )
     )
-    if vertical_magnetic_field_eq == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
+    if vertical_magnetic_field_equation == VertMagneticFieldEq.MgnticFsionEnrgyFrmlry:
         vertical_magnetic_field = float(
             constants.mu_0
             * plasma_current
             * (1 / (4 * np.pi * major_radius))
             * (np.log(8 / inverse_aspect_ratio) + beta_poloidal + (internal_inductivity / 2) - 1.5)
         )
-    elif vertical_magnetic_field_eq == VertMagneticFieldEq.Mit_and_Taka_Eq13:
+    elif vertical_magnetic_field_equation == VertMagneticFieldEq.Mit_and_Taka_Eq13:
         vertical_magnetic_field = float(
             constants.mu_0
             * plasma_current
@@ -325,7 +329,7 @@ def calc_vertical_magnetic_field(
                 - 1.5
             )
         )
-    elif vertical_magnetic_field_eq == VertMagneticFieldEq.Jean:
+    elif vertical_magnetic_field_equation == VertMagneticFieldEq.Jean:
         vertical_magnetic_field = float(
             constants.mu_0
             * plasma_current
@@ -345,11 +349,11 @@ def calc_vertical_magnetic_field(
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fa_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate a sum for eq. 17 on page 6 in...
+    """Calculate a sum for eq. 17 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
     NOTE: Default values for for the coefficients 'N[a,d]' and '[a,e]' are taken from `Barr_2018` which are obtained
-    from fitting them to model flux_PF and flux_I obtained from over 330 model equilibria spanning 0<=delta<=0.5 whereas
+    from fitting them to model flux_PF and flux_Le obtained from over 330 model equilibria spanning 0<=delta<=0.5 whereas
     SPARC is projected to have delta95 = 0.54
 
     Args:
@@ -378,7 +382,7 @@ def calc_fa_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fa_Sum_Ne(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate a sum for eq. 17 on page 6 in...
+    """Calculate a sum for eq. 17 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -404,7 +408,7 @@ def calc_fa_Sum_Ne(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fb_Sum_Nb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate the sum for eq. 18 on page 6 in...
+    """Calculate the sum for eq. 18 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -431,7 +435,7 @@ def calc_fb_Sum_Nb(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fc_Sum_Nc(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate the sum for eq. 18 on page 6 in...
+    """Calculate the sum for eq. 18 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -457,7 +461,7 @@ def calc_fc_Sum_Nc(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fd_Sum_Nd(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate the sum for eq. 20 on page 6 in...
+    """Calculate the sum for eq. 20 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -483,7 +487,7 @@ def calc_fd_Sum_Nd(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fg_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate sums for eq. 22 on page 6 in...
+    """Calculate sums for eq. 22 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -508,7 +512,7 @@ def calc_fg_Sums_Na(inverse_aspect_ratio: float, surface_inductance_coefficients
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fg_Sum_Ce(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate a sum for eq. 22 on page 6 in...
+    """Calculate a sum for eq. 22 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -534,7 +538,7 @@ def calc_fg_Sum_Ce(inverse_aspect_ratio: float, surface_inductance_coefficients:
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fh_Sum_Cb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> Unitfull:
-    """Calculate a sum for eq. 23 on page 6 in...
+    """Calculate a sum for eq. 23 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -567,7 +571,7 @@ def calc_fh_Sum_Cb(inverse_aspect_ratio: float, surface_inductance_coefficients:
 def calc_fa(
     inverse_aspect_ratio: float, beta_poloidal: float, internal_inductivity: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
 ) -> float:
-    """Calculate eq. 17 on page 6 in...
+    """Calculate eq. 17 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -595,7 +599,7 @@ def calc_fa(
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fb(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 18 on page 6 in...
+    """Calculate eq. 18 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -620,7 +624,7 @@ def calc_fb(inverse_aspect_ratio: float, surface_inductance_coefficients: Surfac
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fc(inverse_aspect_ratio: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 19 on page 6 in...
+    """Calculate eq. 19 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -642,7 +646,7 @@ def calc_fc(inverse_aspect_ratio: float, surface_inductance_coefficients: Surfac
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fd(inverse_aspect_ratio: float, areal_elongation: float, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 20 on page 6 in...
+    """Calculate eq. 20 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -674,7 +678,7 @@ def calc_fd(inverse_aspect_ratio: float, areal_elongation: float, surface_induct
 def calc_fg(
     inverse_aspect_ratio: float, beta_poloidal: float, internal_inductivity: float, surface_inductance_coefficients: SurfaceInductanceCoeffs
 ) -> float:
-    """Calculate eq. 22 on page 6 in...
+    """Calculate eq. 22 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 
@@ -703,7 +707,7 @@ def calc_fg(
     pass_as_kwargs=("surface_inductance_coefficients",),
 )
 def calc_fh(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, surface_inductance_coefficients: SurfaceInductanceCoeffs) -> float:
-    """Calculate eq. 23 on page 6 in...
+    """Calculate eq. 23 on page 6 in :cite:`Barr_2018`
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
 

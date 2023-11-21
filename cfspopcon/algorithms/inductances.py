@@ -16,18 +16,17 @@ def run_calc_inductances(
     major_radius: Unitfull,
     plasma_volume: Unitfull,
     poloidal_circumference: Unitfull,
-    custom_internal_inductivity: bool,
     internal_inductance_geometry: named_options.InternalInductanceGeometry,
     plasma_current: Unitfull,
     magnetic_field_on_axis: Unitfull,
     minor_radius: Unitfull,
-    q_0: Unitfull,
+    safety_factor_on_axis: Unitfull,
     inverse_aspect_ratio: Unitfull,
     areal_elongation: Unitfull,
     beta_poloidal: Unitfull,
-    vertical_magnetic_field_eq: named_options.VertMagneticFieldEq,
+    vertical_magnetic_field_equation: named_options.VertMagneticFieldEq,
     surface_inductance_coefficients: named_options.SurfaceInductanceCoeffs,
-    internal_inductivity: Unitfull = 0.5,
+    internal_inductivity: Unitfull = None,
 ) -> dict[str, Unitfull]:
     """Calculate the vertical magnetic field, as well as the plasma surface's mutual inductance with the vertical field, internal inductivity, external inductance and internal inductance.
 
@@ -38,15 +37,14 @@ def run_calc_inductances(
         separatrix_elongation: [~] :term:`glossary link<separatrix_elongation>`
         beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
         surface_inductance_coefficients: [~] :term:`glossary link<surface_inductance_coefficients>`
-        vertical_magnetic_field_eq: [~] :term:`glossary link<vertical_magnetic_field_eq>`
+        vertical_magnetic_field_equation: [~] :term:`glossary link<vertical_magnetic_field_equation>`
         plasma_volume: [m**3] :term:`glossary<plasma_volume>`
         poloidal_circumference: [m] :term:`glossary<poloidal_circumference>`
-        custom_internal_inductivity: [~] :term:`glossary<custom_internal_inductivity>`
         internal_inductance_geometry: [~] :term:`glossary<internal_inductance_geometry>`
         internal_inductivity: [~] :term:`glossary<internal_inductivity>`
         magnetic_field_on_axis: [T] :term:`glossary<magnetic_field_on_axis>`
         minor_radius: [m] :term:`glossary<minor_radius>`
-        q_0: [~] :term:`glossary<q_0>`
+        safety_factor_on_axis: [~] :term:`glossary<safety_factor_on_axis>`
         areal_elongation: [~] :term:`glossary<areal_elongation>`
 
     Returns:
@@ -56,8 +54,10 @@ def run_calc_inductances(
         :term:`vertical_field_mutual_inductance`,
         :term:`vertical_magnetic_field`
     """
-    if not custom_internal_inductivity:
-        internal_inductivity = formulas.calc_internal_inductivity(plasma_current, major_radius, magnetic_field_on_axis, minor_radius, q_0)
+    if internal_inductivity is None:
+        internal_inductivity = formulas.calc_internal_inductivity(
+            plasma_current, major_radius, magnetic_field_on_axis, minor_radius, safety_factor_on_axis
+        )
 
     internal_inductance = formulas.calc_internal_inductance(
         major_radius, internal_inductivity, plasma_volume, poloidal_circumference, internal_inductance_geometry
@@ -76,7 +76,7 @@ def run_calc_inductances(
         external_inductance,
         major_radius,
         plasma_current,
-        vertical_magnetic_field_eq,
+        vertical_magnetic_field_equation,
         surface_inductance_coefficients,
     )
 

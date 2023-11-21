@@ -40,7 +40,7 @@ Physics Glossary
     An impurity which is assumed to be already in the plasma (without being injected by us).
 
   invmu_0_dLedR
-    :math:`\frac{1}{\mu_0}\frac{\partial L_e}{\partial R}` (eq.21 in :cite:`Barr_2018`)
+    :math:`\frac{1}{\mu_0}\frac{\partial L_e}{\partial R}` (eq.21 in :cite:`Barr_2018`) which is a part of the hoop force and therefore appears in the :term:`vertical_magnetic_field_equation` which counteracts the outward toroidal forces.
 
   P_SOL
   power_crossing_separatrix
@@ -202,7 +202,7 @@ Physics Glossary
   vertical_magnetic_field
     Vertical magnetic field derived from the necessary force to balance the hoop force :math:`B_V`
 
-  vertical_magnetic_field_eq
+  vertical_magnetic_field_equation
     Which vertical magnetic field equation to select from :cite:`mit&taka`, :cite:`Barr_2018`, :cite:`Jean`, :cite:`MFEF`
 
   average_electron_density
@@ -336,7 +336,7 @@ Physics Glossary
   q_star
     Analytical approximation of safety factor at :math:`\rho=0.95`.
   
-  q_0
+  safety_factor_on_axis
     On-axis safety factor
 
   loop_voltage
@@ -346,13 +346,10 @@ Physics Glossary
     Empirical linear scaling factor of the product of major radius and plasma current at flattop correlated with resistive flux at start of flattop :math:`C_E`.
 
   resistive_flux
-    Usually this is the magnetic flux induced by the resistance of the plasma. However, given that POPCON calculates this with the emprical :math:`C_E`, it may also hold information about information about flux induced coupling with the wall. :math:`\psi_{res} = C_E\mu_0R_0I_p`.
+    Usually this is the magnetic flux induced by the resistance of the plasma. However, given that POPCON calculates this with the empirical :math:`C_E`, it may also hold information about flux induced coupling with the wall. :math:`\psi_{res} = C_E\mu_0R_0I_p`.
 
   internal_inductivity
     Also known as normalized internal inductance, for a general geometry, is :math:`\frac{\langle B^2_{\theta} \rangle _V}{\langle B_{\theta}(r=LCFS) \rangle}` but is approximated in POPCON for a cylindrical plasma.
-
-  custom_internal_inductivity
-    A boolean which, if `True`, indicates that the user will supply their own internal inductivity (from simulation) or, if `False`, will use the cylindrical approximation calculated by POPCON 
 
   internal_inductance_geometry
     The assumed geometry of the plasma used to calculate the internal inductance:
@@ -376,7 +373,7 @@ Physics Glossary
   vertical_field_mutual_inductance
     This unitless mutual-inductance quantity provides the coupling between the plasma surface and the vertical magnetic field.
 
-  PF_flux
+  poloidal_field_flux
     The surface flux contribution from the vertical magnetic field required for radial force balance (which arises from the poloidal field coils).
   
   breakdown_flux_consumption
@@ -395,7 +392,7 @@ Physics Glossary
     Given the loop voltage at flattop, and how much flux from the CS has been consumed over the ramp-up, this defines how long your flattop can be.
 
   surface_inductance_coefficients
-    The set of coefficients from Hirshman or Barr's paper on external flux [see references] which are used to fit analytic expressions, dependent on plasma geometry, to the external inductance and vertical field mutual inductance of the plasma.
+    The set of coefficients from Hirshman :cite:`hirshman` or Barr's :cite:`Barr_2018` paper on external flux which are used to fit analytic expressions, dependent on plasma geometry, to the external inductance and vertical field mutual inductance of the plasma.
 
   energy_confinement_scaling
   tau_e_scaling

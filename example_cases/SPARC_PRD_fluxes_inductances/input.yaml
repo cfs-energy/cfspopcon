@@ -178,8 +178,6 @@ ejima_coefficient: 0.6
 # Which internal inductance geometry? Cylindrical approximation or a generalized geometry?
 internal_inductance_geometry: Cylindrical
 # safety-factor on axis
-q_0: 1
+safety_factor_on_axis: 1
 # Which vertical magnetic field equation based on toroidal force balance?
-vertical_magnetic_field_eq: Barr
-# Will the internal inductivity be calculated by POPCON or input manually?
-custom_internal_inductivity: False
+vertical_magnetic_field_equation: Barr

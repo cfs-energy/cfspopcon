@@ -35,16 +35,15 @@ def test_calc_inductances():
         major_radius=1.85 * ureg.m,
         plasma_volume=19 * ureg.m**3,
         poloidal_circumference=4 * ureg.m,
-        custom_internal_inductivity=False,
         internal_inductance_geometry=InternalInductanceGeometry.NonCylindrical,
         plasma_current=8.7 * ureg.MA,
         magnetic_field_on_axis=12.16 * ureg.T,
         minor_radius=0.56 * ureg.m,
-        q_0=1,
+        safety_factor_on_axis=1,
         inverse_aspect_ratio=0.56 / 1.85,
         areal_elongation=1.7,
         beta_poloidal=0.3,
-        vertical_magnetic_field_eq=VertMagneticFieldEq.Barr,
+        vertical_magnetic_field_equation=VertMagneticFieldEq.Barr,
         surface_inductance_coefficients=SurfaceInductanceCoeffs.Barr,
     )
 
@@ -82,8 +81,8 @@ def test_calc_flux_external():
 def test_calc_flux_PF():
     coeffs = SurfaceInductanceCoeffs.Barr
     vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(0.3, 1.7, coeffs)
-    PF_flux = calc_flux_PF(vertical_field_mutual_inductance, 0.6 * ureg.T, 1.85 * ureg.m).item()
-    np.testing.assert_allclose(PF_flux.to("weber").magnitude, 6.629771312025196, rtol=1e-5, atol=0)
+    poloidal_field_flux = calc_flux_PF(vertical_field_mutual_inductance, 0.6 * ureg.T, 1.85 * ureg.m).item()
+    np.testing.assert_allclose(poloidal_field_flux.to("weber").magnitude, 6.629771312025196, rtol=1e-5, atol=0)
 
 
 def test_calc_flux_resistive():
@@ -107,9 +106,9 @@ def test_calc_vertical_magnetic_field():
     external_inductance = calc_external_inductance(
         0.3 * ureg.dimensionless, 1.7 * ureg.dimensionless, 0.3 * ureg.dimensionless, 1.85 * ureg.m, 0.8 * ureg.dimensionless, coeffs
     )
-    vertical_magnetic_field_eq = VertMagneticFieldEq.Barr
+    vertical_magnetic_field_equation = VertMagneticFieldEq.Barr
     vertical_magnetic_field = calc_vertical_magnetic_field(
-        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, 8.7e6 * ureg.A, vertical_magnetic_field_eq, coeffs
+        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, 8.7e6 * ureg.A, vertical_magnetic_field_equation, coeffs
     ).item()
     np.testing.assert_allclose(vertical_magnetic_field.to("tesla").magnitude, 1.1286206938400316, rtol=1e-5, atol=0)
 

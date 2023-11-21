@@ -7,7 +7,7 @@ RETURN_KEYS = [
     "internal_flux",
     "external_flux",
     "resistive_flux",
-    "PF_flux",
+    "poloidal_field_flux",
     "max_flux_for_flattop",
     "max_flattop_duration",
     "breakdown_flux_consumption",
@@ -45,10 +45,10 @@ def run_calc_fluxes(
     internal_flux = formulas.calc_flux_internal(plasma_current, internal_inductance)
     external_flux = formulas.calc_flux_external(plasma_current, external_inductance)
     resistive_flux = formulas.calc_flux_res(plasma_current, major_radius, ejima_coefficient)
-    PF_flux = formulas.calc_flux_PF(vertical_field_mutual_inductance, vertical_magnetic_field, major_radius)
+    poloidal_field_flux = formulas.calc_flux_PF(vertical_field_mutual_inductance, vertical_magnetic_field, major_radius)
 
-    flux_needed_from_CS_over_rampup = internal_flux + external_flux + resistive_flux - PF_flux
-    max_flux_for_flattop = total_flux_available_from_CS - internal_flux - external_flux - resistive_flux + PF_flux
+    flux_needed_from_CS_over_rampup = internal_flux + external_flux + resistive_flux - poloidal_field_flux
+    max_flux_for_flattop = total_flux_available_from_CS - internal_flux - external_flux - resistive_flux + poloidal_field_flux
     max_flattop_duration = max_flux_for_flattop / loop_voltage
 
     breakdown_flux_consumption = formulas.calc_breakdown_flux_consumption(major_radius)
