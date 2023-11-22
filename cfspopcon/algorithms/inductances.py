@@ -67,7 +67,7 @@ def run_calc_inductances(
     vertical_field_mutual_inductance = formulas.calc_vertical_field_mutual_inductance(
         inverse_aspect_ratio, areal_elongation, surface_inductance_coefficients
     )
-    invmu_0_dLedR = formulas.calc_invmu_0_dLedR(
+    invmu_0_dLedR = formulas.inductances.calc_invmu_0_dLedR(
         inverse_aspect_ratio,
         areal_elongation,
         beta_poloidal,

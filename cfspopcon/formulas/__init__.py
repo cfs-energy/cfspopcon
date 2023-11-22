@@ -33,7 +33,6 @@ from .inductances import (
     calc_internal_inductance,
     calc_internal_inductivity,
     calc_vertical_field_mutual_inductance,
-    calc_invmu_0_dLedR,
     calc_vertical_magnetic_field,
 )
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
@@ -77,7 +76,6 @@ __all__ = [
     "calc_greenwald_fraction",
     "calc_internal_inductivity",
     "calc_internal_inductance",
-    "calc_invmu_0_dLedR",
     "calc_external_inductance",
     "calc_vertical_field_mutual_inductance",
     "calc_vertical_magnetic_field",
