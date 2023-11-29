@@ -1,0 +1,123 @@
+{
+    "attrs": {},
+    "coords": {
+        "dim_separatrix_electron_density": {
+            "attrs": {},
+            "data": 1.623076923076923e+19,
+            "dims": []
+        },
+        "dim_separatrix_electron_temp": {
+            "attrs": {},
+            "data": 57.51724137931035,
+            "dims": []
+        }
+    },
+    "data_vars": {
+        "LH_transition_condition": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.013618191308572,
+            "dims": []
+        },
+        "Lmode_density_limit_condition": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6234469893104395,
+            "dims": []
+        },
+        "alpha_t_turbulence_param": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6073549597011819,
+            "dims": []
+        },
+        "elongation_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.6,
+            "dims": []
+        },
+        "ideal_MHD_limit_condition": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3481188528665416,
+            "dims": []
+        },
+        "ion_mass": {
+            "attrs": {
+                "units": "unified_atomic_mass_unit"
+            },
+            "data": 2.0,
+            "dims": []
+        },
+        "magnetic_field_on_axis": {
+            "attrs": {
+                "units": "tesla"
+            },
+            "data": 2.5,
+            "dims": []
+        },
+        "major_radius": {
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 1.65,
+            "dims": []
+        },
+        "mean_ion_charge": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0,
+            "dims": []
+        },
+        "minor_radius": {
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 0.49,
+            "dims": []
+        },
+        "plasma_current": {
+            "attrs": {
+                "units": "ampere"
+            },
+            "data": 800000.0,
+            "dims": []
+        },
+        "separatrix_electron_density": {
+            "attrs": {
+                "units": "1 / meter ** 3"
+            },
+            "data": 1.623076923076923e+19,
+            "dims": []
+        },
+        "separatrix_electron_temp": {
+            "attrs": {
+                "units": "electron_volt"
+            },
+            "data": 57.51724137931035,
+            "dims": []
+        },
+        "triangularity_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3,
+            "dims": []
+        },
+        "z_effective": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.25,
+            "dims": []
+        }
+    },
+    "dims": {}
+}

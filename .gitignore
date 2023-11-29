@@ -134,8 +134,9 @@ dmypy.json
 #macOS metadata
 .DS_Store
 
-# Mess
+# avoid committing nc files
 example_cases/**/output/*
+tests/regression_results/test*.nc
 cfspopcon/atomic_data/*.nc
 
 # Top-level (working) notebooks should not be tracked

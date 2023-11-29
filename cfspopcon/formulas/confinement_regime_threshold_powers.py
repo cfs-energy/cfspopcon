@@ -27,7 +27,7 @@ def _calc_Martin_LH_threshold(
         scale=ureg.dimensionless,
     ),
 )
-def calc_LH_transition_threshold_power(
+def calLH_transition_condition_transition_threshold_power(
     plasma_current: float,
     magnetic_field_on_axis: float,
     minor_radius: float,
@@ -133,7 +133,7 @@ def calc_confinement_transition_threshold_power(
         :term:`P_LH_thresh` [MW]
     """
     if energy_confinement_scaling not in [ConfinementScaling.LOC, ConfinementScaling.IModey2]:
-        P_LH_thresh = calc_LH_transition_threshold_power.__wrapped__(
+        P_LH_thresh = calLH_transition_condition_transition_threshold_power.__wrapped__(
             plasma_current,
             magnetic_field_on_axis,
             minor_radius,

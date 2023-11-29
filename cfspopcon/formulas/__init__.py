@@ -1,12 +1,12 @@
 """Formulas for POPCONs analysis."""
 
-from . import energy_confinement_time_scalings, fusion_reaction_data, plasma_profile_data, radiated_power
+from . import energy_confinement_time_scalings, fusion_reaction_data, plasma_profile_data, radiated_power, separatrix_operational_space
 from .average_fuel_ion_mass import calc_fuel_average_mass_number
 from .beta import calc_beta_normalised, calc_beta_poloidal, calc_beta_toroidal, calc_beta_total
 from .confinement_regime_threshold_powers import (
     calc_confinement_transition_threshold_power,
-    calc_LH_transition_threshold_power,
     calc_LI_transition_threshold_power,
+    calLH_transition_condition_transition_threshold_power,
 )
 from .current_drive import (
     calc_bootstrap_fraction,
@@ -41,6 +41,7 @@ from .radiated_power import (
 )
 
 __all__ = [
+    "separatrix_operational_space",
     "energy_confinement_time_scalings",
     "fusion_reaction_data",
     "calc_density_peaking",
@@ -60,7 +61,7 @@ __all__ = [
     "calc_f_shaping",
     "calc_fusion_power",
     "calc_greenwald_fraction",
-    "calc_LH_transition_threshold_power",
+    "calLH_transition_condition_transition_threshold_power",
     "calc_LI_transition_threshold_power",
     "calc_loop_voltage",
     "calc_resistivity_trapped_enhancement",

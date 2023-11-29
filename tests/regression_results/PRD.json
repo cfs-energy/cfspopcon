@@ -42,14 +42,14 @@
             "attrs": {
                 "units": "megawatt * tesla / meter"
             },
-            "data": 168.76392067708971,
+            "data": 168.76392067708986,
             "dims": []
         },
         "PBpRnSq": {
             "attrs": {
                 "units": "megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter"
             },
-            "data": 8.206676168550032,
+            "data": 8.20667616855004,
             "dims": []
         },
         "P_LH_thresh": {
@@ -112,7 +112,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 1.2016139539804378,
+            "data": 1.201613953980438,
             "dims": []
         },
         "P_radiated_by_core_radiator": {
@@ -126,14 +126,14 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 5.871591678614546,
+            "data": 5.871591678614526,
             "dims": []
         },
         "P_sol": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 25.59125026660787,
+            "data": 25.59125026660789,
             "dims": []
         },
         "Q": {
@@ -243,7 +243,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.18661987651456066,
+            "data": 0.18661987651456,
             "dims": []
         },
         "core_radiator": {
@@ -269,7 +269,7 @@
             "attrs": {
                 "units": "second"
             },
-            "data": 16.361532562672082,
+            "data": 16.36153256267208,
             "dims": []
         },
         "dilution": {
@@ -587,7 +587,7 @@
             "data": [
                 58.37812639204965,
                 1.9999999473503665,
-                7.999453250480196
+                7.999453250480197
             ],
             "dims": [
                 "dim_species"
@@ -711,7 +711,7 @@
             "attrs": {
                 "units": "volt"
             },
-            "data": 0.1509719887879264,
+            "data": 0.15097198878792642,
             "dims": []
         },
         "magnetic_field_on_axis": {
@@ -746,7 +746,7 @@
             "attrs": {
                 "units": "meter * ohm"
             },
-            "data": 2.9146805798816443e-09,
+            "data": 2.9146805798816447e-09,
             "dims": []
         },
         "nesep_over_nebar": {
@@ -788,7 +788,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.023749179486475976,
+            "data": 0.02374917948647598,
             "dims": []
         },
         "parallel_connection_length": {
@@ -863,14 +863,14 @@
             "attrs": {
                 "units": "gigawatt / meter ** 2"
             },
-            "data": 11.460018573149283,
+            "data": 11.460018573149295,
             "dims": []
         },
         "q_perp": {
             "attrs": {
                 "units": "megawatt / meter ** 2"
             },
-            "data": 5941.561499571544,
+            "data": 5941.56149957155,
             "dims": []
         },
         "q_star": {
@@ -896,7 +896,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.0405553139384702,
+            "data": 1.0405553139384711,
             "dims": []
         },
         "rho": {
@@ -966,6 +966,13 @@
             "data": 0.0022127891680210022,
             "dims": []
         },
+        "separatrix_electron_temp": {
+            "attrs": {
+                "units": "electron_volt"
+            },
+            "data": 299.1230493155571,
+            "dims": []
+        },
         "separatrix_elongation": {
             "attrs": {
                 "units": "dimensionless"
@@ -1005,14 +1012,14 @@
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },
-            "data": 44.86845739733103,
+            "data": 44.86845739733095,
             "dims": []
         },
         "target_electron_flux": {
             "attrs": {
                 "units": "1 / meter ** 2 / second"
             },
-            "data": 1.971000727006153e+25,
+            "data": 1.9710007270061514e+25,
             "dims": []
         },
         "target_electron_temp": {
@@ -1026,7 +1033,7 @@
             "attrs": {
                 "units": "gigawatt / meter ** 2"
             },
-            "data": 0.41293376247700014,
+            "data": 0.4129337624770006,
             "dims": []
         },
         "temperature_peaking": {
@@ -1064,13 +1071,6 @@
             "data": 1.8,
             "dims": []
         },
-        "upstream_electron_temp": {
-            "attrs": {
-                "units": "electron_volt"
-            },
-            "data": 299.12304931555707,
-            "dims": []
-        },
         "vertical_minor_radius": {
             "attrs": {
                 "units": "meter"
@@ -1082,7 +1082,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.343818980316905,
+            "data": 1.3438189803169052,
             "dims": []
         },
         "zeff_change_from_core_rad": {

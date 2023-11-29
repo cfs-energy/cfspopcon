@@ -9,7 +9,7 @@ from ..unit_handling import Quantity, convert_to_default_units
 from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
-    "upstream_electron_temp",
+    "separatrix_electron_temp",
     "target_electron_density",
     "target_electron_temp",
     "target_electron_flux",
@@ -44,13 +44,13 @@ def run_two_point_model_fixed_fpow(
         raise_error_if_not_converged: Raise an error if solve does not converge
 
     Returns:
-        :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
+    (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=nesep_over_nebar * average_electron_density,
+        separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,

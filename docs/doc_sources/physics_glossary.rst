@@ -64,7 +64,7 @@ Physics Glossary
   upstream
     The point where heat enters the flux-tube being considered for the two-point-model. Usually 'upstream' means the outboard-midplane separatrix.
 
-  upstream_electron_temp
+  separatrix_electron_temp
     The :term:`upstream` electron temperature.
 
   target_electron_density
@@ -371,3 +371,15 @@ Physics Glossary
   heavier_fuel_species_fraction
     Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this is :math:`f_T = n_T/(n_T+n_D)`.
 
+  Lmode_density_limit_condition
+    Condition function for the L-mode density limit (calculated by the separatrix operational space). If $c_{LDL} > 1$, the state is predicted to be unstable.
+  
+  ideal_MHD_limit_condition
+    Condition function for the ideal MHD limit (calculated by the separatrix operational space). If $c_{MHD} > 1$, the state is predicted to be unstable.
+  
+  LH_transition_condition
+    Condition function for the LH limit (calculated by the separatrix operational space). If $c_{LH} > 1$, the state is predicted to be in H-mode.
+  
+  alpha_t_turbulence_param
+    Turbulence characterization parameter used by the separatrix operational space.
+  

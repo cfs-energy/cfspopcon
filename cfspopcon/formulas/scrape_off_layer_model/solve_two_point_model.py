@@ -7,6 +7,7 @@ import xarray as xr
 from ...named_options import MomentumLossFunction
 from ...unit_handling import Quantity, Unitfull, ureg
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
+from .separatrix_electron_temp import calc_separatrix_electron_temp
 from .target_electron_density import (
     calc_f_other_target_electron_density,
     calc_f_vol_loss_target_electron_density,
@@ -26,14 +27,13 @@ from .target_electron_temp import (
     calc_target_electron_temp_basic,
 )
 from .total_pressure import calc_upstream_total_pressure
-from .upstream_electron_temp import calc_upstream_electron_temp
 
 
 def solve_two_point_model(
     SOL_power_loss_fraction: Unitfull,
     parallel_heat_flux_density: Unitfull,
     parallel_connection_length: Unitfull,
-    upstream_electron_density: Unitfull,
+    separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
     fuel_average_mass_number: Unitfull,
     kappa_e0: Unitfull,
@@ -66,7 +66,7 @@ def solve_two_point_model(
         SOL_power_loss_fraction: [~]
         parallel_heat_flux_density: [GW/m^2]
         parallel_connection_length: [m]
-        upstream_electron_density: [m^-3]
+        separatrix_electron_density: [m^-3]
         toroidal_flux_expansion: [~]
         fuel_average_mass_number: [~]
         kappa_e0: electron heat conductivity constant [W / (eV^3.5 * m)]
@@ -90,7 +90,7 @@ def solve_two_point_model(
         raise_error_if_not_converged: raise an error if not all point converge within max iterations (otherwise return NaN)
         quiet: if not True, print additional information about the iterative solve to terminal
     Returns:
-        upstream_electron_temp [eV], target_electron_density [m^-3], target_electron_temp [eV], target_electron_flux [m^-2 s^-1]
+        separatrix_electron_temp [eV], target_electron_density [m^-3], target_electron_temp [eV], target_electron_flux [m^-2 s^-1]
     """
     f_other_kwargs = dict(
         target_ratio_of_ion_to_electron_temp=target_ratio_of_ion_to_electron_temp,
@@ -108,7 +108,7 @@ def solve_two_point_model(
     while iteration < max_iterations:
         iteration += 1
 
-        new_upstream_electron_temp = calc_upstream_electron_temp(
+        new_separatrix_electron_temp = calc_separatrix_electron_temp(
             target_electron_temp=target_electron_temp,
             parallel_heat_flux_density=parallel_heat_flux_density,
             parallel_connection_length=parallel_connection_length,
@@ -117,8 +117,8 @@ def solve_two_point_model(
         )
 
         upstream_total_pressure = calc_upstream_total_pressure(
-            upstream_electron_density=upstream_electron_density,
-            upstream_electron_temp=new_upstream_electron_temp,
+            separatrix_electron_density=separatrix_electron_density,
+            separatrix_electron_temp=new_separatrix_electron_temp,
             upstream_ratio_of_ion_to_electron_temp=upstream_ratio_of_ion_to_electron_temp,
             upstream_ratio_of_electron_to_ion_density=upstream_ratio_of_electron_to_ion_density,
             upstream_mach_number=upstream_mach_number,
@@ -155,22 +155,22 @@ def solve_two_point_model(
         )
 
         if iteration == 1:
-            upstream_electron_temp = new_upstream_electron_temp
+            separatrix_electron_temp = new_separatrix_electron_temp
             target_electron_density = new_target_electron_density
             target_electron_temp = new_target_electron_temp
             continue
 
-        change_in_upstream_electron_temp = new_upstream_electron_temp - upstream_electron_temp
+        change_in_separatrix_electron_temp = new_separatrix_electron_temp - separatrix_electron_temp
         change_in_target_electron_density = new_target_electron_density - target_electron_density
         change_in_target_electron_temp = new_target_electron_temp - target_electron_temp
 
-        upstream_electron_temp = upstream_electron_temp + upstream_temp_relaxation * change_in_upstream_electron_temp
+        separatrix_electron_temp = separatrix_electron_temp + upstream_temp_relaxation * change_in_separatrix_electron_temp
         target_electron_density = target_electron_density + target_electron_density_relaxation * change_in_target_electron_density
         target_electron_temp = target_electron_temp + target_temp_relaxation * change_in_target_electron_temp
 
         if np.all(
             [
-                np.abs(change_in_upstream_electron_temp / upstream_electron_temp).max() < upstream_temp_max_residual,
+                np.abs(change_in_separatrix_electron_temp / separatrix_electron_temp).max() < upstream_temp_max_residual,
                 np.abs(change_in_target_electron_density / target_electron_density).max() < target_electron_density_max_residual,
                 np.abs(change_in_target_electron_temp / target_electron_temp).max() < target_temp_max_residual,
             ]
@@ -192,7 +192,7 @@ def solve_two_point_model(
     )
 
     mask = (
-        (np.abs(change_in_upstream_electron_temp / upstream_electron_temp) < upstream_temp_max_residual)
+        (np.abs(change_in_separatrix_electron_temp / separatrix_electron_temp) < upstream_temp_max_residual)
         & (np.abs(change_in_target_electron_density / target_electron_density) < target_electron_density_max_residual)
         & (np.abs(change_in_target_electron_temp / target_electron_temp) < target_temp_max_residual)
     )
@@ -201,9 +201,9 @@ def solve_two_point_model(
     if number_nonconverged > 0 and not quiet:
         print(f"{number_nonconverged} values did not converge in {max_iterations} iterations.")
 
-    upstream_electron_temp = xr.where(mask, upstream_electron_temp, np.nan)  # type:ignore[no-untyped-call]
+    separatrix_electron_temp = xr.where(mask, separatrix_electron_temp, np.nan)  # type:ignore[no-untyped-call]
     target_electron_density = xr.where(mask, target_electron_density, np.nan)  # type:ignore[no-untyped-call]
     target_electron_temp = xr.where(mask, target_electron_temp, np.nan)  # type:ignore[no-untyped-call]
     target_electron_flux = xr.where(mask, target_electron_flux, np.nan)  # type:ignore[no-untyped-call]
 
-    return upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux
+    return separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux

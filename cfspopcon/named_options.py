@@ -40,6 +40,7 @@ class Algorithms(Enum):
     calc_P_SOL = auto()
     use_LOC_tau_e_below_threshold = auto()
     calc_plasma_stored_energy = auto()
+    calc_separatrix_operational_space = auto()
 
 
 class ProfileForm(Enum):
