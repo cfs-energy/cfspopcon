@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt  # type:ignore[import]
 import xarray as xr
 from scipy.interpolate import RectBivariateSpline  # type:ignore[import]
 
-from cfspopcon.unit_handling import Unitfull, convert_units, ureg, magnitude
+from cfspopcon.unit_handling import Unitfull, convert_units, magnitude, ureg
 
 
 def extract_LH_contour_points(LH_transition_condition: xr.DataArray) -> tuple[xr.DataArray, xr.DataArray]:
@@ -26,7 +26,9 @@ def interpolate_field_to_LH_curve(
 ) -> xr.DataArray:
     """Interpolate a 2D field to the points defined by the LH transition curve."""
     interpolator = RectBivariateSpline(
-        field.dim_separatrix_electron_density, field.dim_separatrix_electron_temp, magnitude(field.transpose("dim_separatrix_electron_density", "dim_separatrix_electron_temp"))
+        field.dim_separatrix_electron_density,
+        field.dim_separatrix_electron_temp,
+        magnitude(field.transpose("dim_separatrix_electron_density", "dim_separatrix_electron_temp")),
     )
 
     interpolated_curve = xr.DataArray(
