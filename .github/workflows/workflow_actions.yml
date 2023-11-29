@@ -90,6 +90,11 @@ jobs:
       - name: Tests
         run: MPLBACKEND=Agg poetry run pytest tests --nbmake example_cases
 
+      - name: Tests with new regression results
+        run: |
+          poetry run python tests/regression_results/generate_regression_results.py
+          MPLBACKEND=Agg poetry run pytest --no-cov tests/test_regression_against_cases.py
+
       - name: Test package
         run: |
           poetry build -f wheel
