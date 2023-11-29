@@ -173,3 +173,5 @@ target_electron_temp: 25.0
 edge_impurity_species: Argon
 # Factor applied to the result of the Lengyel model to give an absolute low-Z impurity concentration.
 lengyel_overestimation_factor: 4.3
+# Ratio of edge impurity concentration in the edge to in the core (c_edge / c_core)
+edge_impurity_enrichment: 5.0
