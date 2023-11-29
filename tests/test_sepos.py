@@ -26,7 +26,7 @@ def scalar_case(density1D, temp1D):
 def separatrix_electron_density(density1D):
     if density1D:
         ne_sep = np.linspace(0.01, 7.0, num=40) * 1e19
-        return xr.DataArray(Quantity(ne_sep, ureg.m**-3), coords=dict(dim_separatrix_density=ne_sep))
+        return xr.DataArray(Quantity(ne_sep, ureg.m**-3), coords=dict(dim_separatrix_electron_density=ne_sep))
     else:
         return Quantity(1.62, ureg.n19)
 
@@ -35,7 +35,7 @@ def separatrix_electron_density(density1D):
 def separatrix_electron_temp(temp1D):
     if temp1D:
         te_sep = np.linspace(1, 150, num=30)
-        return xr.DataArray(Quantity(te_sep, ureg.eV), coords=dict(dim_separatrix_temp=te_sep))
+        return xr.DataArray(Quantity(te_sep, ureg.eV), coords=dict(dim_separatrix_electron_temp=te_sep))
     else:
         return Quantity(57.5, ureg.eV)
 
