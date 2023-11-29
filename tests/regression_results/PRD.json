@@ -999,7 +999,7 @@
             },
             "data": 5941.561499571544
         },
-        "upstream_electron_temp": {
+        "separatrix_electron_temp": {
             "dims": [],
             "attrs": {
                 "units": "electron_volt"

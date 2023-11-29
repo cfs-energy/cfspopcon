@@ -9,7 +9,7 @@ from ..unit_handling import Unitfull, convert_to_default_units
 from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
-    "upstream_electron_temp",
+    "separatrix_electron_temp",
     "target_electron_density",
     "SOL_power_loss_fraction",
     "target_electron_flux",
@@ -42,13 +42,18 @@ def run_two_point_model_fixed_tet(
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
 
     Returns:
-        :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`SOL_power_loss_fraction`, :term:`target_electron_flux`, :term:`target_q_parallel`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`SOL_power_loss_fraction`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (SOL_power_loss_fraction, upstream_electron_temp, target_electron_density, target_electron_flux,) = solve_target_first_two_point_model(
+    (
+        SOL_power_loss_fraction,
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_flux,
+    ) = solve_target_first_two_point_model(
         target_electron_temp=target_electron_temp,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=nesep_over_nebar * average_electron_density,
+        separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,

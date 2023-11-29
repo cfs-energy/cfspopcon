@@ -1,0 +1,47 @@
+type: popcon
+
+figsize: [8, 6]
+show_dpi: 150
+save_as: "AUG_SepOS"
+
+coords:
+  x:
+    dimension: separatrix_electron_density
+    label: "$n_{e,sep}$ [$10^{19} m^{-3}$]"
+    units: n19
+  y:
+    dimension: separatrix_electron_temp
+    label: "$T_{e,sep}$ [$eV$]"
+    units: eV
+
+points:
+  AUG_SepOS_minTe:
+    label: "LH minimum $P_{SOL}$"
+    marker: "x"
+    color: "red"
+    size: 50.0
+
+# Suggested colors are "tab:red", "tab:blue", "tab:orange", "tab:green", "tab:purple",
+# "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan"
+contour:
+
+  LH_transition_condition:
+    label: "LH transition"
+    levels: [1.0]
+    color: "tab:blue"
+  
+  ideal_MHD_limit_condition:
+    label: "Ideal MHD limit"
+    levels: [1.0]
+    color: "black"
+  
+  Lmode_density_limit_condition:
+    label: "L-mode density limit"
+    levels: [1.0]
+    color: "tab:red"
+
+  alpha_t_turbulence_param:
+    label: "$\\alpha_t$"
+    levels: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    color: "tab:green"
+  
