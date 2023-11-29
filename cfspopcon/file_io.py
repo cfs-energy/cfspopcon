@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-import xarray as xr
 import numpy as np
+import xarray as xr
 
 from .helpers import convert_named_options
 from .point_selection import build_mask_from_dict, find_coords_of_minimum
