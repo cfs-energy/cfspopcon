@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import xarray as xr
 
 from .helpers import convert_named_options
@@ -48,7 +47,7 @@ def promote_variable(val: xr.DataArray, key: str) -> Any:
     except KeyError:
         pass
 
-    if val.dtype == object or val.dtype.type == np.str_:
+    if val.dtype == object:
         if val.size == 1:
             return convert_named_options(key, val.item())
         else:
