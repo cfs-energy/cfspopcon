@@ -4,7 +4,7 @@ Closely related to scrape_off_layer_model/separatrix_electron_temp.py, but with 
 """
 import numpy as np
 
-from ...unit_handling import Quantity, Unitfull, ureg, convert_units
+from ...unit_handling import Quantity, Unitfull, convert_units, ureg
 
 
 def calc_power_crossing_separatrix(
