@@ -6,7 +6,7 @@ from .auxillaries import calc_curvature_drive_omega_B, calc_electron_beta, calc_
 from .turbulence_wavenumbers import calc_k_EM
 
 
-def calc_LH_transition_condition_transition_condition(
+def calc_LH_transition_condition(
     electron_density: Unitfull,
     electron_temperature: Unitfull,
     major_radius: Unitfull,

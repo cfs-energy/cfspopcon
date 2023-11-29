@@ -10,7 +10,7 @@ from ..formulas.separatrix_operational_space import (
     calc_L_mode_density_limit_condition,
     calc_lambda_pe_Eich2021H,
     calc_lambda_pe_Manz2023L,
-    calc_LH_transition_condition_transition_condition,
+    calc_LH_transition_condition,
     calc_sound_larmor_radius_rho_s,
 )
 from ..unit_handling import Unitfull, convert_to_default_units, ureg
@@ -116,7 +116,7 @@ def run_calc_separatrix_operational_space(
         alpha_c,
         lambda_pe=lambda_pe_H,
     )
-    LH_transition_condition = calc_LH_transition_condition_transition_condition(
+    LH_transition_condition = calc_LH_transition_condition(
         separatrix_electron_density,
         separatrix_electron_temp,
         major_radius,

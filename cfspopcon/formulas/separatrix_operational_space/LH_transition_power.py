@@ -1,6 +1,5 @@
 """Routines to calculate the separatrix power required to reach the LH transition."""
 import matplotlib.pyplot as plt  # type:ignore[import]
-import numpy as np
 import xarray as xr
 from scipy.interpolate import RectBivariateSpline  # type:ignore[import]
 
@@ -27,7 +26,7 @@ def interpolate_field_to_LH_curve(
 ) -> xr.DataArray:
     """Interpolate a 2D field to the points defined by the LH transition curve."""
     interpolator = RectBivariateSpline(
-        field.separatrix_density, field.separatrix_temp, field.transpose("separatrix_density", "separatrix_temp")
+        field.dim_separatrix_density, field.dim_separatrix_temp, field.transpose("dim_separatrix_density", "dim_separatrix_temp")
     )
 
     interpolated_curve = xr.DataArray(
@@ -58,13 +57,3 @@ def calc_power_crossing_separatrix_in_ion_channel(
     P_SOL_i = surface_area * separatrix_density * chi_i / L_Ti
 
     return convert_units(P_SOL_i, ureg.MW)
-
-
-def calLH_transition_condition_power_required_for_given_Qi_to_Qe(
-    P_LH_electron_channel: Unitfull, P_LH_ion_channel: Unitfull, Qi_to_Qe: float = 0.5
-) -> Unitfull:
-    """Calculate the total power crossing the separatrix, assuming some fixed ratio of Qi/Qe.
-
-    Qi_to_Qe = Qi / Qe
-    """
-    return np.maximum(P_LH_electron_channel * (1.0 + Qi_to_Qe), P_LH_ion_channel * (1.0 + 1.0 / Qi_to_Qe))
