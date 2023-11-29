@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import xarray as xr
+import numpy as np
 
 from .helpers import convert_named_options
 from .point_selection import build_mask_from_dict, find_coords_of_minimum
@@ -47,7 +48,7 @@ def promote_variable(val: xr.DataArray, key: str) -> Any:
     except KeyError:
         pass
 
-    if val.dtype == object:
+    if val.dtype == object or val.dtype.type == np.str_:
         if val.size == 1:
             return convert_named_options(key, val.item())
         else:
