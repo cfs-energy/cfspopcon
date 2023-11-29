@@ -93,6 +93,9 @@ def extend_impurities_array(array: xr.DataArray, species: Union[str, Impurity], 
 
     N.b. You can also 'extend' an empty array, constructed via xr.DataArray()
     """
+    if isinstance(species, xr.DataArray):
+        species = species.item()
+    
     if not isinstance(species, Impurity):
         species = Impurity[species.capitalize()]
 

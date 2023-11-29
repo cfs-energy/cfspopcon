@@ -135,6 +135,8 @@ DEFAULT_UNITS = dict(
     lengyel_overestimation_factor="",
     upstream_electron_density="n19",
     edge_impurity_concentration="",
+    edge_impurity_concentration_in_core="",
+    edge_impurity_enrichment="",
 )
 
 

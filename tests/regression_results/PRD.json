@@ -293,6 +293,20 @@
             "data": 0.08444947767817207,
             "dims": []
         },
+        "edge_impurity_concentration_in_core": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.016889895535634417,
+            "dims": []
+        },
+        "edge_impurity_enrichment": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 5.0,
+            "dims": []
+        },
         "edge_impurity_species": {
             "attrs": {},
             "data": "Argon",
