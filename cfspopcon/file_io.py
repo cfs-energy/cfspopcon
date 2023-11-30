@@ -105,4 +105,4 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
     output_dir.mkdir(parents=True, exist_ok=True)
 
     with open(output_dir / f"{point_key}.json", "w") as file:
-        json.dump(point.to_dict(), file, indent=4)
+        json.dump(point.to_dict(), file, indent=4, sort_keys=True)
