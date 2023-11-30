@@ -127,10 +127,18 @@ DEFAULT_UNITS = dict(
     triangularity_psi95="",
     triangularity_ratio_sep_to_psi95="",
     two_point_model_method=None,
-    upstream_electron_temp="eV",
+    separatrix_electron_temp="eV",
     vertical_minor_radius="m",
     z_effective="",
     zeff_change_from_core_rad="",
+    Lmode_density_limit_condition="",
+    LH_transition_condition="",
+    ideal_MHD_limit_condition="",
+    alpha_t_turbulence_param="",
+    ion_mass="amu",
+    elongation_psi95="",
+    mean_ion_charge="",
+    separatrix_electron_density="m**-3",
 )
 
 

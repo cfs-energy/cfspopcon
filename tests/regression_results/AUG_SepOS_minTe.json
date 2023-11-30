@@ -1,0 +1,123 @@
+{
+    "coords": {
+        "dim_separatrix_electron_density": {
+            "dims": [],
+            "attrs": {},
+            "data": 1.623076923076923e+19
+        },
+        "dim_separatrix_electron_temp": {
+            "dims": [],
+            "attrs": {},
+            "data": 57.51724137931035
+        }
+    },
+    "attrs": {},
+    "dims": {},
+    "data_vars": {
+        "magnetic_field_on_axis": {
+            "dims": [],
+            "attrs": {
+                "units": "tesla"
+            },
+            "data": 2.5
+        },
+        "major_radius": {
+            "dims": [],
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 1.65
+        },
+        "minor_radius": {
+            "dims": [],
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 0.49
+        },
+        "ion_mass": {
+            "dims": [],
+            "attrs": {
+                "units": "unified_atomic_mass_unit"
+            },
+            "data": 2.0
+        },
+        "plasma_current": {
+            "dims": [],
+            "attrs": {
+                "units": "ampere"
+            },
+            "data": 800000.0
+        },
+        "elongation_psi95": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.6
+        },
+        "triangularity_psi95": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3
+        },
+        "z_effective": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.25
+        },
+        "mean_ion_charge": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0
+        },
+        "separatrix_electron_density": {
+            "dims": [],
+            "attrs": {
+                "units": "1 / meter ** 3"
+            },
+            "data": 1.623076923076923e+19
+        },
+        "separatrix_electron_temp": {
+            "dims": [],
+            "attrs": {
+                "units": "electron_volt"
+            },
+            "data": 57.51724137931035
+        },
+        "Lmode_density_limit_condition": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6234469893104395
+        },
+        "ideal_MHD_limit_condition": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3481188528665416
+        },
+        "LH_transition_condition": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.013618191308572
+        },
+        "alpha_t_turbulence_param": {
+            "dims": [],
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6073549597011819
+        }
+    }
+}

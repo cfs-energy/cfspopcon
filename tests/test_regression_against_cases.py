@@ -19,7 +19,7 @@ def test_regression_against_case(case: Path):
     input_parameters, algorithm, _ = read_case(case)
     case_name = case.parent.stem
 
-    dataset = algorithm.run(**input_parameters)
+    dataset = algorithm.run(**input_parameters).merge(input_parameters)
 
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 
@@ -34,9 +34,7 @@ def test_regression_against_case_with_update(case: Path):
     case_name = case.parent.stem
 
     dataset = xr.Dataset(input_parameters)
-
-    for alg in algorithm.algorithms:  # type: ignore
-        dataset = alg.update_dataset(dataset)
+    algorithm.update_dataset(dataset, in_place=True)
 
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 

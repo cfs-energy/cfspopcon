@@ -7,7 +7,7 @@ import xarray as xr
 from ...unit_handling import Quantity
 
 
-def calc_upstream_electron_temp(
+def calc_separatrix_electron_temp(
     target_electron_temp: Union[Quantity, xr.DataArray],
     parallel_heat_flux_density: Union[Quantity, xr.DataArray],
     parallel_connection_length: Union[Quantity, xr.DataArray],
@@ -26,7 +26,7 @@ def calc_upstream_electron_temp(
         SOL_conduction_fraction: [eV]
 
     Returns:
-        upstream_electron_temp [eV]
+        separatrix_electron_temp [eV]
     """
     return (
         target_electron_temp**3.5 + 3.5 * (SOL_conduction_fraction * parallel_heat_flux_density * parallel_connection_length / kappa_e0)
