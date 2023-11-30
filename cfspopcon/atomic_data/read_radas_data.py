@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import RectBivariateSpline, RegularGridInterpolator  # type: ignore[import]
+from scipy.interpolate import RectBivariateSpline, RegularGridInterpolator  # type: ignore[import-untyped]
 
 from ..named_options import Impurity
 from ..unit_handling import convert_units, magnitude, ureg

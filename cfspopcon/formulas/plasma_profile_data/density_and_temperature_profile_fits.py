@@ -54,7 +54,7 @@ import numpy as np
 import pandas as pd
 import yaml
 from numpy.typing import NDArray
-from scipy.interpolate import RectBivariateSpline  # type: ignore[import]
+from scipy.interpolate import RectBivariateSpline  # type: ignore[import-untyped]
 
 plasma_profiles_directory = Path(__file__).parent
 
