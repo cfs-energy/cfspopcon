@@ -10,6 +10,6 @@ poetry install --only main
 
 poetry run python adas_data/fetch_adas_data.py
 
-poetry run python run_radas.py all
+poetry run python run_radas.py --case all
 
 popd
