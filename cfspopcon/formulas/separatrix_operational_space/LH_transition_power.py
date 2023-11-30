@@ -1,7 +1,7 @@
 """Routines to calculate the separatrix power required to reach the LH transition."""
-import matplotlib.pyplot as plt  # type:ignore[import]
+import matplotlib.pyplot as plt
 import xarray as xr
-from scipy.interpolate import RectBivariateSpline  # type:ignore[import]
+from scipy.interpolate import RectBivariateSpline  # type:ignore[import-untyped]
 
 from cfspopcon.unit_handling import Unitfull, convert_units, magnitude, ureg
 
@@ -15,8 +15,8 @@ def extract_LH_contour_points(LH_transition_condition: xr.DataArray) -> tuple[xr
 
     p = contour_set.collections[0].get_paths()[0]
     v = p.vertices
-    LH_separatrix_density = xr.DataArray(v[:, 0], coords=dict(LH_separatrix_density=v[:, 0]))
-    LH_separatrix_temp = xr.DataArray(v[:, 1], coords=dict(LH_separatrix_density=v[:, 0]))
+    LH_separatrix_density = xr.DataArray(v[:, 0], coords=dict(LH_separatrix_density=v[:, 0]))  # type:ignore[call-overload,index]
+    LH_separatrix_temp = xr.DataArray(v[:, 1], coords=dict(LH_separatrix_density=v[:, 0]))  # type:ignore[call-overload,index]
 
     return LH_separatrix_density, LH_separatrix_temp
 
