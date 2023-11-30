@@ -5,9 +5,9 @@ import sys
 from pathlib import Path
 
 import click
-import matplotlib.pyplot as plt  # type:ignore[import]
+import matplotlib.pyplot as plt
 import xarray as xr
-from ipdb import launch_ipdb_on_exception  # type:ignore[import]
+from ipdb import launch_ipdb_on_exception  # type:ignore[import-untyped]
 
 from cfspopcon import file_io
 from cfspopcon.input_file_handling import read_case

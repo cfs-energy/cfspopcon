@@ -1,8 +1,9 @@
 """Functions for saving results to file and loading those files."""
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
+import numpy as np
 import xarray as xr
 
 from .helpers import convert_named_options
@@ -26,7 +27,9 @@ def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray:
     return val
 
 
-def write_dataset_to_netcdf(dataset: xr.Dataset, filepath: Path) -> None:
+def write_dataset_to_netcdf(
+    dataset: xr.Dataset, filepath: Path, netcdf_writer: Literal["netcdf4", "scipy", "h5netcdf"] = "netcdf4"
+) -> None:
     """Write a dataset to a NetCDF file."""
     serialized_dataset = dataset.copy()
     for key in dataset.keys():
@@ -37,7 +40,7 @@ def write_dataset_to_netcdf(dataset: xr.Dataset, filepath: Path) -> None:
         assert isinstance(key, str)  # because hashable type of key is broader str but we  know it's str
         serialized_dataset[key] = sanitize_variable(dataset[key], key)
 
-    serialized_dataset.to_netcdf(filepath)
+    serialized_dataset.to_netcdf(filepath, engine=netcdf_writer)
 
 
 def promote_variable(val: xr.DataArray, key: str) -> Any:
@@ -47,7 +50,8 @@ def promote_variable(val: xr.DataArray, key: str) -> Any:
     except KeyError:
         pass
 
-    if val.dtype == object:
+    # scipy i/o yields objects for strings while netcdf4 yields np.str_
+    if val.dtype == object or val.dtype.type == np.str_:
         if val.size == 1:
             return convert_named_options(key, val.item())
         else:

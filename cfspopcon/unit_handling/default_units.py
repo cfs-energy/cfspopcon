@@ -252,7 +252,7 @@ def convert_to_default_units(value: Quantity, key: str) -> Quantity:
 def convert_to_default_units(value: Union[float, Quantity, xr.DataArray], key: str) -> Union[float, Quantity, xr.DataArray]:
     """Convert an array or scalar to default units."""
     unit = DEFAULT_UNITS[key]
-    if unit is None or unit == "":
+    if unit is None:
         return value
     elif isinstance(value, (xr.DataArray, Quantity)):
         return convert_units(value, unit)

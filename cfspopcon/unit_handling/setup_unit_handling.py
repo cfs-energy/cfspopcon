@@ -7,7 +7,7 @@ from typing import Any, TypeVar, Union, overload
 import numpy as np
 import numpy.typing as npt
 import pint
-import pint_xarray  # type:ignore[import]
+import pint_xarray  # type:ignore[import-untyped]
 import xarray as xr
 from pint.errors import DimensionalityError
 from typing_extensions import ParamSpec

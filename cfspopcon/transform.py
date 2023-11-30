@@ -4,7 +4,7 @@ from typing import Callable, Optional, Union
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import griddata  # type:ignore[import]
+from scipy.interpolate import griddata  # type:ignore[import-untyped]
 
 from cfspopcon.unit_handling import Unit, magnitude
 

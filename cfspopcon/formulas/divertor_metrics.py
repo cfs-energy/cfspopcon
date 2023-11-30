@@ -1,6 +1,6 @@
 """Divertor loading and functions to calculate OMP pitch (for q_parallel calculation)."""
 import numpy as np
-from scipy import constants  # type: ignore[import]
+from scipy import constants  # type: ignore[import-untyped]
 
 from ..unit_handling import ureg, wraps_ufunc
 

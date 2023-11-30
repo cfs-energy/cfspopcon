@@ -4,7 +4,7 @@ from typing import Any
 
 from numpy import float64
 from numpy.typing import NDArray
-from scipy import constants  # type: ignore[import]
+from scipy import constants  # type: ignore[import-untyped]
 
 
 def reaction_energy_DT(
