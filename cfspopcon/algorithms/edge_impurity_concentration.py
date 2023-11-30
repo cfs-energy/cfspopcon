@@ -1,12 +1,13 @@
 """Run the two point model with a fixed sheath entrance temperature."""
 
 import xarray as xr
+
 from ..atomic_data import read_atomic_data
 from ..formulas.scrape_off_layer_model import build_L_int_integrator, calc_required_edge_impurity_concentration
+from ..helpers import extend_impurities_array
 from ..named_options import Impurity
 from ..unit_handling import Unitfull, convert_to_default_units, ureg
 from .algorithm_class import Algorithm
-from ..helpers import extend_impurities_array
 
 RETURN_KEYS = [
     "edge_impurity_concentration",
