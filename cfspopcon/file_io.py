@@ -50,7 +50,7 @@ def promote_variable(val: xr.DataArray, key: str) -> Any:
     except KeyError:
         pass
 
-    # scipy i/o yields objects for strings while netcdf4 yields np.str_ 
+    # scipy i/o yields objects for strings while netcdf4 yields np.str_
     if val.dtype == object or val.dtype.type == np.str_:
         if val.size == 1:
             return convert_named_options(key, val.item())
