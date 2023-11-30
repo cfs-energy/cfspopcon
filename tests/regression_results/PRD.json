@@ -1,551 +1,313 @@
 {
+    "attrs": {},
     "coords": {
+        "dim_average_electron_density": {
+            "attrs": {},
+            "data": 25.0,
+            "dims": []
+        },
+        "dim_average_electron_temp": {
+            "attrs": {},
+            "data": 9.137931034482758,
+            "dims": []
+        },
         "dim_species": {
-            "dims": [
-                "dim_0"
-            ],
             "attrs": {},
             "data": [
                 "Tungsten",
                 "Helium",
                 "Oxygen"
+            ],
+            "dims": [
+                "dim_0"
             ]
-        },
-        "dim_average_electron_density": {
-            "dims": [],
-            "attrs": {},
-            "data": 25.0
-        },
-        "dim_average_electron_temp": {
-            "dims": [],
-            "attrs": {},
-            "data": 9.137931034482758
         }
     },
-    "attrs": {},
-    "dims": {
-        "dim_0": 3,
-        "dim_species": 3,
-        "dim_rho": 50
-    },
     "data_vars": {
-        "major_radius": {
-            "dims": [],
-            "attrs": {
-                "units": "meter"
-            },
-            "data": 1.85
-        },
-        "magnetic_field_on_axis": {
-            "dims": [],
+        "B_pol_out_mid": {
             "attrs": {
                 "units": "tesla"
             },
-            "data": 12.2
+            "data": 3.0527119151332296,
+            "dims": []
         },
-        "inverse_aspect_ratio": {
-            "dims": [],
+        "B_t_out_mid": {
             "attrs": {
-                "units": "dimensionless"
+                "units": "tesla"
             },
-            "data": 0.3081
+            "data": 9.326504089901384,
+            "dims": []
         },
-        "areal_elongation": {
-            "dims": [],
+        "PB_over_R": {
             "attrs": {
-                "units": "dimensionless"
+                "units": "megawatt * tesla / meter"
             },
-            "data": 1.75
+            "data": 168.76392067708971,
+            "dims": []
         },
-        "elongation_ratio_sep_to_areal": {
-            "dims": [],
+        "PBpRnSq": {
             "attrs": {
-                "units": "dimensionless"
+                "units": "megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter"
             },
-            "data": 1.125
+            "data": 8.206676168550032,
+            "dims": []
         },
-        "triangularity_psi95": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.3
-        },
-        "triangularity_ratio_sep_to_psi95": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.8
-        },
-        "plasma_current": {
-            "dims": [],
-            "attrs": {
-                "units": "ampere"
-            },
-            "data": 8700000.0
-        },
-        "fraction_of_external_power_coupled": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.9
-        },
-        "fusion_reaction": {
-            "dims": [],
-            "attrs": {},
-            "data": "DT"
-        },
-        "heavier_fuel_species_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.5
-        },
-        "profile_form": {
-            "dims": [],
-            "attrs": {},
-            "data": "prf"
-        },
-        "normalized_inverse_temp_scale_length": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 2.5
-        },
-        "electron_density_peaking_offset": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": -0.1
-        },
-        "ion_density_peaking_offset": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": -0.2
-        },
-        "temperature_peaking": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 2.5
-        },
-        "ion_to_electron_temp_ratio": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.0
-        },
-        "confinement_threshold_scalar": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.0
-        },
-        "confinement_time_scalar": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.0
-        },
-        "energy_confinement_scaling": {
-            "dims": [],
-            "attrs": {},
-            "data": "ITER98y2"
-        },
-        "radiated_power_method": {
-            "dims": [],
-            "attrs": {},
-            "data": "Radas"
-        },
-        "radiated_power_scalar": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.0
-        },
-        "minimum_core_radiated_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0
-        },
-        "impurities": {
-            "dims": [
-                "dim_species"
-            ],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": [
-                1.5e-05,
-                0.06,
-                0.0031
-            ]
-        },
-        "core_radiator": {
-            "dims": [],
-            "attrs": {},
-            "data": "Xenon"
-        },
-        "nesep_over_nebar": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.3
-        },
-        "toroidal_flux_expansion": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.6974
-        },
-        "parallel_connection_length": {
-            "dims": [],
-            "attrs": {
-                "units": "meter"
-            },
-            "data": 30.0
-        },
-        "lambda_q_scaling": {
-            "dims": [],
-            "attrs": {},
-            "data": "EichRegression15"
-        },
-        "lambda_q_factor": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.0
-        },
-        "SOL_momentum_loss_function": {
-            "dims": [],
-            "attrs": {},
-            "data": "KotovReiter"
-        },
-        "fraction_of_P_SOL_to_divertor": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.6
-        },
-        "kappa_e0": {
-            "dims": [],
-            "attrs": {
-                "units": "watt / electron_volt ** 3.5 / meter"
-            },
-            "data": 2600.0
-        },
-        "target_electron_temp": {
-            "dims": [],
-            "attrs": {
-                "units": "electron_volt"
-            },
-            "data": 25.0
-        },
-        "average_electron_density": {
-            "dims": [],
-            "attrs": {
-                "units": "_1e19_per_cubic_metre"
-            },
-            "data": 25.0
-        },
-        "average_electron_temp": {
-            "dims": [],
-            "attrs": {
-                "units": "kiloelectron_volt"
-            },
-            "data": 9.137931034482758
-        },
-        "separatrix_elongation": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.96875
-        },
-        "separatrix_triangularity": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.54
-        },
-        "minor_radius": {
-            "dims": [],
-            "attrs": {
-                "units": "meter"
-            },
-            "data": 0.569985
-        },
-        "vertical_minor_radius": {
-            "dims": [],
-            "attrs": {
-                "units": "meter"
-            },
-            "data": 1.1221579687499998
-        },
-        "plasma_volume": {
-            "dims": [],
-            "attrs": {
-                "units": "meter ** 3"
-            },
-            "data": 19.79484837055445
-        },
-        "surface_area": {
-            "dims": [],
-            "attrs": {
-                "units": "meter ** 2"
-            },
-            "data": 55.536257947812175
-        },
-        "f_shaping": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 2.6721853873123846
-        },
-        "q_star": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 3.2902757162288694
-        },
-        "fuel_average_mass_number": {
-            "dims": [],
-            "attrs": {
-                "units": "unified_atomic_mass_unit"
-            },
-            "data": 2.5
-        },
-        "average_ion_temp": {
-            "dims": [],
-            "attrs": {
-                "units": "kiloelectron_volt"
-            },
-            "data": 9.137931034482758
-        },
-        "impurity_charge_state": {
-            "dims": [
-                "dim_species"
-            ],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": [
-                58.37812639204965,
-                1.9999999473503665,
-                7.999453250480196
-            ]
-        },
-        "z_effective": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.343818980316905
-        },
-        "dilution": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.8543260261866087
-        },
-        "summed_impurity_density": {
-            "dims": [],
-            "attrs": {
-                "units": "_1e19_per_cubic_metre"
-            },
-            "data": 1.5778750000000001
-        },
-        "average_ion_density": {
-            "dims": [],
-            "attrs": {
-                "units": "_1e19_per_cubic_metre"
-            },
-            "data": 21.358150654665216
-        },
-        "plasma_stored_energy": {
-            "dims": [],
-            "attrs": {
-                "units": "megajoule"
-            },
-            "data": 20.838369393350952
-        },
-        "energy_confinement_time": {
-            "dims": [],
-            "attrs": {
-                "units": "second"
-            },
-            "data": 0.6623168189838371
-        },
-        "P_in": {
-            "dims": [],
+        "P_LH_thresh": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 31.462841945222415
+            "data": 24.59383938922551,
+            "dims": []
         },
-        "beta_toroidal": {
-            "dims": [],
+        "P_alpha": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 22.558692697232903,
+            "dims": []
+        },
+        "P_auxillary": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 7.702535294009074,
+            "dims": []
+        },
+        "P_external": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 8.904149247989512,
+            "dims": []
+        },
+        "P_fusion": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 112.79346348616448,
+            "dims": []
+        },
+        "P_in": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 31.462841945222415,
+            "dims": []
+        },
+        "P_launched": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 9.893499164432791,
+            "dims": []
+        },
+        "P_neutron": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 90.23477078893161,
+            "dims": []
+        },
+        "P_ohmic": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 1.2016139539804378,
+            "dims": []
+        },
+        "P_radiated_by_core_radiator": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 0.0,
+            "dims": []
+        },
+        "P_radiation": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 5.871591678614546,
+            "dims": []
+        },
+        "P_sol": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 25.59125026660787,
+            "dims": []
+        },
+        "Q": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.012360853882996833
+            "data": 11.40076545330472,
+            "dims": []
         },
-        "beta_poloidal": {
-            "dims": [],
+        "SOL_momentum_loss_function": {
+            "attrs": {},
+            "data": "KotovReiter",
+            "dims": []
+        },
+        "SOL_power_loss_fraction": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.19742242875250135
+            "data": 0.9639674438709462,
+            "dims": []
+        },
+        "areal_elongation": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.75,
+            "dims": []
+        },
+        "average_electron_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 25.0,
+            "dims": []
+        },
+        "average_electron_temp": {
+            "attrs": {
+                "units": "kiloelectron_volt"
+            },
+            "data": 9.137931034482758,
+            "dims": []
+        },
+        "average_ion_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 21.358150654665216,
+            "dims": []
+        },
+        "average_ion_temp": {
+            "attrs": {
+                "units": "kiloelectron_volt"
+            },
+            "data": 9.137931034482758,
+            "dims": []
+        },
+        "average_total_pressure": {
+            "attrs": {
+                "units": "pascal"
+            },
+            "data": 732028.9793275861,
+            "dims": []
         },
         "beta": {
-            "dims": [],
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.011632527455851185
+            "data": 0.011632527455851185,
+            "dims": []
         },
-        "normalized_beta": {
-            "dims": [],
+        "beta_poloidal": {
             "attrs": {
-                "units": "meter * percent * tesla / megaampere"
+                "units": "dimensionless"
             },
-            "data": 0.9297754847754564
+            "data": 0.19742242875250135,
+            "dims": []
+        },
+        "beta_toroidal": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.012360853882996833,
+            "dims": []
+        },
+        "bootstrap_fraction": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.08515117576845077,
+            "dims": []
+        },
+        "confinement_threshold_scalar": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0,
+            "dims": []
+        },
+        "confinement_time_scalar": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0,
+            "dims": []
+        },
+        "core_radiated_power_fraction": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.18661987651456066,
+            "dims": []
+        },
+        "core_radiator": {
+            "attrs": {},
+            "data": "Xenon",
+            "dims": []
+        },
+        "core_radiator_charge_state": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 45.77499167746534,
+            "dims": []
+        },
+        "core_radiator_concentration": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.0,
+            "dims": []
+        },
+        "current_relaxation_time": {
+            "attrs": {
+                "units": "second"
+            },
+            "data": 16.361532562672082,
+            "dims": []
+        },
+        "dilution": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.8543260261866087,
+            "dims": []
+        },
+        "dilution_change_from_core_rad": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.0,
+            "dims": []
         },
         "effective_collisionality": {
-            "dims": [],
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.07443149734873825
-        },
-        "ion_density_peaking": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.4011372596580545
+            "data": 0.07443149734873825,
+            "dims": []
         },
         "electron_density_peaking": {
-            "dims": [],
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.5011372596580543
+            "data": 1.5011372596580543,
+            "dims": []
         },
-        "peak_electron_density": {
-            "dims": [],
-            "attrs": {
-                "units": "_1e19_per_cubic_metre"
-            },
-            "data": 37.52843149145136
-        },
-        "peak_fuel_ion_density": {
-            "dims": [],
-            "attrs": {
-                "units": "_1e19_per_cubic_metre"
-            },
-            "data": 29.925700679641505
-        },
-        "peak_electron_temp": {
-            "dims": [],
-            "attrs": {
-                "units": "kiloelectron_volt"
-            },
-            "data": 22.844827586206897
-        },
-        "peak_ion_temp": {
-            "dims": [],
-            "attrs": {
-                "units": "kiloelectron_volt"
-            },
-            "data": 22.844827586206897
-        },
-        "rho": {
-            "dims": [
-                "dim_rho"
-            ],
+        "electron_density_peaking_offset": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": [
-                0.0,
-                0.02,
-                0.04,
-                0.06,
-                0.08,
-                0.1,
-                0.12,
-                0.14,
-                0.16,
-                0.18,
-                0.2,
-                0.22,
-                0.24,
-                0.26,
-                0.28,
-                0.3,
-                0.32,
-                0.34,
-                0.36,
-                0.38,
-                0.4,
-                0.42,
-                0.44,
-                0.46,
-                0.48,
-                0.5,
-                0.52,
-                0.54,
-                0.56,
-                0.58,
-                0.6,
-                0.62,
-                0.64,
-                0.66,
-                0.68,
-                0.7000000000000001,
-                0.72,
-                0.74,
-                0.76,
-                0.78,
-                0.8,
-                0.8200000000000001,
-                0.84,
-                0.86,
-                0.88,
-                0.9,
-                0.92,
-                0.9400000000000001,
-                0.96,
-                0.98
-            ]
+            "data": -0.1,
+            "dims": []
         },
         "electron_density_profile": {
-            "dims": [
-                "dim_rho"
-            ],
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },
@@ -600,12 +362,126 @@
                 19.313144858739772,
                 18.306469509218292,
                 11.626327009971213
-            ]
-        },
-        "fuel_ion_density_profile": {
+            ],
             "dims": [
                 "dim_rho"
+            ]
+        },
+        "electron_temp_profile": {
+            "attrs": {
+                "units": "kiloelectron_volt"
+            },
+            "data": [
+                22.81700031005393,
+                22.794916213858393,
+                22.72879209094119,
+                22.61901119942156,
+                22.46620818995649,
+                22.271262994778876,
+                22.035292388010884,
+                21.759639330503582,
+                21.44586024142759,
+                21.095710365374412,
+                20.71112742738783,
+                20.294213788755364,
+                19.84721733324049,
+                19.372511326493818,
+                18.872573500483547,
+                18.349964619853683,
+                17.807306788148814,
+                17.247261748912724,
+                16.672509429922524,
+                16.085726968478994,
+                15.489568442015889,
+                14.886645511652285,
+                14.279509167072204,
+                13.67063273969366,
+                13.06239632792736,
+                12.457072753886544,
+                11.857198932297228,
+                11.278916509472818,
+                10.728837253556305,
+                10.205585679849829,
+                9.707853386836657,
+                9.234395784495796,
+                8.784028982178587,
+                8.355626828265335,
+                7.948118094199611,
+                7.560483795858814,
+                7.1917546455630434,
+                6.841008628350937,
+                6.50736869646198,
+                6.190000576260198,
+                5.888110682115468,
+                5.600944132026026,
+                5.327782860020225,
+                5.067943820617523,
+                4.820777280858972,
+                4.585665195636339,
+                4.36201966225737,
+                4.046835325082298,
+                3.835898711955329,
+                2.4361558507970544
             ],
+            "dims": [
+                "dim_rho"
+            ]
+        },
+        "elongation_ratio_sep_to_areal": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.125,
+            "dims": []
+        },
+        "energy_confinement_scaling": {
+            "attrs": {},
+            "data": "ITER98y2",
+            "dims": []
+        },
+        "energy_confinement_time": {
+            "attrs": {
+                "units": "second"
+            },
+            "data": 0.6623168189838371,
+            "dims": []
+        },
+        "f_shaping": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.6721853873123846,
+            "dims": []
+        },
+        "fieldline_pitch_at_omp": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 3.214648364176006,
+            "dims": []
+        },
+        "fraction_of_P_SOL_to_divertor": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6,
+            "dims": []
+        },
+        "fraction_of_external_power_coupled": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.9,
+            "dims": []
+        },
+        "fuel_average_mass_number": {
+            "attrs": {
+                "units": "unified_atomic_mass_unit"
+            },
+            "data": 2.5,
+            "dims": []
+        },
+        "fuel_ion_density_profile": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },
@@ -660,442 +536,566 @@
                 17.52688019511696,
                 16.61331182624222,
                 10.551012903566784
-            ]
-        },
-        "electron_temp_profile": {
+            ],
             "dims": [
                 "dim_rho"
-            ],
-            "attrs": {
-                "units": "kiloelectron_volt"
-            },
-            "data": [
-                22.81700031005393,
-                22.794916213858393,
-                22.72879209094119,
-                22.61901119942156,
-                22.46620818995649,
-                22.271262994778876,
-                22.035292388010884,
-                21.759639330503582,
-                21.44586024142759,
-                21.095710365374412,
-                20.71112742738783,
-                20.294213788755364,
-                19.84721733324049,
-                19.372511326493818,
-                18.872573500483547,
-                18.349964619853683,
-                17.807306788148814,
-                17.247261748912724,
-                16.672509429922524,
-                16.085726968478994,
-                15.489568442015889,
-                14.886645511652285,
-                14.279509167072204,
-                13.67063273969366,
-                13.06239632792736,
-                12.457072753886544,
-                11.857198932297228,
-                11.278916509472818,
-                10.728837253556305,
-                10.205585679849829,
-                9.707853386836657,
-                9.234395784495796,
-                8.784028982178587,
-                8.355626828265335,
-                7.948118094199611,
-                7.560483795858814,
-                7.1917546455630434,
-                6.841008628350937,
-                6.50736869646198,
-                6.190000576260198,
-                5.888110682115468,
-                5.600944132026026,
-                5.327782860020225,
-                5.067943820617523,
-                4.820777280858972,
-                4.585665195636339,
-                4.36201966225737,
-                4.046835325082298,
-                3.835898711955329,
-                2.4361558507970544
             ]
         },
-        "ion_temp_profile": {
-            "dims": [
-                "dim_rho"
-            ],
-            "attrs": {
-                "units": "kiloelectron_volt"
-            },
-            "data": [
-                22.81700031005393,
-                22.794916213858393,
-                22.72879209094119,
-                22.61901119942156,
-                22.46620818995649,
-                22.271262994778876,
-                22.035292388010884,
-                21.759639330503582,
-                21.44586024142759,
-                21.095710365374412,
-                20.71112742738783,
-                20.294213788755364,
-                19.84721733324049,
-                19.372511326493818,
-                18.872573500483547,
-                18.349964619853683,
-                17.807306788148814,
-                17.247261748912724,
-                16.672509429922524,
-                16.085726968478994,
-                15.489568442015889,
-                14.886645511652285,
-                14.279509167072204,
-                13.67063273969366,
-                13.06239632792736,
-                12.457072753886544,
-                11.857198932297228,
-                11.278916509472818,
-                10.728837253556305,
-                10.205585679849829,
-                9.707853386836657,
-                9.234395784495796,
-                8.784028982178587,
-                8.355626828265335,
-                7.948118094199611,
-                7.560483795858814,
-                7.1917546455630434,
-                6.841008628350937,
-                6.50736869646198,
-                6.190000576260198,
-                5.888110682115468,
-                5.600944132026026,
-                5.327782860020225,
-                5.067943820617523,
-                4.820777280858972,
-                4.585665195636339,
-                4.36201966225737,
-                4.046835325082298,
-                3.835898711955329,
-                2.4361558507970544
-            ]
-        },
-        "P_radiation": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 5.871591678614546
-        },
-        "core_radiator_concentration": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0
-        },
-        "P_radiated_by_core_radiator": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 0.0
-        },
-        "core_radiator_charge_state": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 45.77499167746534
-        },
-        "zeff_change_from_core_rad": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0
-        },
-        "dilution_change_from_core_rad": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0
-        },
-        "P_fusion": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 112.79346348616448
-        },
-        "P_neutron": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 90.23477078893161
-        },
-        "P_alpha": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 22.558692697232903
-        },
-        "P_external": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 8.904149247989512
-        },
-        "P_launched": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 9.893499164432791
-        },
-        "Q": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 11.40076545330472
-        },
-        "neutron_power_flux_to_walls": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt / meter ** 2"
-            },
-            "data": 1.624790256371358
-        },
-        "neutron_rate": {
-            "dims": [],
-            "attrs": {
-                "units": "1 / second"
-            },
-            "data": 4.00000810164065e+19
-        },
-        "bootstrap_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.08515117576845077
-        },
-        "spitzer_resistivity": {
-            "dims": [],
-            "attrs": {
-                "units": "meter * ohm"
-            },
-            "data": 1.0136457814443183e-09
-        },
-        "trapped_particle_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 2.377505168672477
-        },
-        "neoclassical_loop_resistivity": {
-            "dims": [],
-            "attrs": {
-                "units": "meter * ohm"
-            },
-            "data": 2.9146805798816443e-09
-        },
-        "loop_voltage": {
-            "dims": [],
-            "attrs": {
-                "units": "volt"
-            },
-            "data": 0.1509719887879264
-        },
-        "P_ohmic": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 1.2016139539804378
-        },
-        "P_auxillary": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 7.702535294009074
-        },
-        "P_sol": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 25.59125026660787
-        },
-        "average_total_pressure": {
-            "dims": [],
-            "attrs": {
-                "units": "pascal"
-            },
-            "data": 732028.9793275861
-        },
-        "PB_over_R": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt * tesla / meter"
-            },
-            "data": 168.76392067708971
-        },
-        "PBpRnSq": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter"
-            },
-            "data": 8.206676168550032
-        },
-        "B_pol_out_mid": {
-            "dims": [],
-            "attrs": {
-                "units": "tesla"
-            },
-            "data": 3.0527119151332296
-        },
-        "B_t_out_mid": {
-            "dims": [],
-            "attrs": {
-                "units": "tesla"
-            },
-            "data": 9.326504089901384
-        },
-        "fieldline_pitch_at_omp": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 3.214648364176006
-        },
-        "lambda_q": {
-            "dims": [],
-            "attrs": {
-                "units": "millimeter"
-            },
-            "data": 0.28326855346030794
-        },
-        "q_parallel": {
-            "dims": [],
-            "attrs": {
-                "units": "gigawatt / meter ** 2"
-            },
-            "data": 11.460018573149283
-        },
-        "q_perp": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt / meter ** 2"
-            },
-            "data": 5941.561499571544
-        },
-        "upstream_electron_temp": {
-            "dims": [],
-            "attrs": {
-                "units": "electron_volt"
-            },
-            "data": 299.12304931555707
-        },
-        "target_electron_density": {
-            "dims": [],
-            "attrs": {
-                "units": "_1e19_per_cubic_metre"
-            },
-            "data": 44.86845739733103
-        },
-        "SOL_power_loss_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.9639674438709462
-        },
-        "target_electron_flux": {
-            "dims": [],
-            "attrs": {
-                "units": "1 / meter ** 2 / second"
-            },
-            "data": 1.971000727006153e+25
-        },
-        "target_q_parallel": {
-            "dims": [],
-            "attrs": {
-                "units": "gigawatt / meter ** 2"
-            },
-            "data": 0.41293376247700014
-        },
-        "greenwald_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.2932901530528177
-        },
-        "P_LH_thresh": {
-            "dims": [],
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 24.59383938922551
-        },
-        "ratio_of_P_SOL_to_P_LH": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 1.0405553139384702
-        },
-        "core_radiated_power_fraction": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.18661987651456066
-        },
-        "nu_star": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.023749179486475976
-        },
-        "rho_star": {
-            "dims": [],
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0022127891680210022
+        "fusion_reaction": {
+            "attrs": {},
+            "data": "DT",
+            "dims": []
         },
         "fusion_triple_product": {
-            "dims": [],
             "attrs": {
                 "units": "_1e20_per_cubic_metre * kiloelectron_volt * second"
             },
-            "data": 45.2791219241439
+            "data": 45.2791219241439,
+            "dims": []
+        },
+        "greenwald_fraction": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.2932901530528177,
+            "dims": []
+        },
+        "heavier_fuel_species_fraction": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.5,
+            "dims": []
+        },
+        "impurities": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                1.5e-05,
+                0.06,
+                0.0031
+            ],
+            "dims": [
+                "dim_species"
+            ]
+        },
+        "impurity_charge_state": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                58.37812639204965,
+                1.9999999473503665,
+                7.999453250480196
+            ],
+            "dims": [
+                "dim_species"
+            ]
+        },
+        "inverse_aspect_ratio": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3081,
+            "dims": []
+        },
+        "ion_density_peaking": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.4011372596580545,
+            "dims": []
+        },
+        "ion_density_peaking_offset": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": -0.2,
+            "dims": []
+        },
+        "ion_temp_profile": {
+            "attrs": {
+                "units": "kiloelectron_volt"
+            },
+            "data": [
+                22.81700031005393,
+                22.794916213858393,
+                22.72879209094119,
+                22.61901119942156,
+                22.46620818995649,
+                22.271262994778876,
+                22.035292388010884,
+                21.759639330503582,
+                21.44586024142759,
+                21.095710365374412,
+                20.71112742738783,
+                20.294213788755364,
+                19.84721733324049,
+                19.372511326493818,
+                18.872573500483547,
+                18.349964619853683,
+                17.807306788148814,
+                17.247261748912724,
+                16.672509429922524,
+                16.085726968478994,
+                15.489568442015889,
+                14.886645511652285,
+                14.279509167072204,
+                13.67063273969366,
+                13.06239632792736,
+                12.457072753886544,
+                11.857198932297228,
+                11.278916509472818,
+                10.728837253556305,
+                10.205585679849829,
+                9.707853386836657,
+                9.234395784495796,
+                8.784028982178587,
+                8.355626828265335,
+                7.948118094199611,
+                7.560483795858814,
+                7.1917546455630434,
+                6.841008628350937,
+                6.50736869646198,
+                6.190000576260198,
+                5.888110682115468,
+                5.600944132026026,
+                5.327782860020225,
+                5.067943820617523,
+                4.820777280858972,
+                4.585665195636339,
+                4.36201966225737,
+                4.046835325082298,
+                3.835898711955329,
+                2.4361558507970544
+            ],
+            "dims": [
+                "dim_rho"
+            ]
+        },
+        "ion_to_electron_temp_ratio": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0,
+            "dims": []
+        },
+        "kappa_e0": {
+            "attrs": {
+                "units": "watt / electron_volt ** 3.5 / meter"
+            },
+            "data": 2600.0,
+            "dims": []
+        },
+        "lambda_q": {
+            "attrs": {
+                "units": "millimeter"
+            },
+            "data": 0.28326855346030794,
+            "dims": []
+        },
+        "lambda_q_factor": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0,
+            "dims": []
+        },
+        "lambda_q_scaling": {
+            "attrs": {},
+            "data": "EichRegression15",
+            "dims": []
+        },
+        "loop_voltage": {
+            "attrs": {
+                "units": "volt"
+            },
+            "data": 0.1509719887879264,
+            "dims": []
+        },
+        "magnetic_field_on_axis": {
+            "attrs": {
+                "units": "tesla"
+            },
+            "data": 12.2,
+            "dims": []
+        },
+        "major_radius": {
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 1.85,
+            "dims": []
+        },
+        "minimum_core_radiated_fraction": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.0,
+            "dims": []
+        },
+        "minor_radius": {
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 0.569985,
+            "dims": []
+        },
+        "neoclassical_loop_resistivity": {
+            "attrs": {
+                "units": "meter * ohm"
+            },
+            "data": 2.9146805798816443e-09,
+            "dims": []
+        },
+        "nesep_over_nebar": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3,
+            "dims": []
+        },
+        "neutron_power_flux_to_walls": {
+            "attrs": {
+                "units": "megawatt / meter ** 2"
+            },
+            "data": 1.624790256371358,
+            "dims": []
+        },
+        "neutron_rate": {
+            "attrs": {
+                "units": "1 / second"
+            },
+            "data": 4.00000810164065e+19,
+            "dims": []
+        },
+        "normalized_beta": {
+            "attrs": {
+                "units": "meter * percent * tesla / megaampere"
+            },
+            "data": 0.9297754847754564,
+            "dims": []
+        },
+        "normalized_inverse_temp_scale_length": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.5,
+            "dims": []
+        },
+        "nu_star": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.023749179486475976,
+            "dims": []
+        },
+        "parallel_connection_length": {
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 30.0,
+            "dims": []
+        },
+        "peak_electron_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 37.52843149145136,
+            "dims": []
+        },
+        "peak_electron_temp": {
+            "attrs": {
+                "units": "kiloelectron_volt"
+            },
+            "data": 22.844827586206897,
+            "dims": []
+        },
+        "peak_fuel_ion_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 29.925700679641505,
+            "dims": []
+        },
+        "peak_ion_temp": {
+            "attrs": {
+                "units": "kiloelectron_volt"
+            },
+            "data": 22.844827586206897,
+            "dims": []
         },
         "peak_pressure": {
-            "dims": [],
             "attrs": {
                 "units": "pascal"
             },
-            "data": 2468918.97623166
+            "data": 2468918.97623166,
+            "dims": []
         },
-        "current_relaxation_time": {
-            "dims": [],
+        "plasma_current": {
             "attrs": {
-                "units": "second"
+                "units": "ampere"
             },
-            "data": 16.361532562672082
+            "data": 8700000.0,
+            "dims": []
+        },
+        "plasma_stored_energy": {
+            "attrs": {
+                "units": "megajoule"
+            },
+            "data": 20.838369393350952,
+            "dims": []
+        },
+        "plasma_volume": {
+            "attrs": {
+                "units": "meter ** 3"
+            },
+            "data": 19.79484837055445,
+            "dims": []
+        },
+        "profile_form": {
+            "attrs": {},
+            "data": "prf",
+            "dims": []
+        },
+        "q_parallel": {
+            "attrs": {
+                "units": "gigawatt / meter ** 2"
+            },
+            "data": 11.460018573149283,
+            "dims": []
+        },
+        "q_perp": {
+            "attrs": {
+                "units": "megawatt / meter ** 2"
+            },
+            "data": 5941.561499571544,
+            "dims": []
+        },
+        "q_star": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 3.2902757162288694,
+            "dims": []
+        },
+        "radiated_power_method": {
+            "attrs": {},
+            "data": "Radas",
+            "dims": []
+        },
+        "radiated_power_scalar": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0,
+            "dims": []
+        },
+        "ratio_of_P_SOL_to_P_LH": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0405553139384702,
+            "dims": []
+        },
+        "rho": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                0.0,
+                0.02,
+                0.04,
+                0.06,
+                0.08,
+                0.1,
+                0.12,
+                0.14,
+                0.16,
+                0.18,
+                0.2,
+                0.22,
+                0.24,
+                0.26,
+                0.28,
+                0.3,
+                0.32,
+                0.34,
+                0.36,
+                0.38,
+                0.4,
+                0.42,
+                0.44,
+                0.46,
+                0.48,
+                0.5,
+                0.52,
+                0.54,
+                0.56,
+                0.58,
+                0.6,
+                0.62,
+                0.64,
+                0.66,
+                0.68,
+                0.7000000000000001,
+                0.72,
+                0.74,
+                0.76,
+                0.78,
+                0.8,
+                0.8200000000000001,
+                0.84,
+                0.86,
+                0.88,
+                0.9,
+                0.92,
+                0.9400000000000001,
+                0.96,
+                0.98
+            ],
+            "dims": [
+                "dim_rho"
+            ]
+        },
+        "rho_star": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.0022127891680210022,
+            "dims": []
+        },
+        "separatrix_elongation": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.96875,
+            "dims": []
+        },
+        "separatrix_triangularity": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.54,
+            "dims": []
+        },
+        "spitzer_resistivity": {
+            "attrs": {
+                "units": "meter * ohm"
+            },
+            "data": 1.0136457814443183e-09,
+            "dims": []
+        },
+        "summed_impurity_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 1.5778750000000001,
+            "dims": []
+        },
+        "surface_area": {
+            "attrs": {
+                "units": "meter ** 2"
+            },
+            "data": 55.536257947812175,
+            "dims": []
+        },
+        "target_electron_density": {
+            "attrs": {
+                "units": "_1e19_per_cubic_metre"
+            },
+            "data": 44.86845739733103,
+            "dims": []
+        },
+        "target_electron_flux": {
+            "attrs": {
+                "units": "1 / meter ** 2 / second"
+            },
+            "data": 1.971000727006153e+25,
+            "dims": []
+        },
+        "target_electron_temp": {
+            "attrs": {
+                "units": "electron_volt"
+            },
+            "data": 25.0,
+            "dims": []
+        },
+        "target_q_parallel": {
+            "attrs": {
+                "units": "gigawatt / meter ** 2"
+            },
+            "data": 0.41293376247700014,
+            "dims": []
+        },
+        "temperature_peaking": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.5,
+            "dims": []
+        },
+        "toroidal_flux_expansion": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6974,
+            "dims": []
+        },
+        "trapped_particle_fraction": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.377505168672477,
+            "dims": []
+        },
+        "triangularity_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.3,
+            "dims": []
+        },
+        "triangularity_ratio_sep_to_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.8,
+            "dims": []
+        },
+        "upstream_electron_temp": {
+            "attrs": {
+                "units": "electron_volt"
+            },
+            "data": 299.12304931555707,
+            "dims": []
+        },
+        "vertical_minor_radius": {
+            "attrs": {
+                "units": "meter"
+            },
+            "data": 1.1221579687499998,
+            "dims": []
+        },
+        "z_effective": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.343818980316905,
+            "dims": []
+        },
+        "zeff_change_from_core_rad": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.0,
+            "dims": []
         }
+    },
+    "dims": {
+        "dim_0": 3,
+        "dim_rho": 50,
+        "dim_species": 3
     }
 }
