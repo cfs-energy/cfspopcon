@@ -4,7 +4,7 @@ git clone https://github.com/cfs-energy/radas.git
 
 pushd radas
 
-git checkout d9e23824f2edc46ef35e2fd54cf26438a3180733
+git checkout b538ea3d42f0d3eea6cf28433a2390503457083d
 
 poetry install --only main
 
