@@ -3,7 +3,7 @@ from typing import Callable
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import InterpolatedUnivariateSpline
+from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
 
 from ...named_options import Impurity
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
@@ -42,12 +42,11 @@ def build_L_int_integrator(
     Lz_sqrt_Te = Lz_curve * np.sqrt(electron_temp)
 
     interpolator = InterpolatedUnivariateSpline(electron_temp, magnitude(Lz_sqrt_Te))
-    def L_int(start_temp, stop_temp):
-        return interpolator.integral(start_temp, stop_temp)
 
-    return wraps_ufunc(
-        input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV), return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5)
-    )(L_int)
+    def L_int(start_temp: float, stop_temp: float) -> float:
+        return interpolator.integral(start_temp, stop_temp)  # type: ignore[no-any-return]
+
+    return wraps_ufunc(input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV), return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5))(L_int)  # type: ignore[no-any-return]
 
 
 def calc_required_edge_impurity_concentration(

@@ -95,7 +95,7 @@ def extend_impurities_array(array: xr.DataArray, species: Union[str, Impurity], 
     """
     if isinstance(species, xr.DataArray):
         species = species.item()
-    
+
     if not isinstance(species, Impurity):
         species = Impurity[species.capitalize()]
 
@@ -107,4 +107,4 @@ def extend_impurities_array(array: xr.DataArray, species: Union[str, Impurity], 
         return concentration
     else:
         other_species = array.sel(dim_species=[s for s in array.dim_species if s != species])
-        return xr.concat((other_species, concentration), dim="dim_species")
+        return xr.concat((other_species, concentration), dim="dim_species").sortby("dim_species")

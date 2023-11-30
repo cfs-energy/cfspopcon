@@ -14,9 +14,10 @@
         "dim_species": {
             "attrs": {},
             "data": [
-                "Tungsten",
                 "Helium",
-                "Oxygen"
+                "Oxygen",
+                "Argon",
+                "Tungsten"
             ],
             "dims": [
                 "dim_0"
@@ -598,9 +599,10 @@
                 "units": "dimensionless"
             },
             "data": [
-                1.5e-05,
                 0.06,
-                0.0031
+                0.0031,
+                0.016889895535634417,
+                1.5e-05
             ],
             "dims": [
                 "dim_species"
@@ -611,9 +613,10 @@
                 "units": "dimensionless"
             },
             "data": [
-                58.37812639204965,
                 1.9999999473503665,
-                7.999453250480196
+                7.999453250480196,
+                NaN,
+                58.37812639204965
             ],
             "dims": [
                 "dim_species"
@@ -1134,8 +1137,8 @@
         }
     },
     "dims": {
-        "dim_0": 3,
+        "dim_0": 4,
         "dim_rho": 50,
-        "dim_species": 3
+        "dim_species": 4
     }
 }

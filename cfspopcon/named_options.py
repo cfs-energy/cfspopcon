@@ -88,6 +88,14 @@ class Impurity(Enum):
     Xenon = 54
     Tungsten = 74
 
+    def __lt__(self, other: "Impurity") -> bool:
+        """Implements '<' to allow sorting."""
+        return self.value < other.value
+
+    def __gt__(self, other: "Impurity") -> bool:
+        """Implements '>' to allow sorting."""
+        return self.value > other.value
+
 
 class ConfinementScaling(Enum):
     r"""Enum of implemented \tau_{E} scalings."""
