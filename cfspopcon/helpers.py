@@ -9,6 +9,7 @@ from .named_options import (
     Impurity,
     LambdaQScaling,
     MomentumLossFunction,
+    ParallelConductionModel,
     ProfileForm,
     RadiationMethod,
     ReactionType,
@@ -43,6 +44,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
         return ReactionType[val]
     elif key == "radiation_method":
         return RadiationMethod[val]
+    elif key == "parallel_conduction_model":
+        return ParallelConductionModel[val]
     else:
         # If the key doesn't match, don't convert the value
         return val
