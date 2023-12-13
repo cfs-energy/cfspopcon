@@ -40,10 +40,16 @@ jobs:
         with:
           path: radas
           key: radas-${{ hashFiles('.github/workflows/make_radas_data.sh')}}
-
+      
       - name: Make radas data
         if: steps.radas.outputs.cache-hit != 'true'
         run: bash .github/workflows/make_radas_data.sh
+      
+      - name: Upload radas artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: radas_cases
+          path: radas/cases
 
   build:
     needs: radas
