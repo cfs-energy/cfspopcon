@@ -33,6 +33,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
         return make_impurities_array(list(val.keys()), list(val.values()))
     elif key == "core_radiator":
         return Impurity[val]
+    elif key == "edge_impurity_species":
+        return Impurity[val]
     elif key == "lambda_q_scaling":
         return LambdaQScaling[val]
     elif key == "SOL_momentum_loss_function":
@@ -91,6 +93,9 @@ def extend_impurities_array(array: xr.DataArray, species: Union[str, Impurity], 
 
     N.b. You can also 'extend' an empty array, constructed via xr.DataArray()
     """
+    if isinstance(species, xr.DataArray):
+        species = species.item()
+
     if not isinstance(species, Impurity):
         species = Impurity[species.capitalize()]
 
@@ -102,4 +107,4 @@ def extend_impurities_array(array: xr.DataArray, species: Union[str, Impurity], 
         return concentration
     else:
         other_species = array.sel(dim_species=[s for s in array.dim_species if s != species])
-        return xr.concat((other_species, concentration), dim="dim_species")
+        return xr.concat((other_species, concentration), dim="dim_species").sortby("dim_species")

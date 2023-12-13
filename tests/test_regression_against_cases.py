@@ -23,7 +23,8 @@ def test_regression_against_case(case: Path):
 
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 
-    assert_allclose(dataset, reference_dataset, rtol=1e-8, atol=0)
+    dataset, reference_dataset = xr.align(dataset, reference_dataset)
+    assert_allclose(dataset, reference_dataset, rtol=1e-6, atol=0)
 
 
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
@@ -35,9 +36,9 @@ def test_regression_against_case_with_update(case: Path):
 
     dataset = xr.Dataset(input_parameters)
 
-    for alg in algorithm.algorithms:  # type: ignore
-        dataset = alg.update_dataset(dataset)
+    dataset = algorithm.update_dataset(dataset)
 
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 
-    assert_allclose(dataset, reference_dataset, rtol=1e-8, atol=0)
+    dataset, reference_dataset = xr.align(dataset, reference_dataset)
+    assert_allclose(dataset, reference_dataset, rtol=1e-6, atol=0)

@@ -21,8 +21,7 @@ def run_two_point_model_fixed_tet(
     target_electron_temp: Unitfull,
     q_parallel: Unitfull,
     parallel_connection_length: Unitfull,
-    average_electron_density: Unitfull,
-    nesep_over_nebar: Unitfull,
+    upstream_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
     fuel_average_mass_number: Unitfull,
     kappa_e0: Unitfull,
@@ -35,7 +34,7 @@ def run_two_point_model_fixed_tet(
         q_parallel: :term:`glossary link<q_parallel>`
         parallel_connection_length: :term:`glossary link<parallel_connection_length>`
         average_electron_density: :term:`glossary link<average_electron_density>`
-        nesep_over_nebar: :term:`glossary link<nesep_over_nebar>`
+        upstream_electron_density: :term:`glossary link<upstream_electron_density>`
         toroidal_flux_expansion: :term:`glossary link<toroidal_flux_expansion>`
         fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
         kappa_e0: :term:`glossary link<kappa_e0>`
@@ -48,7 +47,7 @@ def run_two_point_model_fixed_tet(
         target_electron_temp=target_electron_temp,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=nesep_over_nebar * average_electron_density,
+        upstream_electron_density=upstream_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,
