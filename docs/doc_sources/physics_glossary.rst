@@ -370,4 +370,15 @@ Physics Glossary
 
   heavier_fuel_species_fraction
     Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this is :math:`f_T = n_T/(n_T+n_D)`.
-
+    
+  parallel_conduction_model
+    Method to use for SOL parallel heat conduction. Options: Spitzer, FluxLimiter ("SOLPS-like")
+    
+  flux_limit_factor_alpha: 0.15
+    Mutliplication factor on the "free-streaming-flux" quantity used by the flux limiter on the conductivity (for FluxLimiter conduction option)
+  
+  Spitzer_conduction_reduction_factor
+    Multiplication factor on kappa_e0 to account for kinetic effects on reduced conduction
+  
+  upstream_SOL_collisionality
+    Standard SOL collisionality metric for electron mean-free-path normalised to connection length, :math:`\nu_{SOL} = \lambda_{ee}/L` 

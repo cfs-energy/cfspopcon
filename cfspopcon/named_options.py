@@ -125,3 +125,10 @@ class LambdaQScaling(Enum):
     Brunner = auto()
     EichRegression14 = auto()
     EichRegression15 = auto()
+
+
+class ParallelConductionModel(Enum):
+    """Method for SOL parallel heat conduction."""
+
+    Spitzer = auto()
+    FluxLimiter = auto()
