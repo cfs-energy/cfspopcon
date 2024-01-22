@@ -4,9 +4,10 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
-from ...named_options import MomentumLossFunction
+from ...named_options import MomentumLossFunction, ParallelConductionModel
 from ...unit_handling import Quantity, Unitfull, ureg
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
+from .parallel_conduction import calc_Spitzer_conduction_reduction_factor_fluxlim
 from .target_electron_density import (
     calc_f_other_target_electron_density,
     calc_f_vol_loss_target_electron_density,
@@ -27,6 +28,7 @@ from .target_electron_temp import (
 )
 from .total_pressure import calc_upstream_total_pressure
 from .upstream_electron_temp import calc_upstream_electron_temp
+from .upstream_SOL_collisionality import calc_upstream_SOL_collisionality
 
 
 def solve_two_point_model(
@@ -38,6 +40,7 @@ def solve_two_point_model(
     fuel_average_mass_number: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    parallel_conduction_model: Union[ParallelConductionModel, xr.DataArray],
     initial_target_electron_temp: Unitfull = 10.0 * ureg.eV,
     sheath_heat_transmission_factor: Unitfull = 7.5 * ureg.dimensionless,
     SOL_conduction_fraction: Unitfull = 1.0 * ureg.dimensionless,
@@ -47,6 +50,8 @@ def solve_two_point_model(
     upstream_ratio_of_ion_to_electron_temp: Unitfull = 1.0 * ureg.dimensionless,
     upstream_ratio_of_electron_to_ion_density: Unitfull = 1.0 * ureg.dimensionless,
     upstream_mach_number: Unitfull = 0.0 * ureg.dimensionless,
+    Spitzer_conduction_reduction_factor: Unitfull = 1.0 * ureg.dimensionless,
+    flux_limit_factor_alpha: Unitfull = 0.15 * ureg.dimensionless,
     # Controlling the iterative solve
     max_iterations: int = 100,
     upstream_temp_relaxation: float = 0.5,
@@ -59,7 +64,14 @@ def solve_two_point_model(
     raise_error_if_not_converged: bool = True,
     # Print information about the solve to terminal
     quiet: bool = True,
-) -> tuple[Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray]]:
+) -> tuple[
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+]:
     """Calculate the upstream and target electron temperature and target electron density according to the extended two-point-model.
 
     Args:
@@ -71,6 +83,7 @@ def solve_two_point_model(
         fuel_average_mass_number: [~]
         kappa_e0: electron heat conductivity constant [W / (eV^3.5 * m)]
         SOL_momentum_loss_function: which momentum loss function to use
+        parallel_conduction_model: which model for the parallel conductive heat flux to use
         initial_target_electron_temp: starting guess for target electron temp [eV]
         sheath_heat_transmission_factor: [~]
         SOL_conduction_fraction: [~]
@@ -80,6 +93,8 @@ def solve_two_point_model(
         upstream_ratio_of_ion_to_electron_temp: [~]
         upstream_ratio_of_electron_to_ion_density: [~]
         upstream_mach_number: [~]
+        Spitzer_conduction_reduction_factor: multiplication factor on kappa_e0 to account for kinetic effects on reduced conduction
+        flux_limit_factor_alpha: mutliplication factor on the "free-streaming-flux" quantity used by the flux limiter on the conductivity
         max_iterations: how many iterations to try before returning NaN
         upstream_temp_relaxation: step-size for upstream Te evolution
         target_electron_density_relaxation: step-size for target ne evolution
@@ -108,12 +123,24 @@ def solve_two_point_model(
     while iteration < max_iterations:
         iteration += 1
 
+        if parallel_conduction_model == ParallelConductionModel.FluxLimiter:
+            if iteration != 1:
+                Spitzer_conduction_reduction_factor = calc_Spitzer_conduction_reduction_factor_fluxlim(
+                    upstream_electron_density=upstream_electron_density,
+                    upstream_electron_temp=upstream_electron_temp,
+                    parallel_connection_length=parallel_connection_length,
+                    target_electron_temp=target_electron_temp,
+                    SOL_conduction_fraction=SOL_conduction_fraction,
+                    kappa_e0=kappa_e0,
+                    flux_limit_factor_alpha=flux_limit_factor_alpha,
+                )
+
         new_upstream_electron_temp = calc_upstream_electron_temp(
             target_electron_temp=target_electron_temp,
             parallel_heat_flux_density=parallel_heat_flux_density,
             parallel_connection_length=parallel_connection_length,
             SOL_conduction_fraction=SOL_conduction_fraction,
-            kappa_e0=kappa_e0,
+            kappa_e0=Spitzer_conduction_reduction_factor * kappa_e0,
         )
 
         upstream_total_pressure = calc_upstream_total_pressure(
@@ -191,6 +218,12 @@ def solve_two_point_model(
         f_other_target_electron_flux=f_other_target_electron_flux,
     )
 
+    upstream_SOL_collisionality = calc_upstream_SOL_collisionality(
+        upstream_electron_density=upstream_electron_density,
+        upstream_electron_temp=upstream_electron_temp,
+        parallel_connection_length=parallel_connection_length,
+    )
+
     mask = (
         (np.abs(change_in_upstream_electron_temp / upstream_electron_temp) < upstream_temp_max_residual)
         & (np.abs(change_in_target_electron_density / target_electron_density) < target_electron_density_max_residual)
@@ -205,5 +238,14 @@ def solve_two_point_model(
     target_electron_density = xr.where(mask, target_electron_density, np.nan)  # type:ignore[no-untyped-call]
     target_electron_temp = xr.where(mask, target_electron_temp, np.nan)  # type:ignore[no-untyped-call]
     target_electron_flux = xr.where(mask, target_electron_flux, np.nan)  # type:ignore[no-untyped-call]
+    Spitzer_conduction_reduction_factor = xr.where(mask, Spitzer_conduction_reduction_factor, np.nan)  # type:ignore[no-untyped-call]
+    upstream_SOL_collisionality = xr.where(mask, upstream_SOL_collisionality, np.nan)  # type:ignore[no-untyped-call]
 
-    return upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux
+    return (
+        upstream_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+        Spitzer_conduction_reduction_factor,
+        upstream_SOL_collisionality,
+    )

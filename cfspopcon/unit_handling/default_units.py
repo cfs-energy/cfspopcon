@@ -131,6 +131,10 @@ DEFAULT_UNITS = dict(
     vertical_minor_radius="m",
     z_effective="",
     zeff_change_from_core_rad="",
+    parallel_conduction_model=None,
+    flux_limit_factor_alpha="",
+    upstream_SOL_collisionality="",
+    Spitzer_conduction_reduction_factor="",
 )
 
 
