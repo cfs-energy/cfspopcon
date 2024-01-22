@@ -15,7 +15,7 @@ def build_L_int_integrator(
     reference_electron_density: Unitfull,
     reference_ne_tau: Unitfull,
 ) -> Callable[[Unitfull, Unitfull], Unitfull]:
-    r"""Build an interpolator to calculate L_{int}$ between arbitrary temperature points.
+    r"""Build an interpolator to calculate the integral of L_{int}$ between arbitrary temperature points.
 
     $L_int = \int_a^b L_z(T_e) sqrt(T_e) dT_e$ where $L_z$ is a cooling curve for an impurity species.
     This is used in the calculation of the radiated power associated with a given impurity.
@@ -27,7 +27,7 @@ def build_L_int_integrator(
         reference_ne_tau: [n20 * ms] :term:`glossary link<reference_ne_tau>`
 
     Returns:
-        :term:`L_int_interpolator`
+        L_int_integrator
     """
     if isinstance(impurity_species, xr.DataArray):
         impurity_species = impurity_species.item()
@@ -66,7 +66,7 @@ def calc_required_edge_impurity_concentration(
     to find a consistent set of L_parallel, T_t and T_u.
 
     Args:
-        L_int_integrator: :term:`glossary link<L_int_integrator>`
+        L_int_integrator: an interpolator to calculate the integral of L_{int}$ between arbitrary temperature points
         q_parallel: :term:`glossary link<q_parallel>`
         SOL_power_loss_fraction: :term:`glossary link<SOL_power_loss_fraction>`
         target_electron_temp: :term:`glossary link<target_electron_temp>`

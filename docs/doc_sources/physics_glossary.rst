@@ -66,6 +66,9 @@ Physics Glossary
 
   upstream_electron_temp
     The :term:`upstream` electron temperature.
+  
+  upstream_electron_density
+    The :term:`upstream` electron density.
 
   target_electron_density
     The :term:`target` electron density.
@@ -371,3 +374,11 @@ Physics Glossary
   heavier_fuel_species_fraction
     Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this is :math:`f_T = n_T/(n_T+n_D)`.
 
+  lengyel_overestimation_factor
+    A constant calibration factor applied to the impurity concentration calculated by the Lengyel model such that its value approximately matches the value calculated by higher fidelity modelling such as SOLPS.
+
+  reference_electron_density
+    A constant upstream electron density used when evaluating the :math:`L_Z` impurity radiation curve (due to the reasonably weak dependence of :math:`L_Z` on :math:`n_e`, this approximation shouldn't be too harmful).
+
+  reference_ne_tau
+    A constant :math:`n_e\tau` (upstream electron density times impurity residence time) used when evaluating the :math:`L_Z` impurity radiation curve.
