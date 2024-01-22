@@ -40,10 +40,16 @@ jobs:
         with:
           path: radas
           key: radas-${{ hashFiles('.github/workflows/make_radas_data.sh')}}
-
+      
       - name: Make radas data
         if: steps.radas.outputs.cache-hit != 'true'
         run: bash .github/workflows/make_radas_data.sh
+      
+      - name: Upload radas artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: radas_cases
+          path: radas/cases
 
   build:
     needs: radas
@@ -94,6 +100,14 @@ jobs:
         run: |
           poetry run python tests/regression_results/generate_regression_results.py
           MPLBACKEND=Agg poetry run pytest --no-cov tests/test_regression_against_cases.py
+      
+      - name: Upload regression results
+        uses: actions/upload-artifact@v3
+        if: always()
+        # replace with `if: failure()` once this pipeline is stable
+        with:
+          name: regression_results
+          path: tests/regression_results
 
       - name: Test package
         run: |

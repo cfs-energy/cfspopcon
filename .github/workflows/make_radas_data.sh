@@ -8,8 +8,8 @@ git checkout b538ea3d42f0d3eea6cf28433a2390503457083d
 
 poetry install --only main
 
-poetry run python adas_data/fetch_adas_data.py
+poetry run fetch_adas
 
-poetry run python run_radas.py --case all
+poetry run radas
 
 popd

@@ -137,4 +137,6 @@ dmypy.json
 # Mess
 example_cases/SPARC_PRD/output/*
 # avoid committing nc files
-*.nc
+tests/regression_results/test*.nc
+cfspopcon/atomic_data/*.nc
+example_cases/**/output/dataset.nc
