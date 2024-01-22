@@ -37,7 +37,7 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
     # why doesn't mypy deduce the below without hint?
     algorithm: Union[Algorithm, CompositeAlgorithm] = CompositeAlgorithm(algorithm_list) if len(algorithm_list) > 1 else algorithm_list[0]
 
-    points = repr_d.pop("points")
+    points = repr_d.pop("points", dict())
 
     grid_values = repr_d.pop("grid")
     for key, grid_spec in grid_values.items():

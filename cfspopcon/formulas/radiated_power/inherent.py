@@ -88,8 +88,8 @@ def calc_synchrotron_radiation(
     For now this calculation assumes 90% wall reflectivity, consistent with stott_feasibility_2005.
 
     This calculation also assumes profiles of the form n(r) = n[1 - (r/a)**2]**alpha_n and
-    T(r) = Tedge + (T - Tedge)[1 - (r/a)**gamma_T]**alpha_T. For now, these are assumed as
-    gamma_T = 2, alpha_n = 0.5 and alpha_T = 1, consistent with stott_feasibility_2005.
+    T(r) = Tedge + (T - Tedge)[1 - (r/a)**gamma_T]**alpha_t. For now, these are assumed as
+    gamma_T = 2, alpha_n = 0.5 and alpha_t = 1, consistent with stott_feasibility_2005.
 
     An alternative approach could be developed using formula 6 in :cite:`zohm_use_2019`, which assumes 80% wall reflectivity.
 
@@ -111,16 +111,16 @@ def calc_synchrotron_radiation(
     Rw = 0.8  # wall reflectivity
     gamma_T = 2  # temperature profile inner exponent (2 is ~parabolic)
     alpha_n = 0.5  # density profile outer exponent (0.5 is rather broad)
-    alpha_T = 1  # temperature profile outer exponent (1 is ~parabolic)
+    alpha_t = 1  # temperature profile outer exponent (1 is ~parabolic)
 
     # effective optical thickness
     rhoa = 6.04e3 * minor_radius * ne20 / magnetic_field_on_axis
     # profile peaking correction
     Ks = (
-        (alpha_n + 3.87 * alpha_T + 1.46) ** (-0.79)
+        (alpha_n + 3.87 * alpha_t + 1.46) ** (-0.79)
         * (1.98 + alpha_n) ** (1.36)
         * gamma_T**2.14
-        * (gamma_T**1.53 + 1.87 * alpha_T - 0.16) ** (-1.33)
+        * (gamma_T**1.53 + 1.87 * alpha_t - 0.16) ** (-1.33)
     )
     # aspect ratio correction
     Gs = 0.93 * (1 + 0.85 * np.exp(-0.82 * major_radius / minor_radius))
