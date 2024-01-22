@@ -135,8 +135,8 @@ dmypy.json
 .DS_Store
 
 # Mess
-example_cases/SPARC_PRD/output/*
-# avoid committing nc files
-tests/regression_results/test*.nc
+example_cases/**/output/*
 cfspopcon/atomic_data/*.nc
-example_cases/**/output/dataset.nc
+
+# Top-level (working) notebooks should not be tracked
+*.ipynb
