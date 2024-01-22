@@ -7,9 +7,11 @@ from .beta import calc_beta
 from .composite_algorithm import predictive_popcon
 from .core_radiated_power import calc_core_radiated_power
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
+from .fluxes import calc_fluxes
 from .fusion_gain import calc_fusion_gain
 from .geometry import calc_geometry
 from .heat_exhaust import calc_heat_exhaust
+from .inductances import calc_inductances
 from .ohmic_power import calc_ohmic_power
 from .peaked_profiles import calc_peaked_profiles
 from .plasma_current_from_q_star import calc_plasma_current_from_q_star
@@ -24,6 +26,8 @@ from .zeff_and_dilution_from_impurities import calc_zeff_and_dilution_from_impur
 
 ALGORITHMS: dict[Algorithms, Union[Algorithm, CompositeAlgorithm]] = {
     Algorithms["calc_beta"]: calc_beta,
+    Algorithms["calc_inductances"]: calc_inductances,
+    Algorithms["calc_fluxes"]: calc_fluxes,
     Algorithms["calc_core_radiated_power"]: calc_core_radiated_power,
     Algorithms["calc_extrinsic_core_radiator"]: calc_extrinsic_core_radiator,
     Algorithms["calc_fusion_gain"]: calc_fusion_gain,
@@ -58,6 +62,8 @@ __all__ = [
     "calc_extrinsic_core_radiator",
     "calc_fusion_gain",
     "calc_geometry",
+    "calc_fluxes",
+    "calc_inductances",
     "calc_heat_exhaust",
     "calc_ohmic_power",
     "calc_peaked_profiles",

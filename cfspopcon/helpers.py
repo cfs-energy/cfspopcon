@@ -12,6 +12,7 @@ from .named_options import (
     ProfileForm,
     RadiationMethod,
     ReactionType,
+    SurfaceInductanceCoeffs,
 )
 
 
@@ -43,6 +44,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
         return ReactionType[val]
     elif key == "radiation_method":
         return RadiationMethod[val]
+    elif key == "surface_inductance_coefficients":
+        return SurfaceInductanceCoeffs[val]
     else:
         # If the key doesn't match, don't convert the value
         return val

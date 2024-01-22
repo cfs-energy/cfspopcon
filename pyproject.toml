@@ -61,10 +61,11 @@ nbsphinx = "^0.9.3"
 fail_under = 82
 
 [tool.pytest.ini_options]
-addopts = "--cov=cfspopcon --cov-report term-missing --cov-report xml:coverage.xml --verbose -s --nbmake"
+addopts = "-Werror --cov=cfspopcon --cov-report term-missing --cov-report xml:coverage.xml --verbose -s --nbmake"
 testpaths = [
   "tests",
-  "docs/doc_sources"
+  "docs/doc_sources",
+  "example_cases"
 ]
 
 [build-system]

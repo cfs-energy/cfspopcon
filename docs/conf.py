@@ -42,6 +42,12 @@ linkcheck_ignore = [
     r"https://doi.org/10.13182/FST91-A29553",
     r"https://doi.org/10.1080/10420150.2018.1462361",
     r"https://github.com/cfs-energy/cfspopcon/blob/main/docs/doc_sources/getting_started.ipynb",
+    r"https://doi.org/10.1080/10420150.2018.1462361",
+    r"https://arxiv.org/abs/https://doi.org/10.13182/FST11-A11650",
+    r"https://doi.org/10.13182/FST43-67",
+    r"https://doi.org/10.13182/FST11-A11650",
+    r"https://arxiv.org/abs/https://doi.org/10.13182/FST43-67",
+    r"https://library.psfc.mit.edu/catalog/online_pubs/MFE_formulary_2014.pdf",
 ]
 linkcheck_retries = 5
 linkcheck_timeout = 120

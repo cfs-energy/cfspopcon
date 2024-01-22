@@ -24,9 +24,17 @@ from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .divertor_metrics import calc_B_pol_omp, calc_B_tor_omp
 from .energy_confinement_time_scalings import calc_tau_e_and_P_in_from_scaling
 from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
+from .fluxes import calc_breakdown_flux_consumption, calc_flux_external, calc_flux_internal, calc_flux_PF, calc_flux_res
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
-from .geometry import calc_plasma_surface_area, calc_plasma_volume
+from .geometry import calc_plasma_poloidal_circumference, calc_plasma_surface_area, calc_plasma_volume
 from .impurity_effects import calc_change_in_dilution, calc_change_in_zeff, calc_impurity_charge_state
+from .inductances import (
+    calc_external_inductance,
+    calc_internal_inductance,
+    calc_internal_inductivity,
+    calc_vertical_field_mutual_inductance,
+    calc_vertical_magnetic_field,
+)
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
 from .plasma_profiles import calc_1D_plasma_profiles
 from .Q_thermal_gain_factor import thermal_calc_gain_factor
@@ -58,8 +66,19 @@ __all__ = [
     "calc_bootstrap_fraction",
     "calc_current_relaxation_time",
     "calc_f_shaping",
+    "calc_plasma_poloidal_circumference",
+    "calc_flux_external",
+    "calc_flux_internal",
+    "calc_flux_res",
+    "calc_flux_PF",
+    "calc_breakdown_flux_consumption",
     "calc_fusion_power",
     "calc_greenwald_fraction",
+    "calc_internal_inductivity",
+    "calc_internal_inductance",
+    "calc_external_inductance",
+    "calc_vertical_field_mutual_inductance",
+    "calc_vertical_magnetic_field",
     "calc_LH_transition_threshold_power",
     "calc_LI_transition_threshold_power",
     "calc_loop_voltage",
