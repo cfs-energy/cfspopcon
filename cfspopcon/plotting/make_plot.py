@@ -65,7 +65,6 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
         # Overlay contour plots
 
         for variable, subplot_params in plot_params["contour"].items():
-
             field = dataset[variable]
             units = subplot_params.get("units", field.pint.units)
             field = field.pint.to(units)

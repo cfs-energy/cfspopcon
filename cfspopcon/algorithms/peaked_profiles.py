@@ -69,7 +69,13 @@ def run_calc_peaked_profiles(
 
     # Calculate the total fusion power by estimating density and temperature profiles and
     # using this to calculate fusion power profiles.
-    (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile,) = formulas.calc_1D_plasma_profiles(
+    (
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
+    ) = formulas.calc_1D_plasma_profiles(
         profile_form,
         average_electron_density,
         average_electron_temp,

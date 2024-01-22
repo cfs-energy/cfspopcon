@@ -185,6 +185,7 @@ def resolve(app, env, node, contnode):
 # which is BSD3 licensed see:
 # https://github.com/celery/celery/blob/1683008881717d2f8391264cb2b6177d85ff5ea8/LICENSE#L1
 
+
 # wraps_ufunc returns a class which leads to sphinx ignoring the function
 # This is a custom documenter to ensure automodule correctly lists wrapped functions
 # and creates a better signature for them. Setting the signature object on the actual class (like for Algorithms)

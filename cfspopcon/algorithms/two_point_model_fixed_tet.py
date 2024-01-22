@@ -43,7 +43,12 @@ def run_two_point_model_fixed_tet(
     Returns:
         :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`SOL_power_loss_fraction`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (SOL_power_loss_fraction, upstream_electron_temp, target_electron_density, target_electron_flux,) = solve_target_first_two_point_model(
+    (
+        SOL_power_loss_fraction,
+        upstream_electron_temp,
+        target_electron_density,
+        target_electron_flux,
+    ) = solve_target_first_two_point_model(
         target_electron_temp=target_electron_temp,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,

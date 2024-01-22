@@ -203,7 +203,14 @@ def _calc_fusion_reaction_rate(
     # This generates a false positive when type checking, as the type checker doesn't
     # realize that the sigmav_func and energy_func pair always correctly matches.
     # That's because the return type of a dictionary can't be narrowed based on a runtime key.
-    (rxn_energy, rxn_energy_neut, rxn_energy_charged, number_power_dens, number_power_dens_neut, number_power_dens_charged,) = energy_func(
+    (
+        rxn_energy,
+        rxn_energy_neut,
+        rxn_energy_charged,
+        number_power_dens,
+        number_power_dens_neut,
+        number_power_dens_charged,
+    ) = energy_func(
         sigmav=sigmav, heavier_fuel_species_fraction=heavier_fuel_species_fraction  # type:ignore[call-arg]
     )
 

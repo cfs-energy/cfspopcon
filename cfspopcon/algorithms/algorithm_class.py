@@ -256,7 +256,6 @@ class CompositeAlgorithm:
             warn(f"Not all input parameters were used. Unused parameters: [{', '.join(parameters_extra)}]", stacklevel=3)
 
         for alg in self.algorithms:
-
             alg_kwargs = {key: result[key] for key in result.keys() if key in alg.input_keys}
 
             alg_result = alg.run(**alg_kwargs)
