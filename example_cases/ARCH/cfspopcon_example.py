@@ -76,16 +76,21 @@ for i in range(40):
             
 print(np.array([[i_dens, j_dens], [i_temp, j_temp]]))
 
+print("cfspopcon electron temperature profile parameters", 
+      dataset["average_electron_temp"].values[j_temp], 
+      dataset["temperature_peaking"].values
+      )
+
 # Plot and Compare
 fig, axs = plt.subplots(2, 1)
 plt.subplots_adjust(hspace=0.4)
 axs[0].plot(rho, get_profiles(i_dens, j_dens)['cfspopcon']['density'], color='red', label='cfspopcon')
 axs[0].plot(rho, get_profiles(i_dens, j_dens)['frank']['density'], color='blue', label='frank')
-axs[0].set_title(f'Density Profiles - density index={i_dens}, temp index={j_dens}')
+axs[0].set_title(f'Density Profiles - density={dataset["average_electron_density"].values[i_dens]}, temp={dataset["average_electron_temp"].values[j_dens]}')
 axs[0].legend()
 axs[1].plot(rho, get_profiles(i_temp, j_temp)['cfspopcon']['temperature'], color='red', label='cfspopcon')
 axs[1].plot(rho, get_profiles(i_temp, j_temp)['frank']['temperature'], color='blue', label='frank')
-axs[1].set_title(f'Temperature Profiles - density index={i_temp}, temp index={j_temp}')
+axs[1].set_title(f'Temperature Profiles - density={dataset["average_electron_density"].values[i_temp]}, temp index={dataset["average_electron_temp"].values[j_temp]}')
 axs[1].legend()
 plt.show()
     
