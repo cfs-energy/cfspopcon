@@ -11,9 +11,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 np.set_printoptions(threshold=np.Inf)
 
 # Load input paramters from yaml file
-input_parameters, algorithm, points = cfspopcon.read_case(
-    os.path.join(os.getcwd(), "example_cases/SPARC_PRD/input.yaml")
-)
+
+input_parameters, algorithm, points = cfspopcon.read_case(os.path.join(os.getcwd(), "example_cases/ARCH/input_arch.yaml"))
 algorithm.validate_inputs(input_parameters)
 dataset = xr.Dataset(input_parameters)
 algorithm.update_dataset(dataset, in_place=True)
@@ -50,9 +49,12 @@ def get_profiles(i, j):
     return {'cfspopcon': {'density': electron_density_profile, 'temperature': electron_temp_profile},
             'frank': {'density': density_profile, 'temperature': temperature_profile}}
 
+print(dataset['average_electron_density'][0] * dataset['electron_density_peaking'][0][0])
+
+
 npoints = 50
 rho = np.linspace(0, 1, num=npoints, endpoint=False)
-
+"""
 min_density_diff = 99999
 min_temp_diff = 99999
 i_dens = 0
@@ -76,10 +78,10 @@ for i in range(40):
             
 print(np.array([[i_dens, j_dens], [i_temp, j_temp]]))
 
-print("cfspopcon electron temperature profile parameters", 
-      dataset["average_electron_temp"].values[j_temp], 
-      dataset["temperature_peaking"].values
-      )
+#print("cfspopcon electron temperature profile parameters", 
+      #dataset["average_electron_temp"].values[j_temp], 
+      #dataset["temperature_peaking"].values
+      #)
 
 # Plot and Compare
 fig, axs = plt.subplots(2, 1)
@@ -93,12 +95,10 @@ axs[1].plot(rho, get_profiles(i_temp, j_temp)['frank']['temperature'], color='bl
 axs[1].set_title(f'Temperature Profiles - density={dataset["average_electron_density"].values[i_temp]}, temp index={dataset["average_electron_temp"].values[j_temp]}')
 axs[1].legend()
 plt.show()
-    
 """
+
+
 # Make a popcon
-plot_style = cfspopcon.read_plot_style(
-    os.path.abspath(os.path.dirname("plot_popcon.yaml"))
-)
-cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="Example POPCON")
+plot_style = cfspopcon.read_plot_style(os.path.join(os.getcwd(), "example_cases/SPARC_PRD/plot_popcon.yaml"))
+cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=None)
 plt.show()
-"""

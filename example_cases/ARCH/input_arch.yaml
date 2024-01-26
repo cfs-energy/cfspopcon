@@ -70,8 +70,8 @@ grid:
 
   average_electron_temp:
     # Average electron temperature in keV
-    min: 18.0 # orig 5.0
-    max: 30.0 
+    min: 1.0
+    max: 30.0
     num: 30
     spacing: linear
 
@@ -80,7 +80,7 @@ points:
     maximize: Q
     where:
       P_auxillary:
-        min: 10.0 # orig 0.0
+        min: 0.0
         max: 25.0
         units: MW
       greenwald_fraction:
@@ -88,7 +88,7 @@ points:
       ratio_of_P_SOL_to_P_LH:
         min: 1.0
       P_fusion:
-        max: 3000.0 # orig 500.0
+        max: 140.0
         units: MW
 
 # Major radius in metres
@@ -115,21 +115,21 @@ fusion_reaction: DT
 # Fraction of fuel ions which are the heavier species
 heavier_fuel_species_fraction: 0.5
 
-# What sort of 1D profiles should be assumed? # figure these out
-profile_form: analytic
+# What fusion reaction are we using?
+fusion_reaction: DT
+# Fraction of fuel ions which are the heavier species
+heavier_fuel_species_fraction: 0.5
+
+# What sort of 1D profiles should be assumed?
+profile_form: prf
 # Inverse normalized electron temp scale length a / L_Te = a / (Te / grad(Te))
-density_sep: 1.00
-  units: n20
-temperature_sep: 0.1
-  units: keV
-density_0: 4.00 # This is an estimate, can't actually find this exact value in Frank but maybe in another paper?
-  units: n20
-temperature_0: 24.9
-  units: keV
-alpha_density: 1.1
-  units:
-alpha_temperature: 1.5
-  units: 
+normalized_inverse_temp_scale_length: 2.5
+# Offset for the electron density peaking factor
+electron_density_peaking_offset: -0.1
+# Offset for the ion density peaking factor
+ion_density_peaking_offset: -0.2
+# Temperature peaking factor
+temperature_peaking: 2.5
 # Ratio of volume-averaged temperatures (Ti / Te)
 ion_to_electron_temp_ratio: 1.0
 
@@ -146,11 +146,11 @@ minimum_core_radiated_fraction: 0.0
 
 impurities:
   # Impurity concentration relative to electron density.
-  Tungsten: 1.5e-5
-  Helium: 6.0e-2
-  Oxygen: 3.1e-3
+  Krypton: 5.0e-4
+  #Helium: 6.0e-2
+  #Oxygen: 3.1e-3
 
-core_radiator: Xenon
+core_radiator: Krypton
 
 # Inputs for two-point-model
 # Ratio of separatrix to average density
