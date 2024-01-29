@@ -6,6 +6,7 @@ from cfspopcon.unit_handling import ureg
 import warnings
 import numpy as np
 import os
+from pathlib import Path
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def get_profiles(i, j):
@@ -87,7 +88,7 @@ def plot_profiles():
 # Make a popcon
 def plot_popcon():
     plot_style = cfspopcon.read_plot_style(os.path.join(os.getcwd(), "example_cases/ARCH/plot_popcon_arch.yaml"))
-    cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=None)
+    cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=Path(os.path.join(os.getcwd(), "example_cases/ARCH")))
     plt.show()
 
 if __name__ == '__main__':

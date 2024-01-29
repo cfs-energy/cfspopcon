@@ -2,7 +2,7 @@ type: popcon
 
 figsize: [8, 6]
 show_dpi: 150
-save_as: "SPARC_PRD"
+save_as: "cfspopcon_example"
 
 coords:
   x:
