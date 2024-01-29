@@ -53,7 +53,7 @@ contour:
 
   P_auxillary:
     label: "$P_{aux}$"
-    levels: [1.0, 5.0, 10.0, 25.0, 50.0]
+    levels: [0.1, 1.0, 5.0, 10.0, 25.0, 50.0]
     color: "tab:gray"
     format: "1.2g"
 
@@ -61,5 +61,12 @@ contour:
     label: "$P_{fusion}$"
     color: "tab:purple"
     levels: [50.0, 100.0, 150.0, 200.0]
+    format: "1.2g"
+
+# Added this
+  P_ohmic:
+    label: $P_{ohmic}$
+    color: "tab:green"
+    levels: [0.1, 1.0, 5.0, 10.0, 25.0, 50.0]
     format: "1.2g"
   

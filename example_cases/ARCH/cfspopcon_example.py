@@ -8,17 +8,8 @@ import numpy as np
 import os
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-np.set_printoptions(threshold=np.Inf)
-
-# Load input paramters from yaml file
-
-input_parameters, algorithm, points = cfspopcon.read_case(os.path.join(os.getcwd(), "example_cases/ARCH/input_arch.yaml"))
-algorithm.validate_inputs(input_parameters)
-dataset = xr.Dataset(input_parameters)
-algorithm.update_dataset(dataset, in_place=True)
-
 def get_profiles(i, j):
-    # CFSPOPCON Profiles
+    # Get CFSPOPCON Profile
     average_electron_density = dataset['average_electron_density'].values[i]
     electron_density_peaking = dataset['electron_density_peaking'].values[i][j]
     dilution = dataset['dilution'].values[i][j]
@@ -35,7 +26,7 @@ def get_profiles(i, j):
     electron_temp_profile = average_electron_temp * temperature_peaking * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
     ion_temp_profile = average_ion_temp * temperature_peaking * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
 
-    # Frank Profiles
+    # Get Frank Profile
     density_sep = 1.00
     temperature_sep = 0.1
     density_0 = 4.00 # This is an estimate, can't actually find this exact value in Frank but maybe in another paper?
@@ -49,56 +40,67 @@ def get_profiles(i, j):
     return {'cfspopcon': {'density': electron_density_profile, 'temperature': electron_temp_profile},
             'frank': {'density': density_profile, 'temperature': temperature_profile}}
 
-print(dataset['average_electron_density'][0] * dataset['electron_density_peaking'][0][0])
 
+# Find temperature and density array indices in CFSPOPCON that produce density profiles most similar to the ones in Frank.
+# Also find temperature and density array indices in CFSPOPCON that produce temperature profiles most similar to the ones in Frank. 
+def find_matching_cfspopcon_profile():
+    min_density_diff = 99999
+    min_temp_diff = 99999
+    indices = {'Dens Profile': {'Dens Index': 0, 'Temp Index': 0}, 
+               'Temp Profile': {'Dens Index': 0, 'Temp Index': 0}}
+    profiles = None
+    for i in range(40):
+        for j in range(30):
+            profiles = get_profiles(i, j)
+            new_density_diff = np.linalg.norm(profiles['cfspopcon']['density'] - profiles['frank']['density'])
+            if new_density_diff < min_density_diff:
+                min_density_diff = new_density_diff
+                indices['Dens Profile']['Dens Index'] = i
+                indices['Dens Profile']['Temp Index'] = j
+            new_temp_diff = np.linalg.norm(profiles['cfspopcon']['temperature'] - profiles['frank']['temperature'])
+            if new_temp_diff < min_temp_diff:
+                min_temp_diff = new_temp_diff
+                indices['Temp Profile']['Dens Index'] = i
+                indices['Temp Profile']['Temp Index'] = j
+    return indices
 
-npoints = 50
-rho = np.linspace(0, 1, num=npoints, endpoint=False)
-"""
-min_density_diff = 99999
-min_temp_diff = 99999
-i_dens = 0
-j_dens = 0
-i_temp = 0
-j_temp = 0
-profiles = None
-for i in range(40):
-    for j in range(30):
-        profiles = get_profiles(i,j)
-        new_density_diff = np.linalg.norm(profiles['cfspopcon']['density'] - profiles['frank']['density'])
-        if new_density_diff < min_density_diff:
-            min_density_diff = new_density_diff
-            i_dens = i
-            j_dens = j
-        new_temp_diff = np.linalg.norm(profiles['cfspopcon']['temperature'] - profiles['frank']['temperature'])
-        if new_temp_diff < min_temp_diff:
-            min_temp_diff = new_temp_diff
-            i_temp = i
-            j_temp = j
-            
-print(np.array([[i_dens, j_dens], [i_temp, j_temp]]))
+# Plot CFSPOPCON Density, Frank Density, CFSPOPCON Temperature, Frank Temperature Profiles
+def plot_profiles():
+    indices = find_matching_cfspopcon_profile()
+    dpdi = indices['Dens Profile']['Dens Index']
+    dpti = indices['Dens Profile']['Temp Index']
+    tpdi = indices['Temp Profile']['Dens Index']
+    tpti = indices['Temp Profile']['Temp Index']
 
-#print("cfspopcon electron temperature profile parameters", 
-      #dataset["average_electron_temp"].values[j_temp], 
-      #dataset["temperature_peaking"].values
-      #)
-
-# Plot and Compare
-fig, axs = plt.subplots(2, 1)
-plt.subplots_adjust(hspace=0.4)
-axs[0].plot(rho, get_profiles(i_dens, j_dens)['cfspopcon']['density'], color='red', label='cfspopcon')
-axs[0].plot(rho, get_profiles(i_dens, j_dens)['frank']['density'], color='blue', label='frank')
-axs[0].set_title(f'Density Profiles - density={dataset["average_electron_density"].values[i_dens]}, temp={dataset["average_electron_temp"].values[j_dens]}')
-axs[0].legend()
-axs[1].plot(rho, get_profiles(i_temp, j_temp)['cfspopcon']['temperature'], color='red', label='cfspopcon')
-axs[1].plot(rho, get_profiles(i_temp, j_temp)['frank']['temperature'], color='blue', label='frank')
-axs[1].set_title(f'Temperature Profiles - density={dataset["average_electron_density"].values[i_temp]}, temp index={dataset["average_electron_temp"].values[j_temp]}')
-axs[1].legend()
-plt.show()
-"""
-
+    fig, axs = plt.subplots(2, 1)
+    plt.subplots_adjust(hspace=0.4)
+    axs[0].plot(rho, get_profiles(dpdi, dpti)['cfspopcon']['density'], color='red', label='cfspopcon')
+    axs[0].plot(rho, get_profiles(dpdi, dpti)['frank']['density'], color='blue', label='frank')
+    axs[0].set_title(f'Density Profiles - density={dataset["average_electron_density"].values[dpdi]}, temp={dataset["average_electron_temp"].values[dpti]}')
+    axs[0].legend()
+    axs[1].plot(rho, get_profiles(tpdi, tpti)['cfspopcon']['temperature'], color='red', label='cfspopcon')
+    axs[1].plot(rho, get_profiles(tpdi, tpti)['frank']['temperature'], color='blue', label='frank')
+    axs[1].set_title(f'Temperature Profiles - density={dataset["average_electron_density"].values[tpdi]}, temp index={dataset["average_electron_temp"].values[tpti]}')
+    axs[1].legend()
+    plt.show()
 
 # Make a popcon
-plot_style = cfspopcon.read_plot_style(os.path.join(os.getcwd(), "example_cases/SPARC_PRD/plot_popcon.yaml"))
-cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=None)
-plt.show()
+def plot_popcon():
+    plot_style = cfspopcon.read_plot_style(os.path.join(os.getcwd(), "example_cases/ARCH/plot_popcon_arch.yaml"))
+    cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=None)
+    plt.show()
+
+if __name__ == '__main__':
+    np.set_printoptions(threshold=np.Inf)
+
+    npoints = 50
+    rho = np.linspace(0, 1, num=npoints, endpoint=False)
+    
+    # Load input paramters from yaml file
+    input_parameters, algorithm, points = cfspopcon.read_case(os.path.join(os.getcwd(), "example_cases/ARCH/input_arch.yaml"))
+    algorithm.validate_inputs(input_parameters)
+    dataset = xr.Dataset(input_parameters)
+    algorithm.update_dataset(dataset, in_place=True)
+
+    plot_profiles()
+    plot_popcon()

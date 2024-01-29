@@ -63,9 +63,9 @@ grid:
 
   average_electron_density:
     # Average electron density in 1e19 particles / m^3
-    min: 1.0 
-    max: 40.0 
-    num: 40 
+    min: 1.0
+    max: 50.0
+    num: 50 
     spacing: linear
 
   average_electron_temp:
@@ -102,18 +102,13 @@ areal_elongation: 1.6 # fixed
 # Ratio of separatrix_elongation to kappa_A
 elongation_ratio_sep_to_areal: 1.000 # fixed
 # Triangularity at rho_pol = 0.95
-triangularity_psi95: 0 # fixed 
+triangularity_psi95: 0 # fixed
 # Ratio of separatrix_triangularity to delta_95
-triangularity_ratio_sep_to_psi95: 0 # fixed
+triangularity_ratio_sep_to_psi95: 1.8 # fixed orig 0
 # Plasma current in Ampere
 plasma_current: 1.4e+7 # fixed
 # Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
-fraction_of_external_power_coupled: 0.9 # figure this out
-
-# What fusion reaction are we using?
-fusion_reaction: DT
-# Fraction of fuel ions which are the heavier species
-heavier_fuel_species_fraction: 0.5
+fraction_of_external_power_coupled: 0.9
 
 # What fusion reaction are we using?
 fusion_reaction: DT
@@ -121,7 +116,7 @@ fusion_reaction: DT
 heavier_fuel_species_fraction: 0.5
 
 # What sort of 1D profiles should be assumed?
-profile_form: prf
+profile_form: analytic
 # Inverse normalized electron temp scale length a / L_Te = a / (Te / grad(Te))
 normalized_inverse_temp_scale_length: 2.5
 # Offset for the electron density peaking factor
@@ -136,7 +131,7 @@ ion_to_electron_temp_ratio: 1.0
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0
 # Confinement enhancement factor
-confinement_time_scalar: 1.3 # fixed
+confinement_time_scalar: 1.0
 # Name of the tau_e scaling used
 energy_confinement_scaling: ITER98y2 # figure this out
 
@@ -146,9 +141,10 @@ minimum_core_radiated_fraction: 0.0
 
 impurities:
   # Impurity concentration relative to electron density.
-  Krypton: 5.0e-4
-  #Helium: 6.0e-2
-  #Oxygen: 3.1e-3
+  #Krypton: 5.0e-4
+  Tungsten: 1.5e-5
+  Helium: 6.0e-2
+  Oxygen: 3.1e-3
 
 core_radiator: Krypton
 
@@ -169,5 +165,5 @@ SOL_momentum_loss_function: KotovReiter
 fraction_of_P_SOL_to_divertor: 0.6
 # Electron thermal conductivity in W / (eV**3.5 m)
 kappa_e0: 2600.0
-# Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
+# Calculate P_rad_SOL such that te target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
 target_electron_temp: 25.0
