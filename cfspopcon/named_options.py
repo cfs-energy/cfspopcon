@@ -10,6 +10,8 @@ class Algorithms(Enum):
     two_point_model_fixed_qpart = auto()
     two_point_model_fixed_tet = auto()
     calc_beta = auto()
+    calc_inductances = auto()
+    calc_fluxes = auto()
     calc_core_radiated_power = auto()
     calc_fusion_gain = auto()
     calc_geometry = auto()
@@ -40,6 +42,29 @@ class Algorithms(Enum):
     calc_P_SOL = auto()
     use_LOC_tau_e_below_threshold = auto()
     calc_plasma_stored_energy = auto()
+
+
+class VertMagneticFieldEq(Enum):
+    """Vertical magnetic field equation from various papers. NOTE: the choice of Barr vs. Mitarai also affects invmu_0_dLedR and the vertical_magnetic_field_mutual_inductance."""
+
+    Mit_and_Taka_Eq13 = auto()
+    Barr = auto()
+    Jean = auto()
+    MgnticFsionEnrgyFrmlry = auto()
+
+
+class InternalInductanceGeometry(Enum):
+    """Plasma Geometries to calculate internal inductance."""
+
+    Cylindrical = auto()
+    NonCylindrical = auto()
+
+
+class SurfaceInductanceCoeffs(Enum):
+    """Coefficeints to calculate external inductance components."""
+
+    Hirshman = auto()
+    Barr = auto()
 
 
 class ProfileForm(Enum):

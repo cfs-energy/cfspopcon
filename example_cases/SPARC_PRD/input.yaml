@@ -34,6 +34,9 @@ algorithms:
   - calc_bootstrap_fraction
   - calc_ohmic_power
   - calc_auxillary_power
+  # We compute the inductances and then flux to get the max_flux_for_flattop
+  - calc_inductances
+  - calc_fluxes
   # Once we have the power input into and radiated from the confined
   # region, we can determine the power crossing the separatrix. We use
   # a scaling for lambda_q to calculate a corresponding q_parallel, and
@@ -166,3 +169,16 @@ fraction_of_P_SOL_to_divertor: 0.6
 kappa_e0: 2600.0
 # Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
 target_electron_temp: 25.0
+
+# What set of fitting coefficients for the surface inductance?
+surface_inductance_coefficients: Barr
+# How much flux is availble from the CS for ramp-up and flattop? [Wb]
+total_flux_available_from_CS: 35
+# What is the scaling law factor for resistive flux consumption over the ramp-up?
+ejima_coefficient: 0.6
+# Which internal inductance geometry? Cylindrical approximation or a generalized geometry?
+internal_inductance_geometry: Cylindrical
+# safety-factor on axis
+safety_factor_on_axis: 1
+# Which vertical magnetic field equation based on toroidal force balance?
+vertical_magnetic_field_equation: Barr

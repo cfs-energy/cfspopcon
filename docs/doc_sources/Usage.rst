@@ -33,3 +33,4 @@ The example notebook linked below can be found within the `docs folder <https://
 .. toctree::
 
   getting_started
+  time_independent_inductance_and_fluxes
