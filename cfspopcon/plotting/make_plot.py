@@ -25,6 +25,7 @@ def make_plot(
         if ax is None:
             _, ax = plt.subplots(figsize=plot_params["figsize"], dpi=plot_params["show_dpi"])
         fig, ax = make_popcon_plot(dataset, title, plot_params, points, ax=ax)
+        return fig, ax
     else:
         raise NotImplementedError(f"No plotting method for type '{plot_params['type']}'")
 
@@ -65,7 +66,6 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
         # Overlay contour plots
 
         for variable, subplot_params in plot_params["contour"].items():
-
             field = dataset[variable]
             units = subplot_params.get("units", field.pint.units)
             field = field.pint.to(units)
