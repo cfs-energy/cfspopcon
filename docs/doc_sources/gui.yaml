@@ -33,5 +33,11 @@ sliders:
     start: -0.5
     end: 0.5
     default: 0.3
-    step_size: 0.05
+    step_size: 0.01
+    unit: ""
+  - name: "confinement_time_scalar"
+    start: 0.8
+    end: 1.2
+    default: 1.0
+    step_size: 0.01
     unit: ""
