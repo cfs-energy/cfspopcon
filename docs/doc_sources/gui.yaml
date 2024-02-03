@@ -1,0 +1,37 @@
+sliders:
+  - name: "magnetic_field_on_axis"
+    start: 5.0
+    end: 14.0
+    default: 12.2
+    step_size: 0.1
+    unit: "T"
+  - name: "major_radius"
+    start: 1.5
+    end: 5.0
+    default: 1.85
+    step_size: 0.1
+    unit: "m"
+  - name: "inverse_aspect_ratio"
+    start: 0.2
+    end: 0.4
+    default: 0.308
+    step_size: 0.001
+    unit: ""
+  - name: "plasma_current"
+    start: 3.0
+    end: 15.0
+    default: 8.7
+    step_size: 0.1
+    unit: "MA"
+  - name: "areal_elongation"
+    start: 1.2
+    end: 2.0
+    default: 1.75
+    step_size: 0.01
+    unit: ""
+  - name: "triangularity_psi95"
+    start: -0.5
+    end: 0.5
+    default: 0.3
+    step_size: 0.05
+    unit: ""
