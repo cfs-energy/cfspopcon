@@ -11,7 +11,7 @@ For more information please have a look at our [documentation](https://cfspopcon
 
 # How2Use 2263 GUI Locally as Developer
 1) Use Linux
-2) [Install poetry](https://python-poetry.org/)
+2) [Install poetry](https://python-poetry.org/docs/)
 3) Follow RADAS instructions given by CFSPOPCON (https://cfspopcon.readthedocs.io/en/latest/doc_sources/Usage.html)
 4) Activate the poetry shell (see poetry docs) run a `poetry install` in the root of the repo
 5) From the root of the repo do a `cd docs/doc_sources/`
