@@ -79,17 +79,8 @@ points:
   PRD:
     maximize: Q
     where:
-      P_auxillary:
-        min: 0.0
-        max: 25.0
-        units: MW
       greenwald_fraction:
         max: 0.9
-      ratio_of_P_SOL_to_P_LH:
-        min: 1.0
-      P_fusion:
-        max: 140.0
-        units: MW
 
 # Major radius in metres
 major_radius: 4.55

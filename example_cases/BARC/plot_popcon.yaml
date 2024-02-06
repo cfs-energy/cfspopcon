@@ -19,14 +19,11 @@ fill:
   where:
       Q:
         min: 0.1
-        max: 100
-      P_auxillary:
-        min: 0.0
-        max: 25.0
-        units: MW
-      ratio_of_P_SOL_to_P_LH:
-        min: 0.1
-        max: 1.5
+        max: 40.0
+      # P_auxillary:
+      #   min: 0.0
+      #   max: 50.0
+      #   units: MW
         
 # Suggested colors are "tab:red", "tab:blue", "tab:orange", "tab:green", "tab:purple",
 # "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan"
@@ -34,7 +31,7 @@ contour:
 
   Q:
     label: $Q$
-    levels: [0.1, 1.0, 2.0, 5.0, 10.0, 50.0]
+    levels: [0.1, 1.0, 2.0, 5.0, 10.0, 15.0, 20.0, 30.0, 40.0]
     color: "tab:red"
     format: "1.2g"
   
@@ -46,13 +43,13 @@ contour:
 
   P_auxillary:
     label: "$P_{aux}$"
-    levels: [1.0, 5.0, 10.0, 25.0, 50.0]
-    color: "tab:gray"
+    levels: [1.0, 5.0, 10.0, 25.0, 50.0, 75.0]
+    color: "tab:cyan"
     format: "1.2g"
 
   P_fusion:
     label: "$P_{fusion}$"
-    color: "tab:purple"
-    levels: [50.0, 100.0, 150.0, 200.0]
+    color: "tab:orange"
+    levels: [50.0, 100.0, 150.0, 200.0, 300.0, 400.0, 500.0]
     format: "1.2g"
   
