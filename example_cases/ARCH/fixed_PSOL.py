@@ -21,15 +21,15 @@ algorithm.update_dataset(dataset, in_place=True)
 # This helps us obtain the density and temperature at which P_sol = target.
 
 target = 50
-P_sol_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
+impurities_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
 
-for i in range(0, P_sol_array.shape[0]): # some elements have P_sol = 0, should we not count them?
-    for j in range(0, P_sol_array.shape[1]): # some elements have P_sol = 0, should we not count them?
+for i in range(0, impurities_array.shape[0]): # some elements have P_sol = 0, should we not count them?
+    for j in range(0, impurities_array.shape[1]): # some elements have P_sol = 0, should we not count them?
         diff = np.abs(dataset['P_sol'].values[i,j] - target)
         while(np.abs(diff) > 1.0):
             increment = np.sign(diff) * 1e-3 # Find a better formula for increment!! Very slow 😭
             dataset['impurities'].values = ureg.Quantity(dataset['impurities'].values + increment, 'dimensionless')
             algorithm.update_dataset(dataset, in_place=True) # Getting invalid arguments for logarithms for some reason.
             print(dataset['P_sol'].values[i,j])
-            P_sol_array[i,j] = dataset['P_sol'].values[i,j]
+            impurities_array[i,j] = dataset['P_sol'].values[i,j]
             diff = np.abs(dataset['P_sol'].values[i,j] - target)
