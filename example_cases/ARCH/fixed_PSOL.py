@@ -31,5 +31,5 @@ for i in range(0, impurities_array.shape[0]): # some elements have P_sol = 0, sh
             dataset['impurities'].values = ureg.Quantity(dataset['impurities'].values + increment, 'dimensionless')
             algorithm.update_dataset(dataset, in_place=True) # Getting invalid arguments for logarithms for some reason.
             print(dataset['P_sol'].values[i,j])
-            impurities_array[i,j] = dataset['P_sol'].values[i,j]
+            impurities_array[i,j] = dataset['impurities'].values
             diff = np.abs(dataset['P_sol'].values[i,j] - target)
