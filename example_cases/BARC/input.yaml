@@ -106,7 +106,7 @@ triangularity_psi95: -0.5
 # Ratio of separatrix_triangularity to delta_95
 triangularity_ratio_sep_to_psi95: 1.8
 # Plasma current in Ampere
-plasma_current: 1e+7
+plasma_current: 1.0e+7
 # Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
 fraction_of_external_power_coupled: 0.9
 
