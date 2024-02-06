@@ -50,8 +50,8 @@ def find_matching_cfspopcon_profile():
     indices = {'Dens Profile': {'Dens Index': 0, 'Temp Index': 0}, 
                'Temp Profile': {'Dens Index': 0, 'Temp Index': 0}}
     profiles = None
-    for i in range(40):
-        for j in range(30):
+    for i in range(dataset['average_electron_density'].values.shape[0]):
+        for j in range(dataset['average_electron_temp'].values.shape[0]):
             profiles = get_profiles(i, j)
             new_density_diff = np.linalg.norm(profiles['cfspopcon']['density'] - profiles['frank']['density'])
             if new_density_diff < min_density_diff:
@@ -87,8 +87,8 @@ def plot_profiles():
 
 # Make a popcon
 def plot_popcon():
-    plot_style = cfspopcon.read_plot_style(os.path.join(os.getcwd(), "example_cases/ARCH/plot_popcon_arch.yaml"))
-    cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=Path(os.path.join(os.getcwd(), "example_cases/ARCH")))
+    plot_style = cfspopcon.read_plot_style(os.path.join(os.getcwd(), "example_cases/SPARC_PRD/plot_popcon_creely.yaml"))
+    cfspopcon.plotting.make_plot(dataset, plot_style, points=points, title="POPCON example", output_dir=Path(os.path.join(os.getcwd(), "example_cases/SPARC_PRD")))
     plt.show()
 
 if __name__ == '__main__':
@@ -98,10 +98,10 @@ if __name__ == '__main__':
     rho = np.linspace(0, 1, num=npoints, endpoint=False)
     
     # Load input paramters from yaml file
-    input_parameters, algorithm, points = cfspopcon.read_case(os.path.join(os.getcwd(), "example_cases/ARCH/input_arch.yaml"))
+    input_parameters, algorithm, points = cfspopcon.read_case(os.path.join(os.getcwd(), "example_cases/SPARC_PRD/input_creely.yaml"))
     algorithm.validate_inputs(input_parameters)
     dataset = xr.Dataset(input_parameters)
     algorithm.update_dataset(dataset, in_place=True)
 
-    plot_profiles()
+    #plot_profiles()
     plot_popcon()

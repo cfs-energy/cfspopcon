@@ -62,17 +62,17 @@ grid:
   # a corresponding linspace or logspace of values
 
   average_electron_density:
-    # Average electron density in 1e19 particles / m^3
+    # Average electron density in 1e19 particles / m^3=
     min: 1.0
-    max: 50.0
-    num: 50 
+    max: 100.0
+    num: 5
     spacing: linear
 
   average_electron_temp:
     # Average electron temperature in keV
-    min: 1.0
-    max: 30.0
-    num: 30
+    min: 0.5
+    max: 16.0
+    num: 5
     spacing: linear
 
 points:
@@ -133,7 +133,7 @@ confinement_threshold_scalar: 1.0
 # Confinement enhancement factor
 confinement_time_scalar: 1.0
 # Name of the tau_e scaling used
-energy_confinement_scaling: ITER98y2 # figure this out
+energy_confinement_scaling: ITER98y2
 
 radiated_power_method: Radas
 radiated_power_scalar: 1.0
@@ -142,9 +142,9 @@ minimum_core_radiated_fraction: 0.0
 impurities:
   # Impurity concentration relative to electron density.
   #Krypton: 5.0e-4
-  Tungsten: 1.5e-5
-  Helium: 6.0e-2
-  Oxygen: 3.1e-3
+  #Tungsten: 1.5e-5
+  Helium: 7.0e-2
+  #Oxygen: 3.1e-3
 
 core_radiator: Krypton
 
