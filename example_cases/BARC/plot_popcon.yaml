@@ -19,6 +19,7 @@ fill:
   where:
       Q:
         min: 0.1
+        max: 100
       P_auxillary:
         min: 0.0
         max: 25.0
