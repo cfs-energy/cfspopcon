@@ -64,13 +64,13 @@ grid:
   average_electron_density:
     # Average electron density in 1e19 particles / m^3
     min: 1.0
-    max: 40.0
+    max: 25.0
     num: 40
     spacing: linear
 
   average_electron_temp:
     # Average electron temperature in keV
-    min: 5.0
+    min: 1.0
     max: 20.0
     num: 30
     spacing: linear
@@ -92,21 +92,21 @@ points:
         units: MW
 
 # Major radius in metres
-major_radius: 1.85
+major_radius: 4.55
 # Toroidal field on-axis in Tesla
-magnetic_field_on_axis: 12.2
+magnetic_field_on_axis: 11.08
 # Inverse aspect ratio
-inverse_aspect_ratio: 0.3081
+inverse_aspect_ratio:  0.26373626 
 # Areal elongation
-areal_elongation: 1.75
+areal_elongation:  1.4
 # Ratio of separatrix_elongation to kappa_A
 elongation_ratio_sep_to_areal: 1.125
 # Triangularity at rho_pol = 0.95
-triangularity_psi95: 0.3
+triangularity_psi95: -0.5 
 # Ratio of separatrix_triangularity to delta_95
 triangularity_ratio_sep_to_psi95: 1.8
 # Plasma current in Ampere
-plasma_current: 8.7e+6
+plasma_current: 1e+7
 # Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
 fraction_of_external_power_coupled: 0.9
 
@@ -118,20 +118,20 @@ heavier_fuel_species_fraction: 0.5
 # What sort of 1D profiles should be assumed?
 profile_form: prf
 # Inverse normalized electron temp scale length a / L_Te = a / (Te / grad(Te))
-normalized_inverse_temp_scale_length: 2.5
+normalized_inverse_temp_scale_length: 1.5
 # Offset for the electron density peaking factor
-electron_density_peaking_offset: -0.1
+electron_density_peaking_offset: 0
 # Offset for the ion density peaking factor
-ion_density_peaking_offset: -0.2
+ion_density_peaking_offset: 0
 # Temperature peaking factor
-temperature_peaking: 2.5
+temperature_peaking: 2.0
 # Ratio of volume-averaged temperatures (Ti / Te)
-ion_to_electron_temp_ratio: 1.0
+ion_to_electron_temp_ratio: 0.9
 
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0
 # Confinement enhancement factor
-confinement_time_scalar: 1.0
+confinement_time_scalar: 0.9
 # Name of the tau_e scaling used
 energy_confinement_scaling: ITER98y2
 
