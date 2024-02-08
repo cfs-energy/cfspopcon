@@ -64,7 +64,7 @@ for i in range(impurities_array.shape[0]): # some elements have P_sol = 0, shoul
 print(P_sols_array, "\n")
 print(impurities_array)
 
-# If you run this code, you will notice that there is a negative impurity concentration for impurities_array[1, 2]...wtf?
+# If you run this code, you will notice that there is a negative impurity concentration for impurities_array[1, 2]...what?
 # This seems wrong, but looking at the graphs in P_sol_vs_impurities.png, this makes sense. 
 # There is actually no impurity concentration for which dataset['P_sol'].values[1, 2] = 50.
 
