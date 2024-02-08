@@ -20,6 +20,8 @@ algorithm.update_dataset(dataset, in_place=True)
 # Then, add (i,j) to the "data" array.
 # This helps us obtain the density and temperature at which P_sol = target.
 
+print(dataset['P_sol'].values)
+
 target = 50
 epsilon = 1e-3
 delta_imp = 1e-7
