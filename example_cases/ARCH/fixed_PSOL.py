@@ -67,4 +67,5 @@ print(impurities_array)
 # If you run this code, you will notice that there is a negative impurity concentration for impurities_array[1, 2]...what?
 # This seems wrong, but looking at the graphs in P_sol_vs_impurities.png, this makes sense. 
 # There is actually no impurity concentration for which dataset['P_sol'].values[1, 2] = 50.
+# The negative value is an artifact of using Newton's algorithm.
 
