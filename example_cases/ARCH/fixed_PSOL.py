@@ -21,28 +21,48 @@ algorithm.update_dataset(dataset, in_place=True)
 # This helps us obtain the density and temperature at which P_sol = target.
 
 target = 50
-impurities_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
+epsilon = 1e-3
+delta_imp = 1e-7
+initial_impurity = [0.0] 
 
-for i in range(0, impurities_array.shape[0]): # some elements have P_sol = 0, should we not count them?
-    for j in range(0, impurities_array.shape[1]): # some elements have P_sol = 0, should we not count them?
-        print("INDICES", i, j)
-        while(np.abs(dataset['P_sol'].values[i][j] - target) > 0.5):
+impurities_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
+P_sols_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
+
+for i in range(impurities_array.shape[0]): # some elements have P_sol = 0, should we not count them?
+    for j in range(impurities_array.shape[1]): # some elements have P_sol = 0, should we not count them?
+        
+        print(f"(i, j) = ({i}, {j})")
+
+        dataset['impurities'].values = ureg.Quantity(initial_impurity, 'dimensionless') # Set initial impurity to initial_impurity = [0.0]
+        algorithm.update_dataset(dataset, in_place=True)
+
+        while(np.abs(dataset['P_sol'].values[i,j] - target) > epsilon):
             
             # Approximate partial derivative of P_sol WRT impurity concentration (at an impurity concentration imp_0)
             imp_0 = dataset['impurities'].values
-            P_sol_0 = dataset['P_sol'].values[i][j]
-            imp_1 = imp_0 + 1e-7
+            P_sol_0 = dataset['P_sol'].values[i,j]
+            imp_1 = imp_0 + delta_imp
             dataset['impurities'].values = ureg.Quantity(imp_1, 'dimensionless')
             algorithm.update_dataset(dataset, in_place=True)
-            P_sol_1 = dataset['P_sol'].values[i][j]
+            P_sol_1 = dataset['P_sol'].values[i,j]
             derivative = (P_sol_1 - P_sol_0) / (imp_1 - imp_0)
 
             if(derivative == 0):
                 break
 
             # Adjust impurity concentration and recalculate other parameters
-            imp_0 = imp_0 - (P_sol_0 - target) / derivative
+            else:
+                imp_0 = imp_0 - (P_sol_0 - target) / derivative
             dataset['impurities'].values = ureg.Quantity(imp_0, 'dimensionless')
             algorithm.update_dataset(dataset, in_place=True)
 
-            print(f"impurity: {imp_0}...P_sol: {dataset['P_sol'].values[i][j]}")
+            impurities_array[i,j] = imp_0
+            P_sols_array[i,j] = dataset['P_sol'].values[i,j]
+
+print(P_sols_array, "\n")
+print(impurities_array)
+
+# If you run this code, you will notice that there is a negative impurity concentration for impurities_array[1, 2]...wtf?
+# This seems wrong, but looking at the graphs in P_sol_vs_impurities.png, this makes sense. 
+# There is actually no impurity concentration for which dataset['P_sol'].values[1, 2] = 50.
+
