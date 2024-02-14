@@ -9,11 +9,11 @@ cfspopcon: 0D Plasma Calculations & Plasma OPerating CONtours
 
 For more information please have a look at our [documentation](https://cfspopcon.readthedocs.io/en/latest/).
 
-# How2Use 2263 GUI Locally as Developer
-1) Use Linux
-2) [Install poetry](https://python-poetry.org/docs/), I recommend using the default instructions with a Python version >=3.9: `curl -sSL https://install.python-poetry.org | python3 -`
-3) Follow RADAS instructions given by CFSPOPCON (https://cfspopcon.readthedocs.io/en/latest/doc_sources/Usage.html)
-4) Activate the poetry shell by running a `poetry shell` in the root of the repo and run a `poetry install`
-5) From the root of the repo do a `cd cfspopcon/gui`
-6) To start the gui run `panel serve panel_gui.ipynb --autoreload`
-7) Copy the url it spits out into your browser (probs gonna be `http://localhost:5006/panel_gui`)
+# BARC Instructions
+## Option 1: Run CFSPOPCON Normally via. Jupyter Notebook
+1) Open `docs/doc_sources/getting_started.ipynb` with your favorite Jupyter Notebook editor
+2) Run it all!
+
+# Option 2: Use GUI
+1) To start the gui run `panel serve panel_gui.ipynb --autoreload`
+2) Copy the url it spits out into your browser (probs gonna be `http://localhost:5006/panel_gui`)
