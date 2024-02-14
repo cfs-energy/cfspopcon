@@ -79,17 +79,8 @@ points:
   PRD:
     maximize: Q
     where:
-      P_auxillary:
-        min: 0.0
-        max: 25.0
-        units: MW
       greenwald_fraction:
         max: 0.9
-      ratio_of_P_SOL_to_P_LH:
-        min: 1.0
-      P_fusion:
-        max: 140.0
-        units: MW
 
 # Major radius in metres
 major_radius: 4.55
@@ -106,7 +97,7 @@ triangularity_psi95: -0.5
 # Ratio of separatrix_triangularity to delta_95
 triangularity_ratio_sep_to_psi95: 1.8
 # Plasma current in Ampere
-plasma_current: 1e+7
+plasma_current: 1.0e+7
 # Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
 fraction_of_external_power_coupled: 0.9
 
