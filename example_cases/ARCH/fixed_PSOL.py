@@ -23,9 +23,9 @@ algorithm.update_dataset(dataset, in_place=True)
 print(dataset['P_sol'].values)
 
 target = 50
-epsilon = 1e-3
-delta_imp = 1e-7
-initial_impurity = [0.0] 
+epsilon = 1e-5
+delta_imp = 1e-9
+initial_impurity = [0.0]
 
 impurities_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
 P_sols_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
@@ -38,28 +38,49 @@ for i in range(impurities_array.shape[0]): # some elements have P_sol = 0, shoul
         dataset['impurities'].values = ureg.Quantity(initial_impurity, 'dimensionless') # Set initial impurity to initial_impurity = [0.0]
         algorithm.update_dataset(dataset, in_place=True)
 
-        while(np.abs(dataset['P_sol'].values[i,j] - target) > epsilon):
-            
+        if np.abs(dataset['P_sol'].values[i,j]) < target:
+            impurities_array[i,j] = initial_impurity[0]
+            continue
+        while(np.abs(dataset['P_sol'].values[i][j] - target) > epsilon):
+
             # Approximate partial derivative of P_sol WRT impurity concentration (at an impurity concentration imp_0)
+
             imp_0 = dataset['impurities'].values
             P_sol_0 = dataset['P_sol'].values[i,j]
-            imp_1 = imp_0 + delta_imp
-            dataset['impurities'].values = ureg.Quantity(imp_1, 'dimensionless')
+
+            print(imp_0, P_sol_0)
+            
+            imp_next = imp_0 + delta_imp
+            dataset['impurities'].values = ureg.Quantity(imp_next, 'dimensionless')
             algorithm.update_dataset(dataset, in_place=True)
-            P_sol_1 = dataset['P_sol'].values[i,j]
-            derivative = (P_sol_1 - P_sol_0) / (imp_1 - imp_0)
+            P_sol_next = dataset['P_sol'].values[i,j]
+
+            derivative = (P_sol_next - P_sol_0) / delta_imp
+
+            """imp_prev = imp_0 - delta_imp
+            dataset['impurities'].values = ureg.Quantity(imp_prev, 'dimensionless')
+            algorithm.update_dataset(dataset, in_place=True)
+            P_sol_prev = dataset['P_sol'].values[i,j]
+
+            derivative2 = P_sol_next - 2*P_sol_0 + P_sol_prev / delta_imp**2 """
 
             if(derivative == 0):
                 break
 
             # Adjust impurity concentration and recalculate other parameters
-            else:
-                imp_0 = imp_0 - (P_sol_0 - target) / derivative
+            imp_0 = imp_0 - (P_sol_0 - target) / derivative
             dataset['impurities'].values = ureg.Quantity(imp_0, 'dimensionless')
             algorithm.update_dataset(dataset, in_place=True)
 
+            while(dataset['P_sol'].values[i,j] == 0.0):
+                print(imp_0, dataset['P_sol'].values[i][j])
+                imp_0 = imp_0 * 0.99
+                dataset['impurities'].values = ureg.Quantity(imp_0, 'dimensionless')
+                algorithm.update_dataset(dataset, in_place=True)
+            
             impurities_array[i,j] = imp_0
             P_sols_array[i,j] = dataset['P_sol'].values[i,j]
+            
 
 print(P_sols_array, "\n")
 print(impurities_array)

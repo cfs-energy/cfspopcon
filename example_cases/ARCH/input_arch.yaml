@@ -142,8 +142,8 @@ minimum_core_radiated_fraction: 0.0
 impurities:
   # Impurity concentration relative to electron density.
   #Krypton: 5.0e-4
-  #Tungsten: 1.5e-5
-  Helium: 7.0e-2
+  Tungsten: 1.5e-5
+  #Helium: 7.0e-2
   #Oxygen: 3.1e-3
 
 core_radiator: Krypton
