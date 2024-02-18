@@ -135,7 +135,7 @@ def calc_tau_e_and_P_in_from_scaling(
         * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity])) ** scaling["params"]["a_d"]
         * q_star ** scaling["params"]["a_q"]
     )
-
+    
     if gamma > 0.0:
         P_tau = (plasma_stored_energy / gamma) ** (1.0 / (1.0 + scaling["params"]["a_P"]))
     else:

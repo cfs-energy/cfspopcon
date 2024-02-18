@@ -40,6 +40,7 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
     points = repr_d.pop("points")
 
     grid_values = repr_d.pop("grid")
+
     for key, grid_spec in grid_values.items():
         grid_spacing = grid_spec.get("spacing", "linear")
 
