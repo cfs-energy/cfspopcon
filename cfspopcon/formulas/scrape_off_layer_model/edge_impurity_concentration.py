@@ -65,6 +65,12 @@ def calc_required_edge_impurity_concentration(
     with the parallel temperature profile. You may wish to implement an iterative solver
     to find a consistent set of L_parallel, T_t and T_u.
 
+    This model is based on the "Lengyel" model originally presented in a 1981 IPP report titled
+    "Analysis of Radiating Plasma Boundary Layers" by L. L. Lengyel :cite:`Lengyel_1981`.
+
+    The lengyel_overestimation_factor is introduced by D. Moulton et al. in :cite:`Moulton_2021`.
+    This paper also provides a good description of the Lengyel model.
+
     Args:
         L_int_integrator: an interpolator to calculate the integral of L_{int}$ between arbitrary temperature points
         q_parallel: :term:`glossary link<q_parallel>`

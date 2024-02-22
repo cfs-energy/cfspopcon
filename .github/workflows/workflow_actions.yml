@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
@@ -69,7 +69,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install pandoc
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -142,7 +142,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
 
       - name: Poetry build
         run: poetry build
