@@ -34,7 +34,6 @@ def test_wraps_simple():
 
 @pytest.mark.filterwarnings("error")
 def test_wraps_with_too_many_input_units():
-
     with pytest.raises(ValueError):
 
         @wraps_ufunc(return_units=dict(result=ureg.m), input_units=dict(a=ureg.m, b=ureg.mm))
@@ -54,7 +53,6 @@ def test_wraps_with_too_many_output_units():
 
 @pytest.mark.filterwarnings("error")
 def test_wraps_with_wrong_arguments():
-
     with pytest.raises(ValueError):
 
         @wraps_ufunc(return_units=dict(result=ureg.m), input_units=dict(b=ureg.m))

@@ -11,8 +11,7 @@ from cfspopcon.helpers import (
 
 
 def test_convert_named_options():
-
-    for (val, key) in (
+    for val, key in (
         (named_options.Algorithms.predictive_popcon, "algorithms"),
         (named_options.ConfinementScaling.ITER98y2, "energy_confinement_scaling"),
         (named_options.ProfileForm.analytic, "profile_form"),
@@ -34,7 +33,6 @@ def test_convert_named_options():
 
 
 def test_impurity_array_helpers():
-
     array = xr.DataArray([[1, 2], [3, 4]], coords=dict(a=[1, 2], b=[3, 5]))
 
     make_impurities_array(xr.DataArray("tungsten"), array)

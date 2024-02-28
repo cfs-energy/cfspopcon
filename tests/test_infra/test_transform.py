@@ -5,7 +5,6 @@ from cfspopcon import transform
 
 
 def test_interpolate_onto_new_coords(z, z1, z2):
-
     z_interp = transform.interpolate_array_onto_new_coords(array=z, new_coords=dict(z1=z1, z2=z2), default_resolution=5)
 
     assert z_interp.min() >= z.min()
@@ -15,7 +14,6 @@ def test_interpolate_onto_new_coords(z, z1, z2):
 
 
 def test_order_dimensions(z):
-
     assert transform.order_dimensions(z, dims=("x", "y"), order_for_plotting=True).dims == ("y", "x")
     assert transform.order_dimensions(z, dims=("x", "y"), order_for_plotting=False).dims == ("x", "y")
 

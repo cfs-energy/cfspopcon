@@ -42,7 +42,9 @@ algorithms:
   - calc_P_SOL
   - calc_average_total_pressure
   - calc_heat_exhaust
+  - calc_upstream_electron_density
   - two_point_model_fixed_tet
+  - calc_edge_impurity_concentration
   # Finally, we calculate several parameters which aren't used in other
   # calculations, but which are useful for characterizing operational
   # points. These can be used later when masking inaccessible operational
@@ -166,3 +168,10 @@ fraction_of_P_SOL_to_divertor: 0.6
 kappa_e0: 2600.0
 # Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
 target_electron_temp: 25.0
+
+# Which species should be injected to cool the scrape-off-layer?
+edge_impurity_species: Argon
+# Factor applied to the result of the Lengyel model to give an absolute low-Z impurity concentration.
+lengyel_overestimation_factor: 4.3
+# Ratio of edge impurity concentration in the edge to in the core (c_edge / c_core)
+edge_impurity_enrichment: 5.0

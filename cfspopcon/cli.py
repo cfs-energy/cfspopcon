@@ -56,7 +56,7 @@ def run_popcon(case: str, plots: tuple[str], show: bool) -> None:
     dataset = xr.Dataset(input_parameters)
 
     algorithm.validate_inputs(dataset)
-    algorithm.update_dataset(dataset, in_place=True)
+    dataset = algorithm.update_dataset(dataset)
 
     output_dir = Path(case) / "output" if Path(case).is_dir() else Path(case).parent / "output"
     output_dir.mkdir(exist_ok=True)

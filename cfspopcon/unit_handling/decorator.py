@@ -79,7 +79,6 @@ def wraps_ufunc(  # noqa: PLR0915
         input_core_dims = len(pass_as_positional_args) * [()]
 
     def _wraps_ufunc(func: FunctionType) -> FunctionType:
-
         func_signature = signature(func)
         func_parameters = func_signature.parameters
 
@@ -175,7 +174,6 @@ def wraps_ufunc(  # noqa: PLR0915
 
 
 def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Union[str, Unit, None]]:
-
     for key, unit in units_dict.items():
         if unit is None:
             pass
@@ -188,7 +186,6 @@ def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Uni
 
 
 def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
-
     if not set(vals.keys()) == set(units_mapping):
         raise ValueError(f"Argument keys {vals.keys()} did not match units_mapping keys {units_mapping.keys()}")
 
@@ -217,7 +214,6 @@ def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Uni
 
 
 def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
-
     if not isinstance(vals, tuple):
         vals = (vals,)
 

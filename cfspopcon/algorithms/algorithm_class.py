@@ -81,21 +81,15 @@ class Algorithm:
 
         return run
 
-    def update_dataset(self, dataset: xr.Dataset, in_place: bool = False) -> Optional[xr.Dataset]:
+    def update_dataset(self, dataset: xr.Dataset, allow_overwrite: bool = True) -> xr.Dataset:
         """Retrieve inputs from passed dataset and return a new dataset combining input and output quantities.
-
-        Specifying in_place=True modifies the dataset in place (changing the input), whereas in_place=False will
-        return a copy of the dataset with the outputs appended.
 
         Args:
             dataset: input dataset
-            in_place: modify the dataset in place, otherwise return a modified dataset keeping the input unchanged.
+            allow_overwrite: if False, raise an error if trying to write a variable which is already defined in dataset
 
         Returns: modified dataset
         """
-        if not in_place:
-            dataset = dataset.copy(deep=True)
-
         input_values = {}
         for key in self.input_keys:
             if key in dataset.keys():
@@ -108,14 +102,7 @@ class Algorithm:
                 raise KeyError(f"Key '{key}' not in dataset keys [{sorted_dataset_keys}] or default values [{sorted_default_keys}]")
 
         result = self._function(**input_values)
-
-        for key, val in result.items():
-            dataset[key] = val
-
-        if not in_place:
-            return dataset
-        else:
-            return None
+        return xr.Dataset(result).merge(dataset, join="left", compat=("override" if allow_overwrite else "no_conflicts"))
 
     def __add__(self, other: Union[Algorithm, CompositeAlgorithm]) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this Algorithm and another Algorithm or CompositeAlgorithm."""
@@ -269,7 +256,6 @@ class CompositeAlgorithm:
             warn(f"Not all input parameters were used. Unused parameters: [{', '.join(parameters_extra)}]", stacklevel=3)
 
         for alg in self.algorithms:
-
             alg_kwargs = {key: result[key] for key in result.keys() if key in alg.input_keys}
 
             alg_result = alg.run(**alg_kwargs)
@@ -277,32 +263,21 @@ class CompositeAlgorithm:
 
         return xr.Dataset(result)
 
-    def update_dataset(self, dataset: xr.Dataset, in_place: bool = False) -> Optional[xr.Dataset]:
+    def update_dataset(self, dataset: xr.Dataset, allow_overwrite: bool = True) -> xr.Dataset:
         """Retrieve inputs from passed dataset and return a new dataset combining input and output quantities.
-
-        Specifying in_place=True modifies the dataset in place (changing the input), whereas in_place=False will
-        return a copy of the dataset with the outputs appended.
 
         N.b. will not throw a warning if the dataset contains unused elements.
 
         Args:
             dataset: input dataset
-            in_place: modify the dataset in place, otherwise return a modified dataset keeping the input unchanged.
+            allow_overwrite: if False, raise an error if trying to write a variable which is already defined in dataset
 
         Returns: modified dataset
         """
-        if not in_place:
-            dataset = dataset.copy(deep=True)
-
         for alg in self.algorithms:
-            # We've already used copy on the dataset, so can now call update_dataset with
-            # in_place = True for each of the algorithms.
-            alg.update_dataset(dataset, in_place=True)
+            dataset = alg.update_dataset(dataset, allow_overwrite=allow_overwrite)
 
-        if not in_place:
-            return dataset
-        else:
-            return None
+        return dataset
 
     def __add__(self, other: Union[Algorithm, CompositeAlgorithm]) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this CompositeAlgorithm and another Algorithm or CompositeAlgorithm."""
