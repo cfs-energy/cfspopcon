@@ -46,12 +46,7 @@ def run_two_point_model_fixed_fpow(
     Returns:
         :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (
-        upstream_electron_temp,
-        target_electron_density,
-        target_electron_temp,
-        target_electron_flux,
-    ) = solve_two_point_model(
+    (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
