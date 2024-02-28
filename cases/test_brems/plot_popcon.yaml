@@ -1,0 +1,62 @@
+type: popcon
+
+figsize: [8, 6]
+show_dpi: 150
+save_as: "Brems"
+
+coords:
+  x:
+    dimension: average_electron_temp
+    label: "$<T_e>$ [$keV$]"
+    units: keV
+  y:
+    dimension: average_electron_density
+    label: "$<n_e>$ [$10^{20} m^{-3}$]"
+    units: n20
+
+fill:
+  variable: P_in
+  # variable: P_fusion
+  where:
+      Q:
+        min: 1.0
+      P_sol:
+        min: 0.00000001
+        units: MW
+      P_external:
+        min: 0.00000001
+        units: MW
+      # greenwald_fraction:
+      #   max: 0.9
+      # ratio_of_P_SOL_to_P_LH:
+      #   min: 1.0
+
+points:
+  max_Q:
+    label: "max_Q"
+    marker: "x"
+    color: "red"
+    size: 50.0
+
+# Suggested colors are "tab:red", "tab:blue", "tab:orange", "tab:green", "tab:purple",
+# "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan"
+contour:
+
+  Q:
+    label: $Q$
+    levels: [0.1, 1.0, 2.0, 5.0, 10.0, 50.0]
+    color: "tab:red"
+    format: "1.2g"
+  
+  ratio_of_P_SOL_to_P_LH:
+    label: "$P_{SOL}/P_{LH}$"
+    color: "tab:blue"
+    levels: [1.0]
+    format: "1.2g"
+
+  P_fusion:
+    label: "$P_{fusion}$"
+    color: "tab:purple"
+    levels: [50.0, 100.0, 150.0, 200.0]
+    format: "1.2g"
+  

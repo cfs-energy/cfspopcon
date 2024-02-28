@@ -1,0 +1,83 @@
+algorithms:
+  - calc_geometry
+  - calc_q_star_from_plasma_current
+  - calc_fuel_average_mass_number
+  - calc_average_ion_temp
+  - calc_average_ion_density
+  - calc_plasma_stored_energy_simple
+  - calc_power_balance_from_tau_e
+  - calc_beta
+  - calc_peaked_profiles
+  - calc_core_radiated_power
+  - calc_fusion_gain
+  - calc_P_SOL
+  - calc_greenwald_fraction
+  - calc_confinement_transition_threshold_power
+  - calc_ratio_P_LH
+
+
+
+grid:
+  # input variables in the 'grid' block will be replaced by
+  # a corresponding linspace or logspace of values
+
+  average_electron_density:
+    # Average electron density in 1e19 particles / m^3
+    min: 1.0
+    max: 40.0
+    num: 40
+    spacing: linear
+
+  average_electron_temp:
+    # Average electron temperature in keV
+    min: 3.0
+    max: 20.0
+    num: 30
+    spacing: linear
+
+points:
+  max_Q:
+    maximize: Q
+    where:
+      greenwald_fraction:
+        max: 0.9
+      ratio_of_P_SOL_to_P_LH:
+        min: 1.0
+
+radiated_power_scalar: 1.0
+energy_confinement_scaling: ITER98y2
+elongation_ratio_sep_to_areal: 1.125
+major_radius: 1.85
+heavier_fuel_species_fraction: 0.5
+impurities:
+  # Impurity concentration relative to electron density.
+  Tungsten: 1.5e-5
+  Helium: 6.0e-2
+  Oxygen: 3.1e-3
+inverse_aspect_ratio: 0.3081
+confinement_time_scalar: 1.0
+plasma_current: 8.7e+6
+z_effective: 2.5
+fusion_reaction: DT
+areal_elongation: 1.75
+triangularity_ratio_sep_to_psi95: 1.8
+magnetic_field_on_axis: 12.2
+triangularity_psi95: 0.3
+dilution: 0.85
+# radiated_power_method: Radas
+radiated_power_method: Inherent
+
+# What sort of 1D profiles should be assumed?
+profile_form: prf
+# Inverse normalized electron temp scale length a / L_Te = a / (Te / grad(Te))
+normalized_inverse_temp_scale_length: 2.5
+# Offset for the electron density peaking factor
+electron_density_peaking_offset: -0.1
+# Offset for the ion density peaking factor
+ion_density_peaking_offset: -0.2
+# Temperature peaking factor
+temperature_peaking: 2.5
+# Ratio of volume-averaged temperatures (Ti / Te)
+ion_to_electron_temp_ratio: 1.0
+
+fraction_of_external_power_coupled: 0.9

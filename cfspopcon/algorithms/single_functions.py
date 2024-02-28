@@ -71,5 +71,19 @@ calc_plasma_stored_energy = Algorithm.from_single_function(
     return_keys=["plasma_stored_energy"],
     name="calc_plasma_stored_energy",
 )
+calc_average_ion_density = Algorithm.from_single_function(
+    lambda average_electron_density, dilution: dilution * average_electron_density,
+    return_keys=["average_ion_density"],
+    name = "calc_average_ion_density",
+)
+calc_plasma_stored_energy_simple = Algorithm.from_single_function(
+    lambda average_electron_density, average_electron_temp, average_ion_density, average_ion_temp, plasma_volume: (
+        (3.0 / 2.0)
+        * ((average_electron_density * average_electron_temp) + (average_ion_density * average_ion_temp))
+        * plasma_volume
+    ).pint.to(ureg.MJ),
+    return_keys=["plasma_stored_energy"],
+    name="calc_plasma_stored_energy_simple",
+)
 
 SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}
