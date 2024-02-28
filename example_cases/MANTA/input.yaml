@@ -122,7 +122,7 @@ normalized_inverse_temp_scale_length: 1.5
 # Offset for the electron density peaking factor
 electron_density_peaking_offset: 0
 # Offset for the ion density peaking factor
-on_density_peaking_offset: 0
+ion_density_peaking_offset: 0
 # Temperature peaking factor
 temperature_peaking: 2.0
 # Ratio of volume-averaged temperatures (Ti / Te)
