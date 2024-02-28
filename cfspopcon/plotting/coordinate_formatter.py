@@ -5,6 +5,7 @@ Usage:
 >>> ax.format_coord = CoordinateFormatter(x, y, z)
 """
 import xarray as xr
+from ..unit_handling import magnitude
 
 
 class CoordinateFormatter:
@@ -18,6 +19,6 @@ class CoordinateFormatter:
         """Returns a string which gives the field value at the queried mouse position."""
         lookup = dict(zip(self.array.dims, (mouse_y, mouse_x)))
 
-        mouse_z = float(self.array.sel(lookup, method="nearest").item())
+        mouse_z = float(magnitude(self.array.sel(lookup, method="nearest").item()))
 
         return f"x={mouse_x:f}, y={mouse_y:f}, z={mouse_z:f}"
