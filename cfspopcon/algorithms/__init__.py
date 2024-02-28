@@ -58,3 +58,6 @@ __all__ = [
     "ALGORITHMS",
     "get_algorithm",
 ]
+
+for key in ALGORITHMS.keys():
+    __all__.append(key.name)

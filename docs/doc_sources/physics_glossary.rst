@@ -382,3 +382,12 @@ Physics Glossary
 
   reference_ne_tau
     A constant :math:`n_e\tau` (upstream electron density times impurity residence time) used when evaluating the :math:`L_Z` impurity radiation curve.
+
+  edge_impurity_species
+    An :class:`~cfspopcon.named_options.Impurity` indicating which :term:`extrinsic<extrinsic impurity>` edge radiator species should be injected into the confined region to enhance the edge radiated power.
+
+  edge_impurity_enrichment
+    Ratio of concentration of the edge radiator in the core to in the edge, :math:`f_e = n_{edge}/n_{core}`.
+
+  edge_impurity_concentration
+    Concentration of the edge radiator (impurity density relative to the electron density) in the edge.
