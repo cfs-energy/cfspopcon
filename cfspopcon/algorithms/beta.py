@@ -14,6 +14,7 @@ RETURN_KEYS = [
 def run_calc_beta(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
+    average_ion_density: Unitfull,
     average_ion_temp: Unitfull,
     magnetic_field_on_axis: Unitfull,
     plasma_current: Unitfull,
@@ -32,9 +33,9 @@ def run_calc_beta(
     Returns:
         :term:`beta_toroidal`, :term:`beta_poloidal`, :term:`beta_total`, :term:`beta_N`
     """
-    beta_toroidal = formulas.calc_beta_toroidal(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field_on_axis)
+    beta_toroidal = formulas.calc_beta_toroidal(average_electron_density, average_electron_temp, average_ion_density, average_ion_temp, magnetic_field_on_axis)
     beta_poloidal = formulas.calc_beta_poloidal(
-        average_electron_density, average_electron_temp, average_ion_temp, plasma_current, minor_radius
+        average_electron_density, average_electron_temp, average_ion_density, average_ion_temp, plasma_current, minor_radius
     )
 
     beta = formulas.calc_beta_total(beta_toroidal=beta_toroidal, beta_poloidal=beta_poloidal)
