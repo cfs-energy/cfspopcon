@@ -25,7 +25,7 @@ def _calc_beta_general(
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
-        average_ion_density: [1e-19 m^-3] :term:`glossary link<average_ion_density>`
+        average_ion_density: [1e19 m^-3] :term:`glossary link<average_ion_density>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         magnetic_field: magnetic field generating magnetic pressure [T]
 
@@ -50,7 +50,7 @@ def calc_beta_toroidal(
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
-        average_ion_density: [1e-19 m^-3] :term:`glossary link<average_ion_density>`
+        average_ion_density: [1e19 m^-3] :term:`glossary link<average_ion_density>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
 
@@ -88,7 +88,7 @@ def calc_beta_poloidal(
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
-        average_ion_density: [1e-19 m^-3] :term:`glossary link<average_ion_density>`
+        average_ion_density: [1e19 m^-3] :term:`glossary link<average_ion_density>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         plasma_current: [MA] :term:`glossary link<plasma_current>`
         minor_radius: [m] :term:`glossary link<minor_radius>`
