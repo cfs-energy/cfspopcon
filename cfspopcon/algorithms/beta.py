@@ -25,7 +25,7 @@ def run_calc_beta(
     Args:
         average_electron_density: :term:`glossary link<average_electron_density>`
         average_electron_temp: :term:`glossary link<average_electron_temp>`
-        average_ion_density: [1e-19 m^-3] :term:`glossary link<average_ion_density>`
+        average_ion_density: :term:`glossary link<average_ion_density>`
         average_ion_temp: :term:`glossary link<average_ion_temp>`
         magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
         plasma_current: :term:`glossary link<plasma_current>`
