@@ -25,6 +25,7 @@ def make_plot(
         if ax is None:
             _, ax = plt.subplots(figsize=plot_params["figsize"], dpi=plot_params["show_dpi"])
         fig, ax = make_popcon_plot(dataset, title, plot_params, points, ax=ax)
+        return fig, ax
     else:
         raise NotImplementedError(f"No plotting method for type '{plot_params['type']}'")
 
