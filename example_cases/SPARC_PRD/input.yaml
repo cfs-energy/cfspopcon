@@ -3,6 +3,7 @@ algorithms:
   # The POPCON algorithm starts by selecting an average density
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
+  - calc_line_averaged_density
   - calc_geometry
   - calc_q_star_from_plasma_current
   - calc_fuel_average_mass_number
@@ -10,6 +11,7 @@ algorithms:
   - calc_zeff_and_dilution_from_impurities
   - calc_plasma_stored_energy
   - calc_power_balance_from_tau_e
+  - calc_average_total_pressure
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -40,7 +42,6 @@ algorithms:
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
   - calc_P_SOL
-  - calc_average_total_pressure
   - calc_heat_exhaust
   - two_point_model_fixed_tet
   # Finally, we calculate several parameters which aren't used in other
@@ -127,6 +128,8 @@ ion_density_peaking_offset: -0.2
 temperature_peaking: 2.5
 # Ratio of volume-averaged temperatures (Ti / Te)
 ion_to_electron_temp_ratio: 1.0
+# Ratio of line-averaged to volume-averaged electron densities
+frac : 1.0
 
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0

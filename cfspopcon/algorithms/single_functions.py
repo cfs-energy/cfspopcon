@@ -71,5 +71,8 @@ calc_plasma_stored_energy = Algorithm.from_single_function(
     return_keys=["plasma_stored_energy"],
     name="calc_plasma_stored_energy",
 )
+calc_line_averaged_density = Algorithm.from_single_function(
+    lambda average_electron_density, frac:(frac * average_electron_density),return_keys=["ne_bar"], name="calc_line_averaged_electron_density"
+)
 
 SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}
