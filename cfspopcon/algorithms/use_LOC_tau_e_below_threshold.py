@@ -16,7 +16,7 @@ def run_use_LOC_tau_e_below_threshold(
     plasma_stored_energy: Unitfull,
     energy_confinement_time: Unitfull,
     P_in: Unitfull,
-    average_electron_density: Unitfull,
+    ne_bar: Unitfull,
     confinement_time_scalar: Unitfull,
     plasma_current: Unitfull,
     magnetic_field_on_axis: Unitfull,
@@ -35,7 +35,7 @@ def run_use_LOC_tau_e_below_threshold(
         plasma_stored_energy: :term:`glossary link<plasma_stored_energy>`
         energy_confinement_time: :term:`glossary link<energy_confinement_time>`
         P_in: :term:`glossary link<P_in>`
-        average_electron_density: :term:`glossary link<average_electron_density>`
+        ne_bar: :term:`glossary link<line_averaged_electron_density>`
         confinement_time_scalar: :term:`glossary link<confinement_time_scalar>`
         plasma_current: :term:`glossary link<plasma_current>`
         magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
@@ -57,7 +57,7 @@ def run_use_LOC_tau_e_below_threshold(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,
-        average_electron_density=average_electron_density,
+        average_electron_density=ne_bar,
         major_radius=major_radius,
         areal_elongation=areal_elongation,
         separatrix_elongation=separatrix_elongation,
