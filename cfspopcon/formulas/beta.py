@@ -2,6 +2,7 @@
 import numpy as np
 
 from ..unit_handling import Quantity, Unitfull, convert_units, ureg
+from algorithms.single_functions import calc_average_total_pressure
 
 
 def _calc_beta_general(
@@ -24,6 +25,7 @@ def _calc_beta_general(
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
+        average_ion_density: [1e19 m^-3] :term:`glossary link<average_ion_density>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         average_total_pressure: [pascal] :term:`glossary link<average_total_pressure>`
         magnetic_field: magnetic field generating magnetic pressure [T]
@@ -40,6 +42,7 @@ def _calc_beta_general(
 
 def calc_beta_toroidal(
     average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull, average_total_pressure: Unitfull, magnetic_field_on_axis: Unitfull
+ensity: Unitfull, average_electron_temp: Unitfull, average_ion_density: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull
 ) -> Unitfull:
     """Calculate the average ratio of the plasma pressure to the magnetic pressure due to the toroidal field.
 
@@ -49,6 +52,7 @@ def calc_beta_toroidal(
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
+        average_ion_density: [1e19 m^-3] :term:`glossary link<average_ion_density>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         average_total_pressure: [pascal] :term:`glossary link<average_total_pressure>`
         magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
@@ -58,10 +62,10 @@ def calc_beta_toroidal(
     """
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, average_total_pressure, magnetic_field=magnetic_field_on_axis)
 
-
 def calc_beta_poloidal(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
+    average_ion_density: Unitfull,
     average_ion_temp: Unitfull,
     plasma_current: Unitfull,
     average_total_pressure: Unitfull,
@@ -87,6 +91,7 @@ def calc_beta_poloidal(
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
+        average_ion_density: [1e19 m^-3] :term:`glossary link<average_ion_density>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         plasma_current: [MA] :term:`glossary link<plasma_current>`
         average_total_pressure: [pascal] :term:`glossary link<average_total_pressure>`
