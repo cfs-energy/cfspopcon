@@ -12,9 +12,6 @@ RETURN_KEYS = [
 
 
 def run_calc_beta(
-    average_electron_density: Unitfull,
-    average_electron_temp: Unitfull,
-    average_ion_temp: Unitfull,
     average_total_pressure: Unitfull,
     magnetic_field_on_axis: Unitfull,
     plasma_current: Unitfull,
@@ -23,9 +20,6 @@ def run_calc_beta(
     """Calculate toroidal, poloidal, total and normalized beta.
 
     Args:
-        average_electron_density: :term:`glossary link<average_electron_density>`
-        average_electron_temp: :term:`glossary link<average_electron_temp>`
-        average_ion_temp: :term:`glossary link<average_ion_temp>`
         average_total_pressure: :term:`glossary link<average_total_pressure>`
         magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
         plasma_current: :term:`glossary link<plasma_current>`
@@ -35,10 +29,8 @@ def run_calc_beta(
         :term:`beta_toroidal`, :term:`beta_poloidal`, :term:`beta_total`, :term:`beta_N`
     """
 
-    beta_toroidal = formulas.calc_beta_toroidal(average_electron_density, average_electron_temp, average_ion_temp, average_total_pressure, magnetic_field_on_axis)
-    beta_poloidal = formulas.calc_beta_poloidal(
-        average_electron_density, average_electron_temp, average_ion_temp, plasma_current, average_total_pressure, minor_radius
-    )
+    beta_toroidal = formulas.calc_beta_toroidal(average_total_pressure, magnetic_field_on_axis)
+    beta_poloidal = formulas.calc_beta_poloidal(plasma_current, average_total_pressure, minor_radius)
 
     beta = formulas.calc_beta_total(beta_toroidal=beta_toroidal, beta_poloidal=beta_poloidal)
     normalized_beta = formulas.calc_beta_normalised(beta, minor_radius, magnetic_field_on_axis, plasma_current)
