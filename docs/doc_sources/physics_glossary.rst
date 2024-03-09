@@ -199,6 +199,9 @@ Physics Glossary
   average_electron_density
     Volume-averaged electron density in the confined region :math:`\bar n_e`.
 
+  line_averaged_electron_density
+    Electron density averaged over minor and major radius :math:`ne_bar`
+  
   average_electron_temp
     Volume-averaged electron temperature in the confined region :math:`\bar T_e`.
 

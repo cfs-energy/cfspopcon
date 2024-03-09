@@ -32,8 +32,8 @@ calc_peak_pressure = Algorithm.from_single_function(
     func=formulas.calc_peak_pressure, return_keys=["peak_pressure"], name="calc_peak_pressure"
 )
 calc_average_total_pressure = Algorithm.from_single_function(
-    lambda average_electron_density, average_electron_temp, average_ion_temp: average_electron_density
-    * (average_electron_temp + average_ion_temp),
+    lambda average_electron_density, average_electron_temp, average_ion_density, average_ion_temp: 
+    (average_electron_density * average_electron_temp + average_ion_density * average_ion_temp),
     return_keys=["average_total_pressure"],
     name="calc_average_total_pressure",
 )
@@ -75,6 +75,9 @@ calc_upstream_electron_density = Algorithm.from_single_function(
     lambda nesep_over_nebar, average_electron_density: nesep_over_nebar * average_electron_density,
     return_keys=["upstream_electron_density"],
     name="calc_upstream_electron_density",
+)
+calc_line_averaged_density = Algorithm.from_single_function(
+    lambda average_electron_density, frac:(frac * average_electron_density),return_keys=["line_averaged_electron_density"], name="calc_line_averaged_electron_density"
 )
 
 SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}
