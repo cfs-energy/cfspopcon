@@ -40,12 +40,9 @@ class Algorithms(Enum):
     calc_P_SOL = auto()
     use_LOC_tau_e_below_threshold = auto()
     calc_plasma_stored_energy = auto()
-<<<<<<< HEAD
     calc_edge_impurity_concentration = auto()
     calc_upstream_electron_density = auto()
-=======
     calc_line_averaged_density = auto()
->>>>>>> upstream/ne_bar_<ne>
 
 
 class ProfileForm(Enum):
