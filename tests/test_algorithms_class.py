@@ -72,7 +72,6 @@ def test_composite_signature(how_many_birds, how_many_animals):
 
 
 def test_dummy_algorithm(how_many_birds, BIRDS):
-
     assert how_many_birds.return_keys == BIRDS
     assert how_many_birds.input_keys == ["things_that_quack", "things_that_cluck"]
     assert how_many_birds.required_input_keys == ["things_that_quack"]
@@ -99,7 +98,6 @@ def test_dummy_algorithm(how_many_birds, BIRDS):
 
 
 def test_dummy_composite_algorithm(how_many_birds, BIRDS, how_many_animals, ANIMALS):
-
     count_the_farm = how_many_birds + how_many_animals
 
     assert set(count_the_farm.return_keys) == set(BIRDS).union(set(ANIMALS))
@@ -222,7 +220,6 @@ def test_composite_of_composite(how_many_birds: Algorithm, how_many_animals: Alg
 
 
 def test_repeated_dataset_updates(how_many_animals):
-
     ds = xr.Dataset(dict(all_birds=0, things_that_baa=0, new_chickens_per_count=1))
     ds = how_many_animals.update_dataset(ds)
     assert ds["all_animals"] == 1
@@ -237,7 +234,6 @@ def test_repeated_dataset_updates(how_many_animals):
 
 
 def test_composite_of_a_single_algorithm_fails(how_many_birds):
-
     with pytest.raises(TypeError):
         CompositeAlgorithm(how_many_birds)
 
@@ -263,7 +259,6 @@ def test_single_function_algorithm():
 
 
 def test_get_algorithm():
-
     # Pass in Algorithm Enums
     for key in Algorithms:
         alg = get_algorithm(key)

@@ -10,9 +10,7 @@ ALL_CASE_PATHS = list(CASES_DIR.rglob("input.yaml"))
 ALL_CASE_NAMES = [path.parent.relative_to(CASES_DIR).stem for path in ALL_CASE_PATHS]
 
 if __name__ == "__main__":
-
     for case in ALL_CASE_PATHS:
-
         input_parameters, algorithm, points = read_case(case)
 
         dataset = xr.Dataset(input_parameters)

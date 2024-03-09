@@ -40,6 +40,8 @@ class Algorithms(Enum):
     calc_P_SOL = auto()
     use_LOC_tau_e_below_threshold = auto()
     calc_plasma_stored_energy = auto()
+    calc_edge_impurity_concentration = auto()
+    calc_upstream_electron_density = auto()
     calc_line_averaged_density = auto()
 
 
@@ -86,6 +88,14 @@ class Impurity(Enum):
     Krypton = 36
     Xenon = 54
     Tungsten = 74
+
+    def __lt__(self, other: "Impurity") -> bool:
+        """Implements '<' to allow sorting."""
+        return self.value < other.value
+
+    def __gt__(self, other: "Impurity") -> bool:
+        """Implements '>' to allow sorting."""
+        return self.value > other.value
 
 
 class ConfinementScaling(Enum):

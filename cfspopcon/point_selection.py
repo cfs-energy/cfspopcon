@@ -48,7 +48,6 @@ def build_mask_from_dict(dataset: xr.Dataset, plot_params: dict) -> xr.DataArray
     mask = xr.DataArray(True)
 
     for mask_key, mask_range in plot_params.get("where", dict()).items():
-
         mask_field = dataset[mask_key]
         mask_min = Quantity(mask_range.get("min", -np.inf), mask_range.get("units", ""))
         mask_max = Quantity(mask_range.get("max", +np.inf), mask_range.get("units", ""))

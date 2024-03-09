@@ -133,6 +133,12 @@ DEFAULT_UNITS = dict(
     vertical_minor_radius="m",
     z_effective="",
     zeff_change_from_core_rad="",
+    edge_impurity_species=None,
+    lengyel_overestimation_factor="",
+    upstream_electron_density="n19",
+    edge_impurity_concentration="",
+    edge_impurity_concentration_in_core="",
+    edge_impurity_enrichment="",
 )
 
 

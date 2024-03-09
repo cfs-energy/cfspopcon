@@ -8,7 +8,6 @@ from cfspopcon.unit_handling import dimensionless_magnitude, ureg, Quantity, ure
 
 
 def test_conversion_of_dimensionless():
-
     val = Quantity(2.0, ureg.percent)
 
     assert np.isclose(dimensionless_magnitude(val), 2e-2)
