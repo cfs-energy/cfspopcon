@@ -100,7 +100,7 @@ def calc_1D_plasma_profiles(
 
 
 def calc_analytic_profiles(
-    average_electron_density: float,
+    line_averaged_electron_density: float,
     average_electron_temp: float,
     average_ion_temp: float,
     electron_density_peaking: float,
@@ -112,7 +112,7 @@ def calc_analytic_profiles(
     """Estimate density and temperature profiles using a simple analytic fit.
 
     Args:
-        average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
+        line_averaged_electron_density: [1e19 m^-3] :term:`glossary link<line_averaged_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
         electron_density_peaking: [~] :term:`glossary link<electron_density_peaking>`
@@ -127,10 +127,10 @@ def calc_analytic_profiles(
     rho = np.linspace(0, 1, num=npoints, endpoint=False)
 
     electron_density_profile = (
-        average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
+        line_averaged_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
     )
     fuel_ion_density_profile = (
-        average_electron_density * dilution * (ion_density_peaking) * ((1.0 - rho**2.0) ** (ion_density_peaking - 1.0))
+        line_averaged_electron_density * dilution * (ion_density_peaking) * ((1.0 - rho**2.0) ** (ion_density_peaking - 1.0))
     )
     electron_temp_profile = average_electron_temp * temperature_peaking * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
     ion_temp_profile = average_ion_temp * temperature_peaking * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
