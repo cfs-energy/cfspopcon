@@ -205,7 +205,7 @@ Physics Glossary
   average_electron_temp
     Volume-averaged electron temperature in the confined region :math:`\bar T_e`.
 
-  summed_impurity_density
+  summed_impurity_average_density
     Density of non-fuel ions.
 
   average_ion_density
