@@ -36,7 +36,6 @@ from .plasma_profile_data.density_and_temperature_profile_fits import evaluate_d
 )
 def calc_1D_plasma_profiles(
     profile_form: ProfileForm,
-    average_electron_density: float,
     line_averaged_electron_density: float,
     average_electron_temp: float,
     average_ion_temp: float,
@@ -51,7 +50,6 @@ def calc_1D_plasma_profiles(
 
     Args:
         profile_form: select between analytic fit or profiles from Pablo Rodriguez-Fernandez
-        average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         line_averaged_electron_density: [1e19 m^-3] :term:`glossary link<line_averaged_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
@@ -85,7 +83,7 @@ def calc_1D_plasma_profiles(
             raise ValueError("normalized_inverse_temp_scale_length must be set if using profile_form = prf")
 
         rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = calc_prf_profiles(
-            average_electron_density,
+            line_averaged_electron_density,
             average_electron_temp,
             average_ion_temp,
             electron_density_peaking,
