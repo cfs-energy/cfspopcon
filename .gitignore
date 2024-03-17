@@ -141,3 +141,4 @@ tests/regression_results/test*.nc
 
 # Top-level (working) notebooks should not be tracked
 *.ipynb
+docs/doc_sources/getting_started.ipynb
