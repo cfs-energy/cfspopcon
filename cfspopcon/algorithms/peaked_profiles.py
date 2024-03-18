@@ -22,6 +22,7 @@ RETURN_KEYS = [
 
 def run_calc_peaked_profiles(
     profile_form: ProfileForm,
+    average_electron_density: Unitfull,
     line_averaged_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     average_ion_temp: Unitfull,
@@ -38,6 +39,7 @@ def run_calc_peaked_profiles(
 
     Args:
         profile_form: :term:`glossary link<profile_form>`
+        average_electron_density: :term:`glossary link<average_electron_density>`
         line_averaged_electron_density: :term:`glossary link<line_averaged_electron_density>`
         average_electron_temp: :term:`glossary link<average_electron_temp>`
         average_ion_temp: :term:`glossary link<average_ion_temp>`
@@ -73,6 +75,7 @@ def run_calc_peaked_profiles(
     # using this to calculate fusion power profiles.
     (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile,) = formulas.calc_1D_plasma_profiles(
         profile_form,
+        average_electron_density,
         line_averaged_electron_density,
         average_electron_temp,
         average_ion_temp,

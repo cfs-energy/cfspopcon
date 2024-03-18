@@ -51,7 +51,7 @@ def calc_1D_plasma_profiles(
 
     Args:
         profile_form: select between analytic fit or profiles from Pablo Rodriguez-Fernandez
-        average_electron_density: [keV] :term:`glossary link<average_electron_density>`
+        average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         line_averaged_electron_density: [1e19 m^-3] :term:`glossary link<line_averaged_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
