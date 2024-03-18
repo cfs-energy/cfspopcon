@@ -28,7 +28,6 @@ def run_calc_beta(
     Returns:
         :term:`beta_toroidal`, :term:`beta_poloidal`, :term:`beta_total`, :term:`beta_N`
     """
-
     beta_toroidal = formulas.calc_beta_toroidal(average_total_pressure, magnetic_field_on_axis)
     beta_poloidal = formulas.calc_beta_poloidal(plasma_current, average_total_pressure, minor_radius)
 
