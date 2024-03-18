@@ -61,9 +61,11 @@ def run_calc_peaked_profiles(
     electron_density_peaking = formulas.calc_density_peaking(
         effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
     )
-
-    peak_electron_density = line_averaged_electron_density * electron_density_peaking
-    peak_fuel_ion_density = line_averaged_electron_density * dilution * ion_density_peaking
+ 
+    peak_electron_density = average_electron_density * electron_density_peaking
+    peak_fuel_ion_density = (
+        average_electron_density * dilution * ion_density_peaking
+    )  # dilution was calculated from average_electron_density in zeff_and_dilution_from_impurities.py...should it be used here (i.e. with linear densities)?
     peak_electron_temp = average_electron_temp * temperature_peaking
     peak_ion_temp = average_ion_temp * temperature_peaking
 

@@ -3,9 +3,8 @@ import numpy as np
 
 from ..unit_handling import Quantity, Unitfull, convert_units, ureg
 
-def _calc_beta_general(
-    average_total_pressure: Unitfull, magnetic_field: Unitfull
-) -> Unitfull:
+
+def _calc_beta_general(average_total_pressure: Unitfull, magnetic_field: Unitfull) -> Unitfull:
     """Calculate the average ratio of the plasma pressure to the magnetic pressure due to a magnetic_field.
 
     Using equation 11.58 from Freidberg, "Plasma Physics and Fusion Energy" :cite:`freidberg_plasma_2007`
@@ -35,7 +34,8 @@ def _calc_beta_general(
 
 
 def calc_beta_toroidal(
-   average_total_pressure: Unitfull, magnetic_field_on_axis: Unitfull,
+    average_total_pressure: Unitfull,
+    magnetic_field_on_axis: Unitfull,
 ) -> Unitfull:
     """Calculate the average ratio of the plasma pressure to the magnetic pressure due to the toroidal field.
 
@@ -50,6 +50,7 @@ def calc_beta_toroidal(
          :term:`beta_toroidal` [~]
     """
     return _calc_beta_general(average_total_pressure, magnetic_field=magnetic_field_on_axis)
+
 
 def calc_beta_poloidal(
     plasma_current: Unitfull,
