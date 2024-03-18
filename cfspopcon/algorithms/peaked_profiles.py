@@ -23,6 +23,7 @@ RETURN_KEYS = [
 def run_calc_peaked_profiles(
     profile_form: ProfileForm,
     line_averaged_electron_density: Unitfull,
+    average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     average_ion_temp: Unitfull,
     ion_density_peaking_offset: Unitfull,
@@ -39,6 +40,7 @@ def run_calc_peaked_profiles(
     Args:
         profile_form: :term:`glossary link<profile_form>`
         line_averaged_electron_density: :term:`glossary link<line_averaged_electron_density>`
+        average_electron_density: :term:`glossary link<average_electron_density>`
         average_electron_temp: :term:`glossary link<average_electron_temp>`
         average_ion_temp: :term:`glossary link<average_ion_temp>`
         ion_density_peaking_offset: :term:`glossary link<ion_density_peaking_offset>`
@@ -61,7 +63,7 @@ def run_calc_peaked_profiles(
     electron_density_peaking = formulas.calc_density_peaking(
         effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
     )
- 
+
     peak_electron_density = average_electron_density * electron_density_peaking
     peak_fuel_ion_density = (
         average_electron_density * dilution * ion_density_peaking
