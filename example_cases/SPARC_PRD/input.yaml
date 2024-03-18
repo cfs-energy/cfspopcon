@@ -131,7 +131,7 @@ temperature_peaking: 2.5
 # Ratio of volume-averaged temperatures (Ti / Te)
 ion_to_electron_temp_ratio: 1.0
 # Ratio of line-averaged to volume-averaged electron densities
-frac : 1.0
+line_averaged_density_frac: 1.0
 
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0
