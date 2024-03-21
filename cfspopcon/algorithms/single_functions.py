@@ -32,8 +32,9 @@ calc_peak_pressure = Algorithm.from_single_function(
     func=formulas.calc_peak_pressure, return_keys=["peak_pressure"], name="calc_peak_pressure"
 )
 calc_average_total_pressure = Algorithm.from_single_function(
-    lambda average_electron_density, average_electron_temp, average_ion_temp: average_electron_density
-    * (average_electron_temp + average_ion_temp),
+    lambda average_electron_density, average_electron_temp, average_ion_density, average_ion_temp: (
+        average_electron_density * average_electron_temp + average_ion_density * average_ion_temp
+    ),
     return_keys=["average_total_pressure"],
     name="calc_average_total_pressure",
 )
@@ -63,11 +64,16 @@ calc_P_SOL = Algorithm.from_single_function(
     lambda P_in, P_radiation: np.maximum(P_in - P_radiation, 0.0), return_keys=["P_sol"], name="calc_P_SOL"
 )
 calc_plasma_stored_energy = Algorithm.from_single_function(
-    lambda average_electron_density, average_electron_temp, average_ion_density, summed_impurity_density, average_ion_temp, plasma_volume: (
+    lambda average_electron_density, average_electron_temp, average_ion_density, summed_impurity_average_density, average_ion_temp, plasma_volume: (
         (3.0 / 2.0)
-        * ((average_electron_density * average_electron_temp) + ((average_ion_density + summed_impurity_density) * average_ion_temp))
+        * (
+            (average_electron_density * average_electron_temp)
+            + ((average_ion_density + summed_impurity_average_density) * average_ion_temp)
+        )
         * plasma_volume
-    ).pint.to(ureg.MJ),
+    ).pint.to(
+        ureg.MJ
+    ),
     return_keys=["plasma_stored_energy"],
     name="calc_plasma_stored_energy",
 )
@@ -75,6 +81,11 @@ calc_upstream_electron_density = Algorithm.from_single_function(
     lambda nesep_over_nebar, average_electron_density: nesep_over_nebar * average_electron_density,
     return_keys=["upstream_electron_density"],
     name="calc_upstream_electron_density",
+)
+calc_line_averaged_density = Algorithm.from_single_function(
+    lambda average_electron_density, line_averaged_density_frac: (line_averaged_density_frac * average_electron_density),
+    return_keys=["line_averaged_electron_density"],
+    name="calc_line_averaged_electron_density",
 )
 
 SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}
