@@ -138,6 +138,7 @@ dmypy.json
 example_cases/**/output/*
 cfspopcon/atomic_data/*.nc
 tests/regression_results/test*.nc
+radas_dir/*
 
 # Top-level (working) notebooks should not be tracked
 *.ipynb
