@@ -40,8 +40,8 @@ jobs:
         id: radas
         uses: actions/cache@v3
         with:
-          path: radas
-          key: radas-${{ hashFiles('./radas_dir')}}
+          path: ./radas_dir
+          key: radas-${{ hashFiles('poetry.lock')}}
       
       - name: Make radas data
         if: steps.radas.outputs.cache-hit != 'true'
@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: radas_dir
-          path: radas_dir
+          path: ./radas_dir
 
   build:
     needs: radas
@@ -85,8 +85,8 @@ jobs:
       - uses: actions/cache/restore@v3
         id: radas
         with:
-          path: radas
-          key: radas-${{ hashFiles('./radas_dir')}}
+          path: ./radas_dir
+          key: radas-${{ hashFiles('poetry.lock')}}
 
       - name: Check cache hit
         if: steps.radas.outputs.cache-hit != 'true'
