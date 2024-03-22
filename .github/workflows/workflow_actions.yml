@@ -18,7 +18,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   radas:
     runs-on: ubuntu-22.04
     steps:
@@ -26,30 +25,33 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.8.2
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
           cache: 'poetry'
+      
+      - name: Setup
+        run: poetry install
 
       - name: Cache radas results
         id: radas
         uses: actions/cache@v3
         with:
           path: radas
-          key: radas-${{ hashFiles('.github/workflows/make_radas_data.sh')}}
+          key: radas-${{ hashFiles('./radas_dir')}}
       
       - name: Make radas data
         if: steps.radas.outputs.cache-hit != 'true'
-        run: bash .github/workflows/make_radas_data.sh
+        run: poetry run radas
       
       - name: Upload radas artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: radas_cases
-          path: radas/cases
+          name: radas_dir
+          path: radas_dir
 
   build:
     needs: radas
@@ -69,7 +71,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install pandoc
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.8.2
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -84,14 +86,14 @@ jobs:
         id: radas
         with:
           path: radas
-          key: radas-${{ hashFiles('.github/workflows/make_radas_data.sh')}}
+          key: radas-${{ hashFiles('./radas_dir')}}
 
       - name: Check cache hit
         if: steps.radas.outputs.cache-hit != 'true'
         run: exit 1
 
       - name: Copy radas data
-        run: cp ./radas/cases/*/output/*.nc cfspopcon/atomic_data/
+        run: cp ./radas_dir/output/*.nc cfspopcon/atomic_data/
 
       - name: Tests
         run: MPLBACKEND=Agg poetry run pytest tests --nbmake example_cases
@@ -118,7 +120,7 @@ jobs:
           # enter tempdir so import cfspopcon doesn't find the cfspopcon directory
           mkdir tmp_dir && cd tmp_dir
           echo $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
-          cp ../radas/cases/*/output/*.nc $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
+          cp ../radas_dir/output/*.nc $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
           MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD/input.yaml -p ../example_cases/SPARC_PRD/plot_popcon.yaml --show
 
       - name: Run pre-commit checks
@@ -142,7 +144,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python - --version 1.6.1
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.8.2
 
       - name: Poetry build
         run: poetry build
