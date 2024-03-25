@@ -5,7 +5,7 @@ from ..named_options import Algorithms
 from .algorithm_class import Algorithm, CompositeAlgorithm
 from .beta import calc_beta
 from .composite_algorithm import predictive_popcon
-from .core_radiated_power import calc_core_radiated_power
+from .core_radiated_power import calc_core_radiated_power, calc_impurities_from_fixed_PSOL
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .fusion_gain import calc_fusion_gain
 from .geometry import calc_geometry
@@ -40,6 +40,7 @@ ALGORITHMS: dict[Algorithms, Union[Algorithm, CompositeAlgorithm]] = {
     Algorithms["two_point_model_fixed_tet"]: two_point_model_fixed_tet,
     Algorithms["calc_zeff_and_dilution_from_impurities"]: calc_zeff_and_dilution_from_impurities,
     Algorithms["use_LOC_tau_e_below_threshold"]: use_LOC_tau_e_below_threshold,
+    Algorithms["calc_impurities_for_given_P_SOL"]: calc_impurities_from_fixed_PSOL,
     **SINGLE_FUNCTIONS,
 }
 
@@ -53,22 +54,9 @@ def get_algorithm(algorithm: Union[Algorithms, str]) -> Union[Algorithm, Composi
 
 
 __all__ = [
-    "calc_beta",
-    "calc_core_radiated_power",
-    "calc_extrinsic_core_radiator",
-    "calc_fusion_gain",
-    "calc_geometry",
-    "calc_heat_exhaust",
-    "calc_ohmic_power",
-    "calc_peaked_profiles",
-    "calc_plasma_current_from_q_star",
-    "calc_power_balance_from_tau_e",
-    "predictive_popcon",
-    "calc_q_star_from_plasma_current",
-    "two_point_model_fixed_fpow",
-    "two_point_model_fixed_qpart",
-    "two_point_model_fixed_tet",
-    "calc_zeff_and_dilution_from_impurities",
     "ALGORITHMS",
     "get_algorithm",
 ]
+
+for key in ALGORITHMS.keys():
+    __all__.append(key.name)
