@@ -3,6 +3,7 @@ algorithms:
   # The POPCON algorithm starts by selecting an average density
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
+  - calc_line_averaged_density
   - calc_geometry
   - calc_q_star_from_plasma_current
   - calc_fuel_average_mass_number
@@ -10,6 +11,7 @@ algorithms:
   - calc_zeff_and_dilution_from_impurities
   - calc_plasma_stored_energy
   - calc_power_balance_from_tau_e
+  - calc_average_total_pressure
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -40,9 +42,10 @@ algorithms:
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
   - calc_P_SOL
-  - calc_average_total_pressure
   - calc_heat_exhaust
+  - calc_upstream_electron_density
   - two_point_model_fixed_tet
+  - calc_edge_impurity_concentration
   # Finally, we calculate several parameters which aren't used in other
   # calculations, but which are useful for characterizing operational
   # points. These can be used later when masking inaccessible operational
@@ -56,6 +59,7 @@ algorithms:
   - calc_triple_product
   - calc_peak_pressure
   - calc_current_relaxation_time
+  - calc_impurities_for_given_P_SOL
 
 grid:
   # input variables in the 'grid' block will be replaced by
@@ -127,6 +131,10 @@ ion_density_peaking_offset: -0.2
 temperature_peaking: 2.5
 # Ratio of volume-averaged temperatures (Ti / Te)
 ion_to_electron_temp_ratio: 1.0
+# Ratio of line-averaged to volume-averaged electron densities
+line_averaged_density_frac: 1.0
+# Given P_SOL value
+fixed_PSOL_value: 50
 
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0
@@ -166,3 +174,10 @@ fraction_of_P_SOL_to_divertor: 0.6
 kappa_e0: 2600.0
 # Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
 target_electron_temp: 25.0
+
+# Which species should be injected to cool the scrape-off-layer?
+edge_impurity_species: Argon
+# Factor applied to the result of the Lengyel model to give an absolute low-Z impurity concentration.
+lengyel_overestimation_factor: 4.3
+# Ratio of edge impurity concentration in the edge to in the core (c_edge / c_core)
+edge_impurity_enrichment: 5.0
