@@ -6,16 +6,9 @@ from ..atomic_data import read_atomic_data
 from ..unit_handling import Unitfull, convert_to_default_units, ureg
 from .algorithm_class import Algorithm
 
-import xarray as xr
-import numpy as np
-import os
-import cfspopcon
-import warnings
-from pint import UnitStrippedWarning
 
-warnings.filterwarnings("ignore", category=UnitStrippedWarning)
 
-RETURN_KEYS = ["P_radiation", "impurities_for_given_P_SOL"]
+RETURN_KEYS = ["P_radiation"]
 
 
 def run_calc_core_radiated_power(
@@ -91,61 +84,6 @@ def run_calc_core_radiated_power(
 
     local_vars = locals()
     return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-def run_calc_impurities_from_fixed_PSOL(fixed_PSOL_value):
-    input_file_path = os.path.join(os.getcwd(), "example_cases/ARCH/input_arch.yaml")
-    input_parameters, algorithm, points = cfspopcon.read_case(input_file_path)
-    algorithm.validate_inputs(input_parameters)
-    dataset = xr.Dataset(input_parameters)
-    algorithm.update_dataset(dataset, in_place=True)
-
-    target = fixed_PSOL_value
-    epsilon = 1e-5
-    delta_imp = 1e-9
-    initial_impurity = [0.0]
-
-    impurities_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
-    P_sols_array = np.zeros((dataset['average_electron_density'].size, dataset['average_electron_temp'].size))
-
-    for i in range(impurities_array.shape[0]): # some elements have P_sol = 0, should we not count them?
-        for j in range(impurities_array.shape[1]): # some elements have P_sol = 0, should we not count them?
-            dataset['impurities'].values = ureg.Quantity(initial_impurity, 'dimensionless') # Set initial impurity to initial_impurity = [0.0]
-            algorithm.update_dataset(dataset, in_place=True)
-
-            if np.abs(dataset['P_sol'].values[i,j]) < target:
-                impurities_array[i,j] = initial_impurity[0]
-                continue
-            while(np.abs(dataset['P_sol'].values[i][j] - target) > epsilon):
-                imp_0 = dataset['impurities'].values
-                P_sol_0 = dataset['P_sol'].values[i,j]
-                imp_next = imp_0 + delta_imp
-                dataset['impurities'].values = ureg.Quantity(imp_next, 'dimensionless')
-                algorithm.update_dataset(dataset, in_place=True)
-                P_sol_next = dataset['P_sol'].values[i,j]
-                derivative = (P_sol_next - P_sol_0) / delta_imp
-
-                if(derivative == 0):
-                    break
-
-                imp_0 = imp_0 - (P_sol_0 - target) / derivative
-                dataset['impurities'].values = ureg.Quantity(imp_0, 'dimensionless')
-                algorithm.update_dataset(dataset, in_place=True)
-
-                while(dataset['P_sol'].values[i,j] == 0.0):
-                    print(imp_0, dataset['P_sol'].values[i][j])
-                    imp_0 = imp_0 * 0.99
-                    dataset['impurities'].values = ureg.Quantity(imp_0, 'dimensionless')
-                    algorithm.update_dataset(dataset, in_place=True)
-                
-                impurities_array[i,j] = imp_0
-                P_sols_array[i,j] = dataset['P_sol'].values[i,j]
-    return impurities_array
-
-calc_impurities_from_fixed_PSOL = Algorithm(
-    function=run_calc_impurities_from_fixed_PSOL,
-    return_keys=RETURN_KEYS
-)
 
 calc_core_radiated_power = Algorithm(
     function=run_calc_core_radiated_power,

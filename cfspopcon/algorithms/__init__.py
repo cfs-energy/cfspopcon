@@ -5,11 +5,12 @@ from ..named_options import Algorithms
 from .algorithm_class import Algorithm, CompositeAlgorithm
 from .beta import calc_beta
 from .composite_algorithm import predictive_popcon
-from .core_radiated_power import calc_core_radiated_power, calc_impurities_from_fixed_PSOL
+from .core_radiated_power import calc_core_radiated_power
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .fusion_gain import calc_fusion_gain
 from .geometry import calc_geometry
 from .heat_exhaust import calc_heat_exhaust
+from .mcrf_from_fixed_P_SOL import calc_mcrf_from_fixed_P_SOL
 from .ohmic_power import calc_ohmic_power
 from .peaked_profiles import calc_peaked_profiles
 from .plasma_current_from_q_star import calc_plasma_current_from_q_star
@@ -29,6 +30,7 @@ ALGORITHMS: dict[Algorithms, Union[Algorithm, CompositeAlgorithm]] = {
     Algorithms["calc_fusion_gain"]: calc_fusion_gain,
     Algorithms["calc_geometry"]: calc_geometry,
     Algorithms["calc_heat_exhaust"]: calc_heat_exhaust,
+    Algorithms["calc_mcrf_from_fixed_P_SOL"]: calc_mcrf_from_fixed_P_SOL,
     Algorithms["calc_ohmic_power"]: calc_ohmic_power,
     Algorithms["calc_peaked_profiles"]: calc_peaked_profiles,
     Algorithms["calc_plasma_current_from_q_star"]: calc_plasma_current_from_q_star,
@@ -40,7 +42,6 @@ ALGORITHMS: dict[Algorithms, Union[Algorithm, CompositeAlgorithm]] = {
     Algorithms["two_point_model_fixed_tet"]: two_point_model_fixed_tet,
     Algorithms["calc_zeff_and_dilution_from_impurities"]: calc_zeff_and_dilution_from_impurities,
     Algorithms["use_LOC_tau_e_below_threshold"]: use_LOC_tau_e_below_threshold,
-    Algorithms["calc_impurities_for_given_P_SOL"]: calc_impurities_from_fixed_PSOL,
     **SINGLE_FUNCTIONS,
 }
 
