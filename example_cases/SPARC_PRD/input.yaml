@@ -25,7 +25,7 @@ algorithms:
   # increase the power radiated from the core. This increases
   # the fuel dilution and Zeff (computed), as well as degrading
   # core confinement (not yet computed).
-  - calc_mcrf_from_fixed_P_SOL
+  - calc_mcrf_from_fixed_P_sol
   - calc_extrinsic_core_radiator
   # We then recompute the profiles with the dilution due to the
   # core radiator, and use this to determine the fusion power rate.
@@ -57,7 +57,7 @@ algorithms:
   - calc_triple_product
   - calc_peak_pressure
   - calc_current_relaxation_time
-  #- calc_mcrf_from_fixed_P_SOL
+  #- calc_mcrf_from_fixed_P_sol
 
 grid:
   # input variables in the 'grid' block will be replaced by

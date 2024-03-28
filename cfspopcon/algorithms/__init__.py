@@ -10,7 +10,7 @@ from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .fusion_gain import calc_fusion_gain
 from .geometry import calc_geometry
 from .heat_exhaust import calc_heat_exhaust
-from .mcrf_from_fixed_P_SOL import calc_mcrf_from_fixed_P_SOL
+from .mcrf_from_fixed_P_sol import calc_mcrf_from_fixed_P_sol
 from .ohmic_power import calc_ohmic_power
 from .peaked_profiles import calc_peaked_profiles
 from .plasma_current_from_q_star import calc_plasma_current_from_q_star
@@ -30,7 +30,7 @@ ALGORITHMS: dict[Algorithms, Union[Algorithm, CompositeAlgorithm]] = {
     Algorithms["calc_fusion_gain"]: calc_fusion_gain,
     Algorithms["calc_geometry"]: calc_geometry,
     Algorithms["calc_heat_exhaust"]: calc_heat_exhaust,
-    Algorithms["calc_mcrf_from_fixed_P_SOL"]: calc_mcrf_from_fixed_P_SOL,
+    Algorithms["calc_mcrf_from_fixed_P_sol"]: calc_mcrf_from_fixed_P_sol,
     Algorithms["calc_ohmic_power"]: calc_ohmic_power,
     Algorithms["calc_peaked_profiles"]: calc_peaked_profiles,
     Algorithms["calc_plasma_current_from_q_star"]: calc_plasma_current_from_q_star,

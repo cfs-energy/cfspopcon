@@ -11,7 +11,7 @@ RETURN_KEYS = [
     "minimum_core_radiated_fraction"
 ]
 
-def run_calc_mcrf_from_fixed_P_SOL(P_in, P_sol_target):
+def run_calc_mcrf_from_fixed_P_sol(P_in, P_sol_target):
     minimum_core_radiated_fraction = (P_in - P_sol_target) / P_in
     local_vars = locals()
     return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
@@ -25,7 +25,7 @@ def run_calc_mcrf_from_fixed_P_SOL(P_in, P_sol_target):
         :term:`core_radiator_concentration`, :term:`P_radiated_by_core_radiator`, :term:`P_radiation`, :term:`core_radiator_concentration`, :term:`core_radiator_charge_state`, :term:`zeff_change_from_core_rad` :term:`dilution_change_from_core_rad`, :term:`z_effective`, :term:`dilution`
 """
 
-calc_mcrf_from_fixed_P_SOL = Algorithm(
-    function=run_calc_mcrf_from_fixed_P_SOL,
+calc_mcrf_from_fixed_P_sol = Algorithm(
+    function=run_calc_mcrf_from_fixed_P_sol,
     return_keys=RETURN_KEYS,
 )
