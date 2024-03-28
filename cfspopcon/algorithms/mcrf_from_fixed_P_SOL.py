@@ -1,10 +1,4 @@
-import numpy as np
-import xarray as xr
-
-from .. import formulas, named_options
-from ..atomic_data import read_atomic_data
-from ..helpers import make_impurities_array
-from ..unit_handling import Unitfull, convert_to_default_units
+from ..unit_handling import convert_to_default_units
 from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
