@@ -3,8 +3,8 @@ import numpy as np
 import xarray as xr
 
 from .. import formulas, named_options
-from ..atomic_data import read_atomic_data
 from ..helpers import make_impurities_array
+from ..read_atomic_data import AtomicData
 from ..unit_handling import Unitfull, convert_to_default_units
 from .algorithm_class import Algorithm
 
@@ -59,7 +59,7 @@ def run_calc_extrinsic_core_radiator(
         :term:`core_radiator_concentration`, :term:`P_radiated_by_core_radiator`, :term:`P_radiation`, :term:`core_radiator_concentration`, :term:`core_radiator_charge_state`, :term:`zeff_change_from_core_rad` :term:`dilution_change_from_core_rad`, :term:`z_effective`, :term:`dilution`
 
     """
-    atomic_data = read_atomic_data()
+    atomic_data = AtomicData()
 
     # Force P_radiated_by_core_radiator to be >= 0.0 (core radiator cannot reduce radiated power)
     P_radiated_by_core_radiator = np.maximum(minimum_core_radiated_fraction * P_in - P_radiation, 0.0)

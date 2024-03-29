@@ -2,10 +2,10 @@
 
 import xarray as xr
 
-from ..atomic_data import read_atomic_data
 from ..formulas.scrape_off_layer_model import build_L_int_integrator, calc_required_edge_impurity_concentration
 from ..helpers import extend_impurities_array
 from ..named_options import AtomicSpecies
+from ..read_atomic_data import AtomicData
 from ..unit_handling import Unitfull, convert_to_default_units, ureg
 from .algorithm_class import Algorithm
 
@@ -49,7 +49,7 @@ def run_calc_edge_impurity_concentration(
     Returns:
         :term:`edge_impurity_concentration`
     """
-    atomic_data = read_atomic_data()
+    atomic_data = AtomicData()
 
     L_int_integrator = build_L_int_integrator(
         atomic_data=atomic_data,

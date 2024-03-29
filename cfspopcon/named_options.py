@@ -75,6 +75,7 @@ class AtomicSpecies(Enum):
 
     The enum value represents the species atomic number (Z).
     """
+
     Hydrogen = 1
     Helium = 2
     Lithium = 3

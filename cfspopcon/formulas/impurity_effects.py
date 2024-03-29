@@ -3,6 +3,7 @@ import numpy as np
 import xarray as xr
 
 from ..named_options import AtomicSpecies
+from ..read_atomic_data import AtomicData
 from ..unit_handling import ureg, wraps_ufunc
 
 
@@ -20,7 +21,7 @@ def calc_impurity_charge_state(
     average_electron_density: float,
     average_electron_temp: float,
     impurity_species: AtomicSpecies,
-    atomic_data: dict[AtomicSpecies, xr.DataArray],
+    atomic_data: AtomicData,
 ) -> float:
     """Calculate the impurity charge state of the specified impurity species.
 
@@ -33,9 +34,14 @@ def calc_impurity_charge_state(
     Returns:
         :term:`impurity_charge_state`
     """
-    mean_charge_curve = atomic_data[impurity_species].coronal_mean_Z_interpolator
     return float(
-        np.squeeze(np.power(10, mean_charge_curve(np.log10(average_electron_temp), np.log10(average_electron_density), grid=True)))
+        atomic_data.eval_interpolator(
+            electron_density=np.atleast_1d(average_electron_density),
+            electron_temp=np.atleast_1d(average_electron_temp),
+            kind=AtomicData.CoronalZ,
+            species=impurity_species,
+            allow_extrapolation=True,
+        )
     )
 
 

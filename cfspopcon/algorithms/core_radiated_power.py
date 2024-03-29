@@ -2,7 +2,7 @@
 import xarray as xr
 
 from .. import formulas, named_options
-from ..atomic_data import read_atomic_data
+from ..read_atomic_data import AtomicData
 from ..unit_handling import Unitfull, convert_to_default_units
 from .algorithm_class import Algorithm
 
@@ -64,7 +64,7 @@ def run_calc_core_radiated_power(
     if radiated_power_method == named_options.RadiationMethod.Inherent:
         P_radiation = radiated_power_scalar * (P_rad_bremsstrahlung + P_rad_synchrotron)
     else:
-        atomic_data = read_atomic_data()
+        atomic_data = AtomicData()
 
         P_rad_impurity = formulas.calc_impurity_radiated_power(
             radiated_power_method=radiated_power_method,

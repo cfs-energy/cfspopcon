@@ -2,7 +2,7 @@
 import xarray as xr
 
 from .. import formulas
-from ..atomic_data import read_atomic_data
+from ..read_atomic_data import AtomicData
 from ..unit_handling import Unitfull, convert_to_default_units
 from .algorithm_class import Algorithm
 
@@ -34,7 +34,7 @@ def run_calc_zeff_and_dilution_from_impurities(
     starting_zeff = 1.0
     starting_dilution = 1.0
 
-    atomic_data = read_atomic_data()
+    atomic_data = AtomicData()
 
     impurity_charge_state = formulas.calc_impurity_charge_state(
         average_electron_density, average_electron_temp, impurities.dim_species, atomic_data

@@ -5,8 +5,8 @@ import xarray as xr
 
 from .named_options import (
     Algorithms,
-    ConfinementScaling,
     AtomicSpecies,
+    ConfinementScaling,
     LambdaQScaling,
     MomentumLossFunction,
     ProfileForm,
@@ -86,7 +86,9 @@ def make_impurities_array_from_kwargs(**kwargs: Any) -> xr.DataArray:
     return make_impurities_array(list(kwargs.keys()), list(kwargs.values()))
 
 
-def extend_impurities_array(array: xr.DataArray, species: Union[str, AtomicSpecies], concentration: Union[float, xr.DataArray]) -> xr.DataArray:
+def extend_impurities_array(
+    array: xr.DataArray, species: Union[str, AtomicSpecies], concentration: Union[float, xr.DataArray]
+) -> xr.DataArray:
     """Append a new element to the impurities array.
 
     This method automatically handles broadcasting.

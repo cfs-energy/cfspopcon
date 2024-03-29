@@ -2,7 +2,8 @@
 import numpy as np
 import xarray as xr
 
-from ...named_options import AtomicSpecies, RadiationMethod
+from ...named_options import RadiationMethod
+from ...read_atomic_data import AtomicData
 from ...unit_handling import Unitfull, ureg
 from .mavrin_coronal import calc_impurity_radiated_power_mavrin_coronal
 from .mavrin_noncoronal import calc_impurity_radiated_power_mavrin_noncoronal
@@ -17,7 +18,7 @@ def calc_impurity_radiated_power(
     electron_density_profile: Unitfull,
     impurities: xr.DataArray,
     plasma_volume: Unitfull,
-    atomic_data: dict[AtomicSpecies, xr.DataArray],
+    atomic_data: AtomicData,
 ) -> xr.DataArray:
     """Compute the total radiated power due to fuel and impurity species.
 

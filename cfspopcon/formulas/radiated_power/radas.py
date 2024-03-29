@@ -1,11 +1,10 @@
 """Calculate the impurity radiated power using the radas atomic_data."""
-import numpy as np
-import xarray as xr
 from numpy import float64
 from numpy.typing import NDArray
 
 from ...named_options import AtomicSpecies
-from ...unit_handling import magnitude, ureg, wraps_ufunc
+from ...read_atomic_data import AtomicData
+from ...unit_handling import ureg, wraps_ufunc
 from ..helpers import integrate_profile_over_volume
 
 
@@ -30,7 +29,7 @@ def calc_impurity_radiated_power_radas(
     impurity_concentration: float,
     impurity_species: AtomicSpecies,
     plasma_volume: float,
-    atomic_data: dict[AtomicSpecies, xr.DataArray],
+    atomic_data: AtomicData,
 ) -> float:
     """Calculation of radiated power using radas atomic_data datasets.
 
@@ -48,18 +47,15 @@ def calc_impurity_radiated_power_radas(
     """
     MW_per_W = 1e6
 
-    ds = atomic_data[impurity_species]
-    Lz_curve = ds.coronal_Lz_interpolator
-
-    # Use nearest neighbor extrapolation if evaluating for a
-    # point off-grid
-
-    electron_temp_profile = np.minimum(electron_temp_profile, magnitude(ds.electron_temperature.max()))
-    electron_temp_profile = np.maximum(electron_temp_profile, magnitude(ds.electron_temperature.min()))
-    electron_density_profile = np.minimum(electron_density_profile, magnitude(ds.electron_density.max()))
-    electron_density_profile = np.maximum(electron_density_profile, magnitude(ds.electron_density.min()))
-
-    Lz = np.power(10, Lz_curve(np.log10(electron_temp_profile), np.log10(electron_density_profile), grid=False))
+    Lz = atomic_data.eval_interpolator(
+        electron_density=electron_density_profile,
+        electron_temp=electron_temp_profile,
+        kind=AtomicData.CoronalLz,
+        species=impurity_species,
+        grid=False,
+        allow_extrapolation=True,
+        coords=dict(dim_rho=rho),
+    )
     radiated_power_profile = electron_density_profile**2 * Lz
 
     radiated_power = impurity_concentration * integrate_profile_over_volume(radiated_power_profile, rho, plasma_volume) / MW_per_W
