@@ -11,8 +11,8 @@ from .algorithms import get_algorithm
 from .algorithms.algorithm_class import Algorithm, CompositeAlgorithm
 from .helpers import convert_named_options
 from .unit_handling import set_default_units
-from omfit_classes.omfit_eqdsk import OMFITgeqdsk
-
+from .OMFIT.omfit_eqdsk import OMFITgeqdsk
+import scipy.interpolate
 
 def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any]]:
     """Read a yaml file corresponding to a given case.
@@ -32,8 +32,28 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
     with open(input_file) as file:
         repr_d: dict[str, Any] = yaml.load(file, Loader=yaml.FullLoader)
 
+    #Variables to be extracted from the equilibrium file
+    key_list = [
+        "major_radius",
+        "magnetic_field_on_axis",
+        "inverse_aspect_ratio",
+        "areal_elongation",
+        "elongation_ratio_sep_to_areal",
+        "triangularity_psi95",
+        "triangularity_ratio_sep_to_psi95",
+        "plasma_current"
+        ]
+    
     if "equilibrium_file_path" in repr_d.keys():
         equilibrium_file_path = repr_d.pop("equilibrium_file_path")
+        overridden_variables = []
+        for key in key_list:
+            if key in repr_d.keys() and repr_d[key] != None :
+                overridden_variables.append(key)
+        if overridden_variables and equilibrium_file_path:    
+            error_message = ("Cannot specify both equilibrium_file_path and:\n{}.\nModify input.yaml so that EITHER the above variables OR equilibrium_file_path is specified."
+                         ).format(',\n'.join(overridden_variables))
+            raise Exception(error_message)
     else:
         equilibrium_file_path = None
 
@@ -61,31 +81,15 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
     if equilibrium_file_path != None:
         geqdsk = OMFITgeqdsk(equilibrium_file_path)
         eq_input = {}
-        key_list = [
-        "major_radius",
-        "magnetic_field_on_axis",
-        "inverse_aspect_ratio",
-        "areal_elongation",
-        "elongation_ratio_sep_to_areal",
-        "triangularity_psi95",
-        "triangularity_ratio_sep_to_psi95",
-        "plasma_current`"
-        "nesep_over_nebar",
-        "toroidal_flux_expansion",
-        "parallel_connection_length",
-        ]
         value_list = [
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
-        # geqdsk[],
+        geqdsk['RMAXIS'],
+        abs(geqdsk['BCENTR']),
+        geqdsk['fluxSurfaces']['geo']['eps'][-1],
+        geqdsk['fluxSurfaces']['geo']['cxArea'][-1]/(np.pi * (geqdsk['fluxSurfaces']['geo']['a'][-1])**2),
+        geqdsk['fluxSurfaces']['geo']['kap'][-1]/(geqdsk['fluxSurfaces']['geo']['cxArea'][-1]/(np.pi * (geqdsk['fluxSurfaces']['geo']['a'][-1])**2)),
+        scipy.interpolate.interp1d(geqdsk['AuxQuantities']['PSI_NORM'],geqdsk['fluxSurfaces']['geo']['delta'])(0.95).item(),
+        geqdsk['fluxSurfaces']['geo']['delta'][-1]/(scipy.interpolate.interp1d(geqdsk['AuxQuantities']['PSI_NORM'],geqdsk['fluxSurfaces']['geo']['delta'])(0.95).item()),
+        abs(geqdsk['fluxSurfaces']['CURRENT']),
         ]
         for i in range(len(key_list)):
             eq_input[key_list[i]] = convert_named_options(key=key_list[i], val=value_list[i])
@@ -96,12 +100,12 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
         else:
             repr_d[key] = convert_named_options(key=key, val=val)
 
-    for key, val in repr_d.items():
-        repr_d[key] = set_default_units(key=key, value=val)
-    
     try:
         repr_d = {**repr_d, **eq_input}
     except:
         pass
+
+    for key, val in repr_d.items():
+        repr_d[key] = set_default_units(key=key, value=val)
 
     return repr_d, algorithm, points

@@ -1,4 +1,17 @@
 # Primary Reference Discharge, see https://doi.org/10.1017/S0022377820001257
+
+#EITHER equilibrium_file_path OR the following variables should be specified:
+#major_radius
+#magnetic_field_on_axis
+#inverse_aspect_ratio
+#areal_elongation
+#elongation_ratio_sep_to_areal
+#triangularity_psi95
+#triangularity_ratio_sep_to_psi95
+#plasma_current
+
+equilibrium_file_path: '../../example_cases/SPARC_PRD/SPARC_11708_TkMkr030624.eqdsk'
+
 algorithms:
   # The POPCON algorithm starts by selecting an average density
   # and temperature, which defines a stored energy stored_energy. From this,
@@ -94,22 +107,22 @@ points:
         max: 140.0
         units: MW
 
-# Major radius in metres
-major_radius: 1.85
-# Toroidal field on-axis in Tesla
-magnetic_field_on_axis: 12.2
-# Inverse aspect ratio
-inverse_aspect_ratio: 0.3081
-# Areal elongation
-areal_elongation: 1.75
-# Ratio of separatrix_elongation to kappa_A
-elongation_ratio_sep_to_areal: 1.125
-# Triangularity at rho_pol = 0.95
-triangularity_psi95: 0.3
-# Ratio of separatrix_triangularity to delta_95
-triangularity_ratio_sep_to_psi95: 1.8
-# Plasma current in Ampere
-plasma_current: 8.7e+6
+# # Major radius in metres
+# major_radius: 1.85
+# # Toroidal field on-axis in Tesla
+# magnetic_field_on_axis: 12.2
+# # Inverse aspect ratio
+# inverse_aspect_ratio: 0.3081
+# # Areal elongation
+# areal_elongation: 1.75
+# # Ratio of separatrix_elongation to kappa_A
+# elongation_ratio_sep_to_areal: 1.125
+# # Triangularity at rho_pol = 0.95
+# triangularity_psi95: 0.3
+# # Ratio of separatrix_triangularity to delta_95
+# triangularity_ratio_sep_to_psi95: 1.8
+# # Plasma current in Ampere
+# plasma_current: 8.7e+6
 # Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
 fraction_of_external_power_coupled: 0.9
 
