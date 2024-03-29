@@ -4,7 +4,7 @@ import xarray as xr
 from numpy import float64
 from numpy.typing import NDArray
 
-from ...named_options import Impurity
+from ...named_options import AtomicSpecies
 from ...unit_handling import magnitude, ureg, wraps_ufunc
 from ..helpers import integrate_profile_over_volume
 
@@ -28,9 +28,9 @@ def calc_impurity_radiated_power_radas(
     electron_temp_profile: NDArray[float64],
     electron_density_profile: NDArray[float64],
     impurity_concentration: float,
-    impurity_species: Impurity,
+    impurity_species: AtomicSpecies,
     plasma_volume: float,
-    atomic_data: dict[Impurity, xr.DataArray],
+    atomic_data: dict[AtomicSpecies, xr.DataArray],
 ) -> float:
     """Calculation of radiated power using radas atomic_data datasets.
 

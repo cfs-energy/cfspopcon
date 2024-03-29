@@ -2,7 +2,7 @@
 import numpy as np
 import xarray as xr
 
-from ..named_options import Impurity
+from ..named_options import AtomicSpecies
 from ..unit_handling import ureg, wraps_ufunc
 
 
@@ -19,8 +19,8 @@ from ..unit_handling import ureg, wraps_ufunc
 def calc_impurity_charge_state(
     average_electron_density: float,
     average_electron_temp: float,
-    impurity_species: Impurity,
-    atomic_data: dict[Impurity, xr.DataArray],
+    impurity_species: AtomicSpecies,
+    atomic_data: dict[AtomicSpecies, xr.DataArray],
 ) -> float:
     """Calculate the impurity charge state of the specified impurity species.
 

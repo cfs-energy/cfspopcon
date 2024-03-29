@@ -6,27 +6,27 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import RectBivariateSpline, RegularGridInterpolator  # type: ignore[import-untyped]
 
-from ..named_options import Impurity
+from ..named_options import AtomicSpecies
 from ..unit_handling import convert_units, magnitude, ureg
 
 
-def read_atomic_data(directory: Optional[Path] = None) -> dict[Impurity, xr.DataArray]:
-    """Read the atomic data files and return a dictionary mapping Impurity keys to xr.DataArrays of atomic data."""
+def read_atomic_data(directory: Optional[Path] = None) -> dict[AtomicSpecies, xr.DataArray]:
+    """Read the atomic data files and return a dictionary mapping AtomicSpecies keys to xr.DataArrays of atomic data."""
     if directory is None:
         directory = Path(__file__).parent
 
     atomic_data_files = {
-        Impurity.Helium: directory / "helium.nc",
-        Impurity.Lithium: directory / "lithium.nc",
-        Impurity.Beryllium: directory / "beryllium.nc",
-        Impurity.Carbon: directory / "carbon.nc",
-        Impurity.Nitrogen: directory / "nitrogen.nc",
-        Impurity.Oxygen: directory / "oxygen.nc",
-        Impurity.Neon: directory / "neon.nc",
-        Impurity.Argon: directory / "argon.nc",
-        Impurity.Krypton: directory / "krypton.nc",
-        Impurity.Xenon: directory / "xenon.nc",
-        Impurity.Tungsten: directory / "tungsten.nc",
+        AtomicSpecies.Helium: directory / "helium.nc",
+        AtomicSpecies.Lithium: directory / "lithium.nc",
+        AtomicSpecies.Beryllium: directory / "beryllium.nc",
+        AtomicSpecies.Carbon: directory / "carbon.nc",
+        AtomicSpecies.Nitrogen: directory / "nitrogen.nc",
+        AtomicSpecies.Oxygen: directory / "oxygen.nc",
+        AtomicSpecies.Neon: directory / "neon.nc",
+        AtomicSpecies.Argon: directory / "argon.nc",
+        AtomicSpecies.Krypton: directory / "krypton.nc",
+        AtomicSpecies.Xenon: directory / "xenon.nc",
+        AtomicSpecies.Tungsten: directory / "tungsten.nc",
     }
 
     atomic_data = {}

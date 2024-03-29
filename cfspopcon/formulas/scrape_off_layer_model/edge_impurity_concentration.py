@@ -5,13 +5,13 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
 
-from ...named_options import Impurity
+from ...named_options import AtomicSpecies
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
 
 
 def build_L_int_integrator(
-    atomic_data: dict[Impurity, Unitfull],
-    impurity_species: Impurity,
+    atomic_data: dict[AtomicSpecies, Unitfull],
+    impurity_species: AtomicSpecies,
     reference_electron_density: Unitfull,
     reference_ne_tau: Unitfull,
 ) -> Callable[[Unitfull, Unitfull], Unitfull]:

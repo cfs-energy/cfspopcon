@@ -35,7 +35,7 @@ def run_calc_extrinsic_core_radiator(
     plasma_volume: Unitfull,
     radiated_power_method: named_options.RadiationMethod,
     radiated_power_scalar: Unitfull,
-    core_radiator: named_options.Impurity,
+    core_radiator: named_options.AtomicSpecies,
 ) -> dict[str, Unitfull]:
     """Calculate the concentration and effect of a core radiator required to achieve above a defined core radiative fraction.
 

@@ -5,7 +5,7 @@ import xarray as xr
 from ..atomic_data import read_atomic_data
 from ..formulas.scrape_off_layer_model import build_L_int_integrator, calc_required_edge_impurity_concentration
 from ..helpers import extend_impurities_array
-from ..named_options import Impurity
+from ..named_options import AtomicSpecies
 from ..unit_handling import Unitfull, convert_to_default_units, ureg
 from .algorithm_class import Algorithm
 
@@ -17,7 +17,7 @@ RETURN_KEYS = [
 
 
 def run_calc_edge_impurity_concentration(
-    edge_impurity_species: Impurity,
+    edge_impurity_species: AtomicSpecies,
     q_parallel: Unitfull,
     SOL_power_loss_fraction: Unitfull,
     target_electron_temp: Unitfull,

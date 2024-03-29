@@ -55,10 +55,10 @@ class RadiationMethod(Enum):
     """Methods to calculate radiation losses."""
 
     Inherent = "Bremsstrahlung and synchrotron radiation only"
-    PostJensen = "Impurity radiation, using a coronal equilibrium model from Post & Jensen 1977"
-    MavrinCoronal = "Impurity radiation, using a coronal equilibrium model from Mavrin 2018"
-    MavrinNoncoronal = "Impurity radiation, using a non-coronal model from Mavrin 2017"
-    Radas = "Impurity line and bremsstrahlung radiation, using coronal Lz curves from Radas"
+    PostJensen = "AtomicSpecies radiation, using a coronal equilibrium model from Post & Jensen 1977"
+    MavrinCoronal = "AtomicSpecies radiation, using a coronal equilibrium model from Mavrin 2018"
+    MavrinNoncoronal = "AtomicSpecies radiation, using a non-coronal model from Mavrin 2017"
+    Radas = "AtomicSpecies line and bremsstrahlung radiation, using coronal Lz curves from Radas"
 
 
 class ReactionType(Enum):
@@ -70,12 +70,12 @@ class ReactionType(Enum):
     pB11 = "Proton-Boron11"
 
 
-class Impurity(Enum):
-    """Enum of possible impurity elements.
+class AtomicSpecies(Enum):
+    """Enum of possible atomic species.
 
-    The enum value represents the element's atomic number (Z).
+    The enum value represents the species atomic number (Z).
     """
-
+    Hydrogen = 1
     Helium = 2
     Lithium = 3
     Beryllium = 4
@@ -88,11 +88,11 @@ class Impurity(Enum):
     Xenon = 54
     Tungsten = 74
 
-    def __lt__(self, other: "Impurity") -> bool:
+    def __lt__(self, other: "AtomicSpecies") -> bool:
         """Implements '<' to allow sorting."""
         return self.value < other.value
 
-    def __gt__(self, other: "Impurity") -> bool:
+    def __gt__(self, other: "AtomicSpecies") -> bool:
         """Implements '>' to allow sorting."""
         return self.value > other.value
 

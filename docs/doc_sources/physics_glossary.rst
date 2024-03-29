@@ -123,15 +123,15 @@ Physics Glossary
     :math:`P_{SOL}B_0/R`, a metric used to estimate how challenging heat exhaust will be.
 
   atomic_data
-    Dictionary mapping :class:`~cfspopcon.named_options.Impurity` to datasets giving coronal and non-coronal :math:`L_z` radiated power factors and :math:`\langle Z \rangle` mean charge state curves from `radas <https://github.com/cfs-energy/radas>`_.
+    Dictionary mapping :class:`~cfspopcon.named_options.AtomicSpecies` to datasets giving coronal and non-coronal :math:`L_z` radiated power factors and :math:`\langle Z \rangle` mean charge state curves from `radas <https://github.com/cfs-energy/radas>`_.
 
   impurities
     A :class:`xarray.DataArray` giving the concentration of non-fuel species relative to the electron density.
-    This array must have a dimension `dim_species` with :class:`~cfspopcon.named_options.Impurity` coordinates.
+    This array must have a dimension `dim_species` with :class:`~cfspopcon.named_options.AtomicSpecies` coordinates.
     There are several functions in the :mod:`cfspopcon.helpers` module to help you make and extend the `impurities` array.
 
   impurity_species
-    An :class:`~cfspopcon.named_options.Impurity` indicating which non-fuel atomic species we are performing a calculation for.
+    An :class:`~cfspopcon.named_options.AtomicSpecies` indicating which non-fuel atomic species we are performing a calculation for.
 
   impurity_concentration
     Concentration of a non-fuel atomic species relative to the electron density :math:`c_Z = n_Z / n_e`.
@@ -143,7 +143,7 @@ Physics Glossary
     Ratio of the average electron density to the Greenwald density limit :math:`f_{G}=\bar n_e / n_G`.
 
   tau_i
-    Impurity residence/recycling time, which leads to a non-coronal enhancement of radiated power.
+    AtomicSpecies residence/recycling time, which leads to a non-coronal enhancement of radiated power.
 
   radiated_power_method
     A :class:`~cfspopcon.named_options.RadiationMethod` indicating how we should calculate the power radiated from the confined region.
@@ -152,7 +152,7 @@ Physics Glossary
     Fuel-species concentration as a fraction of the electron density :math:`n_{DT}/n_e`.
 
   core_radiator
-    An :class:`~cfspopcon.named_options.Impurity` indicating which :term:`extrinsic<extrinsic impurity>` core radiator species should be injected into the confined region to enhance the core radiated power.
+    An :class:`~cfspopcon.named_options.AtomicSpecies` indicating which :term:`extrinsic<extrinsic impurity>` core radiator species should be injected into the confined region to enhance the core radiated power.
 
   core_radiator_charge_state
     Charge state of the :term:`extrinsic<extrinsic impurity>` core radiator.
@@ -384,7 +384,7 @@ Physics Glossary
     A constant :math:`n_e\tau` (upstream electron density times impurity residence time) used when evaluating the :math:`L_Z` impurity radiation curve.
 
   edge_impurity_species
-    An :class:`~cfspopcon.named_options.Impurity` indicating which :term:`extrinsic<extrinsic impurity>` edge radiator species should be injected into the confined region to enhance the edge radiated power.
+    An :class:`~cfspopcon.named_options.AtomicSpecies` indicating which :term:`extrinsic<extrinsic impurity>` edge radiator species should be injected into the confined region to enhance the edge radiated power.
 
   edge_impurity_enrichment
     Ratio of concentration of the edge radiator in the core to in the edge, :math:`f_e = n_{edge}/n_{core}`.
