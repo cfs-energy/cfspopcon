@@ -92,9 +92,6 @@ jobs:
         if: steps.radas.outputs.cache-hit != 'true'
         run: exit 1
 
-      - name: Copy radas data
-        run: cp ./radas_dir/output/*.nc cfspopcon/atomic_data/
-
       - name: Tests
         run: MPLBACKEND=Agg poetry run pytest tests --nbmake example_cases
 
@@ -119,8 +116,6 @@ jobs:
           pip install $(find ./dist -name "*.whl")
           # enter tempdir so import cfspopcon doesn't find the cfspopcon directory
           mkdir tmp_dir && cd tmp_dir
-          echo $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
-          cp ../radas_dir/output/*.nc $(python -c 'from cfspopcon import atomic_data;from pathlib import Path; print(Path(atomic_data.__file__).parent)')
           MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD/input.yaml -p ../example_cases/SPARC_PRD/plot_popcon.yaml --show
 
       - name: Run pre-commit checks
