@@ -7,16 +7,16 @@ from ..unit_handling import ureg, wraps_ufunc
 @wraps_ufunc(
     return_units=dict(greenwald_fraction=ureg.dimensionless),
     input_units=dict(
-        average_electron_density=ureg.n20, inverse_aspect_ratio=ureg.dimensionless, major_radius=ureg.m, plasma_current=ureg.MA
+        line_averaged_electron_density=ureg.n20, inverse_aspect_ratio=ureg.dimensionless, major_radius=ureg.m, plasma_current=ureg.MA
     ),
 )
 def calc_greenwald_fraction(
-    average_electron_density: float, inverse_aspect_ratio: float, major_radius: float, plasma_current: float
+    line_averaged_electron_density: float, inverse_aspect_ratio: float, major_radius: float, plasma_current: float
 ) -> float:
     """Calculate the fraction of the Greenwald density limit.
 
     Args:
-        average_electron_density: [1e20 m^-3] :term:`glossary link<average_electron_density>`
+        line_averaged_electron_density: [1e20 m^-3] :term:`glossary link<line_averaged_electron_density>`
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
         major_radius: [m] :term:`glossary link<major_radius>`
         plasma_current: [MA] :term:`glossary link<plasma_current>`
@@ -26,7 +26,7 @@ def calc_greenwald_fraction(
     """
     n_Greenwald = calc_greenwald_density_limit.__wrapped__(plasma_current, inverse_aspect_ratio * major_radius)
 
-    return float(average_electron_density / n_Greenwald)
+    return float(line_averaged_electron_density / n_Greenwald)
 
 
 @wraps_ufunc(return_units=dict(nG=ureg.n20), input_units=dict(plasma_current=ureg.MA, minor_radius=ureg.m))

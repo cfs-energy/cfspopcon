@@ -1,8 +1,22 @@
 # Primary Reference Discharge, see https://doi.org/10.1017/S0022377820001257
+
+#EITHER equilibrium_file_path OR the following variables should be specified:
+#major_radius
+#magnetic_field_on_axis
+#inverse_aspect_ratio
+#areal_elongation
+#elongation_ratio_sep_to_areal
+#triangularity_psi95
+#triangularity_ratio_sep_to_psi95
+#plasma_current
+
+equilibrium_file_path: '../../example_cases/SPARC_PRD/SPARC_11708_TkMkr030624.eqdsk'
+
 algorithms:
   # The POPCON algorithm starts by selecting an average density
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
+  - calc_line_averaged_density
   - calc_geometry
   - calc_q_star_from_plasma_current
   - calc_fuel_average_mass_number
@@ -10,6 +24,7 @@ algorithms:
   - calc_zeff_and_dilution_from_impurities
   - calc_plasma_stored_energy
   - calc_power_balance_from_tau_e
+  - calc_average_total_pressure
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -40,7 +55,6 @@ algorithms:
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
   - calc_P_SOL
-  - calc_average_total_pressure
   - calc_heat_exhaust
   - calc_upstream_electron_density
   - two_point_model_fixed_tet
@@ -93,22 +107,22 @@ points:
         max: 140.0
         units: MW
 
-# Major radius in metres
-major_radius: 1.85
-# Toroidal field on-axis in Tesla
-magnetic_field_on_axis: 12.2
-# Inverse aspect ratio
-inverse_aspect_ratio: 0.3081
-# Areal elongation
-areal_elongation: 1.75
-# Ratio of separatrix_elongation to kappa_A
-elongation_ratio_sep_to_areal: 1.125
-# Triangularity at rho_pol = 0.95
-triangularity_psi95: 0.3
-# Ratio of separatrix_triangularity to delta_95
-triangularity_ratio_sep_to_psi95: 1.8
-# Plasma current in Ampere
-plasma_current: 8.7e+6
+# # Major radius in metres
+# major_radius: 1.85
+# # Toroidal field on-axis in Tesla
+# magnetic_field_on_axis: 12.2
+# # Inverse aspect ratio
+# inverse_aspect_ratio: 0.3081
+# # Areal elongation
+# areal_elongation: 1.75
+# # Ratio of separatrix_elongation to kappa_A
+# elongation_ratio_sep_to_areal: 1.125
+# # Triangularity at rho_pol = 0.95
+# triangularity_psi95: 0.3
+# # Ratio of separatrix_triangularity to delta_95
+# triangularity_ratio_sep_to_psi95: 1.8
+# # Plasma current in Ampere
+# plasma_current: 8.7e+6
 # Fraction of launched power absorbed by the plasma. Affects Q=P_fusion / (P_external / f_coupled).
 fraction_of_external_power_coupled: 0.9
 
@@ -129,6 +143,8 @@ ion_density_peaking_offset: -0.2
 temperature_peaking: 2.5
 # Ratio of volume-averaged temperatures (Ti / Te)
 ion_to_electron_temp_ratio: 1.0
+# Ratio of line-averaged to volume-averaged electron densities
+line_averaged_density_frac: 1.0
 
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0

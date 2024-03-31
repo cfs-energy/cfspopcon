@@ -4,7 +4,7 @@ target-version = ['py39', 'py310', 'py311']
 
 [tool.poetry]
 name = "cfspopcon"
-version = "4.0.0"
+version = "5.0.0.dev"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"
@@ -56,6 +56,7 @@ sphinx-copybutton = "^0.5.2"
 ruff = "^0.0.292"
 nbmake = "^1.4.3"
 nbsphinx = "^0.9.3"
+omfit_classes = "^3.2024.09"
 
 [tool.coverage.report]
 fail_under = 82
