@@ -1023,7 +1023,7 @@
             "data": 1.0136457814443183e-09,
             "dims": []
         },
-        "summed_impurity_density": {
+        "summed_impurity_average_density": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },

@@ -23,6 +23,7 @@ RETURN_KEYS = [
 def run_calc_peaked_profiles(
     profile_form: ProfileForm,
     average_electron_density: Unitfull,
+    line_averaged_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     average_ion_temp: Unitfull,
     ion_density_peaking_offset: Unitfull,
@@ -39,6 +40,7 @@ def run_calc_peaked_profiles(
     Args:
         profile_form: :term:`glossary link<profile_form>`
         average_electron_density: :term:`glossary link<average_electron_density>`
+        line_averaged_electron_density: :term:`glossary link<line_averaged_electron_density>`
         average_electron_temp: :term:`glossary link<average_electron_temp>`
         average_ion_temp: :term:`glossary link<average_ion_temp>`
         ion_density_peaking_offset: :term:`glossary link<ion_density_peaking_offset>`
@@ -55,15 +57,17 @@ def run_calc_peaked_profiles(
 
     """
     effective_collisionality = formulas.calc_effective_collisionality(
-        average_electron_density, average_electron_temp, major_radius, z_effective
+        line_averaged_electron_density, average_electron_temp, major_radius, z_effective
     )
     ion_density_peaking = formulas.calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
     electron_density_peaking = formulas.calc_density_peaking(
         effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
     )
 
-    peak_electron_density = average_electron_density * electron_density_peaking
-    peak_fuel_ion_density = average_electron_density * dilution * ion_density_peaking
+    peak_electron_density = line_averaged_electron_density * electron_density_peaking
+    peak_fuel_ion_density = (
+        line_averaged_electron_density * dilution * ion_density_peaking
+    )  # dilution was calculated from average_electron_density in zeff_and_dilution_from_impurities.py...should it be used here (i.e. with linear densities)?
     peak_electron_temp = average_electron_temp * temperature_peaking
     peak_ion_temp = average_ion_temp * temperature_peaking
 
@@ -72,6 +76,7 @@ def run_calc_peaked_profiles(
     (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile,) = formulas.calc_1D_plasma_profiles(
         profile_form,
         average_electron_density,
+        line_averaged_electron_density,
         average_electron_temp,
         average_ion_temp,
         electron_density_peaking,
