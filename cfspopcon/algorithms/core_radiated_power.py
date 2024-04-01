@@ -2,7 +2,6 @@
 import xarray as xr
 
 from .. import formulas, named_options
-from ..read_atomic_data import AtomicData
 from ..unit_handling import Unitfull, convert_to_default_units
 from .algorithm_class import Algorithm
 
@@ -22,6 +21,7 @@ def run_calc_core_radiated_power(
     radiated_power_method: named_options.RadiationMethod,
     radiated_power_scalar: Unitfull,
     impurities: xr.DataArray,
+    atomic_data: xr.DataArray,
 ) -> dict[str, Unitfull]:
     """Calculate the power radiated from the confined region due to the fuel and impurity species.
 
@@ -38,6 +38,7 @@ def run_calc_core_radiated_power(
         radiated_power_method: :term:`glossary link<radiated_power_method>`
         radiated_power_scalar: :term:`glossary link<radiated_power_scalar>`
         impurities: :term:`glossary link<impurities>`
+        atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
         :term:`P_radiation`
@@ -64,8 +65,6 @@ def run_calc_core_radiated_power(
     if radiated_power_method == named_options.RadiationMethod.Inherent:
         P_radiation = radiated_power_scalar * (P_rad_bremsstrahlung + P_rad_synchrotron)
     else:
-        atomic_data = AtomicData()
-
         P_rad_impurity = formulas.calc_impurity_radiated_power(
             radiated_power_method=radiated_power_method,
             rho=rho,
@@ -73,7 +72,7 @@ def run_calc_core_radiated_power(
             electron_density_profile=electron_density_profile,
             impurities=impurities,
             plasma_volume=plasma_volume,
-            atomic_data=atomic_data,
+            atomic_data=atomic_data.item(),
         )
 
         P_radiation = radiated_power_scalar * (
