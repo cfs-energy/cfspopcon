@@ -1,5 +1,6 @@
 """Algorithm wrappers for single functions which don't fit into larger algorithms."""
 import numpy as np
+import xarray as xr
 
 from .. import formulas
 from ..named_options import Algorithms
@@ -78,7 +79,7 @@ calc_upstream_electron_density = Algorithm.from_single_function(
     name="calc_upstream_electron_density",
 )
 read_atomic_data = Algorithm.from_single_function(
-    lambda radas_dir: AtomicData(radas_dir.item()), return_keys=["atomic_data"], name="read_atomic_data"
+    lambda radas_dir: AtomicData(radas_dir.item() if isinstance(radas_dir, xr.DataArray) else radas_dir), return_keys=["atomic_data"], name="read_atomic_data"
 )
 
 SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}

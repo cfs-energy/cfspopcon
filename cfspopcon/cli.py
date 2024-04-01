@@ -15,29 +15,33 @@ from cfspopcon.plotting import make_plot, read_plot_style
 
 @click.command()
 @click.argument("case", type=click.Path(exists=True))
-@click.option("--show", is_flag=True, help="Display an interactive figure of the result")
-@click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher")
-def run_popcon_cli(case: str, show: bool, debug: bool) -> None:
+@click.option("--dict", "-d", "kwargs", type=(str, str), multiple=True, help="Command-line arguments, takes precedence over config.")
+@click.option("--show", is_flag=True, help="Display an interactive figure of the result.")
+@click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher.")
+def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, str]]) -> None:
     """Run POPCON from the command line.
 
     This function uses "Click" to develop the command line interface. You can execute it using
     poetry run python cfspopcon/cli.py --help
     """
+    cli_args: dict[str, str] = dict(kwargs)
+
     if not debug:
-        run_popcon(case, show)
+        run_popcon(case, show, cli_args)
     else:
         with launch_ipdb_on_exception():
-            run_popcon(case, show)
+            run_popcon(case, show, cli_args)
 
 
-def run_popcon(case: str, show: bool) -> None:
+def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
     """Run popcon case.
 
     Args:
         case: specify case to run (corresponding to a case in cases)
         show: show the resulting plots
+        cli_args: command-line arguments, takes precedence over config.
     """
-    input_parameters, algorithm, points, plots = read_case(case)
+    input_parameters, algorithm, points, plots = read_case(case, cli_args)
 
     dataset = xr.Dataset(input_parameters)
 

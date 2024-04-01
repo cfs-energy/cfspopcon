@@ -102,8 +102,7 @@ jobs:
       
       - name: Upload regression results
         uses: actions/upload-artifact@v3
-        if: always()
-        # replace with `if: failure()` once this pipeline is stable
+        if: failure()
         with:
           name: regression_results
           path: tests/regression_results
@@ -116,7 +115,7 @@ jobs:
           pip install $(find ./dist -name "*.whl")
           # enter tempdir so import cfspopcon doesn't find the cfspopcon directory
           mkdir tmp_dir && cd tmp_dir
-          MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD/input.yaml -p ../example_cases/SPARC_PRD/plot_popcon.yaml
+          MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD -d radas_dir WORKING_DIR/../radas_dir
 
       - name: Run pre-commit checks
         run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files

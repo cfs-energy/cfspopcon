@@ -14,11 +14,15 @@ from .helpers import convert_named_options
 from .unit_handling import set_default_units
 
 
-def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
+def read_case(
+    case: Union[str, Path], kwargs: dict[str, str] = dict()
+) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
     """Read a yaml file corresponding to a given case.
 
     case should be passed either as a complete filepath to an input.yaml file or to
     the parent folder of an input.yaml file.
+
+    kwargs can be an arbitrary dictionary of key-value pairs that overwrite the config values.
     """
     if Path(case).exists():
         case = Path(case)
@@ -31,6 +35,8 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
 
     with open(input_file) as file:
         repr_d: dict[str, Any] = yaml.load(file, Loader=yaml.FullLoader)
+
+    repr_d.update(kwargs)
 
     algorithms = repr_d.pop("algorithms")
     algorithm_list = [get_algorithm(algorithm) for algorithm in algorithms]

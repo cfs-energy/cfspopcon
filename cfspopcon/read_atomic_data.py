@@ -8,6 +8,7 @@ from scipy.interpolate import RectBivariateSpline  # type: ignore[import-untyped
 
 from cfspopcon.named_options import AtomicSpecies
 from cfspopcon.unit_handling import magnitude
+from warnings import warn
 
 
 class AtomicData:
@@ -270,5 +271,5 @@ class AtomicData:
         try:
             return xr.DataArray(interpolated_values, coords=coords)  # Return the interpolated values as an xarray DataArray
         except ValueError as e:
-            print("Invalid coordinates. Considering passing coords explicitly, especially if not using grid=True.")
+            warn("Invalid coordinates. Considering passing coords explicitly, especially if not using grid=True.", stacklevel=3)
             raise e

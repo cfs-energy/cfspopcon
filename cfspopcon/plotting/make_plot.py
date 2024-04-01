@@ -22,7 +22,7 @@ def make_plot(
     plot_params: dict,
     points: dict,
     title: str,
-    save_name: str,
+    save_name: str = None,
     ax: Optional[Axes] = None,
     output_dir: Path = Path("."),
 ) -> None:
@@ -34,7 +34,8 @@ def make_plot(
     else:
         raise NotImplementedError(f"No plotting method for type '{plot_params['type']}'")
 
-    fig.savefig(output_dir / save_name)
+    if save_name is not None:
+        fig.savefig(output_dir / save_name)
 
 
 def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points: dict, ax: Axes):
