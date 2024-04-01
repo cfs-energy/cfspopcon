@@ -21,6 +21,7 @@ But these are internals, so it should usually not be required to interact with a
 
 .. autoclass:: cfspopcon.unit_handling.Unitfull
 .. automodule:: cfspopcon.algorithms.algorithm_class
+.. automodule:: cfspopcon.read_atomic_data
 .. automodule:: cfspopcon.formulas
 .. automodule:: cfspopcon.formulas.scrape_off_layer_model
 .. automodule:: cfspopcon.helpers

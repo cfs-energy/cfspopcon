@@ -135,8 +135,7 @@ class AtomicData:
         and z_values data, facilitating interpolation in log space for better accuracy over wide ranges.
 
         Parameters:
-        - z_values (xr.DataArray): The xarray DataArray containing the data to interpolate, indexed by
-          electron temperature and density.
+        - z_values (xr.DataArray): The xarray DataArray containing the data to interpolate, indexed by electron temperature and density.
 
         Returns:
         - RectBivariateSpline: The bivariate spline interpolator object.
