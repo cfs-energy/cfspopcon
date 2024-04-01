@@ -3,6 +3,7 @@ import numpy as np
 
 from .. import formulas
 from ..named_options import Algorithms
+from ..read_atomic_data import AtomicData
 from ..unit_handling import ureg
 from .algorithm_class import Algorithm
 
@@ -75,6 +76,9 @@ calc_upstream_electron_density = Algorithm.from_single_function(
     lambda nesep_over_nebar, average_electron_density: nesep_over_nebar * average_electron_density,
     return_keys=["upstream_electron_density"],
     name="calc_upstream_electron_density",
+)
+read_atomic_data = Algorithm.from_single_function(
+    lambda radas_dir: AtomicData(radas_dir.item()), return_keys=["atomic_data"], name="read_atomic_data"
 )
 
 SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}

@@ -116,7 +116,7 @@ jobs:
           pip install $(find ./dist -name "*.whl")
           # enter tempdir so import cfspopcon doesn't find the cfspopcon directory
           mkdir tmp_dir && cd tmp_dir
-          MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD/input.yaml -p ../example_cases/SPARC_PRD/plot_popcon.yaml --show
+          MPLBACKEND=Agg popcon ../example_cases/SPARC_PRD/input.yaml -p ../example_cases/SPARC_PRD/plot_popcon.yaml
 
       - name: Run pre-commit checks
         run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files

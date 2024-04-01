@@ -1,5 +1,6 @@
 """Methods to run analyses configured via input files."""
 
+from importlib.resources import files
 from pathlib import Path
 from typing import Any, Union
 
@@ -39,6 +40,16 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
 
     points = repr_d.pop("points")
 
+    process_grid_values(repr_d)
+    process_named_options(repr_d)
+    process_paths(repr_d, input_file)
+    process_units(repr_d)
+
+    return repr_d, algorithm, points
+
+
+def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
+    """Process the grid of values to run POPCON over."""
     grid_values = repr_d.pop("grid")
     for key, grid_spec in grid_values.items():
         grid_spacing = grid_spec.get("spacing", "linear")
@@ -52,13 +63,43 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
 
         repr_d[key] = xr.DataArray(grid_vals, coords={f"dim_{key}": grid_vals})
 
+
+def process_named_options(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
+    """Process named options (enums), handling also list arguments."""
     for key, val in repr_d.items():
         if isinstance(val, (list, tuple)):
             repr_d[key] = [convert_named_options(key=key, val=v) for v in val]
         else:
             repr_d[key] = convert_named_options(key=key, val=val)
 
+
+def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-untyped-def]
+    """Process path tags, up to a maximum of one tag per input variable.
+
+    Allowed tags are:
+    * FILE: the folder that the input.yaml file is located in
+    * PWD: the current working directory that the script is being run from
+    * MODULE: the cfspopcon module directory (not always available)
+    * REPO: the directory containing the cfspopcon module directory (not always available)
+    """
+    path_mappings = dict(
+        FILE=input_file.parent,
+        PWD=Path("."),
+        MODULE=Path(files(package="cfspopcon")),  # type:ignore[arg-type]
+        REPO=Path(files(package="cfspopcon")).parent,  # type:ignore[arg-type]
+    )
+
+    for key, val in repr_d.items():
+        if isinstance(val, str):
+
+            for replace_key, replace_path in path_mappings.items():
+                if replace_key in val:
+                    path_val = Path(val.replace(replace_key, str(replace_path.absolute()))).absolute()
+                    repr_d[key] = path_val
+                    return
+
+
+def process_units(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
+    """Set default units on each of the input variables."""
     for key, val in repr_d.items():
         repr_d[key] = set_default_units(key=key, value=val)
-
-    return repr_d, algorithm, points

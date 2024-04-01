@@ -16,12 +16,7 @@ from cfspopcon.plotting import make_plot, read_plot_style
 
 @click.command()
 @click.argument("case", type=click.Path(exists=True))
-@click.option(
-    "--plots",
-    "-p",
-    type=click.Path(exists=True),
-    multiple=True,
-)
+@click.option("--plots", "-p", type=click.Path(exists=True), multiple=True, help="Path to configuration YAML file for plotting")
 @click.option("--show", is_flag=True, help="Display an interactive figure of the result")
 @click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher")
 def run_popcon_cli(case: str, plots: tuple[str], show: bool, debug: bool) -> None:
@@ -33,7 +28,7 @@ def run_popcon_cli(case: str, plots: tuple[str], show: bool, debug: bool) -> Non
     You can specify a set of plots to create by specifying a plot style file after `-p` on the command-line. Multiple entries are supported.
     """
     if show and not plots:
-        print(f"Speficied show={show}, but did not specify a plot style, see --plots!")
+        print(f"Specified show={show}, but did not specify a plot style, see --plots")
         sys.exit(1)
 
     if not debug:

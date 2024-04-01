@@ -42,6 +42,7 @@ class Algorithms(Enum):
     calc_plasma_stored_energy = auto()
     calc_edge_impurity_concentration = auto()
     calc_upstream_electron_density = auto()
+    read_atomic_data = auto()
 
 
 class ProfileForm(Enum):
