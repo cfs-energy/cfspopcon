@@ -2,7 +2,7 @@
 
 from importlib.resources import files
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -15,7 +15,7 @@ from .unit_handling import set_default_units
 
 
 def read_case(
-    case: Union[str, Path], kwargs: dict[str, str] = dict()
+    case: Union[str, Path], kwargs: Optional[dict[str, str]] = None
 ) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
     """Read a yaml file corresponding to a given case.
 
@@ -24,6 +24,8 @@ def read_case(
 
     kwargs can be an arbitrary dictionary of key-value pairs that overwrite the config values.
     """
+    if kwargs is None:
+        kwargs = dict()
     if Path(case).exists():
         case = Path(case)
         if case.is_dir():

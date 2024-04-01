@@ -22,7 +22,7 @@ def make_plot(
     plot_params: dict,
     points: dict,
     title: str,
-    save_name: str = None,
+    save_name: Optional[str] = None,
     ax: Optional[Axes] = None,
     output_dir: Path = Path("."),
 ) -> None:

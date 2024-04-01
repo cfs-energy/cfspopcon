@@ -1,6 +1,7 @@
 """Module defining the AtomicData class, used for interfacing with radas files."""
 from pathlib import Path
 from typing import Optional, Union
+from warnings import warn
 
 import numpy as np
 import xarray as xr
@@ -8,7 +9,6 @@ from scipy.interpolate import RectBivariateSpline  # type: ignore[import-untyped
 
 from cfspopcon.named_options import AtomicSpecies
 from cfspopcon.unit_handling import magnitude
-from warnings import warn
 
 
 class AtomicData:
