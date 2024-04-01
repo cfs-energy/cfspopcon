@@ -14,7 +14,7 @@ from .helpers import convert_named_options
 from .unit_handling import set_default_units
 
 
-def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any]]:
+def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
     """Read a yaml file corresponding to a given case.
 
     case should be passed either as a complete filepath to an input.yaml file or to
@@ -39,13 +39,15 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
     algorithm: Union[Algorithm, CompositeAlgorithm] = CompositeAlgorithm(algorithm_list) if len(algorithm_list) > 1 else algorithm_list[0]
 
     points = repr_d.pop("points")
+    plots = repr_d.pop("plots")
 
     process_grid_values(repr_d)
     process_named_options(repr_d)
     process_paths(repr_d, input_file)
+    process_paths(plots, input_file)
     process_units(repr_d)
 
-    return repr_d, algorithm, points
+    return repr_d, algorithm, points, plots
 
 
 def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
@@ -77,16 +79,16 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
     """Process path tags, up to a maximum of one tag per input variable.
 
     Allowed tags are:
-    * FILE: the folder that the input.yaml file is located in
-    * PWD: the current working directory that the script is being run from
-    * MODULE: the cfspopcon module directory (not always available)
-    * REPO: the directory containing the cfspopcon module directory (not always available)
+    * CASE_DIR: the folder that the input.yaml file is located in
+    * WORKING_DIR: the current working directory that the script is being run from
+    * MODULE_DIR: the cfspopcon module directory (not always available)
+    * REPO_DIR: the directory containing the cfspopcon module directory (not always available)
     """
     path_mappings = dict(
-        FILE=input_file.parent,
-        PWD=Path("."),
-        MODULE=Path(files(package="cfspopcon")),  # type:ignore[arg-type]
-        REPO=Path(files(package="cfspopcon")).parent,  # type:ignore[arg-type]
+        CASE_DIR=input_file.parent,
+        WORKING_DIR=Path("."),
+        MODULE_DIR=Path(files(package="cfspopcon")),  # type:ignore[arg-type]
+        REPO_DIR=Path(files(package="cfspopcon")).parent,  # type:ignore[arg-type]
     )
 
     for key, val in repr_d.items():
@@ -96,7 +98,7 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
                 if replace_key in val:
                     path_val = Path(val.replace(replace_key, str(replace_path.absolute()))).absolute()
                     repr_d[key] = path_val
-                    return
+                    break
 
 
 def process_units(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]

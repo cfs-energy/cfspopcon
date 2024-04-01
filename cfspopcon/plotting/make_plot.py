@@ -18,7 +18,13 @@ from .coordinate_formatter import CoordinateFormatter
 
 
 def make_plot(
-    dataset: xr.Dataset, plot_params: dict, points: dict, title: str, ax: Optional[Axes] = None, output_dir: Path = Path(".")
+    dataset: xr.Dataset,
+    plot_params: dict,
+    points: dict,
+    title: str,
+    save_name: str,
+    ax: Optional[Axes] = None,
+    output_dir: Path = Path("."),
 ) -> None:
     """Given a dictionary corresponding to a plotting style, build a standard plot from the results of the POPCON."""
     if plot_params["type"] == "popcon":
@@ -28,8 +34,7 @@ def make_plot(
     else:
         raise NotImplementedError(f"No plotting method for type '{plot_params['type']}'")
 
-    if "save_as" in plot_params.keys() and output_dir is not None:
-        fig.savefig(output_dir / plot_params["save_as"])
+    fig.savefig(output_dir / save_name)
 
 
 def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points: dict, ax: Axes):
