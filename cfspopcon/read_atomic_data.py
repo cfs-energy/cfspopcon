@@ -5,7 +5,7 @@ from warnings import warn
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import RectBivariateSpline  # type: ignore[import-untyped]
+from scipy.interpolate import RegularGridInterpolator  # type: ignore[import-untyped]
 
 from cfspopcon.named_options import AtomicSpecies
 from cfspopcon.unit_handling import magnitude
@@ -41,10 +41,10 @@ class AtomicData:
         self.available_species = list(self.datasets.keys())  # List available species based on the loaded datasets
 
         # Initialize dictionaries to hold interpolators for different data types and conditions
-        self.coronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RectBivariateSpline] = dict()
-        self.coronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RectBivariateSpline] = dict()
-        self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RectBivariateSpline] = dict()
-        self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RectBivariateSpline] = dict()
+        self.coronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
+        self.coronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
+        self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
+        self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
 
     @staticmethod
     def read_atomic_data(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
@@ -128,7 +128,7 @@ class AtomicData:
         return self.datasets[self.key_to_enum(species)]
 
     @staticmethod
-    def build_interpolator(z_values: xr.DataArray) -> RectBivariateSpline:
+    def build_interpolator(z_values: xr.DataArray) -> RegularGridInterpolator:
         """Builds a bivariate spline interpolator for the provided dataset.
 
         This method creates an interpolator based on logarithmic transformations of the temperature, density,
@@ -138,16 +138,20 @@ class AtomicData:
         - z_values (xr.DataArray): The xarray DataArray containing the data to interpolate, indexed by electron temperature and density.
 
         Returns:
-        - RectBivariateSpline: The bivariate spline interpolator object.
+        - RegularGridInterpolator: The bivariate spline interpolator object.
         """
         # Logarithmic transformation of the temperature, density, and z_values for interpolation
-        return RectBivariateSpline(
-            x=np.log10(z_values.dim_electron_temp),
-            y=np.log10(z_values.dim_electron_density),
-            z=np.log10(magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density"))),
+        return RegularGridInterpolator(
+            points=(
+                np.log10(z_values.dim_electron_temp),
+                np.log10(z_values.dim_electron_density),
+            ),
+            values=np.log10(magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density"))),
+            method="cubic",
+            bounds_error=False,
         )
 
-    def get_interpolator(self, kind: int, species: Union[str, AtomicSpecies], ne_tau: float = np.inf) -> RectBivariateSpline:
+    def get_interpolator(self, kind: int, species: Union[str, AtomicSpecies], ne_tau: float = np.inf) -> RegularGridInterpolator:
         """Retrieves or creates a bivariate spline interpolator for a given species and physical condition.
 
         This method manages a cache of interpolator objects to avoid redundant computations. It also
@@ -159,7 +163,7 @@ class AtomicData:
         - ne_tau (float): The electron density times ionization time product, for non-coronal conditions. Default is infinity, indicating coronal equilibrium.
 
         Returns:
-        - RectBivariateSpline: The requested interpolator object.
+        - RegularGridInterpolator: The requested interpolator object.
 
         Raises:
         - FileNotFoundError: If no dataset is available for the requested species.
@@ -265,7 +269,9 @@ class AtomicData:
             ), f"{electron_density.min()} < {dataset.dim_electron_density.min().item()}"
 
         # Perform the interpolation and convert back from logarithmic values
-        interpolated_values = np.power(10, interpolator(np.log10(electron_temp), np.log10(electron_density), grid=grid))
+        if grid:
+            electron_temp, electron_density = np.meshgrid(electron_temp, electron_density)
+        interpolated_values = np.power(10, interpolator((np.log10(electron_temp), np.log10(electron_density))))
 
         try:
             return xr.DataArray(interpolated_values, coords=coords)  # Return the interpolated values as an xarray DataArray
