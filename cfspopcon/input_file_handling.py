@@ -1,6 +1,5 @@
 """Methods to run analyses configured via input files."""
 
-from importlib.resources import files
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -89,14 +88,10 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
     Allowed tags are:
     * CASE_DIR: the folder that the input.yaml file is located in
     * WORKING_DIR: the current working directory that the script is being run from
-    * MODULE_DIR: the cfspopcon module directory (not always available)
-    * REPO_DIR: the directory containing the cfspopcon module directory (not always available)
     """
     path_mappings = dict(
         CASE_DIR=input_file.parent,
         WORKING_DIR=Path("."),
-        MODULE_DIR=Path(files(package="cfspopcon")),  # type:ignore[arg-type]
-        REPO_DIR=Path(files(package="cfspopcon")).parent,  # type:ignore[arg-type]
     )
 
     for key, val in repr_d.items():
