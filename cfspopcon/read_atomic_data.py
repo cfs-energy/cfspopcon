@@ -156,6 +156,10 @@ class AtomicData:
         def log10_with_floor(x: Union[xr.DataArray, np.ndarray, float]) -> Union[xr.DataArray, np.ndarray, float]:
             return np.log10(np.maximum(x, tiny))  # type:ignore[no-any-return]
 
+        # Remove rows or columns with all negative or zero values
+        z_values = z_values.where(~np.all(z_values <= 0.0, axis=0), drop=True)
+        z_values = z_values.where(~np.all(z_values <= 0.0, axis=1), drop=True)
+
         # Logarithmic transformation of the temperature, density, and z_values for interpolation
         return RegularGridInterpolator(
             points=(
@@ -266,7 +270,7 @@ class AtomicData:
 
         if coords is None:
             coords = dict(
-                dim_electron_temp=electron_temp, dim_electron_density=electron_density  # type: ignore[dict-item]
+                dim_electron_density=electron_density, dim_electron_temp=electron_temp  # type: ignore[dict-item]
             )  # Prepare coordinates for the result DataArray
 
         # Handle optional extrapolation
