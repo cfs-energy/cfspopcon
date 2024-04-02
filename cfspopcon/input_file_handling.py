@@ -46,8 +46,8 @@ def read_case(
     # why doesn't mypy deduce the below without hint?
     algorithm: Union[Algorithm, CompositeAlgorithm] = CompositeAlgorithm(algorithm_list) if len(algorithm_list) > 1 else algorithm_list[0]
 
-    points = repr_d.pop("points")
-    plots = repr_d.pop("plots")
+    points = repr_d.pop("points", dict())
+    plots = repr_d.pop("plots", dict())
 
     process_grid_values(repr_d)
     process_named_options(repr_d)

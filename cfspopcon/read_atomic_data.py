@@ -1,7 +1,6 @@
 """Module defining the AtomicData class, used for interfacing with radas files."""
 from pathlib import Path
 from typing import Optional, Union
-from warnings import warn
 
 import numpy as np
 import xarray as xr
@@ -41,10 +40,22 @@ class AtomicData:
         self.available_species = list(self.datasets.keys())  # List available species based on the loaded datasets
 
         # Initialize dictionaries to hold interpolators for different data types and conditions
-        self.coronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
-        self.coronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
+        self.coronal_Lz_interpolators: dict[AtomicSpecies, RegularGridInterpolator] = dict()
+        self.coronal_Z_interpolators: dict[AtomicSpecies, RegularGridInterpolator] = dict()
         self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
         self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
+        self.grid_limits: dict[AtomicSpecies, tuple[float, float, float, float]] = dict()
+
+        for species in self.available_species:
+            dataset = self.get_dataset(species)
+            self.coronal_Lz_interpolators[species] = self.build_interpolator(dataset.coronal_Lz)
+            self.coronal_Z_interpolators[species] = self.build_interpolator(dataset.coronal_mean_charge_state)
+
+            max_temp = dataset.dim_electron_temp.max().item()
+            min_temp = dataset.dim_electron_temp.min().item()
+            max_density = dataset.dim_electron_density.max().item()
+            min_density = dataset.dim_electron_density.min().item()
+            self.grid_limits[species] = (max_temp, min_temp, max_density, min_density)
 
     @staticmethod
     def read_atomic_data(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
@@ -140,13 +151,18 @@ class AtomicData:
         Returns:
         - RegularGridInterpolator: The bivariate spline interpolator object.
         """
+        tiny = np.finfo(np.float64).tiny
+
+        def log10_with_floor(x: Union[xr.DataArray, np.ndarray, float]) -> Union[xr.DataArray, np.ndarray, float]:
+            return np.log10(np.maximum(x, tiny))  # type:ignore[no-any-return]
+
         # Logarithmic transformation of the temperature, density, and z_values for interpolation
         return RegularGridInterpolator(
             points=(
-                np.log10(z_values.dim_electron_temp),
-                np.log10(z_values.dim_electron_density),
+                log10_with_floor(z_values.dim_electron_temp),
+                log10_with_floor(z_values.dim_electron_density),
             ),
-            values=np.log10(magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density"))),
+            values=log10_with_floor(magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density"))),
             method="cubic",
             bounds_error=False,
         )
@@ -175,7 +191,7 @@ class AtomicData:
                 f"Requested data for {species.name} but no corresponding {species.name.lower()}.nc dataset is available in {(self.atomic_data_directory / 'output').absolute()}"
             )
 
-        key = (species, ne_tau)  # Create a unique key for caching
+        noncoronal_key = (species, ne_tau)  # Create a unique noncoronal_key for caching
         dataset = self.get_dataset(species)  # Retrieve the dataset for the species
 
         # Validate ne_tau and manage exceptions for coronal conditions
@@ -188,24 +204,26 @@ class AtomicData:
 
         # Create or retrieve the appropriate interpolator based on the kind and conditions
         if kind == self.CoronalLz:
-            if key not in self.coronal_Lz_interpolators:
-                self.coronal_Lz_interpolators[key] = self.build_interpolator(dataset.coronal_Lz)
-            return self.coronal_Lz_interpolators[key]
+            if species not in self.coronal_Lz_interpolators:
+                self.coronal_Lz_interpolators[species] = self.build_interpolator(dataset.coronal_Lz)
+            return self.coronal_Lz_interpolators[species]
 
         if kind == self.CoronalZ:
-            if key not in self.coronal_Z_interpolators:
-                self.coronal_Z_interpolators[key] = self.build_interpolator(dataset.coronal_mean_charge_state)
-            return self.coronal_Z_interpolators[key]
+            if species not in self.coronal_Z_interpolators:
+                self.coronal_Z_interpolators[species] = self.build_interpolator(dataset.coronal_mean_charge_state)
+            return self.coronal_Z_interpolators[species]
 
         if kind == self.NoncoronalLz:
-            if key not in self.noncoronal_Lz_interpolators:
-                self.noncoronal_Lz_interpolators[key] = self.build_interpolator(dataset.equilibrium_Lz.sel(dim_ne_tau=ne_tau))
-            return self.noncoronal_Lz_interpolators[key]
+            if noncoronal_key not in self.noncoronal_Lz_interpolators:
+                self.noncoronal_Lz_interpolators[noncoronal_key] = self.build_interpolator(dataset.equilibrium_Lz.sel(dim_ne_tau=ne_tau))
+            return self.noncoronal_Lz_interpolators[noncoronal_key]
 
         if kind == self.NoncoronalZ:
-            if key not in self.noncoronal_Z_interpolators:
-                self.noncoronal_Z_interpolators[key] = self.build_interpolator(dataset.equilibrium_mean_charge_state.sel(dim_ne_tau=ne_tau))
-            return self.noncoronal_Z_interpolators[key]
+            if noncoronal_key not in self.noncoronal_Z_interpolators:
+                self.noncoronal_Z_interpolators[noncoronal_key] = self.build_interpolator(
+                    dataset.equilibrium_mean_charge_state.sel(dim_ne_tau=ne_tau)
+                )
+            return self.noncoronal_Z_interpolators[noncoronal_key]
 
     def eval_interpolator(
         self,
@@ -220,8 +238,13 @@ class AtomicData:
     ) -> xr.DataArray:
         """Evaluates the interpolator for given electron densities and temperatures, returning interpolated values.
 
+        N.b. Not recommended for performant code! It is better to directly work with the interpolators, and use this
+        only as a convenience function.
+
         This method allows for the interpolation of data (e.g., ionization rates) over a grid of electron densities
-        and temperatures for a specific species and physical condition. It supports optional extrapolation.
+        and temperatures for a specific species and physical condition.
+
+        If allow_extrapolation, off-grid points are replaced by their nearest on-grid neighbours.
 
         Parameters:
         - electron_density (xr.DataArray): The electron densities for which to interpolate data.
@@ -238,8 +261,8 @@ class AtomicData:
         Raises:
         - AssertionError: If the input ranges for temperature or density are beyond the available data range, unless extrapolation is allowed.
         """
+        species = self.key_to_enum(species)
         interpolator = self.get_interpolator(kind=kind, species=species, ne_tau=ne_tau)  # Retrieve the appropriate interpolator
-        dataset = self.get_dataset(species)  # Get the dataset for the species
 
         if coords is None:
             coords = dict(
@@ -249,32 +272,43 @@ class AtomicData:
         # Handle optional extrapolation
         if allow_extrapolation:
             # Adjust electron_temp and electron_density to fit within the dataset's bounds, if necessary
-            electron_temp = np.minimum(xr.DataArray(electron_temp), dataset.dim_electron_temp.max())
-            electron_temp = np.maximum(xr.DataArray(electron_temp), dataset.dim_electron_temp.min())
-            electron_density = np.minimum(xr.DataArray(electron_density), dataset.dim_electron_density.max())
-            electron_density = np.maximum(xr.DataArray(electron_density), dataset.dim_electron_density.min())
+            electron_temp, electron_density = self.nearest_neighbour_off_grid(
+                species=species, electron_temp=electron_temp, electron_density=electron_density
+            )
         else:
             # Assert that the electron_temp and electron_density are within the dataset's bounds
-            assert (
-                electron_temp.max() <= dataset.dim_electron_temp.max()
-            ), f"{electron_temp.max()} > {dataset.dim_electron_temp.max().item()}"
-            assert (
-                electron_temp.min() >= dataset.dim_electron_temp.min()
-            ), f"{electron_temp.min()} < {dataset.dim_electron_temp.min().item()}"
-            assert (
-                electron_density.max() <= dataset.dim_electron_density.max()
-            ), f"{electron_density.max()} > {dataset.dim_electron_density.max().item()}"
-            assert (
-                electron_density.min() >= dataset.dim_electron_density.min()
-            ), f"{electron_density.min()} < {dataset.dim_electron_density.min().item()}"
+            self.assert_on_grid(species=species, electron_temp=electron_temp, electron_density=electron_density)
 
         # Perform the interpolation and convert back from logarithmic values
         if grid:
             electron_temp, electron_density = np.meshgrid(electron_temp, electron_density)
         interpolated_values = np.power(10, interpolator((np.log10(electron_temp), np.log10(electron_density))))
 
-        try:
-            return xr.DataArray(interpolated_values, coords=coords)  # Return the interpolated values as an xarray DataArray
-        except ValueError as e:
-            warn("Invalid coordinates. Considering passing coords explicitly, especially if not using grid=True.", stacklevel=3)
-            raise e
+        return xr.DataArray(interpolated_values, coords=coords)  # Return the interpolated values as an xarray DataArray
+
+    def nearest_neighbour_off_grid(
+        self,
+        species: AtomicSpecies,
+        electron_temp: Union[xr.DataArray, np.ndarray],
+        electron_density: Union[xr.DataArray, np.ndarray],
+    ) -> tuple[Union[xr.DataArray, np.ndarray], Union[xr.DataArray, np.ndarray]]:
+        """Replaces off-grid points with their nearest on-grid neighbour."""
+        max_temp, min_temp, max_density, min_density = self.grid_limits[species]
+        electron_temp = np.minimum(electron_temp, max_temp)
+        electron_temp = np.maximum(electron_temp, min_temp)
+        electron_density = np.minimum(electron_density, max_density)
+        electron_density = np.maximum(electron_density, min_density)
+        return electron_temp, electron_density
+
+    def assert_on_grid(
+        self,
+        species: AtomicSpecies,
+        electron_temp: Union[xr.DataArray, np.ndarray],
+        electron_density: Union[xr.DataArray, np.ndarray],
+    ) -> None:
+        """Raises an AssertionError if any points are off-grid."""
+        max_temp, min_temp, max_density, min_density = self.grid_limits[species]
+        assert electron_temp.max() <= max_temp, f"{electron_temp.max()} > {max_temp}"
+        assert electron_temp.min() >= min_temp, f"{electron_temp.min()} < {min_temp}"
+        assert electron_density.max() <= max_density, f"{electron_density.max()} > {max_density}"
+        assert electron_density.min() >= min_density, f"{electron_density.min()} < {min_density}"

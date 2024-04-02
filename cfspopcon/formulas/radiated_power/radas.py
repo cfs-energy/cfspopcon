@@ -1,4 +1,5 @@
 """Calculate the impurity radiated power using the radas atomic_data."""
+import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
 
@@ -47,15 +48,11 @@ def calc_impurity_radiated_power_radas(
     """
     MW_per_W = 1e6
 
-    Lz = atomic_data.eval_interpolator(
-        electron_density=electron_density_profile,
-        electron_temp=electron_temp_profile,
-        kind=AtomicData.CoronalLz,
-        species=impurity_species,
-        grid=False,
-        allow_extrapolation=True,
-        coords=dict(dim_rho=rho),
+    electron_temp_profile, electron_density_profile = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
+        impurity_species, electron_temp_profile, electron_density_profile
     )
+    interpolator = atomic_data.coronal_Lz_interpolators[impurity_species]
+    Lz = np.power(10, interpolator((np.log10(electron_temp_profile), np.log10(electron_density_profile))))
     radiated_power_profile = electron_density_profile**2 * Lz
 
     radiated_power = impurity_concentration * integrate_profile_over_volume(radiated_power_profile, rho, plasma_volume) / MW_per_W
