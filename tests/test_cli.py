@@ -15,6 +15,6 @@ def test_popcon_cli():
     example_case = Path(__file__).parents[1] / "example_cases" / "SPARC_PRD"
     result = runner.invoke(
         run_popcon_cli,
-        [str(example_case), "-p", str(example_case / "plot_popcon.yaml"), "-p", str(example_case / "plot_remapped.yaml"), "--show"],
+        [str(example_case), "--show"],
     )
     assert result.exit_code == 0

@@ -1,7 +1,6 @@
 #!.venv/bin/python
 # Run this script from the repository directory.
 """CLI for cfspopcon."""
-import sys
 from pathlib import Path
 
 import click
@@ -16,42 +15,33 @@ from cfspopcon.plotting import make_plot, read_plot_style
 
 @click.command()
 @click.argument("case", type=click.Path(exists=True))
-@click.option(
-    "--plots",
-    "-p",
-    type=click.Path(exists=True),
-    multiple=True,
-)
-@click.option("--show", is_flag=True, help="Display an interactive figure of the result")
-@click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher")
-def run_popcon_cli(case: str, plots: tuple[str], show: bool, debug: bool) -> None:
+@click.option("--dict", "-d", "kwargs", type=(str, str), multiple=True, help="Command-line arguments, takes precedence over config.")
+@click.option("--show", is_flag=True, help="Display an interactive figure of the result.")
+@click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher.")
+def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, str]]) -> None:
     """Run POPCON from the command line.
 
     This function uses "Click" to develop the command line interface. You can execute it using
     poetry run python cfspopcon/cli.py --help
-
-    You can specify a set of plots to create by specifying a plot style file after `-p` on the command-line. Multiple entries are supported.
     """
-    if show and not plots:
-        print(f"Speficied show={show}, but did not specify a plot style, see --plots!")
-        sys.exit(1)
+    cli_args: dict[str, str] = dict(kwargs)
 
     if not debug:
-        run_popcon(case, plots, show)
+        run_popcon(case, show, cli_args)
     else:
         with launch_ipdb_on_exception():
-            run_popcon(case, plots, show)
+            run_popcon(case, show, cli_args)
 
 
-def run_popcon(case: str, plots: tuple[str], show: bool) -> None:
+def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
     """Run popcon case.
 
     Args:
         case: specify case to run (corresponding to a case in cases)
-        plots: specify which plots to make (corresponding to a plot_style in plot_styles)
         show: show the resulting plots
+        cli_args: command-line arguments, takes precedence over config.
     """
-    input_parameters, algorithm, points = read_case(case)
+    input_parameters, algorithm, points, plots = read_case(case, cli_args)
 
     dataset = xr.Dataset(input_parameters)
 
@@ -67,8 +57,9 @@ def run_popcon(case: str, plots: tuple[str], show: bool) -> None:
         file_io.write_point_to_file(dataset, point, point_params, output_dir=output_dir)
 
     # Plot the results
-    for plot_style in plots:
-        make_plot(dataset, read_plot_style(plot_style), points, title=input_parameters.get("plot_title", "POPCON"), output_dir=output_dir)
+    for plot_name, plot_style in plots.items():
+        print(f"Plotting {plot_name}")
+        make_plot(dataset, read_plot_style(plot_style), points, title=plot_name, output_dir=output_dir, save_name=plot_style.stem)
 
     print("Done")
     if show:

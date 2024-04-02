@@ -3,6 +3,7 @@ algorithms:
   # The POPCON algorithm starts by selecting an average density
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
+  - read_atomic_data
   - calc_geometry
   - calc_q_star_from_plasma_current
   - calc_fuel_average_mass_number
@@ -93,6 +94,10 @@ points:
         max: 140.0
         units: MW
 
+plots:
+  "POPCON for SPARC PRD": CASE_DIR/plot_popcon.yaml
+  "SPARC PRD $(n_e, P_{aux})$": CASE_DIR/plot_remapped.yaml
+
 # Major radius in metres
 major_radius: 1.85
 # Toroidal field on-axis in Tesla
@@ -140,6 +145,7 @@ energy_confinement_scaling: ITER98y2
 radiated_power_method: Radas
 radiated_power_scalar: 1.0
 minimum_core_radiated_fraction: 0.0
+radas_dir: "WORKING_DIR/radas_dir"
 
 impurities:
   # Impurity concentration relative to electron density.

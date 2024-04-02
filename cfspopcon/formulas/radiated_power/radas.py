@@ -1,11 +1,11 @@
 """Calculate the impurity radiated power using the radas atomic_data."""
 import numpy as np
-import xarray as xr
 from numpy import float64
 from numpy.typing import NDArray
 
-from ...named_options import Impurity
-from ...unit_handling import magnitude, ureg, wraps_ufunc
+from ...named_options import AtomicSpecies
+from ...read_atomic_data import AtomicData
+from ...unit_handling import ureg, wraps_ufunc
 from ..helpers import integrate_profile_over_volume
 
 
@@ -28,9 +28,9 @@ def calc_impurity_radiated_power_radas(
     electron_temp_profile: NDArray[float64],
     electron_density_profile: NDArray[float64],
     impurity_concentration: float,
-    impurity_species: Impurity,
+    impurity_species: AtomicSpecies,
     plasma_volume: float,
-    atomic_data: dict[Impurity, xr.DataArray],
+    atomic_data: AtomicData,
 ) -> float:
     """Calculation of radiated power using radas atomic_data datasets.
 
@@ -48,18 +48,11 @@ def calc_impurity_radiated_power_radas(
     """
     MW_per_W = 1e6
 
-    ds = atomic_data[impurity_species]
-    Lz_curve = ds.coronal_Lz_interpolator
-
-    # Use nearest neighbor extrapolation if evaluating for a
-    # point off-grid
-
-    electron_temp_profile = np.minimum(electron_temp_profile, magnitude(ds.electron_temperature.max()))
-    electron_temp_profile = np.maximum(electron_temp_profile, magnitude(ds.electron_temperature.min()))
-    electron_density_profile = np.minimum(electron_density_profile, magnitude(ds.electron_density.max()))
-    electron_density_profile = np.maximum(electron_density_profile, magnitude(ds.electron_density.min()))
-
-    Lz = np.power(10, Lz_curve(np.log10(electron_temp_profile), np.log10(electron_density_profile), grid=False))
+    electron_temp_profile, electron_density_profile = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
+        impurity_species, electron_temp_profile, electron_density_profile
+    )
+    interpolator = atomic_data.coronal_Lz_interpolators[impurity_species]
+    Lz = np.power(10, interpolator((np.log10(electron_temp_profile), np.log10(electron_density_profile))))
     radiated_power_profile = electron_density_profile**2 * Lz
 
     radiated_power = impurity_concentration * integrate_profile_over_volume(radiated_power_profile, rho, plasma_volume) / MW_per_W

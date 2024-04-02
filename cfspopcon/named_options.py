@@ -42,6 +42,7 @@ class Algorithms(Enum):
     calc_plasma_stored_energy = auto()
     calc_edge_impurity_concentration = auto()
     calc_upstream_electron_density = auto()
+    read_atomic_data = auto()
 
 
 class ProfileForm(Enum):
@@ -70,12 +71,13 @@ class ReactionType(Enum):
     pB11 = "Proton-Boron11"
 
 
-class Impurity(Enum):
-    """Enum of possible impurity elements.
+class AtomicSpecies(Enum):
+    """Enum of possible atomic species.
 
-    The enum value represents the element's atomic number (Z).
+    The enum value represents the species atomic number (Z).
     """
 
+    Hydrogen = 1
     Helium = 2
     Lithium = 3
     Beryllium = 4
@@ -88,11 +90,11 @@ class Impurity(Enum):
     Xenon = 54
     Tungsten = 74
 
-    def __lt__(self, other: "Impurity") -> bool:
+    def __lt__(self, other: "AtomicSpecies") -> bool:
         """Implements '<' to allow sorting."""
         return self.value < other.value
 
-    def __gt__(self, other: "Impurity") -> bool:
+    def __gt__(self, other: "AtomicSpecies") -> bool:
         """Implements '>' to allow sorting."""
         return self.value > other.value
 

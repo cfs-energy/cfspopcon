@@ -5,13 +5,14 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
 
-from ...named_options import Impurity
+from ...named_options import AtomicSpecies
+from ...read_atomic_data import AtomicData
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
 
 
 def build_L_int_integrator(
-    atomic_data: dict[Impurity, Unitfull],
-    impurity_species: Impurity,
+    atomic_data: AtomicData,
+    impurity_species: AtomicSpecies,
     reference_electron_density: Unitfull,
     reference_ne_tau: Unitfull,
 ) -> Callable[[Unitfull, Unitfull], Unitfull]:
@@ -32,13 +33,16 @@ def build_L_int_integrator(
     if isinstance(impurity_species, xr.DataArray):
         impurity_species = impurity_species.item()
 
-    Lz_curve = atomic_data[impurity_species].noncoronal_electron_emission_prefactor.sel(
-        dim_log_electron_density=np.log10(magnitude(convert_units(reference_electron_density, ureg.m**-3))),
-        dim_log_ne_tau=np.log10(magnitude(convert_units(reference_ne_tau, ureg.m**-3 * ureg.s))),
+    electron_density_ref = magnitude(convert_units(reference_electron_density, ureg.m**-3))
+    ne_tau_ref = magnitude(convert_units(reference_ne_tau, ureg.m**-3 * ureg.s))
+
+    Lz_curve = (
+        atomic_data.get_dataset(impurity_species)
+        .equilibrium_Lz.sel(dim_electron_density=electron_density_ref, method="nearest", tolerance=1e-6 * electron_density_ref)
+        .sel(dim_ne_tau=ne_tau_ref, method="nearest", tolerance=1e-6 * ne_tau_ref)
     )
 
-    log_electron_temp = Lz_curve.dim_log_electron_temperature
-    electron_temp = np.power(10, log_electron_temp)
+    electron_temp = Lz_curve.dim_electron_temp
     Lz_sqrt_Te = Lz_curve * np.sqrt(electron_temp)
 
     interpolator = InterpolatedUnivariateSpline(electron_temp, magnitude(Lz_sqrt_Te))
