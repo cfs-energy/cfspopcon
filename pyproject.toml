@@ -4,7 +4,7 @@ target-version = ['py39', 'py310', 'py311']
 
 [tool.poetry]
 name = "cfspopcon"
-version = "5.0.0"
+version = "5.0.0.dev"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"

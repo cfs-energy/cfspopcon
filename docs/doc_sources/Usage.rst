@@ -13,6 +13,8 @@ The cfspopcon package is available on the `Python Package Index <https://pypi.or
   >>> pip install cfspopcon
   >>> radas -d ./radas_dir
 
+The second step is to generate a folder of OpenADAS atomic data files. We can't ship these files with
+cfsPOPCON due to licensing issues, but they're easy to make with `radas`. You only need to do this once.
 
 Example Notebook
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
