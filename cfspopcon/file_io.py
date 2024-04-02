@@ -38,15 +38,15 @@ def write_dataset_to_netcdf(
     """Write a dataset to a NetCDF file."""
     serialized_dataset = dataset.copy()
     for key in ignored_keys:
-        assert isinstance(key, str)  # because hashable type of key is broader str but we know it's str
-        serialized_dataset = serialized_dataset.drop(key)
+        assert isinstance(key, str)  # for type-checking
+        serialized_dataset = serialized_dataset.drop_vars(key)
 
     for key in serialized_dataset.keys():  # type:ignore[assignment]
-        assert isinstance(key, str)  # because hashable type of key is broader str but we know it's str
+        assert isinstance(key, str)
         serialized_dataset[key] = sanitize_variable(dataset[key], key)
 
     for key in serialized_dataset.coords:  # type:ignore[assignment]
-        assert isinstance(key, str)  # because hashable type of key is broader str but we know it's str
+        assert isinstance(key, str)
         serialized_dataset[key] = sanitize_variable(dataset[key], key)
 
     serialized_dataset.to_netcdf(filepath, engine=netcdf_writer)
@@ -81,7 +81,7 @@ def read_dataset_from_netcdf(filepath: Path) -> xr.Dataset:
         if key == "dim_species":
             dataset[key] = promote_variable(dataset[key], key="impurity")
         else:
-            assert isinstance(key, str)  # because hashable type of key is broader str but we  know it's str
+            assert isinstance(key, str)
             dataset[key] = promote_variable(dataset[key], key)
 
     return dataset
@@ -104,14 +104,15 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
     point = dataset.isel(point_coords)
     for key in point.keys():
         if key in ignored_keys:
-            point = point.drop(key)
+            assert isinstance(key, str)
+            point = point.drop_vars(key)
 
     for key in point.keys():
-        assert isinstance(key, str)  # because hashable type of key is broader str but we  know it's str
+        assert isinstance(key, str)
         point[key] = sanitize_variable(point[key], key)
 
     for key in point.coords:
-        assert isinstance(key, str)  # because hashable type of key is broader str but we  know it's str
+        assert isinstance(key, str)
         point[key] = sanitize_variable(point[key], key)
 
     output_dir.mkdir(parents=True, exist_ok=True)

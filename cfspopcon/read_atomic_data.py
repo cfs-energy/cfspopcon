@@ -164,7 +164,7 @@ class AtomicData:
             ),
             values=log10_with_floor(magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density"))),
             method="cubic",
-            bounds_error=False,
+            bounds_error=True,
         )
 
     def get_interpolator(self, kind: int, species: Union[str, AtomicSpecies], ne_tau: float = np.inf) -> RegularGridInterpolator:
