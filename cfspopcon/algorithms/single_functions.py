@@ -3,7 +3,6 @@ import numpy as np
 import xarray as xr
 
 from .. import formulas
-from ..named_options import Algorithms
 from ..read_atomic_data import AtomicData
 from ..unit_handling import ureg
 from .algorithm_class import Algorithm
@@ -84,4 +83,4 @@ read_atomic_data = Algorithm.from_single_function(
     name="read_atomic_data",
 )
 
-SINGLE_FUNCTIONS = {Algorithms[key]: val for key, val in locals().items() if isinstance(val, Algorithm)}
+SINGLE_FUNCTIONS = {alg._name: alg for alg in locals().values() if isinstance(alg, Algorithm)}

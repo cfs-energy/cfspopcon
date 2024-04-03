@@ -6,11 +6,10 @@ import xarray as xr
 
 from cfspopcon.algorithms import get_algorithm
 from cfspopcon.algorithms.algorithm_class import Algorithm, CompositeAlgorithm
-from cfspopcon.named_options import Algorithms
 from cfspopcon.unit_handling import ureg
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def BIRDS():
     return [
         "ducks",
@@ -19,7 +18,7 @@ def BIRDS():
     ]
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def how_many_birds(BIRDS):
     def count_birds(things_that_quack: int, things_that_cluck: int = 2) -> dict[str, Any]:
         ducks = things_that_quack
@@ -32,7 +31,7 @@ def how_many_birds(BIRDS):
     return Algorithm(function=count_birds, return_keys=BIRDS)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def ANIMALS():
     return [
         "sheep",
@@ -41,7 +40,7 @@ def ANIMALS():
     ]
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def how_many_animals(ANIMALS):
     def count_animals(things_that_baa: int, all_birds: int, new_chickens_per_count: int = 2) -> dict[str, Any]:
         sheep = things_that_baa
@@ -260,11 +259,11 @@ def test_single_function_algorithm():
 
 def test_get_algorithm():
     # Pass in Algorithm Enums
-    for key in Algorithms:
+    for key in Algorithm.algorithms():
         alg = get_algorithm(key)
-        assert alg._name in [f"run_{key.name}", key.name, "<lambda>"]
+        assert alg._name in [f"run_{key}", key, "<lambda>"]
 
     # Pass in strings instead
-    for key in Algorithms:
-        alg = get_algorithm(key.name)
-        assert alg._name in [f"run_{key.name}", key.name, "<lambda>"]
+    for key in Algorithm.algorithms():
+        alg = get_algorithm(key)
+        assert alg._name in [f"run_{key}", key, "<lambda>"]

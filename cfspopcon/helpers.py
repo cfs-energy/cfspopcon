@@ -4,7 +4,6 @@ from typing import Any, Union
 import xarray as xr
 
 from .named_options import (
-    Algorithms,
     AtomicSpecies,
     ConfinementScaling,
     LambdaQScaling,
@@ -17,9 +16,7 @@ from .named_options import (
 
 def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
     """Given a 'key' matching a named_option, return the corresponding Enum value."""
-    if key == "algorithms":
-        return Algorithms[val]
-    elif key == "energy_confinement_scaling":
+    if key == "energy_confinement_scaling":
         return ConfinementScaling[val]
     elif key == "profile_form":
         return ProfileForm[val]

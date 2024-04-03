@@ -28,8 +28,9 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
 
 def read_default_units() -> dict[str, str]:
     """Read in the default_units.yaml file."""
-    with as_file(files("cfspopcon").joinpath("default_units.yaml")) as f:
-        units_dictionary: dict[str, str] = yaml.safe_load(open(f))
+    with as_file(files("cfspopcon").joinpath("default_units.yaml")) as filepath:
+        with open(filepath) as f:
+            units_dictionary: dict[str, str] = yaml.safe_load(f)
 
     check_units_are_valid(units_dictionary)
     return units_dictionary

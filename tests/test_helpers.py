@@ -12,7 +12,6 @@ from cfspopcon.helpers import (
 
 def test_convert_named_options():
     for val, key in (
-        (named_options.Algorithms.predictive_popcon, "algorithms"),
         (named_options.ConfinementScaling.ITER98y2, "energy_confinement_scaling"),
         (named_options.ProfileForm.analytic, "profile_form"),
         (named_options.RadiationMethod.Radas, "radiated_power_method"),
