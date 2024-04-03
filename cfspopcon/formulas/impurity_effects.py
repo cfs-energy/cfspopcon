@@ -2,11 +2,13 @@
 import numpy as np
 import xarray as xr
 
+from ..algorithm_class import Algorithm
 from ..named_options import AtomicSpecies
 from ..read_atomic_data import AtomicData
 from ..unit_handling import ureg, wraps_ufunc
 
 
+@Algorithm.register_algorithm(return_keys=["impurity_charge_state"])
 @wraps_ufunc(
     return_units=dict(mean_charge_state=ureg.dimensionless),
     input_units=dict(
@@ -45,6 +47,7 @@ def calc_impurity_charge_state(
     return interpolated_values  # type:ignore[no-any-return]
 
 
+@Algorithm.register_algorithm(return_keys=["change_in_zeff"])
 def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
     """Calculate the change in the effective charge due to the specified impurities.
 
@@ -53,11 +56,12 @@ def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr
         impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
 
     Returns:
-        change in zeff [~]
+        change_in_zeff [~]
     """
     return impurity_charge_state * (impurity_charge_state - 1.0) * impurity_concentration
 
 
+@Algorithm.register_algorithm(return_keys=["change_in_dilution"])
 def calc_change_in_dilution(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
     """Calculate the change in n_fuel/n_e due to the specified impurities.
 
@@ -66,6 +70,6 @@ def calc_change_in_dilution(impurity_charge_state: float, impurity_concentration
         impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
 
     Returns:
-        change in dilution [~]
+        change_in_dilution [~]
     """
     return impurity_charge_state * impurity_concentration

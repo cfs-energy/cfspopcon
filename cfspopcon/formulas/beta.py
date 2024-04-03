@@ -1,6 +1,7 @@
 """Calculate the ratio of magnetic to plasma (kinetic) pressure."""
 import numpy as np
 
+from ..algorithm_class import Algorithm
 from ..unit_handling import Quantity, Unitfull, convert_units, ureg
 
 
@@ -37,6 +38,7 @@ def _calc_beta_general(
     return convert_units(ret, ureg.dimensionless)
 
 
+@Algorithm.register_algorithm(return_keys=["beta_toroidal"])
 def calc_beta_toroidal(
     average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull
 ) -> Unitfull:
@@ -57,6 +59,7 @@ def calc_beta_toroidal(
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=magnetic_field_on_axis)
 
 
+@Algorithm.register_algorithm(return_keys=["beta_poloidal"])
 def calc_beta_poloidal(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
@@ -99,6 +102,7 @@ def calc_beta_poloidal(
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=B_pol)
 
 
+@Algorithm.register_algorithm(return_keys=["beta_total"])
 def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitfull:
     """Calculate the total beta from the toroidal and poloidal betas.
 
@@ -114,6 +118,7 @@ def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitful
     return 1.0 / (1.0 / beta_toroidal + 1.0 / beta_poloidal)
 
 
+@Algorithm.register_algorithm(return_keys=["beta_N"])
 def calc_beta_normalised(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:
     """Normalize beta to stability (Troyon) parameters.
 

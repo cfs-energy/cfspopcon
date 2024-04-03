@@ -2,9 +2,11 @@
 import numpy as np
 import xarray as xr
 
+from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, ureg, wraps_ufunc
 
 
+@Algorithm.register_algorithm(return_keys=["nu_n"])
 def calc_density_peaking(effective_collisionality: Unitfull, betaE: Unitfull, nu_noffset: Unitfull) -> Unitfull:
     """Calculate the density peaking (peak over volume average).
 
@@ -26,6 +28,7 @@ def calc_density_peaking(effective_collisionality: Unitfull, betaE: Unitfull, nu
         return max(nu_n, 1.0 * ureg.dimensionless)
 
 
+@Algorithm.register_algorithm(return_keys=["effective_collisionality"])
 @wraps_ufunc(
     return_units=dict(effective_collisionality=ureg.dimensionless),
     input_units=dict(

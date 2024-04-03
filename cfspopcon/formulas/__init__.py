@@ -39,6 +39,18 @@ from .radiated_power import (
     calc_impurity_radiated_power_radas,
     calc_synchrotron_radiation,
 )
+from .misc import (
+    calc_ratio_P_LH,
+    calc_f_rad_core,
+    calc_average_total_pressure,
+    calc_auxillary_power,
+    calc_average_ion_temp,
+    calc_magnetic_field_on_axis,
+    require_P_rad_less_than_P_in,
+    calc_P_SOL,
+    calc_plasma_stored_energy,
+    calc_upstream_electron_density,
+)
 
 __all__ = [
     "calc_1D_plasma_profiles",

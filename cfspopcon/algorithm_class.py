@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import inspect
-import numpy as np
 from collections.abc import Callable, Sequence
 from functools import wraps
 from importlib.resources import as_file, files
@@ -12,9 +11,10 @@ from warnings import warn
 import xarray as xr
 import yaml
 
-from .unit_handling import convert_to_default_units, Quantity, ureg
+from .unit_handling import Quantity, convert_to_default_units, ureg
 
 FunctionType = Callable[..., dict[str, Any]]
+
 
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
@@ -31,10 +31,9 @@ class Algorithm:
         """
         self._function = function
         self._name = self._function.__name__ if name is None else name
-        # TODO: Refactor to remove the need to remove run_ prefix.
         key = self._name.removeprefix("run_")
-        # if key in self.instances:
-        #     raise RuntimeError(f"Algorithm {key} has been defined multiple times.")
+        if key in self.instances:
+            raise RuntimeError(f"Algorithm {key} has been defined multiple times.")
         self.instances[key] = self
 
         self._signature = inspect.signature(function)
@@ -48,7 +47,7 @@ class Algorithm:
                     f"Algorithm only supports functions with keyword arguments, but {function}, has {p.kind} parameter {p.name}"
                 )
         self.input_keys = list(self._signature.parameters.keys())
-        self.return_keys = list(np.atleast_1d(return_keys))
+        self.return_keys = return_keys
 
         self.default_values = {
             key: val.default for key, val in self._signature.parameters.items() if val.default is not inspect.Parameter.empty
@@ -125,7 +124,6 @@ class Algorithm:
         cls, func: Callable, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False
     ) -> Algorithm:
         """Build an Algorithm which wraps a single function."""
-        return_keys = list(np.atleast_1d(return_keys))
 
         @wraps(func)
         def wrapped_function(**kwargs: Any) -> dict:
@@ -138,26 +136,23 @@ class Algorithm:
             for i, key in enumerate(return_keys):
                 if skip_unit_conversion:
                     result_dict[key] = result[i]
+                elif isinstance(result[i], float):
+                    result_dict[key] = convert_to_default_units(Quantity(result[i], ureg.dimensionless), key)
                 else:
-                    if isinstance(result[i], float):
-                        result_dict[key] = convert_to_default_units(Quantity(result[i], ureg.dimensionless), key)
-                    else:
-                        result_dict[key] = convert_to_default_units(result[i], key)
+                    result_dict[key] = convert_to_default_units(result[i], key)
 
             return result_dict
 
         return cls(wrapped_function, return_keys, name=name)
 
     @classmethod
-    def register_algorithm(cls, return_keys: str | list[str], name: Optional[str] = None, skip_unit_conversion: bool = False):
-        """Decorate a function and turn it into an Algorithm. Usage: Algorithm.register_algorithm(return_keys=["..."])"""
-        def function_wrapper(func: Callable) -> Callable:
-            Algorithm.from_single_function(func,
-                                        return_keys=return_keys,
-                                        name=name,
-                                        skip_unit_conversion=skip_unit_conversion
-            )
+    def register_algorithm(cls, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False) -> FunctionType:
+        """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""  # noqa: D402
+
+        def function_wrapper(func: FunctionType) -> FunctionType:
+            Algorithm.from_single_function(func, return_keys=return_keys, name=name, skip_unit_conversion=skip_unit_conversion)
             return func
+
         return function_wrapper
 
     def validate_inputs(

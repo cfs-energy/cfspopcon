@@ -92,6 +92,8 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
         CASE_DIR=input_file.parent,
         WORKING_DIR=Path("."),
     )
+    if repr_d is None:
+        return
 
     for key, val in repr_d.items():
         if isinstance(val, str):

@@ -1,4 +1,5 @@
 """Threshold powers required to enter improved confinement regimes."""
+from ..algorithm_class import Algorithm
 from ..named_options import ConfinementScaling
 from ..unit_handling import ureg, wraps_ufunc
 
@@ -14,6 +15,7 @@ def _calc_Martin_LH_threshold(
     )
 
 
+@Algorithm.register_algorithm(return_keys=["P_LH_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LH_thresh=ureg.MW),
     input_units=dict(
@@ -71,6 +73,7 @@ def calc_LH_transition_threshold_power(
         return P_LH_thresh * scale
 
 
+@Algorithm.register_algorithm(return_keys=["P_LI_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LI_thresh=ureg.MW),
     input_units=dict(plasma_current=ureg.MA, average_electron_density=ureg.n19, scale=ureg.dimensionless),
@@ -91,6 +94,7 @@ def calc_LI_transition_threshold_power(plasma_current: float, average_electron_d
     return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
 
 
+@Algorithm.register_algorithm(return_keys=["P_LH_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LH_thresh=ureg.MW),
     input_units=dict(

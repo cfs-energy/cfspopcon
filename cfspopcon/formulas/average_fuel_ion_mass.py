@@ -1,6 +1,7 @@
 """Calculate the average fuel mass in atomic mass units."""
 from typing import Callable
 
+from ..algorithm_class import Algorithm
 from ..named_options import ReactionType
 from ..unit_handling import ureg, wraps_ufunc
 
@@ -13,6 +14,7 @@ FUEL_MASS_AMU: dict[ReactionType, Callable[[float], float]] = {
 }
 
 
+@Algorithm.register_algorithm(return_keys=["fuel_average_mass_number"])
 @wraps_ufunc(
     return_units=dict(fuel_average_mass_number=ureg.amu),
     input_units=dict(fusion_reaction=None, heavier_fuel_species_fraction=ureg.dimensionless),

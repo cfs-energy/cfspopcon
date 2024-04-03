@@ -1,6 +1,7 @@
 """Calculate the thermal gain factor (Q, Q_plasma, Q_thermal)."""
 import numpy as np
 
+from ..algorithm_class import Algorithm
 from ..unit_handling import ureg, wraps_ufunc
 
 _IGNITED_THRESHOLD = 1e3
@@ -22,6 +23,7 @@ def _ignition_above_threshold(Q: float) -> float:
         return Q
 
 
+@Algorithm.register_algorithm(return_keys=["Q"])
 @wraps_ufunc(return_units=dict(Q=ureg.dimensionless), input_units=dict(P_fusion=ureg.MW, P_launched=ureg.MW))
 def thermal_calc_gain_factor(P_fusion: float, P_launched: float) -> float:
     """Calculate the fusion gain.

@@ -1,9 +1,11 @@
 """Operational limits to avoid disruptive regions."""
 import numpy as np
 
+from ..algorithm_class import Algorithm
 from ..unit_handling import ureg, wraps_ufunc
 
 
+@Algorithm.register_algorithm(return_keys=["greenwald_fraction"])
 @wraps_ufunc(
     return_units=dict(greenwald_fraction=ureg.dimensionless),
     input_units=dict(
@@ -29,6 +31,7 @@ def calc_greenwald_fraction(
     return float(average_electron_density / n_Greenwald)
 
 
+@Algorithm.register_algorithm(return_keys=["greenwald_density_limit"])
 @wraps_ufunc(return_units=dict(nG=ureg.n20), input_units=dict(plasma_current=ureg.MA, minor_radius=ureg.m))
 def calc_greenwald_density_limit(plasma_current: float, minor_radius: float) -> float:
     """Calculate the Greenwald density limit.
@@ -43,6 +46,7 @@ def calc_greenwald_density_limit(plasma_current: float, minor_radius: float) -> 
     return plasma_current / (np.pi * minor_radius**2)
 
 
+@Algorithm.register_algorithm(return_keys=["troyon_max_beta"])
 @wraps_ufunc(
     return_units=dict(troyon_max_beta=ureg.percent),
     input_units=dict(minor_radius=ureg.m, magnetic_field_on_axis=ureg.T, plasma_current=ureg.MA),

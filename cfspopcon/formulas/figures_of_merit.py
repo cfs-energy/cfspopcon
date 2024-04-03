@@ -1,9 +1,11 @@
 """OD figures-of-merit to characterize a design point."""
 import numpy as np
 
+from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, convert_units, ureg, wraps_ufunc
 
 
+@Algorithm.register_algorithm(return_keys=["fusion_triple_product"])
 def calc_triple_product(peak_fuel_ion_density: Unitfull, peak_ion_temp: Unitfull, energy_confinement_time: Unitfull) -> Unitfull:
     """Calculate the fusion triple product.
 
@@ -18,6 +20,7 @@ def calc_triple_product(peak_fuel_ion_density: Unitfull, peak_ion_temp: Unitfull
     return peak_fuel_ion_density * peak_ion_temp * energy_confinement_time
 
 
+@Algorithm.register_algorithm(return_keys=["rho_star"])
 def calc_rho_star(
     fuel_average_mass_number: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull, minor_radius: Unitfull
 ) -> Unitfull:
@@ -48,6 +51,7 @@ def calc_coulomb_logarithm(ne: float, Te: float) -> float:
     return float(30.9 - np.log(ne**0.5 * Te**-1.0))
 
 
+@Algorithm.register_algorithm(return_keys=["nu_star"])
 def calc_normalised_collisionality(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
@@ -88,6 +92,7 @@ def calc_normalised_collisionality(
     )
 
 
+@Algorithm.register_algorithm(return_keys=["peak_pressure"])
 def calc_peak_pressure(
     peak_electron_temp: Unitfull,
     peak_ion_temp: Unitfull,

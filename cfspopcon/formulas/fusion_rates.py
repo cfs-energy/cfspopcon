@@ -5,12 +5,14 @@ from typing import Union
 from numpy import float64
 from numpy.typing import NDArray
 
+from ..algorithm_class import Algorithm
 from ..named_options import ReactionType
 from ..unit_handling import ureg, wraps_ufunc
 from .fusion_reaction_data import ENERGY, SIGMAV
 from .helpers import integrate_profile_over_volume
 
 
+@Algorithm.register_algorithm(return_keys=["P_fusion", "P_neutron", "P_alpha"])
 @wraps_ufunc(
     return_units=dict(P_fusion=ureg.MW, P_neutron=ureg.MW, P_alpha=ureg.MW),
     input_units=dict(
@@ -75,6 +77,7 @@ def calc_fusion_power(
     return total_fusion_power_MW, fusion_power_to_neutral_MW, fusion_power_to_charged_MW
 
 
+@Algorithm.register_algorithm(return_keys=["neutron_power_flux_to_walls", "neutron_rate"])
 @wraps_ufunc(
     return_units=dict(neutron_power_flux_to_walls=ureg.MW / ureg.m**2, neutron_rate=ureg.s**-1),
     input_units=dict(
@@ -116,6 +119,17 @@ def calc_neutron_flux_to_walls(
     return neutron_power_flux_to_walls, neutron_rate
 
 
+@Algorithm.register_algorithm(
+    return_keys=[
+        "sigmav",
+        "rxn_energy",
+        "rxn_energy_neut",
+        "rxn_energy_charged",
+        "number_power_dens",
+        "number_power_dens_neut",
+        "number_power_dens_charged",
+    ]
+)
 @wraps_ufunc(
     return_units=dict(
         sigmav=ureg.cm**3 / ureg.s,

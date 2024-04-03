@@ -6,11 +6,15 @@ import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
 
+from ..algorithm_class import Algorithm
 from ..named_options import ProfileForm
 from ..unit_handling import ureg, wraps_ufunc
 from .plasma_profile_data.density_and_temperature_profile_fits import evaluate_density_and_temperature_profile_fits
 
 
+@Algorithm.register_algorithm(
+    return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
+)
 @wraps_ufunc(
     return_units=dict(
         rho=ureg.dimensionless,

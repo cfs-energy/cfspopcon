@@ -23,6 +23,8 @@ from .unit_handling import (
     wraps_ufunc,
 )
 
+Algorithm.write_yaml()
+
 # export main classes users should need as well as the option enums
 __all__ = [
     "helpers",

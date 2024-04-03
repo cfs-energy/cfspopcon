@@ -5,6 +5,7 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
 
+from ...algorithm_class import Algorithm
 from ...named_options import AtomicSpecies
 from ...read_atomic_data import AtomicData
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
@@ -53,6 +54,7 @@ def build_L_int_integrator(
     return wraps_ufunc(input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV), return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5))(L_int)  # type: ignore[no-any-return]
 
 
+@Algorithm.register_algorithm(return_keys=["impurity_concentration"])
 def calc_required_edge_impurity_concentration(
     L_int_integrator: Callable[[Unitfull, Unitfull], Unitfull],
     q_parallel: Unitfull,
