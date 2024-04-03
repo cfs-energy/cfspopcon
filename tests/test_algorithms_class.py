@@ -4,8 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithms import get_algorithm
-from cfspopcon.algorithms.algorithm_class import Algorithm, CompositeAlgorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
 from cfspopcon.unit_handling import ureg
 
 
@@ -260,10 +259,10 @@ def test_single_function_algorithm():
 def test_get_algorithm():
     # Pass in Algorithm Enums
     for key in Algorithm.algorithms():
-        alg = get_algorithm(key)
+        alg = Algorithm.get_algorithm(key)
         assert alg._name in [f"run_{key}", key, "<lambda>"]
 
     # Pass in strings instead
     for key in Algorithm.algorithms():
-        alg = get_algorithm(key)
+        alg = Algorithm.get_algorithm(key)
         assert alg._name in [f"run_{key}", key, "<lambda>"]

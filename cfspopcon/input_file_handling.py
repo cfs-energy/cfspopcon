@@ -7,8 +7,7 @@ import numpy as np
 import xarray as xr
 import yaml
 
-from .algorithms import get_algorithm
-from .algorithms.algorithm_class import Algorithm, CompositeAlgorithm
+from .algorithm_class import Algorithm, CompositeAlgorithm
 from .helpers import convert_named_options
 from .unit_handling import set_default_units
 
@@ -40,7 +39,7 @@ def read_case(
     repr_d.update(kwargs)
 
     algorithms = repr_d.pop("algorithms")
-    algorithm_list = [get_algorithm(algorithm) for algorithm in algorithms]
+    algorithm_list = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
 
     # why doesn't mypy deduce the below without hint?
     algorithm: Union[Algorithm, CompositeAlgorithm] = CompositeAlgorithm(algorithm_list) if len(algorithm_list) > 1 else algorithm_list[0]
