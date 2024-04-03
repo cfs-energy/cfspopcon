@@ -28,6 +28,43 @@ def calc_density_peaking(effective_collisionality: Unitfull, betaE: Unitfull, nu
         return max(nu_n, 1.0 * ureg.dimensionless)
 
 
+Algorithm.from_single_function(
+    func=lambda effective_collisionality, beta_toroidal, ion_density_peaking_offset: calc_density_peaking(
+        effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset
+    ),
+    return_keys=["ion_density_peaking"],
+    name="calc_ion_density_peaking",
+)
+Algorithm.from_single_function(
+    func=lambda effective_collisionality, beta_toroidal, electron_density_peaking_offset: calc_density_peaking(
+        effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
+    ),
+    return_keys=["electron_density_peaking"],
+    name="calc_electron_density_peaking",
+)
+
+Algorithm.from_single_function(
+    func=lambda average_electron_density, electron_density_peaking: average_electron_density * electron_density_peaking,
+    return_keys=["peak_electron_density"],
+    name="calc_peak_electron_density",
+)
+Algorithm.from_single_function(
+    func=lambda average_electron_density, dilution, ion_density_peaking: average_electron_density * dilution * ion_density_peaking,
+    return_keys=["peak_fuel_ion_density"],
+    name="calc_peak_fuel_ion_density",
+)
+Algorithm.from_single_function(
+    func=lambda average_electron_temp, temperature_peaking: average_electron_temp * temperature_peaking,
+    return_keys=["peak_electron_temp"],
+    name="calc_peak_electron_temp",
+)
+Algorithm.from_single_function(
+    func=lambda average_ion_temp, temperature_peaking: average_ion_temp * temperature_peaking,
+    return_keys=["peak_ion_temp"],
+    name="calc_peak_ion_temp",
+)
+
+
 @Algorithm.register_algorithm(return_keys=["effective_collisionality"])
 @wraps_ufunc(
     return_units=dict(effective_collisionality=ureg.dimensionless),

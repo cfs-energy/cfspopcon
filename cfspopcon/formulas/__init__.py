@@ -27,29 +27,30 @@ from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
 from .geometry import calc_plasma_surface_area, calc_plasma_volume
 from .impurity_effects import calc_change_in_dilution, calc_change_in_zeff, calc_impurity_charge_state
+from .misc import (
+    calc_auxillary_power,
+    calc_average_ion_temp,
+    calc_average_total_pressure,
+    calc_f_rad_core,
+    calc_magnetic_field_on_axis,
+    calc_P_SOL,
+    calc_plasma_stored_energy,
+    calc_ratio_P_LH,
+    calc_upstream_electron_density,
+    require_P_rad_less_than_P_in,
+)
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
 from .plasma_profiles import calc_1D_plasma_profiles
 from .Q_thermal_gain_factor import thermal_calc_gain_factor
 from .radiated_power import (
     calc_bremsstrahlung_radiation,
+    calc_core_radiated_power,
     calc_impurity_radiated_power,
     calc_impurity_radiated_power_mavrin_coronal,
     calc_impurity_radiated_power_mavrin_noncoronal,
     calc_impurity_radiated_power_post_and_jensen,
     calc_impurity_radiated_power_radas,
     calc_synchrotron_radiation,
-)
-from .misc import (
-    calc_ratio_P_LH,
-    calc_f_rad_core,
-    calc_average_total_pressure,
-    calc_auxillary_power,
-    calc_average_ion_temp,
-    calc_magnetic_field_on_axis,
-    require_P_rad_less_than_P_in,
-    calc_P_SOL,
-    calc_plasma_stored_energy,
-    calc_upstream_electron_density,
 )
 
 __all__ = [
@@ -62,6 +63,7 @@ __all__ = [
     "calc_beta_total",
     "calc_bootstrap_fraction",
     "calc_bremsstrahlung_radiation",
+    "calc_core_radiated_power",
     "calc_change_in_dilution",
     "calc_change_in_zeff",
     "calc_confinement_transition_threshold_power",
@@ -104,4 +106,14 @@ __all__ = [
     "radiated_power",
     "scrape_off_layer_model",
     "thermal_calc_gain_factor",
+    "calc_ratio_P_LH",
+    "calc_f_rad_core",
+    "calc_average_total_pressure",
+    "calc_auxillary_power",
+    "calc_average_ion_temp",
+    "calc_magnetic_field_on_axis",
+    "require_P_rad_less_than_P_in",
+    "calc_P_SOL",
+    "calc_plasma_stored_energy",
+    "calc_upstream_electron_density",
 ]

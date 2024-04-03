@@ -19,7 +19,7 @@ from .helpers import integrate_profile_over_volume
         fusion_reaction=None,
         ion_temp_profile=ureg.keV,
         heavier_fuel_species_fraction=ureg.dimensionless,
-        nfuel19=ureg.n19,
+        fuel_ion_density_profile=ureg.n19,
         rho=ureg.dimensionless,
         plasma_volume=ureg.m**3,
     ),
@@ -30,7 +30,7 @@ def calc_fusion_power(
     fusion_reaction: ReactionType,
     ion_temp_profile: NDArray[float64],
     heavier_fuel_species_fraction: float,
-    nfuel19: NDArray[float64],
+    fuel_ion_density_profile: NDArray[float64],
     rho: NDArray[float64],
     plasma_volume: float,
 ) -> tuple[float, float, float]:
@@ -40,7 +40,7 @@ def calc_fusion_power(
         fusion_reaction: which nuclear reaction is being considered
         ion_temp_profile: [keV] :term:`glossary link<ion_temp_profile>`
         heavier_fuel_species_fraction: [~] fraction of fuel mixture which is the heavier nuclide
-        nfuel19: [1e19 m^-3] average fuel density
+        fuel_ion_density_profile: [1e19 m^-3] average fuel density
         rho: [~] :term:`glossary link<rho>`
         plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
 
@@ -55,21 +55,21 @@ def calc_fusion_power(
 
     total_fusion_power_MW = _integrate_power(
         power_density_factor_MW_m3=power_density_factor_MW_m3,
-        fuel_density_per_m3=nfuel19 * 1e19,
+        fuel_density_per_m3=fuel_ion_density_profile * 1e19,
         rho=rho,
         plasma_volume=plasma_volume,
     )
 
     fusion_power_to_neutral_MW = _integrate_power(
         power_density_factor_MW_m3=neutral_power_density_factor_MW_m3,
-        fuel_density_per_m3=nfuel19 * 1e19,
+        fuel_density_per_m3=fuel_ion_density_profile * 1e19,
         rho=rho,
         plasma_volume=plasma_volume,
     )
 
     fusion_power_to_charged_MW = _integrate_power(
         power_density_factor_MW_m3=charged_power_density_factor_MW_m3,
-        fuel_density_per_m3=nfuel19 * 1e19,
+        fuel_density_per_m3=fuel_ion_density_profile * 1e19,
         rho=rho,
         plasma_volume=plasma_volume,
     )

@@ -98,7 +98,7 @@ calc_beta_normalised:
   - plasma_current
   optionals: []
   returns:
-  - beta_N
+  - normalized_beta
 calc_beta_poloidal:
   inputs:
   - average_electron_density
@@ -124,7 +124,7 @@ calc_beta_total:
   - beta_poloidal
   optionals: []
   returns:
-  - beta_total
+  - beta
 calc_bootstrap_fraction:
   inputs:
   - ion_density_peaking
@@ -165,6 +165,24 @@ calc_confinement_transition_threshold_power:
   - confinement_threshold_scalar
   returns:
   - P_LH_thresh
+calc_core_radiated_power:
+  inputs:
+  - rho
+  - electron_density_profile
+  - electron_temp_profile
+  - z_effective
+  - plasma_volume
+  - major_radius
+  - minor_radius
+  - magnetic_field_on_axis
+  - separatrix_elongation
+  - radiated_power_method
+  - radiated_power_scalar
+  - impurities
+  - atomic_data
+  optionals: []
+  returns:
+  - P_radiation
 calc_current_relaxation_time:
   inputs:
   - major_radius
@@ -183,6 +201,26 @@ calc_density_peaking:
   optionals: []
   returns:
   - nu_n
+calc_edge_impurity_concentration:
+  inputs:
+  - edge_impurity_species
+  - q_parallel
+  - SOL_power_loss_fraction
+  - target_electron_temp
+  - upstream_electron_temp
+  - upstream_electron_density
+  - kappa_e0
+  - lengyel_overestimation_factor
+  - edge_impurity_enrichment
+  - impurities
+  - atomic_data
+  optionals:
+  - reference_electron_density
+  - reference_ne_tau
+  returns:
+  - edge_impurity_concentration
+  - edge_impurity_concentration_in_core
+  - impurities
 calc_effective_collisionality:
   inputs:
   - average_electron_density
@@ -192,6 +230,42 @@ calc_effective_collisionality:
   optionals: []
   returns:
   - effective_collisionality
+calc_electron_density_peaking:
+  inputs:
+  - effective_collisionality
+  - beta_toroidal
+  - electron_density_peaking_offset
+  optionals: []
+  returns:
+  - electron_density_peaking
+calc_extrinsic_core_radiator_conc:
+  inputs:
+  - minimum_core_radiated_fraction
+  - P_in
+  - P_radiation
+  - average_electron_density
+  - average_electron_temp
+  - z_effective
+  - dilution
+  - rho
+  - electron_density_profile
+  - electron_temp_profile
+  - plasma_volume
+  - radiated_power_method
+  - radiated_power_scalar
+  - core_radiator
+  - atomic_data
+  optionals: []
+  returns:
+  - core_radiator_concentration
+  - P_radiated_by_core_radiator
+  - P_radiation
+  - core_radiator_concentration
+  - core_radiator_charge_state
+  - zeff_change_from_core_rad
+  - dilution_change_from_core_rad
+  - z_effective
+  - dilution
 calc_f_rad_core:
   inputs:
   - P_radiation
@@ -214,12 +288,23 @@ calc_fuel_average_mass_number:
   optionals: []
   returns:
   - fuel_average_mass_number
+calc_fusion_gain:
+  inputs:
+  - P_in
+  - P_alpha
+  - P_fusion
+  - fraction_of_external_power_coupled
+  optionals: []
+  returns:
+  - P_external
+  - P_launched
+  - Q
 calc_fusion_power:
   inputs:
   - fusion_reaction
   - ion_temp_profile
   - heavier_fuel_species_fraction
-  - nfuel19
+  - fuel_ion_density_profile
   - rho
   - plasma_volume
   optionals: []
@@ -257,6 +342,30 @@ calc_greenwald_fraction:
   optionals: []
   returns:
   - greenwald_fraction
+calc_heat_exhaust_metrics:
+  inputs:
+  - P_sol
+  - magnetic_field_on_axis
+  - major_radius
+  - inverse_aspect_ratio
+  - plasma_current
+  - minor_radius
+  - q_star
+  - average_electron_density
+  - average_total_pressure
+  - fraction_of_P_SOL_to_divertor
+  - lambda_q_scaling
+  optionals:
+  - lambda_q_factor
+  returns:
+  - PB_over_R
+  - PBpRnSq
+  - B_pol_out_mid
+  - B_t_out_mid
+  - fieldline_pitch_at_omp
+  - lambda_q
+  - q_parallel
+  - q_perp
 calc_impurity_charge_state:
   inputs:
   - average_electron_density
@@ -266,6 +375,14 @@ calc_impurity_charge_state:
   optionals: []
   returns:
   - impurity_charge_state
+calc_ion_density_peaking:
+  inputs:
+  - effective_collisionality
+  - beta_toroidal
+  - ion_density_peaking_offset
+  optionals: []
+  returns:
+  - ion_density_peaking
 calc_loop_voltage:
   inputs:
   - major_radius
@@ -328,6 +445,35 @@ calc_ohmic_power:
   optionals: []
   returns:
   - P_Ohmic
+calc_peak_electron_density:
+  inputs:
+  - average_electron_density
+  - electron_density_peaking
+  optionals: []
+  returns:
+  - peak_electron_density
+calc_peak_electron_temp:
+  inputs:
+  - average_electron_temp
+  - temperature_peaking
+  optionals: []
+  returns:
+  - peak_electron_temp
+calc_peak_fuel_ion_density:
+  inputs:
+  - average_electron_density
+  - dilution
+  - ion_density_peaking
+  optionals: []
+  returns:
+  - peak_fuel_ion_density
+calc_peak_ion_temp:
+  inputs:
+  - average_ion_temp
+  - temperature_peaking
+  optionals: []
+  returns:
+  - peak_ion_temp
 calc_peak_pressure:
   inputs:
   - peak_electron_temp
@@ -404,6 +550,23 @@ calc_required_edge_impurity_concentration:
   optionals: []
   returns:
   - impurity_concentration
+calc_resistive_heating:
+  inputs:
+  - bootstrap_fraction
+  - average_electron_temp
+  - inverse_aspect_ratio
+  - z_effective
+  - major_radius
+  - minor_radius
+  - areal_elongation
+  - plasma_current
+  optionals: []
+  returns:
+  - spitzer_resistivity
+  - trapped_particle_fraction
+  - neoclassical_loop_resistivity
+  - loop_voltage
+  - P_ohmic
 calc_resistivity_trapped_enhancement:
   inputs:
   - inverse_aspect_ratio
@@ -434,6 +597,26 @@ calc_separatrix_triangularity_from_psi95:
   optionals: []
   returns:
   - separatrix_triangularity
+calc_tau_e_and_P_in_from_scaling:
+  inputs:
+  - confinement_time_scalar
+  - plasma_current
+  - magnetic_field_on_axis
+  - average_electron_density
+  - major_radius
+  - areal_elongation
+  - separatrix_elongation
+  - inverse_aspect_ratio
+  - fuel_average_mass_number
+  - triangularity_psi95
+  - separatrix_triangularity
+  - plasma_stored_energy
+  - q_star
+  - energy_confinement_scaling
+  optionals: []
+  returns:
+  - energy_confinement_time
+  - P_in
 calc_triple_product:
   inputs:
   - peak_fuel_ion_density
@@ -464,6 +647,19 @@ calc_vertical_minor_radius_from_elongation:
   optionals: []
   returns:
   - vertical_minor_radius
+calc_zeff_and_dilution_from_impurities:
+  inputs:
+  - average_electron_density
+  - average_electron_temp
+  - impurities
+  - atomic_data
+  optionals: []
+  returns:
+  - impurity_charge_state
+  - z_effective
+  - dilution
+  - summed_impurity_density
+  - average_ion_density
 read_atomic_data:
   inputs:
   - radas_dir
@@ -484,3 +680,58 @@ thermal_calc_gain_factor:
   optionals: []
   returns:
   - Q
+two_point_model_fixed_fpow:
+  inputs:
+  - SOL_power_loss_fraction
+  - q_parallel
+  - parallel_connection_length
+  - average_electron_density
+  - nesep_over_nebar
+  - toroidal_flux_expansion
+  - fuel_average_mass_number
+  - kappa_e0
+  - SOL_momentum_loss_function
+  optionals:
+  - raise_error_if_not_converged
+  returns:
+  - upstream_electron_temp
+  - target_electron_density
+  - target_electron_temp
+  - target_electron_flux
+  - target_q_parallel
+two_point_model_fixed_qpart:
+  inputs:
+  - target_q_parallel
+  - q_parallel
+  - parallel_connection_length
+  - average_electron_density
+  - nesep_over_nebar
+  - toroidal_flux_expansion
+  - fuel_average_mass_number
+  - kappa_e0
+  - SOL_momentum_loss_function
+  optionals:
+  - raise_error_if_not_converged
+  returns:
+  - upstream_electron_temp
+  - target_electron_density
+  - target_electron_temp
+  - target_electron_flux
+  - SOL_power_loss_fraction
+two_point_model_fixed_tet:
+  inputs:
+  - target_electron_temp
+  - q_parallel
+  - parallel_connection_length
+  - upstream_electron_density
+  - toroidal_flux_expansion
+  - fuel_average_mass_number
+  - kappa_e0
+  - SOL_momentum_loss_function
+  optionals: []
+  returns:
+  - upstream_electron_temp
+  - target_electron_density
+  - SOL_power_loss_fraction
+  - target_electron_flux
+  - target_q_parallel

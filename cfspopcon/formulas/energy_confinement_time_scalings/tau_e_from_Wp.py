@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+from ...algorithm_class import Algorithm
 from ...named_options import ConfinementScaling
 from ...unit_handling import ureg, wraps_ufunc
 
@@ -12,6 +13,7 @@ with open(Path(__file__).parent / "tau_e_scalings.yaml") as f:
     TAU_E_SCALINGS = yaml.safe_load(f)
 
 
+@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
 @wraps_ufunc(
     return_units=dict(tau_e=ureg.s, P_tau=ureg.MW),
     input_units=dict(
@@ -28,7 +30,7 @@ with open(Path(__file__).parent / "tau_e_scalings.yaml") as f:
         separatrix_triangularity=ureg.dimensionless,
         plasma_stored_energy=ureg.MJ,
         q_star=ureg.dimensionless,
-        tau_e_scaling=None,
+        energy_confinement_scaling=None,
     ),
     output_core_dims=[(), ()],
 )
@@ -46,7 +48,7 @@ def calc_tau_e_and_P_in_from_scaling(
     separatrix_triangularity: float,
     plasma_stored_energy: float,
     q_star: float,
-    tau_e_scaling: ConfinementScaling,
+    energy_confinement_scaling: ConfinementScaling,
 ) -> tuple[float, float]:
     r"""Calculate energy confinement time and input power from a tau_E scaling.
 
@@ -93,7 +95,6 @@ def calc_tau_e_and_P_in_from_scaling(
     .. math::
         P_{\tau} = P_{ohmic} + P_{\alpha} + P_{aux} - P_{rad} = P_{loss} = P_{SOL}
 
-    If you are using a scaling where this is the case, set ``tau_e_scaling_uses_P_in=False``.
     Then, the returned value should be interpreted as :math:`P_{SOL}`.
 
     N.b. there are two more possible cases, where different powers are used in the two :math:`\tau_e` scalings.
@@ -114,12 +115,12 @@ def calc_tau_e_and_P_in_from_scaling(
         separatrix_triangularity: [~] :term:`glossary link<separatrix_triangularity>`
         plasma_stored_energy: [MJ] :term:`glossary link<plasma_stored_energy>`
         q_star: [~] :term:`glossary link<q_star>`
-        tau_e_scaling: [] :term:`glossary link<tau_e_scaling>`
+        energy_confinement_scaling: [] :term:`glossary link<energy_confinement_scaling>`
 
     Returns:
-        :term:`energy_confinement_time` [s], :term:`P_in` if tau_e_scaling_uses_P_in=False, else :term:`P_SOL` [MW]
+        :term:`energy_confinement_time` [s], :term:`P_in`
     """
-    scaling = TAU_E_SCALINGS[tau_e_scaling.name]
+    scaling = TAU_E_SCALINGS[energy_confinement_scaling.name]
 
     gamma = (
         confinement_time_scalar

@@ -1,8 +1,8 @@
 """Algorithm wrappers for single functions which don't fit into larger algorithms."""
 import numpy as np
 
-from ..unit_handling import ureg
 from ..algorithm_class import Algorithm
+from ..unit_handling import ureg
 
 calc_ratio_P_LH = Algorithm.from_single_function(
     func=lambda P_sol, P_LH_thresh: P_sol / P_LH_thresh, return_keys=["ratio_of_P_SOL_to_P_LH"], name="calc_ratio_P_LH"

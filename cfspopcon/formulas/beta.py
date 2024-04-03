@@ -102,7 +102,7 @@ def calc_beta_poloidal(
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=B_pol)
 
 
-@Algorithm.register_algorithm(return_keys=["beta_total"])
+@Algorithm.register_algorithm(return_keys=["beta"])
 def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitfull:
     """Calculate the total beta from the toroidal and poloidal betas.
 
@@ -113,12 +113,12 @@ def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitful
         beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
 
     Returns:
-         :term:`beta_total` [~]
+         :term:`beta` [~]
     """
     return 1.0 / (1.0 / beta_toroidal + 1.0 / beta_poloidal)
 
 
-@Algorithm.register_algorithm(return_keys=["beta_N"])
+@Algorithm.register_algorithm(return_keys=["normalized_beta"])
 def calc_beta_normalised(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:
     """Normalize beta to stability (Troyon) parameters.
 
@@ -131,10 +131,10 @@ def calc_beta_normalised(beta: Unitfull, minor_radius: Unitfull, magnetic_field_
         plasma_current: [MA] :term:`glossary link<plasma_current>`
 
     Returns:
-         :term:`beta_N`
+         :term:`normalized_beta`
     """
     normalisation = plasma_current / (minor_radius * magnetic_field_on_axis)
 
-    beta_N = beta / normalisation
+    normalized_beta = beta / normalisation
 
-    return beta_N
+    return normalized_beta

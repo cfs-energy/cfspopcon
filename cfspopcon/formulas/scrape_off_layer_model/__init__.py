@@ -7,6 +7,7 @@ from .lambda_q import calc_lambda_q
 from .parallel_heat_flux_density import calc_parallel_heat_flux_density
 from .solve_target_first_two_point_model import solve_target_first_two_point_model
 from .solve_two_point_model import solve_two_point_model
+from .two_point_model import run_two_point_model_fixed_tet, two_point_model_fixed_fpow, two_point_model_fixed_qpart
 
 __all__ = [
     "solve_two_point_model",
@@ -15,4 +16,7 @@ __all__ = [
     "solve_target_first_two_point_model",
     "calc_required_edge_impurity_concentration",
     "build_L_int_integrator",
+    "two_point_model_fixed_fpow",
+    "two_point_model_fixed_qpart",
+    "run_two_point_model_fixed_tet",
 ]

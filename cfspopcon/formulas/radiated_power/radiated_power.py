@@ -1,56 +1,77 @@
-"""Compute the total radiated power."""
-import numpy as np
+"""Calculate the power radiated from the confined region due to the fuel and impurity species."""
 import xarray as xr
 
-from ...named_options import RadiationMethod
-from ...read_atomic_data import AtomicData
-from ...unit_handling import Unitfull, ureg
-from .mavrin_coronal import calc_impurity_radiated_power_mavrin_coronal
-from .mavrin_noncoronal import calc_impurity_radiated_power_mavrin_noncoronal
-from .post_and_jensen import calc_impurity_radiated_power_post_and_jensen
-from .radas import calc_impurity_radiated_power_radas
+from ... import named_options
+from ...algorithm_class import Algorithm
+from ...unit_handling import Unitfull
+from .impurity_radiated_power import calc_impurity_radiated_power
+from .inherent import calc_bremsstrahlung_radiation, calc_synchrotron_radiation
 
 
-def calc_impurity_radiated_power(
-    radiated_power_method: RadiationMethod,
+@Algorithm.register_algorithm(return_keys=["P_radiation"])
+def calc_core_radiated_power(
     rho: Unitfull,
-    electron_temp_profile: Unitfull,
     electron_density_profile: Unitfull,
-    impurities: xr.DataArray,
+    electron_temp_profile: Unitfull,
+    z_effective: Unitfull,
     plasma_volume: Unitfull,
-    atomic_data: AtomicData,
-) -> xr.DataArray:
-    """Compute the total radiated power due to fuel and impurity species.
+    major_radius: Unitfull,
+    minor_radius: Unitfull,
+    magnetic_field_on_axis: Unitfull,
+    separatrix_elongation: Unitfull,
+    radiated_power_method: named_options.RadiationMethod,
+    radiated_power_scalar: Unitfull,
+    impurities: xr.DataArray,
+    atomic_data: xr.DataArray,
+) -> dict[str, Unitfull]:
+    """Calculate the power radiated from the confined region due to the fuel and impurity species.
 
     Args:
-        radiated_power_method: [] :term:`glossary link<radiated_power_method>`
-        rho: [~] :term:`glossary link<rho>`
-        electron_temp_profile: [keV] :term:`glossary link<electron_temp_profile>`
-        electron_density_profile: [1e19 m^-3] :term:`glossary link<electron_density_profile>`
-        impurities: [] :term:`glossary link<impurities>`
-        plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
+        rho: :term:`glossary link<rho>`
+        electron_density_profile: :term:`glossary link<electron_density_profile>`
+        electron_temp_profile: :term:`glossary link<electron_temp_profile>`
+        z_effective: :term:`glossary link<z_effective>`
+        plasma_volume: :term:`glossary link<plasma_volume>`
+        major_radius: :term:`glossary link<major_radius>`
+        minor_radius: :term:`glossary link<minor_radius>`
+        magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
+        separatrix_elongation: :term:`glossary link<separatrix_elongation>`
+        radiated_power_method: :term:`glossary link<radiated_power_method>`
+        radiated_power_scalar: :term:`glossary link<radiated_power_scalar>`
+        impurities: :term:`glossary link<impurities>`
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
-         [MW] Estimated radiation power due to this impurity
-    """
-    P_rad_kwargs = dict(
-        rho=rho,
-        electron_temp_profile=electron_temp_profile,
-        electron_density_profile=electron_density_profile,
-        impurity_concentration=impurities,
-        impurity_species=impurities.dim_species,
-        plasma_volume=plasma_volume,
-    )
-    if radiated_power_method == RadiationMethod.PostJensen:
-        P_rad_impurity = calc_impurity_radiated_power_post_and_jensen(**P_rad_kwargs)
-    elif radiated_power_method == RadiationMethod.MavrinCoronal:
-        P_rad_impurity = calc_impurity_radiated_power_mavrin_coronal(**P_rad_kwargs)
-    elif radiated_power_method == RadiationMethod.MavrinNoncoronal:
-        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(**P_rad_kwargs, tau_i=np.inf * ureg.s)
-    elif radiated_power_method == RadiationMethod.Radas:
-        P_rad_impurity = calc_impurity_radiated_power_radas(**P_rad_kwargs, atomic_data=atomic_data)
-    else:
-        raise NotImplementedError(f"No implementation for radiated_power_method = {radiated_power_method}")
+        :term:`P_radiation`
 
-    return P_rad_impurity  # type:ignore[no-any-return]
+    """
+    P_rad_bremsstrahlung = calc_bremsstrahlung_radiation(rho, electron_density_profile, electron_temp_profile, z_effective, plasma_volume)
+    P_rad_bremsstrahlung_from_hydrogen = calc_bremsstrahlung_radiation(
+        rho, electron_density_profile, electron_temp_profile, 1.0, plasma_volume
+    )
+    P_rad_synchrotron = calc_synchrotron_radiation(
+        rho,
+        electron_density_profile,
+        electron_temp_profile,
+        major_radius,
+        minor_radius,
+        magnetic_field_on_axis,
+        separatrix_elongation,
+        plasma_volume,
+    )
+
+    # Calculate radiated power due to Bremsstrahlung, Synchrotron and impurities
+    if radiated_power_method == named_options.RadiationMethod.Inherent:
+        return radiated_power_scalar * (P_rad_bremsstrahlung + P_rad_synchrotron)
+    else:
+        P_rad_impurity = calc_impurity_radiated_power(
+            radiated_power_method=radiated_power_method,
+            rho=rho,
+            electron_temp_profile=electron_temp_profile,
+            electron_density_profile=electron_density_profile,
+            impurities=impurities,
+            plasma_volume=plasma_volume,
+            atomic_data=atomic_data.item(),
+        )
+
+        return radiated_power_scalar * (P_rad_bremsstrahlung_from_hydrogen + P_rad_synchrotron + P_rad_impurity.sum(dim="dim_species"))
