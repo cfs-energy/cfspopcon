@@ -25,7 +25,6 @@ from .divertor_metrics import calc_B_pol_omp, calc_B_tor_omp
 from .energy_confinement_time_scalings import calc_tau_e_and_P_in_from_scaling
 from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
-from .geometry import calc_plasma_surface_area, calc_plasma_volume
 from .impurity_effects import calc_change_in_dilution, calc_change_in_zeff, calc_impurity_charge_state
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
 from .plasma_profiles import calc_1D_plasma_profiles
@@ -76,8 +75,6 @@ __all__ = [
     "calc_ohmic_power",
     "calc_peak_pressure",
     "calc_plasma_current",
-    "calc_plasma_surface_area",
-    "calc_plasma_volume",
     "calc_q_star",
     "calc_resistivity_trapped_enhancement",
     "calc_rho_star",

@@ -180,7 +180,7 @@ calc_fusion_gain:
   - Q
   - neutron_power_flux_to_walls
   - neutron_rate
-calc_geometry:
+calc_geometry_from_ratios:
   inputs:
   - major_radius
   - inverse_aspect_ratio
@@ -194,8 +194,6 @@ calc_geometry:
   - separatrix_triangularity
   - minor_radius
   - vertical_minor_radius
-  - plasma_volume
-  - surface_area
 calc_greenwald_fraction:
   inputs:
   - average_electron_density
@@ -325,6 +323,22 @@ calc_plasma_stored_energy:
   optionals: []
   returns:
   - plasma_stored_energy
+calc_plasma_surface_area:
+  inputs:
+  - major_radius
+  - inverse_aspect_ratio
+  - areal_elongation
+  optionals: []
+  returns:
+  - surface_area
+calc_plasma_volume:
+  inputs:
+  - major_radius
+  - inverse_aspect_ratio
+  - areal_elongation
+  optionals: []
+  returns:
+  - plasma_volume
 calc_power_balance_from_tau_e:
   inputs:
   - plasma_stored_energy

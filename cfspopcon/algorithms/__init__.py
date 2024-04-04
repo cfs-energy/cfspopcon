@@ -4,7 +4,6 @@ from .core_radiated_power import calc_core_radiated_power
 from .edge_impurity_concentration import calc_edge_impurity_concentration
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .fusion_gain import calc_fusion_gain
-from .geometry import calc_geometry
 from .heat_exhaust import calc_heat_exhaust
 from .ohmic_power import calc_ohmic_power
 from .peaked_profiles import calc_peaked_profiles
@@ -45,7 +44,6 @@ __all__ = [
     "calc_edge_impurity_concentration",
     "calc_extrinsic_core_radiator",
     "calc_fusion_gain",
-    "calc_geometry",
     "calc_heat_exhaust",
     "calc_ohmic_power",
     "calc_peaked_profiles",
