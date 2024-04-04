@@ -24,18 +24,18 @@ IModey2:
     notes: "Coefficient C adjusted to account for ne in 1e19m^-3"
     regime: "I-Mode"
   params:
-    C: 0.01346
-    a_A: 0.0
-    a_B: 0.768
-    a_I: 0.685
-    a_P: -0.286
-    a_R: 0.0
-    a_d: 0.0
-    a_e: 0.0
-    a_ka: 0.0
-    a_ks: 0.0
-    a_n: 0.017
-    a_q: 0.0
+    constant: 0.01346
+    mass_ratio_alpha: 0.0
+    field_on_axis_alpha: 0.768
+    plasma_current_alpha: 0.685
+    input_power_alpha: -0.286
+    major_radius_alpha: 0.0
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.0
+    areal_elongation_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.017
+    qstar_alpha: 0.0
 
 ITER89P:
   metadata:
@@ -43,18 +43,18 @@ ITER89P:
     notes: "For L-mode. C is corrected for average_electron_density convention. N.b. The different factor of a_R is because we use inverse_aspect_ratio=a/R instead of a. R^1.2 a^0.3 = R^1.5 inverse_aspect_ratio^0.3."
     regime: "L-Mode"
   params:
-    C: 0.03812775526676551
-    a_A: 0.5
-    a_B: 0.2
-    a_I: 0.85
-    a_P: -0.5
-    a_R: 1.5
-    a_d: 0.0
-    a_e: 0.3
-    a_ka: 0.0
-    a_ks: 0.5
-    a_n: 0.1
-    a_q: 0.0
+    constant: 0.03812775526676551
+    mass_ratio_alpha: 0.5
+    field_on_axis_alpha: 0.2
+    plasma_current_alpha: 0.85
+    input_power_alpha: -0.5
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.3
+    areal_elongation_alpha: 0.0
+    separatrix_elongation_alpha: 0.5
+    average_density_alpha: 0.1
+    qstar_alpha: 0.0
 
 ITER89P_ka:
   metadata:
@@ -62,18 +62,18 @@ ITER89P_ka:
     notes: "For L-mode. C is corrected for average_electron_density convention. Using kappa_A instead of separatrix_elongation, which is likely more accurate for double-nulls. N.b. The different factor of a_R is because we use inverse_aspect_ratio=a/R instead of a. R^1.2 a^0.3 = R^1.5 inverse_aspect_ratio^0.3."
     regime: "L-Mode"
   params:
-    C: 0.03812775526676551
-    a_A: 0.5
-    a_B: 0.2
-    a_I: 0.85
-    a_P: -0.5
-    a_R: 1.5
-    a_d: 0.0
-    a_e: 0.3
-    a_ka: 0.5
-    a_ks: 0.0
-    a_n: 0.1
-    a_q: 0.0
+    constant: 0.03812775526676551
+    mass_ratio_alpha: 0.5
+    field_on_axis_alpha: 0.2
+    plasma_current_alpha: 0.85
+    input_power_alpha: -0.5
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.3
+    areal_elongation_alpha: 0.5
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.1
+    qstar_alpha: 0.0
 
 ITER97L:
   metadata:
@@ -81,18 +81,18 @@ ITER97L:
     notes: ""
     regime: "L-Mode"
   params:
-    C: 0.023
-    a_I: 0.96
-    a_B: 0.03
-    a_R: 1.83
-    a_e: -0.06 # inverse_aspect_ratio = (R / minor_radius)^-1
-    a_ka: 0.64
-    a_n: 0.40
-    a_A: 0.20 # M_eff
-    a_P: -0.73
-    a_d: 0.0
-    a_ks: 0.0
-    a_q: 0.0
+    constant: 0.023
+    plasma_current_alpha: 0.96
+    field_on_axis_alpha: 0.03
+    major_radius_alpha: 1.83
+    inverse_aspect_ratio_alpha: -0.06 # inverse_aspect_ratio = (R / minor_radius)^-1
+    areal_elongation_alpha: 0.64
+    average_density_alpha: 0.40
+    mass_ratio_alpha: 0.20 # M_eff
+    input_power_alpha: -0.73
+    triangularity_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+    qstar_alpha: 0.0
 
 ITER98y2:
   metadata:
@@ -100,18 +100,18 @@ ITER98y2:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.0562
-    a_A: 0.19
-    a_B: 0.15
-    a_I: 0.93
-    a_P: -0.69
-    a_R: 1.97
-    a_d: 0.0
-    a_e: 0.58
-    a_ka: 0.78
-    a_ks: 0.0
-    a_n: 0.41
-    a_q: 0.0
+    constant: 0.0562
+    mass_ratio_alpha: 0.19
+    field_on_axis_alpha: 0.15
+    plasma_current_alpha: 0.93
+    input_power_alpha: -0.69
+    major_radius_alpha: 1.97
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.58
+    areal_elongation_alpha: 0.78
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.41
+    qstar_alpha: 0.0
 
 ITERL96Pth:
   metadata:
@@ -119,18 +119,18 @@ ITERL96Pth:
     notes: ""
     regime: "L-Mode"
   params:
-    C: 0.023
-    a_A: 0.20
-    a_B: 0.03
-    a_I: 0.96
-    a_P: -0.73
-    a_R: 1.83
-    a_d: 0.0
-    a_e: -0.06
-    a_ka: 0.64
-    a_ks: 0.0
-    a_n: 0.40
-    a_q: 0.0
+    constant: 0.023
+    mass_ratio_alpha: 0.20
+    field_on_axis_alpha: 0.03
+    plasma_current_alpha: 0.96
+    input_power_alpha: -0.73
+    major_radius_alpha: 1.83
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.06
+    areal_elongation_alpha: 0.64
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.40
+    qstar_alpha: 0.0
 
 ITPA_2018_STD5_GLS:
   metadata:
@@ -138,18 +138,18 @@ ITPA_2018_STD5_GLS:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.042
-    a_A: 0.47
-    a_B: 0.068
-    a_I: 1.2
-    a_P: -0.78
-    a_R: 1.6
-    a_d: 0.0
-    a_e: -0.052
-    a_ka: 0.88
-    a_ks: 0.0
-    a_n: 0.21
-    a_q: 0.0
+    constant: 0.042
+    mass_ratio_alpha: 0.47
+    field_on_axis_alpha: 0.068
+    plasma_current_alpha: 1.2
+    input_power_alpha: -0.78
+    major_radius_alpha: 1.6
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.052
+    areal_elongation_alpha: 0.88
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.21
+    qstar_alpha: 0.0
 
 ITPA_2018_STD5_OLS:
   metadata:
@@ -157,18 +157,18 @@ ITPA_2018_STD5_OLS:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.049
-    a_A: 0.25
-    a_B: 0.085
-    a_I: 1.1
-    a_P: -0.71
-    a_R: 1.5
-    a_d: 0.0
-    a_e: -0.043
-    a_ka: 0.8
-    a_ks: 0.0
-    a_n: 0.19
-    a_q: 0.0
+    constant: 0.049
+    mass_ratio_alpha: 0.25
+    field_on_axis_alpha: 0.085
+    plasma_current_alpha: 1.1
+    input_power_alpha: -0.71
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.043
+    areal_elongation_alpha: 0.8
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.19
+    qstar_alpha: 0.0
 
 ITPA_2018_STD5_SEL1_GLS:
   metadata:
@@ -176,18 +176,18 @@ ITPA_2018_STD5_SEL1_GLS:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.023
-    a_A: 0.33
-    a_B: -0.018
-    a_I: 1.3
-    a_P: -0.79
-    a_R: 1.5
-    a_d: 0.0
-    a_e: -0.38
-    a_ka: 1.9
-    a_ks: 0.0
-    a_n: 0.17
-    a_q: 0.0
+    constant: 0.023
+    mass_ratio_alpha: 0.33
+    field_on_axis_alpha: -0.018
+    plasma_current_alpha: 1.3
+    input_power_alpha: -0.79
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.38
+    areal_elongation_alpha: 1.9
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.17
+    qstar_alpha: 0.0
 
 ITPA_2018_STD5_SEL1_OLS:
   metadata:
@@ -195,18 +195,18 @@ ITPA_2018_STD5_SEL1_OLS:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.045
-    a_A: 0.24
-    a_B: -0.1
-    a_I: 1.3
-    a_P: -0.71
-    a_R: 1.2
-    a_d: 0.0
-    a_e: -0.32
-    a_ka: 1.1
-    a_ks: 0.0
-    a_n: 0.13
-    a_q: 0.0
+    constant: 0.045
+    mass_ratio_alpha: 0.24
+    field_on_axis_alpha: -0.1
+    plasma_current_alpha: 1.3
+    input_power_alpha: -0.71
+    major_radius_alpha: 1.2
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.32
+    areal_elongation_alpha: 1.1
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.13
+    qstar_alpha: 0.0
 
 ITPA_2018_STD5_SEL1_WLS:
   metadata:
@@ -214,18 +214,18 @@ ITPA_2018_STD5_SEL1_WLS:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.03
-    a_A: 0.094
-    a_B: -0.069
-    a_I: 1.3
-    a_P: -0.64
-    a_R: 1.3
-    a_d: 0.0
-    a_e: -0.46
-    a_ka: 1.3
-    a_ks: 0.0
-    a_n: 0.19
-    a_q: 0.0
+    constant: 0.03
+    mass_ratio_alpha: 0.094
+    field_on_axis_alpha: -0.069
+    plasma_current_alpha: 1.3
+    input_power_alpha: -0.64
+    major_radius_alpha: 1.3
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.46
+    areal_elongation_alpha: 1.3
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.19
+    qstar_alpha: 0.0
 
 ITPA_2018_STD5_WLS:
   metadata:
@@ -233,18 +233,18 @@ ITPA_2018_STD5_WLS:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.04
-    a_A: 0.25
-    a_B: 0.11
-    a_I: 0.99
-    a_P: -0.64
-    a_R: 1.7
-    a_d: 0.0
-    a_e: 0.093
-    a_ka: 0.79
-    a_ks: 0.0
-    a_n: 0.29
-    a_q: 0.0
+    constant: 0.04
+    mass_ratio_alpha: 0.25
+    field_on_axis_alpha: 0.11
+    plasma_current_alpha: 0.99
+    input_power_alpha: -0.64
+    major_radius_alpha: 1.7
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.093
+    areal_elongation_alpha: 0.79
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.29
+    qstar_alpha: 0.0
 
 ITPA20_IL_HighZ:
   metadata:
@@ -252,18 +252,18 @@ ITPA20_IL_HighZ:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.189
-    a_A: 0.312
-    a_B: -0.356
-    a_I: 1.485
-    a_P: -0.6077
-    a_R: 0.671
-    a_d: 0.0
-    a_e: 0.0
-    a_ka: 0.0
-    a_ks: 0.0
-    a_n: 0.018
-    a_q: 0.0
+    constant: 0.189
+    mass_ratio_alpha: 0.312
+    field_on_axis_alpha: -0.356
+    plasma_current_alpha: 1.485
+    input_power_alpha: -0.6077
+    major_radius_alpha: 0.671
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.0
+    areal_elongation_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.018
+    qstar_alpha: 0.0
 
 ITPA20_IL:
   metadata:
@@ -271,18 +271,18 @@ ITPA20_IL:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.067
-    a_A: 0.3
-    a_B: -0.13
-    a_I: 1.29
-    a_P: -0.644
-    a_R: 1.19
-    a_d: 0.56
-    a_e: 0.0
-    a_ka: 0.67
-    a_ks: 0.0
-    a_n: 0.15
-    a_q: 0.0
+    constant: 0.067
+    mass_ratio_alpha: 0.3
+    field_on_axis_alpha: -0.13
+    plasma_current_alpha: 1.29
+    input_power_alpha: -0.644
+    major_radius_alpha: 1.19
+    triangularity_alpha: 0.56
+    inverse_aspect_ratio_alpha: 0.0
+    areal_elongation_alpha: 0.67
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.15
+    qstar_alpha: 0.0
 
 ITPA20_STD5:
   metadata:
@@ -290,37 +290,37 @@ ITPA20_STD5:
     notes: ""
     regime: "H-Mode"
   params:
-    C: 0.053
-    a_A: 0.2
-    a_B: 0.22
-    a_I: 0.98
-    a_P: -0.669
-    a_R: 1.71
-    a_d: 0.36
-    a_e: 0.35
-    a_ka: 0.80
-    a_ks: 0.0
-    a_n: 0.24
-    a_q: 0.0
+    constant: 0.053
+    mass_ratio_alpha: 0.2
+    field_on_axis_alpha: 0.22
+    plasma_current_alpha: 0.98
+    input_power_alpha: -0.669
+    major_radius_alpha: 1.71
+    triangularity_alpha: 0.36
+    inverse_aspect_ratio_alpha: 0.35
+    areal_elongation_alpha: 0.80
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.24
+    qstar_alpha: 0.0
 
-LOC:
+LOconstant:
   metadata:
     documentation: "Linear Ohmic Confinement, from page 2 of ref. [6] in tau_e_scalings.yaml"
     notes: ""
     regime: "LOC"
   params:
-    C: 0.0070
-    a_n: 1.0
-    a_q: 1.0
-    a_ka: 0.5
-    a_e: 1.0
-    a_R: 3.0
-    a_B: 0.0
-    a_I: 0.0
-    a_A: 0.0
-    a_P: 0.0
-    a_d: 0.0
-    a_ks: 0.0
+    constant: 0.0070
+    average_density_alpha: 1.0
+    qstar_alpha: 1.0
+    areal_elongation_alpha: 0.5
+    inverse_aspect_ratio_alpha: 1.0
+    major_radius_alpha: 3.0
+    field_on_axis_alpha: 0.0
+    plasma_current_alpha: 0.0
+    mass_ratio_alpha: 0.0
+    input_power_alpha: 0.0
+    triangularity_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
   
 H_DS03:
   metadata:
@@ -328,15 +328,15 @@ H_DS03:
     notes: ""
     regime: "H-mode"
   params:
-    C: 0.028
-    a_I: 0.83
-    a_B: 0.07
-    a_n: 0.49
-    a_P: -0.55
-    a_R: 2.11
-    a_e: 0.3 # (major_radius/a)^-0.3 = (a/major_radius)^0.3
-    a_ks: 0.75
-    a_A: 0.14 # a_M — isotope mass scaling
-    a_ka: 0.0
-    a_d: 0.0
-    a_q: 0.0
+    constant: 0.028
+    plasma_current_alpha: 0.83
+    field_on_axis_alpha: 0.07
+    average_density_alpha: 0.49
+    input_power_alpha: -0.55
+    major_radius_alpha: 2.11
+    inverse_aspect_ratio_alpha: 0.3 # (major_radius/a)^-0.3 = (a/major_radius)^0.3
+    separatrix_elongation_alpha: 0.75
+    mass_ratio_alpha: 0.14 # a_M — isotope mass scaling
+    areal_elongation_alpha: 0.0
+    triangularity_alpha: 0.0
+    qstar_alpha: 0.0
