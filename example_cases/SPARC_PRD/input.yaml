@@ -16,7 +16,8 @@ algorithms:
   - calc_average_ion_temp_from_temperature_ratio
   - calc_zeff_and_dilution_due_to_impurities
   - calc_plasma_stored_energy
-  - calc_power_balance_from_tau_e
+  - read_confinement_scalings
+  - solve_tau_e_scaling_for_input_power
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -146,7 +147,7 @@ confinement_threshold_scalar: 1.0
 # Confinement enhancement factor
 confinement_time_scalar: 1.0
 # Name of the tau_e scaling used
-energy_confinement_scaling: ITER98y2
+tau_e_scaling: ITER98y2
 
 radiated_power_method: Radas
 radiated_power_scalar: 1.0

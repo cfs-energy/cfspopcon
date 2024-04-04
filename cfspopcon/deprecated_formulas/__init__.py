@@ -1,9 +1,8 @@
 """Formulas for POPCONs analysis."""
 
-from . import energy_confinement_time_scalings, fusion_reaction_data, plasma_profile_data, radiated_power, scrape_off_layer_model
+from . import fusion_reaction_data, plasma_profile_data, radiated_power, scrape_off_layer_model
 from .beta import calc_beta_normalised, calc_beta_poloidal, calc_beta_toroidal, calc_beta_total
 from .confinement_regime_threshold_powers import (
-    calc_confinement_transition_threshold_power,
     calc_LH_transition_threshold_power,
     calc_LI_transition_threshold_power,
 )
@@ -21,7 +20,6 @@ from .current_drive import (
 )
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .divertor_metrics import calc_B_pol_omp, calc_B_tor_omp
-from .energy_confinement_time_scalings import calc_tau_e_and_P_in_from_scaling
 from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
@@ -47,7 +45,6 @@ __all__ = [
     "calc_beta_total",
     "calc_bootstrap_fraction",
     "calc_bremsstrahlung_radiation",
-    "calc_confinement_transition_threshold_power",
     "calc_current_relaxation_time",
     "calc_density_peaking",
     "calc_effective_collisionality",
@@ -74,10 +71,8 @@ __all__ = [
     "calc_rho_star",
     "calc_Spitzer_loop_resistivity",
     "calc_synchrotron_radiation",
-    "calc_tau_e_and_P_in_from_scaling",
     "calc_triple_product",
     "calc_troyon_limit",
-    "energy_confinement_time_scalings",
     "fusion_reaction_data",
     "plasma_profile_data",
     "radiated_power",

@@ -1,5 +1,4 @@
 """Threshold powers required to enter improved confinement regimes."""
-from ..named_options import ConfinementScaling
 from ..unit_handling import ureg, wraps_ufunc
 
 
@@ -91,63 +90,39 @@ def calc_LI_transition_threshold_power(plasma_current: float, average_electron_d
     return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
 
 
-@wraps_ufunc(
-    return_units=dict(P_LH_thresh=ureg.MW),
-    input_units=dict(
-        energy_confinement_scaling=None,
-        plasma_current=ureg.MA,
-        magnetic_field_on_axis=ureg.T,
-        minor_radius=ureg.m,
-        major_radius=ureg.m,
-        surface_area=ureg.m**2,
-        fuel_average_mass_number=ureg.amu,
-        average_electron_density=ureg.n19,
-        confinement_threshold_scalar=ureg.dimensionless,
-    ),
-)
-def calc_confinement_transition_threshold_power(
-    energy_confinement_scaling: ConfinementScaling,
-    plasma_current: float,
-    magnetic_field_on_axis: float,
-    minor_radius: float,
-    major_radius: float,
-    surface_area: float,
-    fuel_average_mass_number: float,
-    average_electron_density: float,
-    confinement_threshold_scalar: float = 1.0,
-) -> float:
-    """Calculate the threshold power (crossing the separatrix) to transition into an improved confinement mode.
+# @wraps_ufunc(
+#     ),
+# def calc_confinement_transition_threshold_power(
+#     energy_confinement_scaling: ConfinementScaling,
+#     plasma_current: float,
+#     magnetic_field_on_axis: float,
+#     minor_radius: float,
+#     major_radius: float,
+#     surface_area: float,
+#     fuel_average_mass_number: float,
+#     average_electron_density: float,
+# ) -> float:
+#     """Calculate the threshold power (crossing the separatrix) to transition into an improved confinement mode.
 
-    Args:
-        energy_confinement_scaling: [] :term:`glossary link<energy_confinement_scaling>`
-        plasma_current: [MA] :term:`glossary link<plasma_current>`
-        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
-        minor_radius: [m] :term:`glossary link<minor_radius>`
-        major_radius: [m] :term:`glossary link<major_radius>`
-        surface_area: [m^2] :term:`glossary link<surface_area>`
-        fuel_average_mass_number: [amu] :term:`glossary link<fuel_average_mass_number>`
-        average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
-        confinement_threshold_scalar: (optional) scaling factor for P_LH adjustment studies [~]
+#     Args:
+#         energy_confinement_scaling: [] :term:`glossary link<energy_confinement_scaling>`
+#         plasma_current: [MA] :term:`glossary link<plasma_current>`
+#         magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
+#         minor_radius: [m] :term:`glossary link<minor_radius>`
+#         major_radius: [m] :term:`glossary link<major_radius>`
+#         surface_area: [m^2] :term:`glossary link<surface_area>`
+#         fuel_average_mass_number: [amu] :term:`glossary link<fuel_average_mass_number>`
+#         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
+#         confinement_threshold_scalar: (optional) scaling factor for P_LH adjustment studies [~]
 
-    Returns:
-        :term:`P_LH_thresh` [MW]
-    """
-    if energy_confinement_scaling not in [ConfinementScaling.LOC, ConfinementScaling.IModey2]:
-        P_LH_thresh = calc_LH_transition_threshold_power.__wrapped__(
-            plasma_current,
-            magnetic_field_on_axis,
-            minor_radius,
-            major_radius,
-            surface_area,
-            fuel_average_mass_number,
-            average_electron_density,
-            scale=confinement_threshold_scalar,
-        )
-    elif energy_confinement_scaling == ConfinementScaling.IModey2:
-        P_LH_thresh = calc_LI_transition_threshold_power.__wrapped__(
-            plasma_current, average_electron_density, scale=confinement_threshold_scalar
-        )
-    else:
-        raise ValueError("Encountered unhandled confinement time scaling.")
-
-    return float(P_LH_thresh)
+#     Returns:
+#         :term:`P_LH_thresh` [MW]
+#     """
+#     if energy_confinement_scaling not in [ConfinementScaling.LOC, ConfinementScaling.IModey2]:
+#             plasma_current,
+#             magnetic_field_on_axis,
+#             minor_radius,
+#             major_radius,
+#             surface_area,
+#             fuel_average_mass_number,
+#             average_electron_density,

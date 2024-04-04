@@ -330,9 +330,8 @@ Physics Glossary
   loop_voltage
     inductive loop voltage
 
-  energy_confinement_scaling
   tau_e_scaling
-    A :class:`~cfspopcon.named_options.ConfinementScaling` indicating which :math:`\tau_e` energy confinement scaling should be used.
+    Which :math:`\tau_e` energy confinement scaling should be used. Should match a confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
 
   energy_confinement_time
     A characteristic time which gives the rate at which the plasma loses energy. In steady-state, :math:`\tau_e=W_p / P_in`.

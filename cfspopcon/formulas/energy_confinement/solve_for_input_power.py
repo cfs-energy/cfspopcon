@@ -1,17 +1,12 @@
-"""Calculate tau_e and P_in from a tau_e scaling and the stored energy."""
-from pathlib import Path
-
+"""Rearrange a tau_e scaling to give a value for the input power, given the stored energy."""
 import numpy as np
-import yaml
 
-from ...named_options import ConfinementScaling
+from ...algorithm_class import Algorithm
 from ...unit_handling import ureg, wraps_ufunc
-
-# Preload the scalings (instead of doing fileio in loop)
-with open(Path(__file__).parent / "tau_e_scalings.yaml") as f:
-    TAU_E_SCALINGS = yaml.safe_load(f)
+from .read_energy_confinement_scalings import ConfinementScaling
 
 
+@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
 @wraps_ufunc(
     return_units=dict(tau_e=ureg.s, P_tau=ureg.MW),
     input_units=dict(
@@ -32,7 +27,7 @@ with open(Path(__file__).parent / "tau_e_scalings.yaml") as f:
     ),
     output_core_dims=[(), ()],
 )
-def calc_tau_e_and_P_in_from_scaling(
+def solve_tau_e_scaling_for_input_power(
     confinement_time_scalar: float,
     plasma_current: float,
     magnetic_field_on_axis: float,
@@ -46,7 +41,7 @@ def calc_tau_e_and_P_in_from_scaling(
     separatrix_triangularity: float,
     plasma_stored_energy: float,
     q_star: float,
-    tau_e_scaling: ConfinementScaling,
+    tau_e_scaling: str,
 ) -> tuple[float, float]:
     r"""Calculate energy confinement time and input power from a tau_E scaling.
 
@@ -93,8 +88,9 @@ def calc_tau_e_and_P_in_from_scaling(
     .. math::
         P_{\tau} = P_{ohmic} + P_{\alpha} + P_{aux} - P_{rad} = P_{loss} = P_{SOL}
 
-    If you are using a scaling where this is the case, set ``tau_e_scaling_uses_P_in=False``.
-    Then, the returned value should be interpreted as :math:`P_{SOL}`.
+    Then, the returned value should be interpreted as :math:`P_{SOL}`. We currently don't allow this case, since the
+    general consensus is that the radiated power has not been consistently removed from scaling relationship. However,
+    if you want to explore the effect of changing this assumption, you can implement a new feature.
 
     N.b. there are two more possible cases, where different powers are used in the two :math:`\tau_e` scalings.
     We don't allow these cases, since 1) experiments generally pick a consistent definition for :math:`P`
@@ -117,53 +113,30 @@ def calc_tau_e_and_P_in_from_scaling(
         tau_e_scaling: [] :term:`glossary link<tau_e_scaling>`
 
     Returns:
-        :term:`energy_confinement_time` [s], :term:`P_in` if tau_e_scaling_uses_P_in=False, else :term:`P_SOL` [MW]
+        :term:`energy_confinement_time` [s], :term:`P_in` [MW]
     """
-    scaling = TAU_E_SCALINGS[tau_e_scaling.name]
+    scaling = ConfinementScaling.instances[tau_e_scaling]
 
     gamma = (
         confinement_time_scalar
-        * scaling["params"]["C"]
-        * plasma_current ** scaling["params"]["a_I"]
-        * magnetic_field_on_axis ** scaling["params"]["a_B"]
-        * average_electron_density ** scaling["params"]["a_n"]
-        * major_radius ** scaling["params"]["a_R"]
-        * areal_elongation ** scaling["params"]["a_ka"]
-        * separatrix_elongation ** scaling["params"]["a_ks"]
-        * inverse_aspect_ratio ** scaling["params"]["a_e"]
-        * fuel_average_mass_number ** scaling["params"]["a_A"]
-        * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity])) ** scaling["params"]["a_d"]
-        * q_star ** scaling["params"]["a_q"]
+        * scaling.constant
+        * plasma_current ** scaling.plasma_current_alpha
+        * magnetic_field_on_axis ** scaling.field_on_axis_alpha
+        * average_electron_density ** scaling.average_density_alpha
+        * major_radius ** scaling.major_radius_alpha
+        * areal_elongation ** scaling.areal_elongation_alpha
+        * separatrix_elongation ** scaling.separatrix_elongation_alpha
+        * inverse_aspect_ratio ** scaling.inverse_aspect_ratio_alpha
+        * fuel_average_mass_number ** scaling.mass_ratio_alpha
+        * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity])) ** scaling.triangularity_alpha
+        * q_star ** scaling.qstar_alpha
     )
 
     if gamma > 0.0:
-        P_tau = (plasma_stored_energy / gamma) ** (1.0 / (1.0 + scaling["params"]["a_P"]))
+        P_tau = (plasma_stored_energy / gamma) ** (1.0 / (1.0 + scaling.input_power_alpha))
     else:
         P_tau = np.inf
 
     tau_E = plasma_stored_energy / P_tau
 
-    return float(tau_E), float(P_tau)
-
-
-def load_metadata(dataset: str) -> dict[str, str]:
-    """Load dataset metadata from YAML file.
-
-    Args:
-        dataset: name of scaling in ./energy_confinement_time.yaml
-
-    Returns:
-        Metadata
-    """
-    metadata: dict[str, str] = TAU_E_SCALINGS[dataset]["metadata"]
-    return metadata
-
-
-def get_datasets() -> list[str]:
-    """Get a list of names of valid datasets.
-
-    Returns:
-        List of names of valid datasets
-    """
-    datasets: list[str] = list(TAU_E_SCALINGS.keys())  # Unpack iterator to list
-    return datasets
+    return tau_E, P_tau

@@ -5,7 +5,6 @@ import xarray as xr
 
 from .named_options import (
     AtomicSpecies,
-    ConfinementScaling,
     LambdaQScaling,
     MomentumLossFunction,
     ProfileForm,
@@ -14,11 +13,9 @@ from .named_options import (
 )
 
 
-def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
+def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
     """Given a 'key' matching a named_option, return the corresponding Enum value."""
-    if key == "energy_confinement_scaling":
-        return ConfinementScaling[val]
-    elif key == "profile_form":
+    if key == "profile_form":
         return ProfileForm[val]
     elif key == "radiated_power_method":
         return RadiationMethod[val]
@@ -36,8 +33,6 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911, PLR0912
         return LambdaQScaling[val]
     elif key == "SOL_momentum_loss_function":
         return MomentumLossFunction[val]
-    elif key == "tauE_scaling":
-        return ConfinementScaling[val]
     elif key == "reaction_type":
         return ReactionType[val]
     elif key == "radiation_method":

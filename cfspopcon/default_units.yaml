@@ -25,7 +25,7 @@ electron_density_peaking: ""
 electron_density_profile: "n19"
 electron_temp_profile: "keV"
 elongation_ratio_sep_to_areal: ""
-energy_confinement_scaling: null
+tau_e_scaling: null
 energy_confinement_time: "s"
 f_shaping: ""
 fieldline_pitch_at_omp: ""

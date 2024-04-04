@@ -64,7 +64,6 @@ calc_bootstrap_fraction:
   - bootstrap_fraction
 calc_confinement_transition_threshold_power:
   inputs:
-  - energy_confinement_scaling
   - plasma_current
   - magnetic_field_on_axis
   - minor_radius
@@ -73,7 +72,7 @@ calc_confinement_transition_threshold_power:
   - fuel_average_mass_number
   - average_electron_density
   optionals:
-  - confinement_threshold_scalar
+  - scale
   returns:
   - P_LH_thresh
 calc_core_radiated_power:
@@ -338,26 +337,6 @@ calc_plasma_volume:
   optionals: []
   returns:
   - plasma_volume
-calc_power_balance_from_tau_e:
-  inputs:
-  - plasma_stored_energy
-  - average_electron_density
-  - confinement_time_scalar
-  - plasma_current
-  - magnetic_field_on_axis
-  - major_radius
-  - areal_elongation
-  - separatrix_elongation
-  - inverse_aspect_ratio
-  - fuel_average_mass_number
-  - triangularity_psi95
-  - separatrix_triangularity
-  - q_star
-  - energy_confinement_scaling
-  optionals: []
-  returns:
-  - energy_confinement_time
-  - P_in
 calc_q_star_from_plasma_current:
   inputs:
   - magnetic_field_on_axis
@@ -439,6 +418,10 @@ read_atomic_data:
   optionals: []
   returns:
   - atomic_data
+read_confinement_scalings:
+  inputs: []
+  optionals: []
+  returns: []
 require_P_rad_less_than_P_in:
   inputs:
   - P_in
@@ -446,6 +429,26 @@ require_P_rad_less_than_P_in:
   optionals: []
   returns:
   - P_radiation
+solve_tau_e_scaling_for_input_power:
+  inputs:
+  - confinement_time_scalar
+  - plasma_current
+  - magnetic_field_on_axis
+  - average_electron_density
+  - major_radius
+  - areal_elongation
+  - separatrix_elongation
+  - inverse_aspect_ratio
+  - fuel_average_mass_number
+  - triangularity_psi95
+  - separatrix_triangularity
+  - plasma_stored_energy
+  - q_star
+  - tau_e_scaling
+  optionals: []
+  returns:
+  - energy_confinement_time
+  - P_in
 two_point_model_fixed_fpow:
   inputs:
   - SOL_power_loss_fraction
@@ -501,25 +504,3 @@ two_point_model_fixed_tet:
   - SOL_power_loss_fraction
   - target_electron_flux
   - target_q_parallel
-use_LOC_tau_e_below_threshold:
-  inputs:
-  - plasma_stored_energy
-  - energy_confinement_time
-  - P_in
-  - average_electron_density
-  - confinement_time_scalar
-  - plasma_current
-  - magnetic_field_on_axis
-  - major_radius
-  - areal_elongation
-  - separatrix_elongation
-  - inverse_aspect_ratio
-  - fuel_average_mass_number
-  - triangularity_psi95
-  - separatrix_triangularity
-  - q_star
-  optionals: []
-  returns:
-  - energy_confinement_time
-  - P_in
-  - SOC_LOC_ratio

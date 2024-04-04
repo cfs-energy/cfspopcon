@@ -24,6 +24,9 @@ def test_regression_against_case(case: Path):
     dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc").load()
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 
+    # TODO: Delete temporary renaming
+    dataset = dataset.rename(dict(tau_e_scaling="energy_confinement_scaling"))
+
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)
 
@@ -41,6 +44,9 @@ def test_regression_against_case_with_update(case: Path):
 
     dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc").load()
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+
+    # TODO: Delete temporary renaming
+    dataset = dataset.rename(dict(tau_e_scaling="energy_confinement_scaling"))
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)

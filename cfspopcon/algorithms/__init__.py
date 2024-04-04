@@ -7,7 +7,6 @@ from .fusion_gain import calc_fusion_gain
 from .heat_exhaust import calc_heat_exhaust
 from .ohmic_power import calc_ohmic_power
 from .peaked_profiles import calc_peaked_profiles
-from .power_balance_from_tau_e import calc_power_balance_from_tau_e
 from .single_functions import (
     calc_auxillary_power,
     calc_average_total_pressure,
@@ -29,7 +28,6 @@ from .single_functions import (
 from .two_point_model_fixed_fpow import two_point_model_fixed_fpow
 from .two_point_model_fixed_qpart import two_point_model_fixed_qpart
 from .two_point_model_fixed_tet import two_point_model_fixed_tet
-from .use_LOC_tau_e_below_threshold import use_LOC_tau_e_below_threshold
 
 __all__ = [
     "get_algorithm",
@@ -41,11 +39,9 @@ __all__ = [
     "calc_heat_exhaust",
     "calc_ohmic_power",
     "calc_peaked_profiles",
-    "calc_power_balance_from_tau_e",
     "two_point_model_fixed_fpow",
     "two_point_model_fixed_qpart",
     "two_point_model_fixed_tet",
-    "use_LOC_tau_e_below_threshold",
     "calc_confinement_transition_threshold_power",
     "calc_ratio_P_LH",
     "calc_f_rad_core",

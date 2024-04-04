@@ -6,7 +6,7 @@ from ..algorithm_class import Algorithm
 from ..unit_handling import ureg
 
 calc_confinement_transition_threshold_power = Algorithm.from_single_function(
-    deprecated_formulas.calc_confinement_transition_threshold_power,
+    deprecated_formulas.calc_LH_transition_threshold_power,
     return_keys=["P_LH_thresh"],
     name="calc_confinement_transition_threshold_power",
 )

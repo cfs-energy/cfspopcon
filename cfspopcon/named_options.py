@@ -56,27 +56,6 @@ class AtomicSpecies(Enum):
         return self.value > other.value
 
 
-class ConfinementScaling(Enum):
-    r"""Enum of implemented \tau_{E} scalings."""
-    ITER98y2 = auto()
-    ITER89P = auto()
-    ITER89P_ka = auto()
-    ITERL96Pth = auto()
-    ITER97L = auto()
-    IModey2 = auto()
-    ITPA20_STD5 = auto()
-    ITPA20_IL = auto()
-    ITPA20_IL_HighZ = auto()
-    ITPA_2018_STD5_OLS = auto()
-    ITPA_2018_STD5_WLS = auto()
-    ITPA_2018_STD5_GLS = auto()
-    ITPA_2018_STD5_SEL1_OLS = auto()
-    ITPA_2018_STD5_SEL1_WLS = auto()
-    ITPA_2018_STD5_SEL1_GLS = auto()
-    LOC = auto()
-    H_DS03 = auto()
-
-
 class MomentumLossFunction(Enum):
     """Select which SOL momentum loss function to use."""
 
