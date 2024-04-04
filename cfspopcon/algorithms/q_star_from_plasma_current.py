@@ -17,7 +17,7 @@ def calc_q_star_from_plasma_current(
     inverse_aspect_ratio: Unitfull,
     areal_elongation: Unitfull,
     triangularity_psi95: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate plasma current from edge safety factor.
 
     Args:

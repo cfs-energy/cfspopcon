@@ -21,7 +21,7 @@ def calc_core_radiated_power(
     radiated_power_scalar: Unitfull,
     impurities: xr.DataArray,
     atomic_data: xr.DataArray,
-) -> dict[str, Unitfull]:
+) -> Unitfull:
     """Calculate the power radiated from the confined region due to the fuel and impurity species.
 
     Args:

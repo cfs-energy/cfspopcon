@@ -31,7 +31,7 @@ def calc_heat_exhaust(
     fraction_of_P_SOL_to_divertor: Unitfull,
     lambda_q_scaling: named_options.LambdaQScaling,
     lambda_q_factor: Unitfull = 1.0 * ureg.dimensionless,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the parallel heat flux density upstream and related metrics.
 
     Args:

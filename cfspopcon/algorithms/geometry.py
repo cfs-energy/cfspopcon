@@ -21,7 +21,7 @@ def calc_geometry(
     triangularity_psi95: Unitfull,
     elongation_ratio_sep_to_areal: Unitfull,
     triangularity_ratio_sep_to_psi95: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate dependent geometry parameters.
 
     Args:

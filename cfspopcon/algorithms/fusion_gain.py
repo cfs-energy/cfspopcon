@@ -26,7 +26,7 @@ def calc_fusion_gain(
     surface_area: Unitfull,
     P_in: Unitfull,
     fraction_of_external_power_coupled: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the fusion power and thermal gain (Q).
 
     Args:

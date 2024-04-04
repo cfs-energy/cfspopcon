@@ -30,7 +30,7 @@ def calc_edge_impurity_concentration(
     atomic_data: xr.DataArray,
     reference_electron_density: Unitfull = 1.0 * ureg.n20,
     reference_ne_tau: Unitfull = 1.0 * ureg.n20 * ureg.ms,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the impurity concentration required to cool the scrape-off-layer using the Lengyel model.
 
     Args:

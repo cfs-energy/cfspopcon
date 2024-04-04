@@ -29,7 +29,7 @@ def use_LOC_tau_e_below_threshold(
     triangularity_psi95: Unitfull,
     separatrix_triangularity: Unitfull,
     q_star: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Switch to the LOC scaling if it predicts a worse energy confinement than our selected tau_e scaling.
 
     Args:

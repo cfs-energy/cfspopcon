@@ -22,7 +22,7 @@ def calc_ohmic_power(
     minor_radius: Unitfull,
     areal_elongation: Unitfull,
     plasma_current: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the power due to Ohmic resistive heating.
 
     Args:

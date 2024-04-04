@@ -29,7 +29,7 @@ def two_point_model_fixed_qpart(
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
     raise_error_if_not_converged: bool = False,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed parallel heat flux density reaching the target.
 
     Args:

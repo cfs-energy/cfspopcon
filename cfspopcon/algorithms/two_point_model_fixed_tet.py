@@ -27,7 +27,7 @@ def two_point_model_fixed_tet(
     fuel_average_mass_number: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed sheath entrance temperature.
 
     Args:

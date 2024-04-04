@@ -20,7 +20,7 @@ def calc_zeff_and_dilution_from_impurities(
     average_electron_temp: Unitfull,
     impurities: xr.DataArray,
     atomic_data: xr.DataArray,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the impact of core impurities on z_effective and dilution.
 
     Args:

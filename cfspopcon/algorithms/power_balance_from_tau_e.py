@@ -25,7 +25,7 @@ def calc_power_balance_from_tau_e(
     separatrix_triangularity: Unitfull,
     q_star: Unitfull,
     energy_confinement_scaling: named_options.ConfinementScaling,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the input power required to maintain the stored energy, given a tau_e scaling.
 
     Args:

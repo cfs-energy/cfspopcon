@@ -19,7 +19,7 @@ def calc_beta(
     magnetic_field_on_axis: Unitfull,
     plasma_current: Unitfull,
     minor_radius: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate toroidal, poloidal, total and normalized beta.
 
     Args:

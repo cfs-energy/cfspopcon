@@ -37,7 +37,7 @@ def calc_extrinsic_core_radiator(
     radiated_power_scalar: Unitfull,
     core_radiator: named_options.AtomicSpecies,
     atomic_data: xr.DataArray,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the concentration and effect of a core radiator required to achieve above a defined core radiative fraction.
 
     Args:

@@ -34,7 +34,7 @@ def calc_peaked_profiles(
     dilution: Unitfull,
     beta_toroidal: Unitfull,
     normalized_inverse_temp_scale_length: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate density peaking and the corresponding density and temperature profiles.
 
     Args:

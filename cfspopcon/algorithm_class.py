@@ -13,7 +13,8 @@ import yaml
 
 from .unit_handling import Quantity, convert_to_default_units, ureg
 
-FunctionType = Callable[..., dict[str, Any]]
+LabelledReturnFunctionType = Callable[..., dict[str, Any]]
+GenericFunctionType = Callable[..., Any]
 
 
 class Algorithm:
@@ -21,7 +22,7 @@ class Algorithm:
 
     instances: ClassVar[dict[str, Algorithm]] = dict()
 
-    def __init__(self, function: FunctionType, return_keys: list[str], name: Optional[str] = None):
+    def __init__(self, function: LabelledReturnFunctionType, return_keys: list[str], name: Optional[str] = None):
         """Initialise an Algorithm.
 
         Args:
@@ -72,7 +73,7 @@ class Algorithm:
         return f"Algorithm: {self._name}"
 
     @classmethod
-    def _make_run(cls, func: FunctionType) -> Callable[..., xr.Dataset]:
+    def _make_run(cls, func: LabelledReturnFunctionType) -> Callable[..., xr.Dataset]:
         """Helper to create the `run()` function with correct doc string.
 
         Args:
@@ -146,10 +147,12 @@ class Algorithm:
         return cls(wrapped_function, return_keys, name=name)
 
     @classmethod
-    def register_algorithm(cls, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False) -> FunctionType:
+    def register_algorithm(
+        cls, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False
+    ) -> GenericFunctionType:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""  # noqa: D402
 
-        def function_wrapper(func: FunctionType) -> FunctionType:
+        def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
             Algorithm.from_single_function(func, return_keys=return_keys, name=name, skip_unit_conversion=skip_unit_conversion)
             return func
 
