@@ -20,7 +20,6 @@ from .single_functions import (
     calc_normalised_collisionality,
     calc_P_SOL,
     calc_peak_pressure,
-    calc_plasma_stored_energy,
     calc_ratio_P_LH,
     calc_rho_star,
     calc_triple_product,
@@ -63,6 +62,5 @@ __all__ = [
     "calc_magnetic_field_on_axis",
     "require_P_rad_less_than_P_in",
     "calc_P_SOL",
-    "calc_plasma_stored_energy",
     "calc_upstream_electron_density",
 ]

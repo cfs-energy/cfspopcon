@@ -1,6 +1,6 @@
 """Formulas used for the POPCON analysis."""
 from . import (
-    energy_confinement_scaling,
+    energy_confinement,
     fusion_power,
     geometry,
     metrics,
@@ -14,7 +14,7 @@ from . import (
 
 __all__ = [
     "geometry",
-    "energy_confinement_scaling",
+    "energy_confinement",
     "fusion_power",
     "metrics",
     "plasma_current",

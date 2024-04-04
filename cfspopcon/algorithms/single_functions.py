@@ -56,15 +56,6 @@ require_P_rad_less_than_P_in = Algorithm.from_single_function(
 calc_P_SOL = Algorithm.from_single_function(
     lambda P_in, P_radiation: np.maximum(P_in - P_radiation, 0.0), return_keys=["P_sol"], name="calc_P_SOL"
 )
-calc_plasma_stored_energy = Algorithm.from_single_function(
-    lambda average_electron_density, average_electron_temp, average_ion_density, summed_impurity_density, average_ion_temp, plasma_volume: (
-        (3.0 / 2.0)
-        * ((average_electron_density * average_electron_temp) + ((average_ion_density + summed_impurity_density) * average_ion_temp))
-        * plasma_volume
-    ).pint.to(ureg.MJ),
-    return_keys=["plasma_stored_energy"],
-    name="calc_plasma_stored_energy",
-)
 calc_upstream_electron_density = Algorithm.from_single_function(
     lambda nesep_over_nebar, average_electron_density: nesep_over_nebar * average_electron_density,
     return_keys=["upstream_electron_density"],
