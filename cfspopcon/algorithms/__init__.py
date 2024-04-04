@@ -5,7 +5,6 @@ from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .fusion_gain import calc_fusion_gain
 from .heat_exhaust import calc_heat_exhaust
 from .ohmic_power import calc_ohmic_power
-from .peaked_profiles import calc_peaked_profiles
 from .single_functions import (
     calc_auxillary_power,
     calc_average_total_pressure,
@@ -35,7 +34,6 @@ __all__ = [
     "calc_fusion_gain",
     "calc_heat_exhaust",
     "calc_ohmic_power",
-    "calc_peaked_profiles",
     "two_point_model_fixed_fpow",
     "two_point_model_fixed_qpart",
     "two_point_model_fixed_tet",

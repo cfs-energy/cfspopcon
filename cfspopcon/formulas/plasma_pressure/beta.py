@@ -37,6 +37,7 @@ def _calc_beta_general(
     ret = unit_conversion_factor * (average_electron_density * (average_electron_temp + average_ion_temp)) / (magnetic_field**2)
     return convert_units(ret, ureg.dimensionless)
 
+
 @Algorithm.register_algorithm(return_keys=["beta_toroidal"])
 def calc_beta_toroidal(
     average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull
@@ -56,6 +57,7 @@ def calc_beta_toroidal(
          :term:`beta_toroidal` [~]
     """
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=magnetic_field_on_axis)
+
 
 @Algorithm.register_algorithm(return_keys=["beta_poloidal"])
 def calc_beta_poloidal(
@@ -114,6 +116,7 @@ def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitful
          :term:`beta` [~]
     """
     return 1.0 / (1.0 / beta_toroidal + 1.0 / beta_poloidal)
+
 
 @Algorithm.register_algorithm(return_keys=["normalized_beta"])
 def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:

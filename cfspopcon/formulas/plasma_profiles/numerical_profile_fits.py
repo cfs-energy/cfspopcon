@@ -56,6 +56,7 @@ import yaml
 from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline  # type: ignore[import-untyped]
 
+# TODO: Replace with importlib.resources
 plasma_profiles_directory = Path(__file__).parent
 
 

@@ -25,7 +25,12 @@ algorithms:
   - calc_beta_poloidal
   - calc_beta_total
   - calc_beta_normalized
-  - calc_peaked_profiles
+  # Calculate peaked profiles
+  - calc_effective_collisionality
+  - calc_electron_density_peaking
+  - calc_ion_density_peaking
+  - calc_temperature_peaking
+  - calc_1D_plasma_profiles
   # Once we have the profiles, we can then estimate the power
   # radiated from the confined region.
   - calc_core_radiated_power
@@ -38,7 +43,10 @@ algorithms:
   - calc_extrinsic_core_radiator
   # We then recompute the profiles with the dilution due to the
   # core radiator, and use this to determine the fusion power rate.
-  - calc_peaked_profiles
+  - calc_electron_density_peaking
+  - calc_ion_density_peaking
+  - calc_temperature_peaking
+  - calc_1D_plasma_profiles
   - calc_fusion_gain
   # We compute the ohmic heating power from the inductive current and
   # loop voltage, and then set P_auxillary = P_in - P_ohmic

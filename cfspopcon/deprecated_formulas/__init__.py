@@ -1,6 +1,6 @@
 """Formulas for POPCONs analysis."""
 
-from . import fusion_reaction_data, plasma_profile_data, radiated_power, scrape_off_layer_model
+from . import fusion_reaction_data, radiated_power, scrape_off_layer_model
 from .confinement_regime_threshold_powers import (
     calc_LH_transition_threshold_power,
     calc_LI_transition_threshold_power,
@@ -17,12 +17,10 @@ from .current_drive import (
     calc_resistivity_trapped_enhancement,
     calc_Spitzer_loop_resistivity,
 )
-from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .divertor_metrics import calc_B_pol_omp, calc_B_tor_omp
 from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
-from .plasma_profiles import calc_1D_plasma_profiles
 from .Q_thermal_gain_factor import thermal_calc_gain_factor
 from .radiated_power import (
     calc_bremsstrahlung_radiation,

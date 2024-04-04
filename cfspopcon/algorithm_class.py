@@ -192,6 +192,16 @@ class Algorithm:
     @classmethod
     def get_algorithm(cls, key: str) -> Algorithm:
         """Retrieves an algorithm by name."""
+        if key not in cls.algorithms():
+            error_message = (
+                f"algorithm '{key}' not found. "
+                "If you have constructed or registered an Algorithm of this name, "
+                "make sure that it is imported in the top-level cfspopcon __init__.py. "
+                "Algorithms which have been successfully registered and imported will "
+                "appear in the algorithms.yaml file."
+            )
+            raise KeyError(error_message)
+
         return cls.instances[key]
 
 
