@@ -4,7 +4,10 @@ algorithms:
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
   - read_atomic_data
-  - calc_geometry_from_ratios
+  - calc_separatrix_elongation_from_areal_elongation
+  - calc_separatrix_triangularity_from_triangularity95
+  - calc_minor_radius_from_inverse_aspect_ratio
+  - calc_vertical_minor_radius_from_elongation_and_minor_radius
   - calc_plasma_volume
   - calc_plasma_surface_area
   - calc_q_star_from_plasma_current

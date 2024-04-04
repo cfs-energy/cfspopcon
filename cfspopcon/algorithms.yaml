@@ -180,20 +180,6 @@ calc_fusion_gain:
   - Q
   - neutron_power_flux_to_walls
   - neutron_rate
-calc_geometry_from_ratios:
-  inputs:
-  - major_radius
-  - inverse_aspect_ratio
-  - areal_elongation
-  - triangularity_psi95
-  - elongation_ratio_sep_to_areal
-  - triangularity_ratio_sep_to_psi95
-  optionals: []
-  returns:
-  - separatrix_elongation
-  - separatrix_triangularity
-  - minor_radius
-  - vertical_minor_radius
 calc_greenwald_fraction:
   inputs:
   - average_electron_density
@@ -234,6 +220,13 @@ calc_magnetic_field_on_axis:
   optionals: []
   returns:
   - magnetic_field_on_axis
+calc_minor_radius_from_inverse_aspect_ratio:
+  inputs:
+  - major_radius
+  - inverse_aspect_ratio
+  optionals: []
+  returns:
+  - minor_radius
 calc_normalised_collisionality:
   inputs:
   - average_electron_density
@@ -387,6 +380,20 @@ calc_rho_star:
   optionals: []
   returns:
   - rho_star
+calc_separatrix_elongation_from_areal_elongation:
+  inputs:
+  - areal_elongation
+  - elongation_ratio_sep_to_areal
+  optionals: []
+  returns:
+  - separatrix_elongation
+calc_separatrix_triangularity_from_triangularity95:
+  inputs:
+  - triangularity_psi95
+  - triangularity_ratio_sep_to_psi95
+  optionals: []
+  returns:
+  - separatrix_triangularity
 calc_triple_product:
   inputs:
   - peak_fuel_ion_density
@@ -402,6 +409,13 @@ calc_upstream_electron_density:
   optionals: []
   returns:
   - upstream_electron_density
+calc_vertical_minor_radius_from_elongation_and_minor_radius:
+  inputs:
+  - minor_radius
+  - separatrix_elongation
+  optionals: []
+  returns:
+  - vertical_minor_radius
 calc_zeff_and_dilution_from_impurities:
   inputs:
   - average_electron_density
