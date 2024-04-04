@@ -1,9 +1,9 @@
 """Calculate the impact of core impurities on z_effective and dilution."""
 import xarray as xr
 
-from .. import deprecated_formulas
-from ..algorithm_class import Algorithm
-from ..unit_handling import Unitfull
+from ...algorithm_class import Algorithm
+from ...unit_handling import Unitfull
+from .impurity_charge_state import calc_impurity_charge_state
 
 
 @Algorithm.register_algorithm(
@@ -15,7 +15,7 @@ from ..unit_handling import Unitfull
         "average_ion_density",
     ]
 )
-def calc_zeff_and_dilution_from_impurities(
+def calc_zeff_and_dilution_due_to_impurities(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     impurities: xr.DataArray,
@@ -36,11 +36,11 @@ def calc_zeff_and_dilution_from_impurities(
     starting_zeff = 1.0
     starting_dilution = 1.0
 
-    impurity_charge_state = deprecated_formulas.calc_impurity_charge_state(
+    impurity_charge_state = calc_impurity_charge_state(
         average_electron_density, average_electron_temp, impurities.dim_species, atomic_data.item()
     )
-    change_in_zeff = deprecated_formulas.calc_change_in_zeff(impurity_charge_state, impurities)
-    change_in_dilution = deprecated_formulas.calc_change_in_dilution(impurity_charge_state, impurities)
+    change_in_zeff = calc_change_in_zeff(impurity_charge_state, impurities)
+    change_in_dilution = calc_change_in_dilution(impurity_charge_state, impurities)
 
     z_effective = starting_zeff + change_in_zeff.sum(dim="dim_species")
     dilution = starting_dilution - change_in_dilution.sum(dim="dim_species")
@@ -48,3 +48,29 @@ def calc_zeff_and_dilution_from_impurities(
     average_ion_density = dilution * average_electron_density
 
     return (impurity_charge_state, z_effective, dilution, summed_impurity_density, average_ion_density)
+
+
+def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
+    """Calculate the change in the effective charge due to the specified impurities.
+
+    Args:
+        impurity_charge_state: [~] :term:`glossary link<impurity_charge_state>`
+        impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
+
+    Returns:
+        change in zeff [~]
+    """
+    return impurity_charge_state * (impurity_charge_state - 1.0) * impurity_concentration
+
+
+def calc_change_in_dilution(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
+    """Calculate the change in n_fuel/n_e due to the specified impurities.
+
+    Args:
+        impurity_charge_state: [~] :term:`glossary link<impurity_charge_state>`
+        impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
+
+    Returns:
+        change in dilution [~]
+    """
+    return impurity_charge_state * impurity_concentration

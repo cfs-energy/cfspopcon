@@ -4,6 +4,8 @@ import xarray as xr
 
 from .. import deprecated_formulas, named_options
 from ..algorithm_class import Algorithm
+from ..formulas.zeff_and_dilution.impurity_charge_state import calc_impurity_charge_state
+from ..formulas.zeff_and_dilution.zeff_and_dilution_from_impurities import calc_change_in_dilution, calc_change_in_zeff
 from ..helpers import make_impurities_array
 from ..unit_handling import Unitfull
 
@@ -80,11 +82,11 @@ def calc_extrinsic_core_radiator(
         P_radiated_by_core_radiator > 0, P_radiated_by_core_radiator / P_rad_per_core_radiator, 0.0
     )
 
-    core_radiator_charge_state = deprecated_formulas.calc_impurity_charge_state(
+    core_radiator_charge_state = calc_impurity_charge_state(
         average_electron_density, average_electron_temp, core_radiator, atomic_data.item()
     )
-    zeff_change_from_core_rad = deprecated_formulas.calc_change_in_zeff(core_radiator_charge_state, core_radiator_concentration)
-    dilution_change_from_core_rad = deprecated_formulas.calc_change_in_dilution(core_radiator_charge_state, core_radiator_concentration)
+    zeff_change_from_core_rad = calc_change_in_zeff(core_radiator_charge_state, core_radiator_concentration)
+    dilution_change_from_core_rad = calc_change_in_dilution(core_radiator_charge_state, core_radiator_concentration)
 
     z_effective = z_effective + zeff_change_from_core_rad
     dilution = (dilution - dilution_change_from_core_rad).clip(min=0.0)

@@ -1,10 +1,9 @@
-"""Calculate the effect of impurities on the effective charge and dilution."""
+"""Calculate the mean charge state of an impurity for given plasma conditions."""
 import numpy as np
-import xarray as xr
 
-from ..named_options import AtomicSpecies
-from ..read_atomic_data import AtomicData
-from ..unit_handling import ureg, wraps_ufunc
+from ...named_options import AtomicSpecies
+from ...read_atomic_data import AtomicData
+from ...unit_handling import ureg, wraps_ufunc
 
 
 @wraps_ufunc(
@@ -43,29 +42,3 @@ def calc_impurity_charge_state(
     interpolated_values = np.minimum(interpolated_values, impurity_species.value)
     interpolated_values = np.maximum(interpolated_values, 0)
     return interpolated_values  # type:ignore[no-any-return]
-
-
-def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
-    """Calculate the change in the effective charge due to the specified impurities.
-
-    Args:
-        impurity_charge_state: [~] :term:`glossary link<impurity_charge_state>`
-        impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
-
-    Returns:
-        change in zeff [~]
-    """
-    return impurity_charge_state * (impurity_charge_state - 1.0) * impurity_concentration
-
-
-def calc_change_in_dilution(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
-    """Calculate the change in n_fuel/n_e due to the specified impurities.
-
-    Args:
-        impurity_charge_state: [~] :term:`glossary link<impurity_charge_state>`
-        impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
-
-    Returns:
-        change in dilution [~]
-    """
-    return impurity_charge_state * impurity_concentration

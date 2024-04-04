@@ -31,7 +31,6 @@ from .two_point_model_fixed_fpow import two_point_model_fixed_fpow
 from .two_point_model_fixed_qpart import two_point_model_fixed_qpart
 from .two_point_model_fixed_tet import two_point_model_fixed_tet
 from .use_LOC_tau_e_below_threshold import use_LOC_tau_e_below_threshold
-from .zeff_and_dilution_from_impurities import calc_zeff_and_dilution_from_impurities
 
 __all__ = [
     "get_algorithm",
@@ -48,7 +47,6 @@ __all__ = [
     "two_point_model_fixed_qpart",
     "two_point_model_fixed_tet",
     "use_LOC_tau_e_below_threshold",
-    "calc_zeff_and_dilution_from_impurities",
     "calc_confinement_transition_threshold_power",
     "calc_ratio_P_LH",
     "calc_f_rad_core",

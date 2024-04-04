@@ -24,7 +24,6 @@ from .divertor_metrics import calc_B_pol_omp, calc_B_tor_omp
 from .energy_confinement_time_scalings import calc_tau_e_and_P_in_from_scaling
 from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
-from .impurity_effects import calc_change_in_dilution, calc_change_in_zeff, calc_impurity_charge_state
 from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
 from .plasma_profiles import calc_1D_plasma_profiles
 from .Q_thermal_gain_factor import thermal_calc_gain_factor
@@ -48,8 +47,6 @@ __all__ = [
     "calc_beta_total",
     "calc_bootstrap_fraction",
     "calc_bremsstrahlung_radiation",
-    "calc_change_in_dilution",
-    "calc_change_in_zeff",
     "calc_confinement_transition_threshold_power",
     "calc_current_relaxation_time",
     "calc_density_peaking",
@@ -58,7 +55,6 @@ __all__ = [
     "calc_fusion_power",
     "calc_greenwald_density_limit",
     "calc_greenwald_fraction",
-    "calc_impurity_charge_state",
     "calc_impurity_radiated_power_mavrin_coronal",
     "calc_impurity_radiated_power_mavrin_noncoronal",
     "calc_impurity_radiated_power_post_and_jensen",
