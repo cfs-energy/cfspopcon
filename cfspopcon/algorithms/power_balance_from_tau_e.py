@@ -1,5 +1,5 @@
 """Calculate the input power required to maintain the stored energy, given a tau_e scaling."""
-from .. import formulas, named_options
+from .. import deprecated_formulas, named_options
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull
 
@@ -48,7 +48,7 @@ def calc_power_balance_from_tau_e(
     :term:`energy_confinement_time`, :term:`P_in`
 
     """
-    energy_confinement_time, P_in = formulas.calc_tau_e_and_P_in_from_scaling(
+    energy_confinement_time, P_in = deprecated_formulas.calc_tau_e_and_P_in_from_scaling(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,

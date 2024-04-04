@@ -1,7 +1,7 @@
 """Calculate the parallel heat flux density upstream and related metrics."""
 import numpy as np
 
-from .. import formulas, named_options
+from .. import deprecated_formulas, named_options
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, ureg
 
@@ -55,16 +55,16 @@ def calc_heat_exhaust(
     PB_over_R = P_sol * magnetic_field_on_axis / major_radius
     PBpRnSq = (P_sol * (magnetic_field_on_axis / q_star) / major_radius) / (average_electron_density**2.0)
 
-    B_pol_out_mid = formulas.calc_B_pol_omp(plasma_current=plasma_current, minor_radius=minor_radius)
-    B_t_out_mid = formulas.calc_B_tor_omp(magnetic_field_on_axis, major_radius, minor_radius)
+    B_pol_out_mid = deprecated_formulas.calc_B_pol_omp(plasma_current=plasma_current, minor_radius=minor_radius)
+    B_t_out_mid = deprecated_formulas.calc_B_tor_omp(magnetic_field_on_axis, major_radius, minor_radius)
 
     fieldline_pitch_at_omp = np.sqrt(B_t_out_mid**2 + B_pol_out_mid**2) / B_pol_out_mid
 
-    lambda_q = lambda_q_factor * formulas.scrape_off_layer_model.calc_lambda_q(
+    lambda_q = lambda_q_factor * deprecated_formulas.scrape_off_layer_model.calc_lambda_q(
         lambda_q_scaling, average_total_pressure, P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio
     )
 
-    q_parallel = formulas.scrape_off_layer_model.calc_parallel_heat_flux_density(
+    q_parallel = deprecated_formulas.scrape_off_layer_model.calc_parallel_heat_flux_density(
         P_sol, fraction_of_P_SOL_to_divertor, major_radius + minor_radius, lambda_q, fieldline_pitch_at_omp
     )
     q_perp = P_sol / (2.0 * np.pi * (major_radius + minor_radius) * lambda_q)

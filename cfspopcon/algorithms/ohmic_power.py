@@ -1,5 +1,5 @@
 """Calculate the power due to Ohmic resistive heating."""
-from .. import formulas
+from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull
 
@@ -39,12 +39,14 @@ def calc_ohmic_power(
     :term:`spitzer_resistivity`, :term:`trapped_particle_fraction`, :term:`neoclassical_loop_resistivity`, :term:`loop_voltage`, :term:`P_ohmic`
     """
     inductive_plasma_current = plasma_current * (1.0 - bootstrap_fraction)
-    spitzer_resistivity = formulas.calc_Spitzer_loop_resistivity(average_electron_temp)
-    trapped_particle_fraction = formulas.calc_resistivity_trapped_enhancement(inverse_aspect_ratio)
-    neoclassical_loop_resistivity = formulas.calc_neoclassical_loop_resistivity(spitzer_resistivity, z_effective, trapped_particle_fraction)
-    loop_voltage = formulas.calc_loop_voltage(
+    spitzer_resistivity = deprecated_formulas.calc_Spitzer_loop_resistivity(average_electron_temp)
+    trapped_particle_fraction = deprecated_formulas.calc_resistivity_trapped_enhancement(inverse_aspect_ratio)
+    neoclassical_loop_resistivity = deprecated_formulas.calc_neoclassical_loop_resistivity(
+        spitzer_resistivity, z_effective, trapped_particle_fraction
+    )
+    loop_voltage = deprecated_formulas.calc_loop_voltage(
         major_radius, minor_radius, inductive_plasma_current, areal_elongation, neoclassical_loop_resistivity
     )
-    P_ohmic = formulas.calc_ohmic_power(inductive_plasma_current, loop_voltage)
+    P_ohmic = deprecated_formulas.calc_ohmic_power(inductive_plasma_current, loop_voltage)
 
     return (spitzer_resistivity, trapped_particle_fraction, neoclassical_loop_resistivity, loop_voltage, P_ohmic)

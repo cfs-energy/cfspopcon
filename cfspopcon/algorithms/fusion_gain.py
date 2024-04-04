@@ -1,5 +1,5 @@
 """Calculate the fusion power and thermal gain (Q)."""
-from .. import formulas, named_options
+from .. import deprecated_formulas, named_options
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, ureg
 
@@ -43,15 +43,15 @@ def calc_fusion_gain(
     Returns:
         :term:`P_fusion`, :term:`P_neutron`, :term:`P_alpha`, :term:`P_external`, :term:`P_launched`, :term:`Q`, :term:`neutron_power_flux_to_walls` :term:`neutron_rate`
     """
-    P_fusion, P_neutron, P_alpha = formulas.calc_fusion_power(
+    P_fusion, P_neutron, P_alpha = deprecated_formulas.calc_fusion_power(
         fusion_reaction, ion_temp_profile, heavier_fuel_species_fraction, fuel_ion_density_profile, rho, plasma_volume
     )
 
     P_external = (P_in - P_alpha).clip(min=0.0 * ureg.MW)
     P_launched = P_external / fraction_of_external_power_coupled
-    Q = formulas.thermal_calc_gain_factor(P_fusion, P_launched)
+    Q = deprecated_formulas.thermal_calc_gain_factor(P_fusion, P_launched)
 
-    neutron_power_flux_to_walls, neutron_rate = formulas.calc_neutron_flux_to_walls(
+    neutron_power_flux_to_walls, neutron_rate = deprecated_formulas.calc_neutron_flux_to_walls(
         P_neutron, surface_area, fusion_reaction, ion_temp_profile, heavier_fuel_species_fraction
     )
 

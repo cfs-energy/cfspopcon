@@ -1,5 +1,5 @@
 """Calculate density peaking and the corresponding density and temperature profiles."""
-from .. import formulas
+from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
 from ..named_options import ProfileForm
 from ..unit_handling import Unitfull
@@ -55,11 +55,13 @@ def calc_peaked_profiles(
     `effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`, :term:`peak_electron_density`, :term:`peak_electron_temp`, :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`, :term:`electron_temp_profile`, :term:`ion_temp_profile`
 
     """
-    effective_collisionality = formulas.calc_effective_collisionality(
+    effective_collisionality = deprecated_formulas.calc_effective_collisionality(
         average_electron_density, average_electron_temp, major_radius, z_effective
     )
-    ion_density_peaking = formulas.calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
-    electron_density_peaking = formulas.calc_density_peaking(
+    ion_density_peaking = deprecated_formulas.calc_density_peaking(
+        effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset
+    )
+    electron_density_peaking = deprecated_formulas.calc_density_peaking(
         effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
     )
 
@@ -70,7 +72,13 @@ def calc_peaked_profiles(
 
     # Calculate the total fusion power by estimating density and temperature profiles and
     # using this to calculate fusion power profiles.
-    (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile,) = formulas.calc_1D_plasma_profiles(
+    (
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
+    ) = deprecated_formulas.calc_1D_plasma_profiles(
         profile_form,
         average_electron_density,
         average_electron_temp,

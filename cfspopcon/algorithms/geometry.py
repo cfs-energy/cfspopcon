@@ -1,5 +1,5 @@
 """Calculate dependent geometry parameters."""
-from .. import formulas
+from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull
 
@@ -42,7 +42,7 @@ def calc_geometry(
     minor_radius = major_radius * inverse_aspect_ratio
     vertical_minor_radius = minor_radius * separatrix_elongation
 
-    plasma_volume = formulas.calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation)
-    surface_area = formulas.calc_plasma_surface_area(major_radius, inverse_aspect_ratio, areal_elongation)
+    plasma_volume = deprecated_formulas.calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation)
+    surface_area = deprecated_formulas.calc_plasma_surface_area(major_radius, inverse_aspect_ratio, areal_elongation)
 
     return (separatrix_elongation, separatrix_triangularity, minor_radius, vertical_minor_radius, plasma_volume, surface_area)

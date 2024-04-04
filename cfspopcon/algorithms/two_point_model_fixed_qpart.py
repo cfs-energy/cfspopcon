@@ -4,7 +4,7 @@ from typing import Union
 import xarray as xr
 
 from ..algorithm_class import Algorithm
-from ..formulas.scrape_off_layer_model import solve_two_point_model
+from ..deprecated_formulas.scrape_off_layer_model import solve_two_point_model
 from ..named_options import MomentumLossFunction
 from ..unit_handling import Unitfull
 

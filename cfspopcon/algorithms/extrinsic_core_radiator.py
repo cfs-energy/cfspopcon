@@ -2,7 +2,7 @@
 import numpy as np
 import xarray as xr
 
-from .. import formulas, named_options
+from .. import deprecated_formulas, named_options
 from ..algorithm_class import Algorithm
 from ..helpers import make_impurities_array
 from ..unit_handling import Unitfull
@@ -65,7 +65,7 @@ def calc_extrinsic_core_radiator(
     P_radiated_by_core_radiator = np.maximum(minimum_core_radiated_fraction * P_in - P_radiation, 0.0)
     P_radiation = np.maximum(minimum_core_radiated_fraction * P_in, P_radiation)
 
-    P_rad_per_core_radiator = radiated_power_scalar * formulas.calc_impurity_radiated_power(
+    P_rad_per_core_radiator = radiated_power_scalar * deprecated_formulas.calc_impurity_radiated_power(
         radiated_power_method=named_options.RadiationMethod.Radas
         if radiated_power_method == named_options.RadiationMethod.Inherent
         else radiated_power_method,
@@ -80,11 +80,11 @@ def calc_extrinsic_core_radiator(
         P_radiated_by_core_radiator > 0, P_radiated_by_core_radiator / P_rad_per_core_radiator, 0.0
     )
 
-    core_radiator_charge_state = formulas.calc_impurity_charge_state(
+    core_radiator_charge_state = deprecated_formulas.calc_impurity_charge_state(
         average_electron_density, average_electron_temp, core_radiator, atomic_data.item()
     )
-    zeff_change_from_core_rad = formulas.calc_change_in_zeff(core_radiator_charge_state, core_radiator_concentration)
-    dilution_change_from_core_rad = formulas.calc_change_in_dilution(core_radiator_charge_state, core_radiator_concentration)
+    zeff_change_from_core_rad = deprecated_formulas.calc_change_in_zeff(core_radiator_charge_state, core_radiator_concentration)
+    dilution_change_from_core_rad = deprecated_formulas.calc_change_in_dilution(core_radiator_charge_state, core_radiator_concentration)
 
     z_effective = z_effective + zeff_change_from_core_rad
     dilution = (dilution - dilution_change_from_core_rad).clip(min=0.0)

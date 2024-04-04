@@ -1,7 +1,7 @@
 """Switch to the LOC scaling if it predicts a worse energy confinement than our selected tau_e scaling."""
 import xarray as xr
 
-from .. import formulas, named_options
+from .. import deprecated_formulas, named_options
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull
 
@@ -54,7 +54,7 @@ def use_LOC_tau_e_below_threshold(
 
     """
     # Calculate linear ohmic confinement for low density
-    energy_confinement_time_LOC, P_in_LOC = formulas.calc_tau_e_and_P_in_from_scaling(
+    energy_confinement_time_LOC, P_in_LOC = deprecated_formulas.calc_tau_e_and_P_in_from_scaling(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,

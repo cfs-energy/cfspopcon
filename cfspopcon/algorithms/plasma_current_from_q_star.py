@@ -1,5 +1,5 @@
 """Calculate plasma current from edge safety factor."""
-from .. import formulas
+from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull
 
@@ -32,7 +32,7 @@ def calc_plasma_current_from_q_star(
     term:`f_shaping`, term:`plasma_current`,
 
     """
-    f_shaping = formulas.calc_f_shaping(inverse_aspect_ratio, areal_elongation, triangularity_psi95)
-    plasma_current = formulas.calc_plasma_current(magnetic_field_on_axis, major_radius, inverse_aspect_ratio, q_star, f_shaping)
+    f_shaping = deprecated_formulas.calc_f_shaping(inverse_aspect_ratio, areal_elongation, triangularity_psi95)
+    plasma_current = deprecated_formulas.calc_plasma_current(magnetic_field_on_axis, major_radius, inverse_aspect_ratio, q_star, f_shaping)
 
     return (f_shaping, plasma_current)

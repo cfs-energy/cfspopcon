@@ -1,5 +1,5 @@
 """Calculate toroidal, poloidal, total and normalized beta."""
-from .. import formulas
+from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull
 
@@ -33,12 +33,14 @@ def calc_beta(
     Returns:
         :term:`beta_toroidal`, :term:`beta_poloidal`, :term:`beta_total`, :term:`beta_N`
     """
-    beta_toroidal = formulas.calc_beta_toroidal(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field_on_axis)
-    beta_poloidal = formulas.calc_beta_poloidal(
+    beta_toroidal = deprecated_formulas.calc_beta_toroidal(
+        average_electron_density, average_electron_temp, average_ion_temp, magnetic_field_on_axis
+    )
+    beta_poloidal = deprecated_formulas.calc_beta_poloidal(
         average_electron_density, average_electron_temp, average_ion_temp, plasma_current, minor_radius
     )
 
-    beta = formulas.calc_beta_total(beta_toroidal=beta_toroidal, beta_poloidal=beta_poloidal)
-    normalized_beta = formulas.calc_beta_normalised(beta, minor_radius, magnetic_field_on_axis, plasma_current)
+    beta = deprecated_formulas.calc_beta_total(beta_toroidal=beta_toroidal, beta_poloidal=beta_poloidal)
+    normalized_beta = deprecated_formulas.calc_beta_normalised(beta, minor_radius, magnetic_field_on_axis, plasma_current)
 
     return beta_toroidal, beta_poloidal, beta, normalized_beta
