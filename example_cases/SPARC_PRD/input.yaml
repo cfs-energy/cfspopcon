@@ -41,7 +41,7 @@ algorithms:
   # a scaling for lambda_q to calculate a corresponding q_parallel, and
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
-  - calc_P_SOL
+  # - calc_P_SOL
   - calc_heat_exhaust
   - two_point_model_fixed_tet
   # Finally, we calculate several parameters which aren't used in other
@@ -57,7 +57,6 @@ algorithms:
   - calc_triple_product
   - calc_peak_pressure
   - calc_current_relaxation_time
-  #- calc_mcrf_from_fixed_P_sol
 
 grid:
   # input variables in the 'grid' block will be replaced by
