@@ -3,16 +3,17 @@ import xarray as xr
 
 from .. import formulas, named_options
 from ..algorithm_class import Algorithm
-from ..unit_handling import Unitfull, convert_to_default_units
-
-RETURN_KEYS = [
-    "energy_confinement_time",
-    "P_in",
-    "SOC_LOC_ratio",
-]
+from ..unit_handling import Unitfull
 
 
-def run_use_LOC_tau_e_below_threshold(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "energy_confinement_time",
+        "P_in",
+        "SOC_LOC_ratio",
+    ]
+)
+def use_LOC_tau_e_below_threshold(
     plasma_stored_energy: Unitfull,
     energy_confinement_time: Unitfull,
     P_in: Unitfull,
@@ -77,11 +78,4 @@ def run_use_LOC_tau_e_below_threshold(
     )  # type:ignore[no-untyped-call]
     P_in = xr.where(SOC_LOC_ratio > 1.0, P_in_LOC, P_in)  # type:ignore[no-untyped-call]
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-use_LOC_tau_e_below_threshold = Algorithm(
-    function=run_use_LOC_tau_e_below_threshold,
-    return_keys=RETURN_KEYS,
-)
+    return (energy_confinement_time, P_in, SOC_LOC_ratio)

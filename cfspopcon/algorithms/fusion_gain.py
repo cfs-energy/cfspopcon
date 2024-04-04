@@ -1,21 +1,22 @@
 """Calculate the fusion power and thermal gain (Q)."""
 from .. import formulas, named_options
 from ..algorithm_class import Algorithm
-from ..unit_handling import Unitfull, convert_to_default_units, ureg
-
-RETURN_KEYS = [
-    "P_fusion",
-    "P_neutron",
-    "P_alpha",
-    "P_external",
-    "P_launched",
-    "Q",
-    "neutron_power_flux_to_walls",
-    "neutron_rate",
-]
+from ..unit_handling import Unitfull, ureg
 
 
-def run_calc_fusion_gain(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "P_fusion",
+        "P_neutron",
+        "P_alpha",
+        "P_external",
+        "P_launched",
+        "Q",
+        "neutron_power_flux_to_walls",
+        "neutron_rate",
+    ]
+)
+def calc_fusion_gain(
     fusion_reaction: named_options.ReactionType,
     ion_temp_profile: Unitfull,
     heavier_fuel_species_fraction: Unitfull,
@@ -54,11 +55,4 @@ def run_calc_fusion_gain(
         P_neutron, surface_area, fusion_reaction, ion_temp_profile, heavier_fuel_species_fraction
     )
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_fusion_gain = Algorithm(
-    function=run_calc_fusion_gain,
-    return_keys=RETURN_KEYS,
-)
+    return (P_fusion, P_neutron, P_alpha, P_external, P_launched, Q, neutron_power_flux_to_walls, neutron_rate)

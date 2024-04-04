@@ -6,18 +6,19 @@ import xarray as xr
 from ..algorithm_class import Algorithm
 from ..formulas.scrape_off_layer_model import solve_two_point_model
 from ..named_options import MomentumLossFunction
-from ..unit_handling import Unitfull, convert_to_default_units
-
-RETURN_KEYS = [
-    "upstream_electron_temp",
-    "target_electron_density",
-    "target_electron_temp",
-    "target_electron_flux",
-    "SOL_power_loss_fraction",
-]
+from ..unit_handling import Unitfull
 
 
-def run_two_point_model_fixed_qpart(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "upstream_electron_temp",
+        "target_electron_density",
+        "target_electron_temp",
+        "target_electron_flux",
+        "SOL_power_loss_fraction",
+    ]
+)
+def two_point_model_fixed_qpart(
     target_q_parallel: Unitfull,
     q_parallel: Unitfull,
     parallel_connection_length: Unitfull,
@@ -61,11 +62,4 @@ def run_two_point_model_fixed_qpart(
         raise_error_if_not_converged=raise_error_if_not_converged,
     )
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-two_point_model_fixed_qpart = Algorithm(
-    function=run_two_point_model_fixed_qpart,
-    return_keys=RETURN_KEYS,
-)
+    return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)

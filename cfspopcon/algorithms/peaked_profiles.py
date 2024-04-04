@@ -2,25 +2,26 @@
 from .. import formulas
 from ..algorithm_class import Algorithm
 from ..named_options import ProfileForm
-from ..unit_handling import Unitfull, convert_to_default_units
-
-RETURN_KEYS = [
-    "effective_collisionality",
-    "ion_density_peaking",
-    "electron_density_peaking",
-    "peak_electron_density",
-    "peak_fuel_ion_density",
-    "peak_electron_temp",
-    "peak_ion_temp",
-    "rho",
-    "electron_density_profile",
-    "fuel_ion_density_profile",
-    "electron_temp_profile",
-    "ion_temp_profile",
-]
+from ..unit_handling import Unitfull
 
 
-def run_calc_peaked_profiles(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "effective_collisionality",
+        "ion_density_peaking",
+        "electron_density_peaking",
+        "peak_electron_density",
+        "peak_fuel_ion_density",
+        "peak_electron_temp",
+        "peak_ion_temp",
+        "rho",
+        "electron_density_profile",
+        "fuel_ion_density_profile",
+        "electron_temp_profile",
+        "ion_temp_profile",
+    ]
+)
+def calc_peaked_profiles(
     profile_form: ProfileForm,
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
@@ -81,11 +82,17 @@ def run_calc_peaked_profiles(
         normalized_inverse_temp_scale_length,
     )
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_peaked_profiles = Algorithm(
-    function=run_calc_peaked_profiles,
-    return_keys=RETURN_KEYS,
-)
+    return (
+        effective_collisionality,
+        ion_density_peaking,
+        electron_density_peaking,
+        peak_electron_density,
+        peak_fuel_ion_density,
+        peak_electron_temp,
+        peak_ion_temp,
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
+    )

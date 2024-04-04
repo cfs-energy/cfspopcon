@@ -6,18 +6,19 @@ import xarray as xr
 from ..algorithm_class import Algorithm
 from ..formulas.scrape_off_layer_model import solve_two_point_model
 from ..named_options import MomentumLossFunction
-from ..unit_handling import Quantity, convert_to_default_units
-
-RETURN_KEYS = [
-    "upstream_electron_temp",
-    "target_electron_density",
-    "target_electron_temp",
-    "target_electron_flux",
-    "target_q_parallel",
-]
+from ..unit_handling import Quantity
 
 
-def run_two_point_model_fixed_fpow(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "upstream_electron_temp",
+        "target_electron_density",
+        "target_electron_temp",
+        "target_electron_flux",
+        "target_q_parallel",
+    ]
+)
+def two_point_model_fixed_fpow(
     SOL_power_loss_fraction: Union[float, xr.DataArray],
     q_parallel: Union[Quantity, xr.DataArray],
     parallel_connection_length: Union[Quantity, xr.DataArray],
@@ -60,11 +61,4 @@ def run_two_point_model_fixed_fpow(
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-two_point_model_fixed_fpow = Algorithm(
-    function=run_two_point_model_fixed_fpow,
-    return_keys=RETURN_KEYS,
-)
+    return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
