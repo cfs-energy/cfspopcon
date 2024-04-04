@@ -56,7 +56,7 @@ sphinx-copybutton = "^0.5.2"
 ruff = "^0.0.292"
 nbmake = "^1.4.3"
 nbsphinx = "^0.9.3"
-omfit_classes = "^3.2024.09"
+freeqdsk = "^0.4.0"
 
 [tool.coverage.report]
 fail_under = 82

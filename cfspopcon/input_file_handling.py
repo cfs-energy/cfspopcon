@@ -11,7 +11,7 @@ from .algorithms import get_algorithm
 from .algorithms.algorithm_class import Algorithm, CompositeAlgorithm
 from .helpers import convert_named_options
 from .unit_handling import set_default_units
-from .OMFIT.omfit_eqdsk import OMFITgeqdsk
+from freeqdsk import geqdsk
 import scipy.interpolate
 
 def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any]]:
@@ -79,17 +79,29 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
         repr_d[key] = xr.DataArray(grid_vals, coords={f"dim_{key}": grid_vals})
 
     if equilibrium_file_path != None:
-        geqdsk = OMFITgeqdsk(equilibrium_file_path)
+        with open(equilibrium_file_path, "r") as f:
+            geqdsk = geqdsk.read(f)
         eq_input = {}
+
+        # TO DO: Filling up algorithms that calculate the following variables from the geqdsk file:
+        # minor_radius;
+        # Plasma_cross-sectional_area
+        # seperatrix_elongation
+        # 1D array of psi_norm
+        # 1D array of triangularity
+
         value_list = [
-        geqdsk['RMAXIS'],
-        abs(geqdsk['BCENTR']),
-        geqdsk['fluxSurfaces']['geo']['eps'][-1],
-        geqdsk['fluxSurfaces']['geo']['cxArea'][-1]/(np.pi * (geqdsk['fluxSurfaces']['geo']['a'][-1])**2),
-        geqdsk['fluxSurfaces']['geo']['kap'][-1]/(geqdsk['fluxSurfaces']['geo']['cxArea'][-1]/(np.pi * (geqdsk['fluxSurfaces']['geo']['a'][-1])**2)),
-        scipy.interpolate.interp1d(geqdsk['AuxQuantities']['PSI_NORM'],geqdsk['fluxSurfaces']['geo']['delta'])(0.95).item(),
-        geqdsk['fluxSurfaces']['geo']['delta'][-1]/(scipy.interpolate.interp1d(geqdsk['AuxQuantities']['PSI_NORM'],geqdsk['fluxSurfaces']['geo']['delta'])(0.95).item()),
-        abs(geqdsk['fluxSurfaces']['CURRENT']),
+        # "major_radius" =
+        geqdsk['rmagx'],
+        # "magnetic_field_on_axis" = 
+        abs(geqdsk['bcentr']),   
+        # "inverse_aspect_ratio" = minor_radius/(geqdsk['rmagx'])**2,
+        # "areal_elongation" = Plasma_cross-sectional_area/(np.pi * minor_radius**2),
+        # "elongation_ratio_sep_to_areal" = seperatrix_elongation/"areal_elongation",
+        # "triangularity_psi95" = scipy.interpolate.interp1d(psi_norm,triangularity)(0.95).item(),
+        # "triangularity_ratio_sep_to_psi95" = triangularity[-1]/"triangularity_psi95",
+        # "plasma_current" = 
+        abs(geqdsk['cpasma']),
         ]
         for i in range(len(key_list)):
             eq_input[key_list[i]] = convert_named_options(key=key_list[i], val=value_list[i])
