@@ -1,7 +1,8 @@
 """Calculate the ratio of magnetic to plasma (kinetic) pressure."""
 import numpy as np
 
-from ..unit_handling import Quantity, Unitfull, convert_units, ureg
+from ...algorithm_class import Algorithm
+from ...unit_handling import Quantity, Unitfull, convert_units, ureg
 
 
 def _calc_beta_general(
@@ -36,7 +37,7 @@ def _calc_beta_general(
     ret = unit_conversion_factor * (average_electron_density * (average_electron_temp + average_ion_temp)) / (magnetic_field**2)
     return convert_units(ret, ureg.dimensionless)
 
-
+@Algorithm.register_algorithm(return_keys=["beta_toroidal"])
 def calc_beta_toroidal(
     average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull
 ) -> Unitfull:
@@ -56,7 +57,7 @@ def calc_beta_toroidal(
     """
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=magnetic_field_on_axis)
 
-
+@Algorithm.register_algorithm(return_keys=["beta_poloidal"])
 def calc_beta_poloidal(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
@@ -99,6 +100,7 @@ def calc_beta_poloidal(
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=B_pol)
 
 
+@Algorithm.register_algorithm(return_keys=["beta"])
 def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitfull:
     """Calculate the total beta from the toroidal and poloidal betas.
 
@@ -109,12 +111,12 @@ def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitful
         beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
 
     Returns:
-         :term:`beta_total` [~]
+         :term:`beta` [~]
     """
     return 1.0 / (1.0 / beta_toroidal + 1.0 / beta_poloidal)
 
-
-def calc_beta_normalised(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:
+@Algorithm.register_algorithm(return_keys=["normalized_beta"])
+def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:
     """Normalize beta to stability (Troyon) parameters.
 
     See section 6.18 in Wesson :cite:`wesson_tokamaks_2011`.
@@ -126,7 +128,7 @@ def calc_beta_normalised(beta: Unitfull, minor_radius: Unitfull, magnetic_field_
         plasma_current: [MA] :term:`glossary link<plasma_current>`
 
     Returns:
-         :term:`beta_N`
+         :term:`normalized_beta`
     """
     normalisation = plasma_current / (minor_radius * magnetic_field_on_axis)
 

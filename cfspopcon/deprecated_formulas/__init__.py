@@ -1,7 +1,6 @@
 """Formulas for POPCONs analysis."""
 
 from . import fusion_reaction_data, plasma_profile_data, radiated_power, scrape_off_layer_model
-from .beta import calc_beta_normalised, calc_beta_poloidal, calc_beta_toroidal, calc_beta_total
 from .confinement_regime_threshold_powers import (
     calc_LH_transition_threshold_power,
     calc_LI_transition_threshold_power,
@@ -39,10 +38,6 @@ __all__ = [
     "calc_1D_plasma_profiles",
     "calc_B_pol_omp",
     "calc_B_tor_omp",
-    "calc_beta_normalised",
-    "calc_beta_poloidal",
-    "calc_beta_toroidal",
-    "calc_beta_total",
     "calc_bootstrap_fraction",
     "calc_bremsstrahlung_radiation",
     "calc_current_relaxation_time",

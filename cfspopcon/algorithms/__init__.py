@@ -1,5 +1,4 @@
 """POPCON algorithms."""
-from .beta import calc_beta
 from .core_radiated_power import calc_core_radiated_power
 from .edge_impurity_concentration import calc_edge_impurity_concentration
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
@@ -30,8 +29,6 @@ from .two_point_model_fixed_qpart import two_point_model_fixed_qpart
 from .two_point_model_fixed_tet import two_point_model_fixed_tet
 
 __all__ = [
-    "get_algorithm",
-    "calc_beta",
     "calc_core_radiated_power",
     "calc_edge_impurity_concentration",
     "calc_extrinsic_core_radiator",

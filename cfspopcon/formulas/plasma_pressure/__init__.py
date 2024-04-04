@@ -1,7 +1,5 @@
 """Routines to calculate the plasma pressure, beta and related quantities."""
 
-from . import plasma_temperature
+from . import beta, plasma_temperature
 
-__all__ = [
-    "plasma_temperature",
-]
+__all__ = ["plasma_temperature", "beta"]

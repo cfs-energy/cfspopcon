@@ -36,20 +36,41 @@ calc_average_total_pressure:
   optionals: []
   returns:
   - average_total_pressure
-calc_beta:
+calc_beta_normalized:
+  inputs:
+  - beta
+  - minor_radius
+  - magnetic_field_on_axis
+  - plasma_current
+  optionals: []
+  returns:
+  - normalized_beta
+calc_beta_poloidal:
+  inputs:
+  - average_electron_density
+  - average_electron_temp
+  - average_ion_temp
+  - plasma_current
+  - minor_radius
+  optionals: []
+  returns:
+  - beta_poloidal
+calc_beta_toroidal:
   inputs:
   - average_electron_density
   - average_electron_temp
   - average_ion_temp
   - magnetic_field_on_axis
-  - plasma_current
-  - minor_radius
   optionals: []
   returns:
   - beta_toroidal
+calc_beta_total:
+  inputs:
+  - beta_toroidal
   - beta_poloidal
+  optionals: []
+  returns:
   - beta
-  - normalized_beta
 calc_bootstrap_fraction:
   inputs:
   - ion_density_peaking

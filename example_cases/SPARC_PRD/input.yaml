@@ -21,7 +21,10 @@ algorithms:
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
-  - calc_beta
+  - calc_beta_toroidal
+  - calc_beta_poloidal
+  - calc_beta_total
+  - calc_beta_normalized
   - calc_peaked_profiles
   # Once we have the profiles, we can then estimate the power
   # radiated from the confined region.

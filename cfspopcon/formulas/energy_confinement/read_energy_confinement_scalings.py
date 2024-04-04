@@ -11,6 +11,7 @@ from ...algorithm_class import Algorithm
 
 class ConfinementScaling:
     """Class to handle different energy confinement scalings."""
+
     instances: ClassVar[dict[str, ConfinementScaling]] = dict()
 
     def __init__(self, name: str, data: dict[str, Any]) -> None:
@@ -37,8 +38,9 @@ class ConfinementScaling:
         self.average_density_alpha = data["params"]["average_density_alpha"]
         self.qstar_alpha = data["params"]["qstar_alpha"]
 
+
 @Algorithm.register_algorithm(return_keys=[])
-def read_confinement_scalings() -> dict[str, Any]:
+def read_confinement_scalings() -> None:
     """Reads the energy confinement scalings from an energy_confinement_scalings.yaml file."""
     with as_file(files("cfspopcon.formulas.energy_confinement").joinpath("energy_confinement_scalings.yaml")) as filepath:
         with open(filepath) as f:

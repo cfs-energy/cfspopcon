@@ -1,10 +1,10 @@
 """Switch the confinement scaling used if below a threshold power or density."""
-import numpy as np
 import xarray as xr
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import ureg, wraps_ufunc, Unitfull
+from ...unit_handling import Unitfull
 from .solve_for_input_power import solve_tau_e_scaling_for_input_power
+
 
 @Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in", "SOC_LOC_ratio"])
 def switch_to_linearised_ohmic_confinement_below_threshold(
@@ -46,7 +46,6 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
     Returns:
         :term:`energy_confinement_time`, :term:`P_in`, :term:`SOC_LOC_ratio`
     """
-
     tau_e_LOC, P_in_LOC = solve_tau_e_scaling_for_input_power(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
@@ -66,11 +65,10 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
 
     # Use Linearized Ohmic Confinement if it gives worse energy confinement.
     SOC_LOC_ratio = energy_confinement_time / tau_e_LOC
-    energy_confinement_time = xr.where(
-        SOC_LOC_ratio > 1.0, tau_e_LOC, energy_confinement_time
-    )  # type:ignore[no-untyped-call]
+    energy_confinement_time = xr.where(SOC_LOC_ratio > 1.0, tau_e_LOC, energy_confinement_time)  # type:ignore[no-untyped-call]
     P_in = xr.where(SOC_LOC_ratio > 1.0, P_in_LOC, P_in)  # type:ignore[no-untyped-call]
 
     return (energy_confinement_time, P_in, SOC_LOC_ratio)
+
 
 # TODO implement switch to L-mode below PLH

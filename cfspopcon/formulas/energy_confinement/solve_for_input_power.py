@@ -120,16 +120,16 @@ def solve_tau_e_scaling_for_input_power(
     gamma = (
         confinement_time_scalar
         * scaling.constant
-        * plasma_current ** scaling.plasma_current_alpha
-        * magnetic_field_on_axis ** scaling.field_on_axis_alpha
-        * average_electron_density ** scaling.average_density_alpha
-        * major_radius ** scaling.major_radius_alpha
-        * areal_elongation ** scaling.areal_elongation_alpha
-        * separatrix_elongation ** scaling.separatrix_elongation_alpha
-        * inverse_aspect_ratio ** scaling.inverse_aspect_ratio_alpha
-        * fuel_average_mass_number ** scaling.mass_ratio_alpha
+        * plasma_current**scaling.plasma_current_alpha
+        * magnetic_field_on_axis**scaling.field_on_axis_alpha
+        * average_electron_density**scaling.average_density_alpha
+        * major_radius**scaling.major_radius_alpha
+        * areal_elongation**scaling.areal_elongation_alpha
+        * separatrix_elongation**scaling.separatrix_elongation_alpha
+        * inverse_aspect_ratio**scaling.inverse_aspect_ratio_alpha
+        * fuel_average_mass_number**scaling.mass_ratio_alpha
         * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity])) ** scaling.triangularity_alpha
-        * q_star ** scaling.qstar_alpha
+        * q_star**scaling.qstar_alpha
     )
 
     if gamma > 0.0:
