@@ -14,6 +14,13 @@ calc_auxillary_power:
   optionals: []
   returns:
   - P_auxillary
+calc_average_fuel_ion_mass:
+  inputs:
+  - fusion_reaction
+  - heavier_fuel_species_fraction
+  optionals: []
+  returns:
+  - fuel_average_mass_number
 calc_average_ion_temp:
   inputs:
   - average_electron_temp
@@ -160,13 +167,6 @@ calc_f_shaping_for_qstar:
   optionals: []
   returns:
   - f_shaping
-calc_fuel_average_mass_number:
-  inputs:
-  - fusion_reaction
-  - heavier_fuel_species_fraction
-  optionals: []
-  returns:
-  - fuel_average_mass_number
 calc_fusion_gain:
   inputs:
   - fusion_reaction

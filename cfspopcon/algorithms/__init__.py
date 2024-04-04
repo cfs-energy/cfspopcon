@@ -16,7 +16,6 @@ from .single_functions import (
     calc_confinement_transition_threshold_power,
     calc_current_relaxation_time,
     calc_f_rad_core,
-    calc_fuel_average_mass_number,
     calc_greenwald_fraction,
     calc_magnetic_field_on_axis,
     calc_normalised_collisionality,

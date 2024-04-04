@@ -1,8 +1,10 @@
 """Calculate the average fuel mass in atomic mass units."""
 from typing import Callable
 
-from ..named_options import ReactionType
-from ..unit_handling import ureg, wraps_ufunc
+from ...named_options import ReactionType
+from ...unit_handling import ureg, wraps_ufunc
+from ...algorithm_class import Algorithm
+
 
 FUEL_MASS_AMU: dict[ReactionType, Callable[[float], float]] = {
     ReactionType.DT: lambda heavier_fuel_species_fraction: 2.0 + heavier_fuel_species_fraction,
@@ -12,12 +14,12 @@ FUEL_MASS_AMU: dict[ReactionType, Callable[[float], float]] = {
     + 1.0 * (1.0 - heavier_fuel_species_fraction),
 }
 
-
+@Algorithm.register_algorithm(return_keys=["fuel_average_mass_number"])
 @wraps_ufunc(
     return_units=dict(fuel_average_mass_number=ureg.amu),
     input_units=dict(fusion_reaction=None, heavier_fuel_species_fraction=ureg.dimensionless),
 )
-def calc_fuel_average_mass_number(fusion_reaction: ReactionType, heavier_fuel_species_fraction: float) -> float:
+def calc_average_fuel_ion_mass(fusion_reaction: ReactionType, heavier_fuel_species_fraction: float) -> float:
     """Calculate the average mass of the fuel ions, based on reaction type and fuel mixture ratio.
 
     Args:

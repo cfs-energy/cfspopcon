@@ -23,6 +23,7 @@ def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: U
         (1.17 - 0.65 * inverse_aspect_ratio) / (1.0 - inverse_aspect_ratio**2.0) ** 2.0
     )
 
+
 @Algorithm.register_algorithm(return_keys=["plasma_current"])
 @wraps_ufunc(
     input_units=dict(
@@ -51,7 +52,10 @@ def calc_plasma_current_from_qstar(
     Returns:
         :term:`plasma_current` [MA]
     """
-    return 5.0 * ((inverse_aspect_ratio * major_radius) ** 2.0) * (magnetic_field_on_axis / (q_star * major_radius)) * f_shaping
+    return (  # type:ignore[no-any-return]
+        5.0 * ((inverse_aspect_ratio * major_radius) ** 2.0) * (magnetic_field_on_axis / (q_star * major_radius)) * f_shaping
+    )
+
 
 @Algorithm.register_algorithm(return_keys=["q_star"])
 @wraps_ufunc(
@@ -81,4 +85,6 @@ def calc_q_star_from_plasma_current(
     Returns:
         :term:`qstar` [~]
     """
-    return 5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
+    return (  # type:ignore[no-any-return]
+        5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
+    )

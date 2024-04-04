@@ -49,9 +49,6 @@ calc_average_ion_temp = Algorithm.from_single_function(
     return_keys=["average_ion_temp"],
     name="calc_average_ion_temp",
 )
-calc_fuel_average_mass_number = Algorithm.from_single_function(
-    deprecated_formulas.calc_fuel_average_mass_number, return_keys=["fuel_average_mass_number"], name="calc_fuel_average_mass_number"
-)
 calc_magnetic_field_on_axis = Algorithm.from_single_function(
     lambda product_of_magnetic_field_and_radius, major_radius: product_of_magnetic_field_and_radius / major_radius,
     return_keys=["magnetic_field_on_axis"],

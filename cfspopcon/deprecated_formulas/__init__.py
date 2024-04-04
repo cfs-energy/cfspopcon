@@ -1,7 +1,6 @@
 """Formulas for POPCONs analysis."""
 
 from . import energy_confinement_time_scalings, fusion_reaction_data, plasma_profile_data, radiated_power, scrape_off_layer_model
-from .average_fuel_ion_mass import calc_fuel_average_mass_number
 from .beta import calc_beta_normalised, calc_beta_poloidal, calc_beta_toroidal, calc_beta_total
 from .confinement_regime_threshold_powers import (
     calc_confinement_transition_threshold_power,
@@ -56,7 +55,6 @@ __all__ = [
     "calc_density_peaking",
     "calc_effective_collisionality",
     "calc_f_shaping",
-    "calc_fuel_average_mass_number",
     "calc_fusion_power",
     "calc_greenwald_density_limit",
     "calc_greenwald_fraction",

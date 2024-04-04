@@ -12,7 +12,7 @@ algorithms:
   - calc_plasma_surface_area
   - calc_f_shaping_for_qstar
   - calc_q_star_from_plasma_current
-  - calc_fuel_average_mass_number
+  - calc_average_fuel_ion_mass
   - calc_average_ion_temp
   - calc_zeff_and_dilution_from_impurities
   - calc_plasma_stored_energy
