@@ -1,8 +1,8 @@
 """Calculate density peaking and the corresponding density and temperature profiles."""
 from .. import formulas
+from ..algorithm_class import Algorithm
 from ..named_options import ProfileForm
 from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
     "effective_collisionality",

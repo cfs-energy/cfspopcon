@@ -1,7 +1,7 @@
 """Calculate the input power required to maintain the stored energy, given a tau_e scaling."""
 from .. import formulas, named_options
+from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
     "energy_confinement_time",

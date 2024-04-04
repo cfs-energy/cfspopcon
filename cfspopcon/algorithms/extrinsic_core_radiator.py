@@ -3,9 +3,9 @@ import numpy as np
 import xarray as xr
 
 from .. import formulas, named_options
+from ..algorithm_class import Algorithm
 from ..helpers import make_impurities_array
 from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
     "core_radiator_concentration",

@@ -3,10 +3,10 @@ from typing import Union
 
 import xarray as xr
 
+from ..algorithm_class import Algorithm
 from ..formulas.scrape_off_layer_model import solve_two_point_model
 from ..named_options import MomentumLossFunction
 from ..unit_handling import Quantity, convert_to_default_units
-from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
     "upstream_electron_temp",

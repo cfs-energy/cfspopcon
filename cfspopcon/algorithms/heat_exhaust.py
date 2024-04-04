@@ -2,8 +2,8 @@
 import numpy as np
 
 from .. import formulas, named_options
+from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, convert_to_default_units, ureg
-from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
     "PB_over_R",

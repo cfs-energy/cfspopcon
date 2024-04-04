@@ -2,8 +2,8 @@
 import xarray as xr
 
 from .. import formulas
+from ..algorithm_class import Algorithm
 from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
 
 RETURN_KEYS = [
     "impurity_charge_state",
