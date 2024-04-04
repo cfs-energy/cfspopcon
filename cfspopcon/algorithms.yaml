@@ -21,7 +21,7 @@ calc_average_fuel_ion_mass:
   optionals: []
   returns:
   - fuel_average_mass_number
-calc_average_ion_temp:
+calc_average_ion_temp_from_temperature_ratio:
   inputs:
   - average_electron_temp
   - ion_to_electron_temp_ratio

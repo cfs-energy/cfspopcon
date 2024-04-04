@@ -10,7 +10,6 @@ from .peaked_profiles import calc_peaked_profiles
 from .power_balance_from_tau_e import calc_power_balance_from_tau_e
 from .single_functions import (
     calc_auxillary_power,
-    calc_average_ion_temp,
     calc_average_total_pressure,
     calc_bootstrap_fraction,
     calc_confinement_transition_threshold_power,
@@ -62,7 +61,6 @@ __all__ = [
     "calc_average_total_pressure",
     "calc_bootstrap_fraction",
     "calc_auxillary_power",
-    "calc_average_ion_temp",
     "calc_fuel_average_mass_number",
     "calc_magnetic_field_on_axis",
     "require_P_rad_less_than_P_in",

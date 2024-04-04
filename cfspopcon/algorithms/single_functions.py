@@ -44,11 +44,7 @@ calc_bootstrap_fraction = Algorithm.from_single_function(
 calc_auxillary_power = Algorithm.from_single_function(
     lambda P_external, P_ohmic: (P_external - P_ohmic).clip(min=0.0 * ureg.MW), return_keys=["P_auxillary"], name="calc_auxillary_power"
 )
-calc_average_ion_temp = Algorithm.from_single_function(
-    lambda average_electron_temp, ion_to_electron_temp_ratio: average_electron_temp * ion_to_electron_temp_ratio,
-    return_keys=["average_ion_temp"],
-    name="calc_average_ion_temp",
-)
+
 calc_magnetic_field_on_axis = Algorithm.from_single_function(
     lambda product_of_magnetic_field_and_radius, major_radius: product_of_magnetic_field_and_radius / major_radius,
     return_keys=["magnetic_field_on_axis"],

@@ -5,6 +5,7 @@ from . import (
     geometry,
     metrics,
     plasma_current,
+    plasma_pressure,
     plasma_profiles,
     radiated_power,
     scrape_off_layer,
@@ -21,4 +22,5 @@ __all__ = [
     "radiated_power",
     "scrape_off_layer",
     "zeff_and_dilution",
+    "plasma_pressure",
 ]
