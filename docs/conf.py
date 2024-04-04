@@ -12,7 +12,7 @@ from sphinx.ext.intersphinx import missing_reference
 from sphinx.util.inspect import stringify_signature
 
 import cfspopcon
-from cfspopcon.algorithms.algorithm_class import Algorithm
+from cfspopcon.algorithm_class import Algorithm
 from cfspopcon import formulas
 from cfspopcon.unit_handling.setup_unit_handling import Quantity, Unit
 

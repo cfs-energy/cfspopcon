@@ -6,8 +6,9 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import RegularGridInterpolator  # type: ignore[import-untyped]
 
-from cfspopcon.named_options import AtomicSpecies
-from cfspopcon.unit_handling import magnitude
+from .algorithm_class import Algorithm
+from .named_options import AtomicSpecies
+from .unit_handling import magnitude
 
 
 class AtomicData:
@@ -316,3 +317,12 @@ class AtomicData:
         assert electron_temp.min() >= min_temp, f"{electron_temp.min()} < {min_temp}"
         assert electron_density.max() <= max_density, f"{electron_density.max()} > {max_density}"
         assert electron_density.min() >= min_density, f"{electron_density.min()} < {min_density}"
+
+
+@Algorithm.register_algorithm(return_keys=["atomic_data"])
+def read_atomic_data(radas_dir: Path) -> AtomicData:
+    """Construct an AtomicData interface using the atomic data in the specified directory."""
+    if isinstance(radas_dir, xr.DataArray):
+        return AtomicData(radas_dir.item())
+    else:
+        return AtomicData(radas_dir)
