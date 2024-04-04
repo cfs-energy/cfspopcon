@@ -152,6 +152,14 @@ calc_f_rad_core:
   optionals: []
   returns:
   - core_radiated_power_fraction
+calc_f_shaping_for_qstar:
+  inputs:
+  - inverse_aspect_ratio
+  - areal_elongation
+  - triangularity_psi95
+  optionals: []
+  returns:
+  - f_shaping
 calc_fuel_average_mass_number:
   inputs:
   - fusion_reaction
@@ -293,17 +301,15 @@ calc_peaked_profiles:
   - fuel_ion_density_profile
   - electron_temp_profile
   - ion_temp_profile
-calc_plasma_current_from_q_star:
+calc_plasma_current_from_qstar:
   inputs:
   - magnetic_field_on_axis
   - major_radius
-  - q_star
   - inverse_aspect_ratio
-  - areal_elongation
-  - triangularity_psi95
+  - q_star
+  - f_shaping
   optionals: []
   returns:
-  - f_shaping
   - plasma_current
 calc_plasma_stored_energy:
   inputs:
@@ -356,13 +362,11 @@ calc_q_star_from_plasma_current:
   inputs:
   - magnetic_field_on_axis
   - major_radius
-  - plasma_current
   - inverse_aspect_ratio
-  - areal_elongation
-  - triangularity_psi95
+  - plasma_current
+  - f_shaping
   optionals: []
   returns:
-  - f_shaping
   - q_star
 calc_ratio_P_LH:
   inputs:

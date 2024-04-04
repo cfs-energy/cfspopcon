@@ -10,6 +10,7 @@ algorithms:
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
   - calc_plasma_volume
   - calc_plasma_surface_area
+  - calc_f_shaping_for_qstar
   - calc_q_star_from_plasma_current
   - calc_fuel_average_mass_number
   - calc_average_ion_temp

@@ -7,9 +7,7 @@ from .fusion_gain import calc_fusion_gain
 from .heat_exhaust import calc_heat_exhaust
 from .ohmic_power import calc_ohmic_power
 from .peaked_profiles import calc_peaked_profiles
-from .plasma_current_from_q_star import calc_plasma_current_from_q_star
 from .power_balance_from_tau_e import calc_power_balance_from_tau_e
-from .q_star_from_plasma_current import calc_q_star_from_plasma_current
 from .single_functions import (
     calc_auxillary_power,
     calc_average_ion_temp,
@@ -47,9 +45,7 @@ __all__ = [
     "calc_heat_exhaust",
     "calc_ohmic_power",
     "calc_peaked_profiles",
-    "calc_plasma_current_from_q_star",
     "calc_power_balance_from_tau_e",
-    "calc_q_star_from_plasma_current",
     "two_point_model_fixed_fpow",
     "two_point_model_fixed_qpart",
     "two_point_model_fixed_tet",
