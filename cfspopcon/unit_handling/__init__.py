@@ -2,7 +2,7 @@
 from typing import Union
 
 import xarray as xr
-from pint import DimensionalityError, UnitStrippedWarning
+from pint import DimensionalityError, UndefinedUnitError, UnitStrippedWarning
 
 from .decorator import wraps_ufunc
 from .default_units import convert_to_default_units, default_unit, magnitude_in_default_units, set_default_units
@@ -25,4 +25,5 @@ __all__ = [
     "dimensionless_magnitude",
     "DimensionalityError",
     "UnitStrippedWarning",
+    "UndefinedUnitError",
 ]
