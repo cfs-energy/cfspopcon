@@ -53,13 +53,15 @@ def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
 
     file_io.write_dataset_to_netcdf(dataset, filepath=output_dir / "dataset.nc")
 
-    for point, point_params in points.items():
-        file_io.write_point_to_file(dataset, point, point_params, output_dir=output_dir)
+    if points is not None:
+        for point, point_params in points.items():
+            file_io.write_point_to_file(dataset, point, point_params, output_dir=output_dir)
 
     # Plot the results
-    for plot_name, plot_style in plots.items():
-        print(f"Plotting {plot_name}")
-        make_plot(dataset, read_plot_style(plot_style), points, title=plot_name, output_dir=output_dir, save_name=plot_style.stem)
+    if plots is not None:
+        for plot_name, plot_style in plots.items():
+            print(f"Plotting {plot_name}")
+            make_plot(dataset, read_plot_style(plot_style), points, title=plot_name, output_dir=output_dir, save_name=plot_style.stem)
 
     print("Done")
     if show:
