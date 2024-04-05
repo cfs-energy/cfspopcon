@@ -34,6 +34,27 @@ calc_B_tor_omp:
   optionals: []
   returns:
   - B_t_out_mid
+calc_LH_transition_threshold_power:
+  inputs:
+  - plasma_current
+  - magnetic_field_on_axis
+  - minor_radius
+  - major_radius
+  - surface_area
+  - fuel_average_mass_number
+  - average_electron_density
+  optionals:
+  - scale
+  returns:
+  - P_LH_thresh
+calc_LI_transition_threshold_power:
+  inputs:
+  - plasma_current
+  - average_electron_density
+  optionals:
+  - scale
+  returns:
+  - P_LI_thresh
 calc_PB_over_R:
   inputs:
   - P_sol
@@ -134,19 +155,6 @@ calc_bootstrap_fraction:
   optionals: []
   returns:
   - bootstrap_fraction
-calc_confinement_transition_threshold_power:
-  inputs:
-  - plasma_current
-  - magnetic_field_on_axis
-  - minor_radius
-  - major_radius
-  - surface_area
-  - fuel_average_mass_number
-  - average_electron_density
-  optionals:
-  - scale
-  returns:
-  - P_LH_thresh
 calc_core_radiated_power:
   inputs:
   - rho
@@ -288,6 +296,13 @@ calc_fusion_power:
   - P_fusion
   - P_neutron
   - P_alpha
+calc_greenwald_density_limit:
+  inputs:
+  - plasma_current
+  - minor_radius
+  optionals: []
+  returns:
+  - greenwald_density_limit
 calc_greenwald_fraction:
   inputs:
   - average_electron_density
@@ -499,6 +514,13 @@ calc_ratio_P_LH:
   optionals: []
   returns:
   - ratio_of_P_SOL_to_P_LH
+calc_ratio_P_LI:
+  inputs:
+  - P_sol
+  - P_LI_thresh
+  optionals: []
+  returns:
+  - ratio_of_P_SOL_to_P_LI
 calc_resistivity_trapped_enhancement:
   inputs:
   - inverse_aspect_ratio
@@ -553,6 +575,14 @@ calc_triple_product:
   optionals: []
   returns:
   - fusion_triple_product
+calc_troyon_limit:
+  inputs:
+  - minor_radius
+  - magnetic_field_on_axis
+  - plasma_current
+  optionals: []
+  returns:
+  - troyon_max_beta
 calc_vertical_minor_radius_from_elongation_and_minor_radius:
   inputs:
   - minor_radius

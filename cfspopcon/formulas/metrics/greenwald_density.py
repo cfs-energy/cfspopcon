@@ -30,6 +30,7 @@ def calc_greenwald_fraction(
 
     return float(average_electron_density / n_Greenwald)
 
+
 @Algorithm.register_algorithm(return_keys=["greenwald_density_limit"])
 @wraps_ufunc(return_units=dict(nG=ureg.n20), input_units=dict(plasma_current=ureg.MA, minor_radius=ureg.m))
 def calc_greenwald_density_limit(plasma_current: float, minor_radius: float) -> float:
