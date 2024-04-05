@@ -9,7 +9,6 @@ from .named_options import (
     MomentumLossFunction,
     ProfileForm,
     RadiationMethod,
-    ReactionType,
 )
 
 
@@ -19,8 +18,6 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return ProfileForm[val]
     elif key == "radiated_power_method":
         return RadiationMethod[val]
-    elif key == "fusion_reaction":
-        return ReactionType[val]
     elif key == "impurity":
         return AtomicSpecies[val]
     elif key == "impurities":
@@ -33,8 +30,6 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return LambdaQScaling[val]
     elif key == "SOL_momentum_loss_function":
         return MomentumLossFunction[val]
-    elif key == "reaction_type":
-        return ReactionType[val]
     elif key == "radiation_method":
         return RadiationMethod[val]
     else:

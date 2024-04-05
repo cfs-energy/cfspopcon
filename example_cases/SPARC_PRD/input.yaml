@@ -139,7 +139,7 @@ plasma_current: 8.7e+6
 fraction_of_external_power_coupled: 0.9
 
 # What fusion reaction are we using?
-fusion_reaction: DT
+fusion_reaction: DTFusionHively
 # Fraction of fuel ions which are the heavier species
 heavier_fuel_species_fraction: 0.5
 

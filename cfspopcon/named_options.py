@@ -19,15 +19,6 @@ class RadiationMethod(Enum):
     Radas = "Impurity line and bremsstrahlung radiation, using coronal Lz curves from Radas"
 
 
-class ReactionType(Enum):
-    """Supported Fusion Fuel Reaction Types."""
-
-    DT = "Deuterium-Tritium"
-    DD = "Deuterium-Deuterium"
-    DHe3 = "Deuterium-Helium3"
-    pB11 = "Proton-Boron11"
-
-
 class AtomicSpecies(Enum):
     """Enum of possible atomic species.
 

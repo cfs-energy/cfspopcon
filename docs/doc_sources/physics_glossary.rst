@@ -368,7 +368,7 @@ Physics Glossary
     Product of the major radius and the (vacuum) magnetic field :math:`B \times R`.
 
   fusion_reaction
-    A :class:`~cfspopcon.named_options.ReactionType` indicating which fusion reaction should be used.
+    A `str` indicating which fusion reaction should be used, should match a class name in `cfspopcon.formulas.fusion_reaction.fusion_data`
 
   heavier_fuel_species_fraction
     Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this is :math:`f_T = n_T/(n_T+n_D)`.

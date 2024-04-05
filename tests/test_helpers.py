@@ -14,7 +14,6 @@ def test_convert_named_options():
     for val, key in (
         (named_options.ProfileForm.analytic, "profile_form"),
         (named_options.RadiationMethod.Radas, "radiated_power_method"),
-        (named_options.ReactionType.DT, "fusion_reaction"),
         (named_options.AtomicSpecies.Neon, "impurity"),
         (named_options.AtomicSpecies.Xenon, "core_radiator"),
         (named_options.LambdaQScaling.EichRegression15, "lambda_q_scaling"),
