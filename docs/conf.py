@@ -13,7 +13,7 @@ from sphinx.util.inspect import stringify_signature
 
 import cfspopcon
 from cfspopcon.algorithm_class import Algorithm
-from cfspopcon import deprecated_formulas
+from cfspopcon import formulas
 from cfspopcon.unit_handling.setup_unit_handling import Quantity, Unit
 
 project = "cfspopcon"

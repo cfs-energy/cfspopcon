@@ -11,6 +11,7 @@ from . import (
     power_crossing_separatrix,
     radiated_power,
     scrape_off_layer,
+    seeded_radiators,
     zeff_and_dilution,
 )
 
@@ -27,4 +28,5 @@ __all__ = [
     "plasma_pressure",
     "auxillary_power",
     "power_crossing_separatrix",
+    "seeded_radiators",
 ]

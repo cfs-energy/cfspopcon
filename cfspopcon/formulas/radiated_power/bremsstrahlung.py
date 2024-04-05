@@ -54,10 +54,13 @@ def calc_bremsstrahlung_radiation(
 
     P_brem = 5.35e-3 * z_effective * Kb  # volume-averaged bremsstrahlung radiaton in MW
 
-    return P_brem
+    return P_brem  # type:ignore[no-any-return]
+
 
 Algorithm.from_single_function(
-    func = lambda rho, electron_density_profile, electron_temp_profile, plasma_volume: calc_bremsstrahlung_radiation(rho, electron_density_profile, electron_temp_profile, 1.0, plasma_volume),
-    name = "calc_P_rad_hydrogen_bremsstrahlung",
-    return_keys=["P_rad_hydrogen_bremsstrahlung"]
+    func=lambda rho, electron_density_profile, electron_temp_profile, plasma_volume: calc_bremsstrahlung_radiation(
+        rho, electron_density_profile, electron_temp_profile, 1.0, plasma_volume
+    ),
+    name="calc_P_rad_hydrogen_bremsstrahlung",
+    return_keys=["P_rad_hydrogen_bremsstrahlung"],
 )

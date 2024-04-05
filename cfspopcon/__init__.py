@@ -4,7 +4,7 @@ from importlib.metadata import metadata
 __version__ = metadata(__package__)["Version"]
 __author__ = metadata(__package__)["Author"]
 
-from . import algorithms, deprecated_formulas, file_io, formulas, helpers, named_options, unit_handling
+from . import file_io, formulas, helpers, named_options, unit_handling
 from .algorithm_class import Algorithm, CompositeAlgorithm
 from .input_file_handling import read_case
 from .plotting import read_plot_style
@@ -30,7 +30,6 @@ __all__ = [
     "helpers",
     "named_options",
     "formulas",
-    "deprecated_formulas",
     "unit_handling",
     "ureg",
     "Quantity",
@@ -50,5 +49,4 @@ __all__ = [
     "CompositeAlgorithm",
     "file_io",
     "AtomicData",
-    "algorithms",
 ]

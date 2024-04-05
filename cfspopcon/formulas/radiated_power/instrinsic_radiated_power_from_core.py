@@ -46,9 +46,7 @@ def calc_instrinsic_radiated_power_from_core(
         :term:`P_radiation`
 
     """
-    P_rad_bremsstrahlung = calc_bremsstrahlung_radiation(
-        rho, electron_density_profile, electron_temp_profile, z_effective, plasma_volume
-    )
+    P_rad_bremsstrahlung = calc_bremsstrahlung_radiation(rho, electron_density_profile, electron_temp_profile, z_effective, plasma_volume)
     P_rad_bremsstrahlung_from_hydrogen = calc_bremsstrahlung_radiation(
         rho, electron_density_profile, electron_temp_profile, 1.0, plasma_volume
     )
