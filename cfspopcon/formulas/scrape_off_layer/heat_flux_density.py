@@ -1,7 +1,9 @@
-from ...unit_handling import Unitfull, wraps_ufunc, ureg
+"""Calculate the parallel and perpendicular heat flux density entering the scrape-off-layer."""
 import numpy as np
-from ...algorithm_class import Algorithm
 from scipy import constants  # type: ignore[import-untyped]
+
+from ...algorithm_class import Algorithm
+from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
 @Algorithm.register_algorithm(return_keys=["B_pol_out_mid"])
@@ -21,6 +23,7 @@ def calc_B_pol_omp(plasma_current: float, minor_radius: float) -> float:
     """
     return float(constants.mu_0 * plasma_current / (2.0 * np.pi * minor_radius))
 
+
 @Algorithm.register_algorithm(return_keys=["B_t_out_mid"])
 def calc_B_tor_omp(magnetic_field_on_axis: Unitfull, major_radius: Unitfull, minor_radius: Unitfull) -> Unitfull:
     """Calculate the toroidal magnetic field at the outboard midplane.
@@ -39,7 +42,7 @@ def calc_B_tor_omp(magnetic_field_on_axis: Unitfull, major_radius: Unitfull, min
 @Algorithm.register_algorithm(return_keys=["fieldline_pitch_at_omp"])
 def calc_fieldline_pitch_at_omp(B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull) -> Unitfull:
     """Calculate the pitch of the magnetic field at the outboard midplane.
-    
+
     Args:
         B_t_out_mid: [T] :term:`glossary link<B_t_out_mid>`
         B_pol_out_mid: [T] :term:`glossary link<B_pol_out_mid>`
@@ -48,6 +51,7 @@ def calc_fieldline_pitch_at_omp(B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull) 
          fieldline_pitch_at_omp [~]
     """
     return np.sqrt(B_t_out_mid**2 + B_pol_out_mid**2) / B_pol_out_mid
+
 
 @Algorithm.register_algorithm(return_keys=["q_parallel"])
 def calc_parallel_heat_flux_density(
@@ -79,9 +83,8 @@ def calc_parallel_heat_flux_density(
       q_parallel [GW/m^2]
     """
     upstream_major_radius = major_radius + minor_radius
-    return (
-        P_sol * fraction_of_P_SOL_to_divertor / (2.0 * np.pi * upstream_major_radius * lambda_q) * fieldline_pitch_at_omp
-    )
+    return P_sol * fraction_of_P_SOL_to_divertor / (2.0 * np.pi * upstream_major_radius * lambda_q) * fieldline_pitch_at_omp
+
 
 @Algorithm.register_algorithm(return_keys=["q_perp"])
 def calc_q_perp(P_sol: Unitfull, major_radius: Unitfull, minor_radius: Unitfull, lambda_q: Unitfull) -> Unitfull:

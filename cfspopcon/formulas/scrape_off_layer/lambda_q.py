@@ -1,8 +1,9 @@
 """Routines to calculate the heat flux decay length (lambda_q), for several different scalings."""
 
+from ...algorithm_class import Algorithm
 from ...named_options import LambdaQScaling
 from ...unit_handling import ureg, wraps_ufunc
-from ...algorithm_class import Algorithm
+
 
 @Algorithm.register_algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(
@@ -42,9 +43,7 @@ def calc_lambda_q(
     elif lambda_q_scaling == LambdaQScaling.EichRegression14:
         return float(calc_lambda_q_with_eich_regression_14.__wrapped__(B_pol_out_mid))
     elif lambda_q_scaling == LambdaQScaling.EichRegression15:
-        return float(
-            calc_lambda_q_with_eich_regression_15.__wrapped__(P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio)
-        )
+        return float(calc_lambda_q_with_eich_regression_15.__wrapped__(P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio))
     else:
         raise NotImplementedError(f"No implementation for lambda_q scaling {lambda_q_scaling}")
 
@@ -79,9 +78,7 @@ def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float) -> float:
         inverse_aspect_ratio=ureg.dimensionless,
     ),
 )
-def calc_lambda_q_with_eich_regression_15(
-    P_sol: float, major_radius: float, B_pol_out_mid: float, inverse_aspect_ratio: float
-) -> float:
+def calc_lambda_q_with_eich_regression_15(P_sol: float, major_radius: float, B_pol_out_mid: float, inverse_aspect_ratio: float) -> float:
     """Return lambda_q according to Eich regression 15.
 
     #15 in Table 3 in :cite:`eich_scaling_2013`
