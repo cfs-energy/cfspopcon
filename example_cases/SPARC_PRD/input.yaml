@@ -33,7 +33,7 @@ algorithms:
   - calc_1D_plasma_profiles
   # Once we have the profiles, we can then estimate the power
   # radiated from the confined region.
-  - calc_core_radiated_power
+  - calc_instrinsic_radiated_power_from_core
   - require_P_rad_less_than_P_in
   # To control the power crossing the separatrix, we can inject
   # a core radiator (high-Z species like Xenon) to intentionally

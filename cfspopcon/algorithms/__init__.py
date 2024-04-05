@@ -1,11 +1,6 @@
 """POPCON algorithms."""
-from .core_radiated_power import calc_core_radiated_power
 from .edge_impurity_concentration import calc_edge_impurity_concentration
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
-from .single_functions import (
-    calc_f_rad_core,
-    require_P_rad_less_than_P_in,
-)
 
 __all__ = [
     "calc_core_radiated_power",

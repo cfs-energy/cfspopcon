@@ -73,6 +73,15 @@ calc_PBpRnSq:
   optionals: []
   returns:
   - PBpRnSq
+calc_P_rad_hydrogen_bremsstrahlung:
+  inputs:
+  - rho
+  - electron_density_profile
+  - electron_temp_profile
+  - plasma_volume
+  optionals: []
+  returns:
+  - P_rad_hydrogen_bremsstrahlung
 calc_Spitzer_loop_resistivity:
   inputs:
   - average_electron_temp
@@ -155,24 +164,16 @@ calc_bootstrap_fraction:
   optionals: []
   returns:
   - bootstrap_fraction
-calc_core_radiated_power:
+calc_bremsstrahlung_radiation:
   inputs:
   - rho
   - electron_density_profile
   - electron_temp_profile
   - z_effective
   - plasma_volume
-  - major_radius
-  - minor_radius
-  - magnetic_field_on_axis
-  - separatrix_elongation
-  - radiated_power_method
-  - radiated_power_scalar
-  - impurities
-  - atomic_data
   optionals: []
   returns:
-  - P_radiation
+  - P_rad_bremsstrahlung
 calc_current_relaxation_time:
   inputs:
   - major_radius
@@ -319,6 +320,24 @@ calc_inductive_plasma_current:
   optionals: []
   returns:
   - inductive_plasma_current
+calc_instrinsic_radiated_power_from_core:
+  inputs:
+  - rho
+  - electron_density_profile
+  - electron_temp_profile
+  - z_effective
+  - plasma_volume
+  - major_radius
+  - minor_radius
+  - magnetic_field_on_axis
+  - separatrix_elongation
+  - radiated_power_method
+  - radiated_power_scalar
+  - impurities
+  - atomic_data
+  optionals: []
+  returns:
+  - P_radiation
 calc_ion_density_peaking:
   inputs:
   - effective_collisionality
@@ -551,6 +570,19 @@ calc_separatrix_triangularity_from_triangularity95:
   optionals: []
   returns:
   - separatrix_triangularity
+calc_synchrotron_radiation:
+  inputs:
+  - rho
+  - electron_density_profile
+  - electron_temp_profile
+  - major_radius
+  - minor_radius
+  - magnetic_field_on_axis
+  - separatrix_elongation
+  - plasma_volume
+  optionals: []
+  returns:
+  - P_rad_synchrotron
 calc_temperature_peaking:
   inputs:
   - average_electron_temp

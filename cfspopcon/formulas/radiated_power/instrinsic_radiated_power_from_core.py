@@ -1,13 +1,16 @@
 """Calculate the power radiated from the confined region due to the fuel and impurity species."""
 import xarray as xr
 
-from .. import deprecated_formulas, named_options
-from ..algorithm_class import Algorithm
-from ..unit_handling import Unitfull
+from ... import named_options
+from ...algorithm_class import Algorithm
+from ...unit_handling import Unitfull
+from .bremsstrahlung import calc_bremsstrahlung_radiation
+from .impurity_radiated_power import calc_impurity_radiated_power
+from .synchrotron import calc_synchrotron_radiation
 
 
 @Algorithm.register_algorithm(return_keys=["P_radiation"])
-def calc_core_radiated_power(
+def calc_instrinsic_radiated_power_from_core(
     rho: Unitfull,
     electron_density_profile: Unitfull,
     electron_temp_profile: Unitfull,
@@ -43,13 +46,13 @@ def calc_core_radiated_power(
         :term:`P_radiation`
 
     """
-    P_rad_bremsstrahlung = deprecated_formulas.calc_bremsstrahlung_radiation(
+    P_rad_bremsstrahlung = calc_bremsstrahlung_radiation(
         rho, electron_density_profile, electron_temp_profile, z_effective, plasma_volume
     )
-    P_rad_bremsstrahlung_from_hydrogen = deprecated_formulas.calc_bremsstrahlung_radiation(
+    P_rad_bremsstrahlung_from_hydrogen = calc_bremsstrahlung_radiation(
         rho, electron_density_profile, electron_temp_profile, 1.0, plasma_volume
     )
-    P_rad_synchrotron = deprecated_formulas.calc_synchrotron_radiation(
+    P_rad_synchrotron = calc_synchrotron_radiation(
         rho,
         electron_density_profile,
         electron_temp_profile,
@@ -64,7 +67,7 @@ def calc_core_radiated_power(
     if radiated_power_method == named_options.RadiationMethod.Inherent:
         return radiated_power_scalar * (P_rad_bremsstrahlung + P_rad_synchrotron)
     else:
-        P_rad_impurity = deprecated_formulas.calc_impurity_radiated_power(
+        P_rad_impurity = calc_impurity_radiated_power(
             radiated_power_method=radiated_power_method,
             rho=rho,
             electron_temp_profile=electron_temp_profile,
