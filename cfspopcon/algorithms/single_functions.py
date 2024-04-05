@@ -28,12 +28,6 @@ calc_greenwald_fraction = Algorithm.from_single_function(
 calc_peak_pressure = Algorithm.from_single_function(
     func=deprecated_formulas.calc_peak_pressure, return_keys=["peak_pressure"], name="calc_peak_pressure"
 )
-calc_average_total_pressure = Algorithm.from_single_function(
-    lambda average_electron_density, average_electron_temp, average_ion_temp: average_electron_density
-    * (average_electron_temp + average_ion_temp),
-    return_keys=["average_total_pressure"],
-    name="calc_average_total_pressure",
-)
 calc_magnetic_field_on_axis = Algorithm.from_single_function(
     lambda product_of_magnetic_field_and_radius, major_radius: product_of_magnetic_field_and_radius / major_radius,
     return_keys=["magnetic_field_on_axis"],
@@ -41,12 +35,4 @@ calc_magnetic_field_on_axis = Algorithm.from_single_function(
 )
 require_P_rad_less_than_P_in = Algorithm.from_single_function(
     lambda P_in, P_radiation: np.minimum(P_radiation, P_in), return_keys=["P_radiation"], name="require_P_rad_less_than_P_in"
-)
-calc_P_SOL = Algorithm.from_single_function(
-    lambda P_in, P_radiation: np.maximum(P_in - P_radiation, 0.0), return_keys=["P_sol"], name="calc_P_SOL"
-)
-calc_upstream_electron_density = Algorithm.from_single_function(
-    lambda nesep_over_nebar, average_electron_density: nesep_over_nebar * average_electron_density,
-    return_keys=["upstream_electron_density"],
-    name="calc_upstream_electron_density",
 )

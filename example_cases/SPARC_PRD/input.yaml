@@ -66,10 +66,17 @@ algorithms:
   # a scaling for lambda_q to calculate a corresponding q_parallel, and
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
-  - calc_P_SOL
+  - calculate_power_crossing_separatrix
   - calc_average_total_pressure
-  - calc_heat_exhaust
-  - calc_upstream_electron_density
+  - calc_PB_over_R
+  - calc_PBpRnSq
+  - calc_B_pol_omp
+  - calc_B_tor_omp
+  - calc_fieldline_pitch_at_omp
+  - calc_lambda_q
+  - calc_parallel_heat_flux_density
+  - calc_q_perp
+  - calc_separatrix_electron_density
   - two_point_model_fixed_tet
   - calc_edge_impurity_concentration
   # Finally, we calculate several parameters which aren't used in other

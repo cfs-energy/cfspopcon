@@ -8,6 +8,7 @@ from . import (
     plasma_current,
     plasma_pressure,
     plasma_profiles,
+    power_crossing_separatrix,
     radiated_power,
     scrape_off_layer,
     zeff_and_dilution,
@@ -25,4 +26,5 @@ __all__ = [
     "zeff_and_dilution",
     "plasma_pressure",
     "auxillary_power",
+    "power_crossing_separatrix",
 ]

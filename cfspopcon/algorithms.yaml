@@ -19,13 +19,39 @@ calc_1D_plasma_profiles:
   - fuel_ion_density_profile
   - electron_temp_profile
   - ion_temp_profile
-calc_P_SOL:
+calc_B_pol_omp:
   inputs:
-  - P_in
-  - P_radiation
+  - plasma_current
+  - minor_radius
   optionals: []
   returns:
+  - B_pol_out_mid
+calc_B_tor_omp:
+  inputs:
+  - magnetic_field_on_axis
+  - major_radius
+  - minor_radius
+  optionals: []
+  returns:
+  - B_t_out_mid
+calc_PB_over_R:
+  inputs:
   - P_sol
+  - magnetic_field_on_axis
+  - major_radius
+  optionals: []
+  returns:
+  - PB_over_R
+calc_PBpRnSq:
+  inputs:
+  - P_sol
+  - magnetic_field_on_axis
+  - q_star
+  - major_radius
+  - average_electron_density
+  optionals: []
+  returns:
+  - PBpRnSq
 calc_Spitzer_loop_resistivity:
   inputs:
   - average_electron_temp
@@ -231,6 +257,13 @@ calc_f_shaping_for_qstar:
   optionals: []
   returns:
   - f_shaping
+calc_fieldline_pitch_at_omp:
+  inputs:
+  - B_t_out_mid
+  - B_pol_out_mid
+  optionals: []
+  returns:
+  - fieldline_pitch_at_omp
 calc_fusion_gain:
   inputs:
   - P_fusion
@@ -264,30 +297,6 @@ calc_greenwald_fraction:
   optionals: []
   returns:
   - greenwald_fraction
-calc_heat_exhaust:
-  inputs:
-  - P_sol
-  - magnetic_field_on_axis
-  - major_radius
-  - inverse_aspect_ratio
-  - plasma_current
-  - minor_radius
-  - q_star
-  - average_electron_density
-  - average_total_pressure
-  - fraction_of_P_SOL_to_divertor
-  - lambda_q_scaling
-  optionals:
-  - lambda_q_factor
-  returns:
-  - PB_over_R
-  - PBpRnSq
-  - B_pol_out_mid
-  - B_t_out_mid
-  - fieldline_pitch_at_omp
-  - lambda_q
-  - q_parallel
-  - q_perp
 calc_inductive_plasma_current:
   inputs:
   - plasma_current
@@ -306,6 +315,17 @@ calc_ion_density_peaking:
   returns:
   - ion_density_peaking
   - peak_fuel_ion_density
+calc_lambda_q:
+  inputs:
+  - lambda_q_scaling
+  - average_total_pressure
+  - P_sol
+  - major_radius
+  - B_pol_out_mid
+  - inverse_aspect_ratio
+  optionals: []
+  returns:
+  - lambda_q
 calc_loop_voltage:
   inputs:
   - major_radius
@@ -368,6 +388,17 @@ calc_ohmic_power:
   optionals: []
   returns:
   - P_ohmic
+calc_parallel_heat_flux_density:
+  inputs:
+  - P_sol
+  - fraction_of_P_SOL_to_divertor
+  - major_radius
+  - minor_radius
+  - lambda_q
+  - fieldline_pitch_at_omp
+  optionals: []
+  returns:
+  - q_parallel
 calc_peak_pressure:
   inputs:
   - peak_electron_temp
@@ -442,6 +473,15 @@ calc_plasma_volume:
   optionals: []
   returns:
   - plasma_volume
+calc_q_perp:
+  inputs:
+  - P_sol
+  - major_radius
+  - minor_radius
+  - lambda_q
+  optionals: []
+  returns:
+  - q_perp
 calc_q_star_from_plasma_current:
   inputs:
   - magnetic_field_on_axis
@@ -475,6 +515,13 @@ calc_rho_star:
   optionals: []
   returns:
   - rho_star
+calc_separatrix_electron_density:
+  inputs:
+  - nesep_over_nebar
+  - average_electron_density
+  optionals: []
+  returns:
+  - upstream_electron_density
 calc_separatrix_elongation_from_areal_elongation:
   inputs:
   - areal_elongation
@@ -506,13 +553,6 @@ calc_triple_product:
   optionals: []
   returns:
   - fusion_triple_product
-calc_upstream_electron_density:
-  inputs:
-  - nesep_over_nebar
-  - average_electron_density
-  optionals: []
-  returns:
-  - upstream_electron_density
 calc_vertical_minor_radius_from_elongation_and_minor_radius:
   inputs:
   - minor_radius
@@ -533,6 +573,13 @@ calc_zeff_and_dilution_due_to_impurities:
   - dilution
   - summed_impurity_density
   - average_ion_density
+calculate_power_crossing_separatrix:
+  inputs:
+  - P_in
+  - P_radiation
+  optionals: []
+  returns:
+  - P_sol
 read_atomic_data:
   inputs:
   - radas_dir

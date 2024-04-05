@@ -16,6 +16,7 @@ def calc_ohmic_power(inductive_plasma_current: Unitfull, loop_voltage: Unitfull)
     """
     return inductive_plasma_current * loop_voltage
 
+
 @Algorithm.register_algorithm(return_keys=["spitzer_resistivity"])
 @wraps_ufunc(input_units=dict(average_electron_temp=ureg.keV), return_units=dict(spitzer_resistivity=ureg.ohm * ureg.m))
 def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
@@ -30,6 +31,7 @@ def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
         :term:`spitzer_resistivity` [Ohm-m]
     """
     return float((2.8e-8) * (average_electron_temp ** (-1.5)))
+
 
 @Algorithm.register_algorithm(return_keys=["trapped_particle_fraction"])
 def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, definition: int = 3) -> Unitfull:
@@ -58,6 +60,7 @@ def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, definit
 
     return trapped_particle_fraction
 
+
 @Algorithm.register_algorithm(return_keys=["neoclassical_loop_resistivity"])
 def calc_neoclassical_loop_resistivity(
     spitzer_resistivity: Unitfull, z_effective: Unitfull, trapped_particle_fraction: Unitfull
@@ -75,6 +78,7 @@ def calc_neoclassical_loop_resistivity(
         :term:`neoclassical_loop_resistivity` [Ohm-m]
     """
     return spitzer_resistivity * z_effective * 0.9 * trapped_particle_fraction
+
 
 @Algorithm.register_algorithm(return_keys=["current_relaxation_time"])
 @wraps_ufunc(
@@ -107,6 +111,7 @@ def calc_current_relaxation_time(
     return float(
         1.4 * ((major_radius * inverse_aspect_ratio) ** 2.0) * areal_elongation * (average_electron_temp**1.5) / z_effective
     )  # [s]
+
 
 @Algorithm.register_algorithm(return_keys=["loop_voltage"])
 def calc_loop_voltage(

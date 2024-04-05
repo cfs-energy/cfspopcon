@@ -314,7 +314,16 @@ class CompositeAlgorithm:
         parameters_extra = set(kwargs) - set(self.required_input_keys)
         parameters_missing = set(self.required_input_keys) - set(kwargs)
         if parameters_missing:
-            raise TypeError(f"CompositeAlgorithm.run() missing arguments: {', '.join(parameters_missing)}")
+            needed_by: dict[str, list] = dict()
+
+            for parameter in parameters_missing:
+                needed_by[parameter] = []
+                for alg in self.algorithms:
+                    if parameter in alg.input_keys:
+                        needed_by[parameter].append(alg._name)
+
+            error_string = ", ".join(f"{key} needed by [{', '.join(val)}]" for key, val in needed_by.items())
+            raise TypeError(f"CompositeAlgorithm.run() missing arguments: {error_string}")
         if parameters_extra:
             warn(f"Not all input parameters were used. Unused parameters: [{', '.join(parameters_extra)}]", stacklevel=3)
 
