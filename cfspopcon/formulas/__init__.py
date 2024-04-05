@@ -1,5 +1,6 @@
 """Formulas used for the POPCON analysis."""
 from . import (
+    auxillary_power,
     energy_confinement,
     fusion_power,
     geometry,
@@ -23,4 +24,5 @@ __all__ = [
     "scrape_off_layer",
     "zeff_and_dilution",
     "plasma_pressure",
+    "auxillary_power",
 ]

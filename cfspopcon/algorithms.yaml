@@ -26,6 +26,12 @@ calc_P_SOL:
   optionals: []
   returns:
   - P_sol
+calc_Spitzer_loop_resistivity:
+  inputs:
+  - average_electron_temp
+  optionals: []
+  returns:
+  - spitzer_resistivity
 calc_auxillary_power:
   inputs:
   - P_external
@@ -282,6 +288,13 @@ calc_heat_exhaust:
   - lambda_q
   - q_parallel
   - q_perp
+calc_inductive_plasma_current:
+  inputs:
+  - plasma_current
+  - bootstrap_fraction
+  optionals: []
+  returns:
+  - inductive_plasma_current
 calc_ion_density_peaking:
   inputs:
   - effective_collisionality
@@ -293,6 +306,16 @@ calc_ion_density_peaking:
   returns:
   - ion_density_peaking
   - peak_fuel_ion_density
+calc_loop_voltage:
+  inputs:
+  - major_radius
+  - minor_radius
+  - inductive_plasma_current
+  - areal_elongation
+  - neoclassical_loop_resistivity
+  optionals: []
+  returns:
+  - loop_voltage
 calc_magnetic_field_on_axis:
   inputs:
   - product_of_magnetic_field_and_radius
@@ -307,6 +330,14 @@ calc_minor_radius_from_inverse_aspect_ratio:
   optionals: []
   returns:
   - minor_radius
+calc_neoclassical_loop_resistivity:
+  inputs:
+  - spitzer_resistivity
+  - z_effective
+  - trapped_particle_fraction
+  optionals: []
+  returns:
+  - neoclassical_loop_resistivity
 calc_neutron_flux_to_walls:
   inputs:
   - P_neutron
@@ -332,20 +363,10 @@ calc_normalised_collisionality:
   - nu_star
 calc_ohmic_power:
   inputs:
-  - bootstrap_fraction
-  - average_electron_temp
-  - inverse_aspect_ratio
-  - z_effective
-  - major_radius
-  - minor_radius
-  - areal_elongation
-  - plasma_current
+  - inductive_plasma_current
+  - loop_voltage
   optionals: []
   returns:
-  - spitzer_resistivity
-  - trapped_particle_fraction
-  - neoclassical_loop_resistivity
-  - loop_voltage
   - P_ohmic
 calc_peak_pressure:
   inputs:
@@ -438,6 +459,13 @@ calc_ratio_P_LH:
   optionals: []
   returns:
   - ratio_of_P_SOL_to_P_LH
+calc_resistivity_trapped_enhancement:
+  inputs:
+  - inverse_aspect_ratio
+  optionals:
+  - definition
+  returns:
+  - trapped_particle_fraction
 calc_rho_star:
   inputs:
   - fuel_average_mass_number

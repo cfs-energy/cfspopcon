@@ -3,13 +3,9 @@ from .core_radiated_power import calc_core_radiated_power
 from .edge_impurity_concentration import calc_edge_impurity_concentration
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .heat_exhaust import calc_heat_exhaust
-from .ohmic_power import calc_ohmic_power
 from .single_functions import (
-    calc_auxillary_power,
     calc_average_total_pressure,
-    calc_bootstrap_fraction,
     calc_confinement_transition_threshold_power,
-    calc_current_relaxation_time,
     calc_f_rad_core,
     calc_greenwald_fraction,
     calc_magnetic_field_on_axis,

@@ -54,6 +54,11 @@ algorithms:
   # We compute the ohmic heating power from the inductive current and
   # loop voltage, and then set P_auxillary = P_in - P_ohmic
   - calc_bootstrap_fraction
+  - calc_inductive_plasma_current
+  - calc_Spitzer_loop_resistivity
+  - calc_resistivity_trapped_enhancement
+  - calc_neoclassical_loop_resistivity
+  - calc_loop_voltage
   - calc_ohmic_power
   - calc_auxillary_power
   # Once we have the power input into and radiated from the confined

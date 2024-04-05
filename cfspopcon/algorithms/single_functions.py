@@ -3,7 +3,6 @@ import numpy as np
 
 from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
-from ..unit_handling import ureg
 
 calc_confinement_transition_threshold_power = Algorithm.from_single_function(
     deprecated_formulas.calc_LH_transition_threshold_power,
@@ -26,9 +25,6 @@ calc_triple_product = Algorithm.from_single_function(
 calc_greenwald_fraction = Algorithm.from_single_function(
     func=deprecated_formulas.calc_greenwald_fraction, return_keys=["greenwald_fraction"], name="calc_greenwald_fraction"
 )
-calc_current_relaxation_time = Algorithm.from_single_function(
-    func=deprecated_formulas.calc_current_relaxation_time, return_keys=["current_relaxation_time"], name="calc_current_relaxation_time"
-)
 calc_peak_pressure = Algorithm.from_single_function(
     func=deprecated_formulas.calc_peak_pressure, return_keys=["peak_pressure"], name="calc_peak_pressure"
 )
@@ -38,13 +34,6 @@ calc_average_total_pressure = Algorithm.from_single_function(
     return_keys=["average_total_pressure"],
     name="calc_average_total_pressure",
 )
-calc_bootstrap_fraction = Algorithm.from_single_function(
-    deprecated_formulas.calc_bootstrap_fraction, return_keys=["bootstrap_fraction"], name="calc_bootstrap_fraction"
-)
-calc_auxillary_power = Algorithm.from_single_function(
-    lambda P_external, P_ohmic: (P_external - P_ohmic).clip(min=0.0 * ureg.MW), return_keys=["P_auxillary"], name="calc_auxillary_power"
-)
-
 calc_magnetic_field_on_axis = Algorithm.from_single_function(
     lambda product_of_magnetic_field_and_radius, major_radius: product_of_magnetic_field_and_radius / major_radius,
     return_keys=["magnetic_field_on_axis"],
