@@ -1,8 +1,9 @@
 """Calculate rho_star, which gives the radio of the device size to the Larmor radius."""
 import numpy as np
 
-from ...unit_handling import Unitfull, convert_units, ureg
 from ...algorithm_class import Algorithm
+from ...unit_handling import Unitfull, convert_units, ureg
+
 
 @Algorithm.register_algorithm(return_keys=["rho_star"])
 def calc_rho_star(

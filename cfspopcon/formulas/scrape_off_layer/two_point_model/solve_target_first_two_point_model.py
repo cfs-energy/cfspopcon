@@ -8,6 +8,7 @@ from ....unit_handling import Unitfull, ureg
 from ..upstream_electron_temp import calc_upstream_electron_temp
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
 from .required_power_loss_fraction import calc_required_SOL_power_loss_fraction
+from .separatrix_pressure import calc_upstream_total_pressure
 from .target_electron_density import (
     calc_f_other_target_electron_density,
     calc_f_vol_loss_target_electron_density,
@@ -21,7 +22,6 @@ from .target_electron_flux import (
     calc_target_electron_flux_basic,
 )
 from .target_electron_temp import calc_f_other_target_electron_temp, calc_target_electron_temp_basic
-from .total_pressure import calc_upstream_total_pressure
 
 
 def solve_target_first_two_point_model(
