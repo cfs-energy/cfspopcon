@@ -37,6 +37,8 @@ def calc_fusion_power(
     Returns:
         :term:`P_fusion` [MW], :term:`P_neutron` [MW], :term:`P_alpha` [MW]
     """
+    if isinstance(fusion_reaction, xr.DataArray):
+        fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
     if not isinstance(reaction, (DTFusionBoschHale, DTFusionHively)):
         raise NotImplementedError(
@@ -97,6 +99,8 @@ def calc_neutron_flux_to_walls(
     Returns:
         neutron_power_flux_to_walls [MW / m^2], neutron_rate [s^-1]
     """
+    if isinstance(fusion_reaction, xr.DataArray):
+        fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
     if not isinstance(reaction, (DTFusionBoschHale, DTFusionHively)):
         raise NotImplementedError(
