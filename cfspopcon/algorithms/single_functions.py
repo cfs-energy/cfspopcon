@@ -84,7 +84,7 @@ calc_upstream_electron_density = Algorithm.from_single_function(
     return_keys=["upstream_electron_density"],
     name="calc_upstream_electron_density",
 )
-calc_line_averaged_density = Algorithm.from_single_function(
+calc_line_averaged_electron_density = Algorithm.from_single_function(
     lambda average_electron_density, line_averaged_density_frac: (line_averaged_density_frac * average_electron_density),
     return_keys=["line_averaged_electron_density"],
     name="calc_line_averaged_electron_density",

@@ -3,7 +3,7 @@ algorithms:
   # The POPCON algorithm starts by selecting an average density
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
-  - calc_line_averaged_density
+  - calc_line_averaged_electron_density
   - read_atomic_data
   - calc_geometry
   - calc_q_star_from_plasma_current
