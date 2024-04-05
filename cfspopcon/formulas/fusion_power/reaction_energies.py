@@ -1,10 +1,12 @@
 """Reaction energies and power densities."""
 
-from typing import Any
+from typing import Any, Callable, Union
 
 from numpy import float64
 from numpy.typing import NDArray
 from scipy import constants  # type: ignore[import-untyped]
+
+from ...named_options import ReactionType
 
 
 def reaction_energy_DT(
@@ -138,3 +140,19 @@ def reaction_energy_pB11(
 
     # Units: [MJ], [MW/m^3]
     return rxn_energy, rxn_energy_neut, rxn_energy_charged, number_power_dens, number_power_dens_neut, number_power_dens_charged
+
+ENERGY: dict[
+    ReactionType,
+    Union[
+        Callable[[NDArray[float64], float], tuple[float, float, float, NDArray[float64], NDArray[float64], NDArray[float64]]],
+        Callable[
+            [tuple[NDArray[float64], NDArray[float64], NDArray[float64]]],
+            tuple[NDArray[float64], float, NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64]],
+        ],
+    ],
+] = {
+    ReactionType.DT: reaction_energy_DT,
+    ReactionType.DD: reaction_energy_DD,
+    ReactionType.DHe3: reaction_energy_DHe3,
+    ReactionType.pB11: reaction_energy_pB11,
+}

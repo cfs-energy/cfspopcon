@@ -26,6 +26,7 @@ def calc_density_peaking(effective_collisionality: Unitfull, beta_toroidal: Unit
     else:
         return max(nu_n, 1.0 * ureg.dimensionless)
 
+
 @Algorithm.register_algorithm(return_keys=["ion_density_peaking", "peak_fuel_ion_density"])
 def calc_ion_density_peaking(
     effective_collisionality: Unitfull,
@@ -46,12 +47,11 @@ def calc_ion_density_peaking(
     Returns:
         :term:`ion_density_peaking`, :term:`peak_fuel_ion_density`
     """
-    ion_density_peaking = calc_density_peaking(
-        effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset
-    )
+    ion_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
     peak_fuel_ion_density = average_electron_density * dilution * ion_density_peaking
 
     return ion_density_peaking, peak_fuel_ion_density
+
 
 @Algorithm.register_algorithm(return_keys=["electron_density_peaking", "peak_electron_density"])
 def calc_electron_density_peaking(
@@ -71,12 +71,11 @@ def calc_electron_density_peaking(
     Returns:
         :term:`electron_density_peaking`, :term:`peak_electron_density`
     """
-    electron_density_peaking = calc_density_peaking(
-        effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
-    )
+    electron_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset)
     peak_electron_density = average_electron_density * electron_density_peaking
 
     return electron_density_peaking, peak_electron_density
+
 
 @Algorithm.register_algorithm(return_keys=["effective_collisionality"])
 @wraps_ufunc(

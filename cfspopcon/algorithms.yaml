@@ -227,25 +227,28 @@ calc_f_shaping_for_qstar:
   - f_shaping
 calc_fusion_gain:
   inputs:
+  - P_fusion
+  - P_alpha
+  - P_in
+  - fraction_of_external_power_coupled
+  optionals: []
+  returns:
+  - P_external
+  - P_launched
+  - Q
+calc_fusion_power:
+  inputs:
   - fusion_reaction
   - ion_temp_profile
   - heavier_fuel_species_fraction
   - fuel_ion_density_profile
   - rho
   - plasma_volume
-  - surface_area
-  - P_in
-  - fraction_of_external_power_coupled
   optionals: []
   returns:
   - P_fusion
   - P_neutron
   - P_alpha
-  - P_external
-  - P_launched
-  - Q
-  - neutron_power_flux_to_walls
-  - neutron_rate
 calc_greenwald_fraction:
   inputs:
   - average_electron_density
@@ -304,6 +307,17 @@ calc_minor_radius_from_inverse_aspect_ratio:
   optionals: []
   returns:
   - minor_radius
+calc_neutron_flux_to_walls:
+  inputs:
+  - P_neutron
+  - surface_area
+  - fusion_reaction
+  - ion_temp_profile
+  - heavier_fuel_species_fraction
+  optionals: []
+  returns:
+  - neutron_power_flux_to_walls
+  - neutron_rate
 calc_normalised_collisionality:
   inputs:
   - average_electron_density

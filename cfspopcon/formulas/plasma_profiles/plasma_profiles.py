@@ -63,15 +63,9 @@ def calc_peaked_profiles(
     `effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`, :term:`peak_electron_density`, :term:`peak_electron_temp`, :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`, :term:`electron_temp_profile`, :term:`ion_temp_profile`
 
     """
-    effective_collisionality = calc_effective_collisionality(
-        average_electron_density, average_electron_temp, major_radius, z_effective
-    )
-    ion_density_peaking = calc_density_peaking(
-        effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset
-    )
-    electron_density_peaking = calc_density_peaking(
-        effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset
-    )
+    effective_collisionality = calc_effective_collisionality(average_electron_density, average_electron_temp, major_radius, z_effective)
+    ion_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
+    electron_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset)
 
     peak_electron_density = average_electron_density * electron_density_peaking
     peak_fuel_ion_density = average_electron_density * dilution * ion_density_peaking
@@ -80,13 +74,7 @@ def calc_peaked_profiles(
 
     # Calculate the total fusion power by estimating density and temperature profiles and
     # using this to calculate fusion power profiles.
-    (
-        rho,
-        electron_density_profile,
-        fuel_ion_density_profile,
-        electron_temp_profile,
-        ion_temp_profile,
-    ) = calc_1D_plasma_profiles(
+    (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile,) = calc_1D_plasma_profiles(
         profile_form,
         average_electron_density,
         average_electron_temp,
@@ -114,11 +102,9 @@ def calc_peaked_profiles(
     )
 
 
-
-
-@Algorithm.register_algorithm(return_keys=[
-    "rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"
-])
+@Algorithm.register_algorithm(
+    return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
+)
 @wraps_ufunc(
     return_units=dict(
         rho=ureg.dimensionless,

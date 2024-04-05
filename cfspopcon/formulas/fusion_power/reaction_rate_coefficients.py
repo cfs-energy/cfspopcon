@@ -1,8 +1,12 @@
 """Reaction rates (<sigma*v>) as a function of ion temperature."""
 
+from typing import Callable, Union
+
 import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
+
+from ...named_options import ReactionType
 
 
 def sigmav_DT(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
@@ -296,3 +300,16 @@ def sigmav_pB11(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
             sigmav[i] = sigmavNRhigh[i] + sigmavR[i]
 
     return sigmav  # [cm^3/s]
+
+SIGMAV: dict[
+    ReactionType,
+    Union[
+        Callable[[NDArray[float64]], NDArray[float64]],
+        Callable[[NDArray[float64]], tuple[NDArray[float64], NDArray[float64], NDArray[float64]]],
+    ],
+] = {
+    ReactionType.DT: sigmav_DT,
+    ReactionType.DD: sigmav_DD_BoschHale,
+    ReactionType.DHe3: sigmav_DHe3,
+    ReactionType.pB11: sigmav_pB11,
+}
