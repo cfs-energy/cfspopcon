@@ -2,7 +2,7 @@
 import numpy as np
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import Quantity, Unitfull, convert_units, ureg
+from ...unit_handling import Quantity, Unitfull, convert_units, ureg, wraps_ufunc
 
 
 def _calc_beta_general(
@@ -138,3 +138,22 @@ def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_
     beta_N = beta / normalisation
 
     return beta_N
+
+
+@Algorithm.register_algorithm(return_keys=["troyon_max_beta"])
+@wraps_ufunc(
+    return_units=dict(troyon_max_beta=ureg.percent),
+    input_units=dict(minor_radius=ureg.m, magnetic_field_on_axis=ureg.T, plasma_current=ureg.MA),
+)
+def calc_troyon_limit(minor_radius: float, magnetic_field_on_axis: float, plasma_current: float) -> float:
+    """Calculate the maximum value for beta, according to the Troyon limit.
+
+    Args:
+        minor_radius: [m] :term:`glossary link<minor_radius>`
+        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
+        plasma_current: [MA] :term:`glossary link<plasma_current>`
+
+    Returns:
+         troyon_max_beta [~]
+    """
+    return 2.8 * plasma_current / (minor_radius * magnetic_field_on_axis)

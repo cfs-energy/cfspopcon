@@ -83,9 +83,9 @@ algorithms:
   # calculations, but which are useful for characterizing operational
   # points. These can be used later when masking inaccessible operational
   # space, such as regions with f_Greenwald >~ 1.0 or where P_SOL < P_LH.
-  - calc_greenwald_fraction
-  - calc_confinement_transition_threshold_power
+  - calc_LH_transition_threshold_power
   - calc_ratio_P_LH
+  - calc_greenwald_fraction
   - calc_f_rad_core
   - calc_normalised_collisionality
   - calc_rho_star

@@ -64,6 +64,7 @@ def two_point_model_fixed_fpow(
 
     return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
 
+
 @Algorithm.register_algorithm(
     return_keys=[
         "upstream_electron_temp",
@@ -118,6 +119,7 @@ def two_point_model_fixed_qpart(
     )
 
     return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
+
 
 @Algorithm.register_algorithm(
     return_keys=[

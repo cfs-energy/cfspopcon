@@ -4,14 +4,6 @@ import numpy as np
 from .. import deprecated_formulas
 from ..algorithm_class import Algorithm
 
-calc_confinement_transition_threshold_power = Algorithm.from_single_function(
-    deprecated_formulas.calc_LH_transition_threshold_power,
-    return_keys=["P_LH_thresh"],
-    name="calc_confinement_transition_threshold_power",
-)
-calc_ratio_P_LH = Algorithm.from_single_function(
-    func=lambda P_sol, P_LH_thresh: P_sol / P_LH_thresh, return_keys=["ratio_of_P_SOL_to_P_LH"], name="calc_ratio_P_LH"
-)
 calc_f_rad_core = Algorithm.from_single_function(
     func=lambda P_radiation, P_in: P_radiation / P_in, return_keys=["core_radiated_power_fraction"], name="calc_f_rad_core"
 )
@@ -21,9 +13,6 @@ calc_normalised_collisionality = Algorithm.from_single_function(
 calc_rho_star = Algorithm.from_single_function(func=deprecated_formulas.calc_rho_star, return_keys=["rho_star"], name="calc_rho_star")
 calc_triple_product = Algorithm.from_single_function(
     func=deprecated_formulas.calc_triple_product, return_keys=["fusion_triple_product"], name="calc_triple_product"
-)
-calc_greenwald_fraction = Algorithm.from_single_function(
-    func=deprecated_formulas.calc_greenwald_fraction, return_keys=["greenwald_fraction"], name="calc_greenwald_fraction"
 )
 calc_peak_pressure = Algorithm.from_single_function(
     func=deprecated_formulas.calc_peak_pressure, return_keys=["peak_pressure"], name="calc_peak_pressure"

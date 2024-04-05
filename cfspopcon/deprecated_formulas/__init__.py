@@ -1,26 +1,7 @@
 """Formulas for POPCONs analysis."""
 
 from . import radiated_power, scrape_off_layer_model
-from .confinement_regime_threshold_powers import (
-    calc_LH_transition_threshold_power,
-    calc_LI_transition_threshold_power,
-)
-from .current_drive import (
-    calc_bootstrap_fraction,
-    calc_current_relaxation_time,
-    calc_f_shaping,
-    calc_loop_voltage,
-    calc_neoclassical_loop_resistivity,
-    calc_ohmic_power,
-    calc_plasma_current,
-    calc_q_star,
-    calc_resistivity_trapped_enhancement,
-    calc_Spitzer_loop_resistivity,
-)
-from .divertor_metrics import calc_B_pol_omp, calc_B_tor_omp
 from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
-from .operational_limits import calc_greenwald_density_limit, calc_greenwald_fraction, calc_troyon_limit
-from .Q_thermal_gain_factor import thermal_calc_gain_factor
 from .radiated_power import (
     calc_bremsstrahlung_radiation,
     calc_impurity_radiated_power,
