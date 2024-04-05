@@ -2,13 +2,12 @@
 import xarray as xr
 
 from .. import formulas, named_options
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = ["P_radiation"]
+from ..algorithm_class import Algorithm
+from ..unit_handling import Unitfull
 
 
-def run_calc_core_radiated_power(
+@Algorithm.register_algorithm(return_keys=["P_radiation"])
+def calc_core_radiated_power(
     rho: Unitfull,
     electron_density_profile: Unitfull,
     electron_temp_profile: Unitfull,
@@ -22,7 +21,7 @@ def run_calc_core_radiated_power(
     radiated_power_scalar: Unitfull,
     impurities: xr.DataArray,
     atomic_data: xr.DataArray,
-) -> dict[str, Unitfull]:
+) -> Unitfull:
     """Calculate the power radiated from the confined region due to the fuel and impurity species.
 
     Args:
@@ -63,7 +62,7 @@ def run_calc_core_radiated_power(
 
     # Calculate radiated power due to Bremsstrahlung, Synchrotron and impurities
     if radiated_power_method == named_options.RadiationMethod.Inherent:
-        P_radiation = radiated_power_scalar * (P_rad_bremsstrahlung + P_rad_synchrotron)
+        return radiated_power_scalar * (P_rad_bremsstrahlung + P_rad_synchrotron)
     else:
         P_rad_impurity = formulas.calc_impurity_radiated_power(
             radiated_power_method=radiated_power_method,
@@ -75,15 +74,4 @@ def run_calc_core_radiated_power(
             atomic_data=atomic_data.item(),
         )
 
-        P_radiation = radiated_power_scalar * (
-            P_rad_bremsstrahlung_from_hydrogen + P_rad_synchrotron + P_rad_impurity.sum(dim="dim_species")
-        )
-
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_core_radiated_power = Algorithm(
-    function=run_calc_core_radiated_power,
-    return_keys=RETURN_KEYS,
-)
+        return radiated_power_scalar * (P_rad_bremsstrahlung_from_hydrogen + P_rad_synchrotron + P_rad_impurity.sum(dim="dim_species"))

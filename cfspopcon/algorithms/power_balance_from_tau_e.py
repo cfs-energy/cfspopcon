@@ -1,15 +1,16 @@
 """Calculate the input power required to maintain the stored energy, given a tau_e scaling."""
 from .. import formulas, named_options
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "energy_confinement_time",
-    "P_in",
-]
+from ..algorithm_class import Algorithm
+from ..unit_handling import Unitfull
 
 
-def run_calc_power_balance_from_tau_e(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "energy_confinement_time",
+        "P_in",
+    ]
+)
+def calc_power_balance_from_tau_e(
     plasma_stored_energy: Unitfull,
     average_electron_density: Unitfull,
     confinement_time_scalar: Unitfull,
@@ -24,7 +25,7 @@ def run_calc_power_balance_from_tau_e(
     separatrix_triangularity: Unitfull,
     q_star: Unitfull,
     energy_confinement_scaling: named_options.ConfinementScaling,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the input power required to maintain the stored energy, given a tau_e scaling.
 
     Args:
@@ -64,11 +65,4 @@ def run_calc_power_balance_from_tau_e(
         tau_e_scaling=energy_confinement_scaling,
     )
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_power_balance_from_tau_e = Algorithm(
-    function=run_calc_power_balance_from_tau_e,
-    return_keys=RETURN_KEYS,
-)
+    return (energy_confinement_time, P_in)

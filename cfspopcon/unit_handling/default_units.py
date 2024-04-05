@@ -1,145 +1,42 @@
 """Define default units for writing to/from disk."""
 from collections.abc import Iterable
+from importlib.resources import as_file, files
 from numbers import Number
 from typing import Any, Union, overload
+from warnings import warn
 
 import numpy as np
 import xarray as xr
+import yaml
 
-from .setup_unit_handling import DimensionalityError, Quantity, convert_units, magnitude
+from .setup_unit_handling import DimensionalityError, Quantity, UndefinedUnitError, convert_units, magnitude
 
-DEFAULT_UNITS = dict(
-    areal_elongation="",
-    average_electron_density="n19",
-    average_electron_temp="keV",
-    average_ion_density="n19",
-    average_ion_temp="keV",
-    average_total_pressure="Pa",
-    B_pol_out_mid="T",
-    B_t_out_mid="T",
-    beta_poloidal="",
-    beta_toroidal="",
-    beta="",
-    bootstrap_fraction="",
-    confinement_threshold_scalar="",
-    confinement_time_scalar="",
-    core_radiated_power_fraction="",
-    core_radiator_charge_state="",
-    core_radiator_concentration="",
-    core_radiator=None,
-    current_relaxation_time="s",
-    dilution_change_from_core_rad="",
-    dilution="",
-    effective_collisionality="",
-    electron_density_peaking_offset="",
-    electron_density_peaking="",
-    electron_density_profile="n19",
-    electron_temp_profile="keV",
-    elongation_ratio_sep_to_areal="",
-    energy_confinement_scaling=None,
-    energy_confinement_time="s",
-    f_shaping="",
-    fieldline_pitch_at_omp="",
-    fraction_of_external_power_coupled="",
-    fraction_of_P_SOL_to_divertor="",
-    fuel_average_mass_number="amu",
-    fuel_ion_density_profile="n19",
-    fusion_reaction=None,
-    fusion_triple_product="n20 * keV * s",
-    greenwald_fraction="",
-    heavier_fuel_species_fraction="",
-    impurities="",
-    impurity_charge_state="",
-    input_SOL_power_loss_fraction="",
-    input_target_electron_temp="eV",
-    input_target_q_parallel="GW / m**2",
-    inverse_aspect_ratio="",
-    ion_density_peaking_offset="",
-    ion_density_peaking="",
-    ion_temp_profile="keV",
-    ion_to_electron_temp_ratio="",
-    kappa_e0="W / (eV**3.5 m)",
-    lambda_q_factor="",
-    lambda_q_scaling=None,
-    lambda_q="mm",
-    loop_voltage="V",
-    magnetic_field_on_axis="T",
-    major_radius="m",
-    minimum_core_radiated_fraction="",
-    minor_radius="m",
-    neoclassical_loop_resistivity="m * ohm",
-    nesep_over_nebar="",
-    neutron_power_flux_to_walls="MW / m**2",
-    neutron_rate="s**-1",
-    normalized_beta="percent * m * T / MA",
-    normalized_inverse_temp_scale_length="",
-    nu_star="",
-    P_alpha="MW",
-    P_auxillary="MW",
-    P_external="MW",
-    P_fusion="MW",
-    P_in="MW",
-    P_launched="MW",
-    P_LH_thresh="MW",
-    P_neutron="MW",
-    P_ohmic="MW",
-    P_radiated_by_core_radiator="MW",
-    P_radiation="MW",
-    P_sol="MW",
-    parallel_connection_length="m",
-    PB_over_R="MW * T / m",
-    PBpRnSq="MW * T / m * n20**-2",
-    peak_electron_density="n19",
-    peak_electron_temp="keV",
-    peak_fuel_ion_density="n19",
-    peak_ion_temp="keV",
-    peak_pressure="Pa",
-    plasma_current="A",
-    plasma_stored_energy="MJ",
-    plasma_volume="m**3",
-    product_of_magnetic_field_and_radius="m * T",
-    profile_form=None,
-    q_parallel="GW / m**2",
-    q_perp="MW / m**2",
-    q_star="",
-    Q="",
-    radiated_power_method=None,
-    radiated_power_scalar="",
-    ratio_of_P_SOL_to_P_LH="",
-    rho_star="",
-    rho="",
-    separatrix_elongation="",
-    separatrix_triangularity="",
-    SOC_LOC_ratio="",
-    SOL_momentum_loss_function=None,
-    SOL_power_loss_fraction="",
-    spitzer_resistivity="m * ohm",
-    summed_impurity_density="n19",
-    surface_area="m**2",
-    target_electron_density="n19",
-    target_electron_flux="m**-2 s**-1",
-    target_electron_temp="eV",
-    target_q_parallel="GW / m**2",
-    tau_e_scaling_uses_P_in=None,
-    temperature_peaking="",
-    toroidal_flux_expansion="",
-    trapped_particle_fraction="",
-    triangularity_psi95="",
-    triangularity_ratio_sep_to_psi95="",
-    two_point_model_method=None,
-    upstream_electron_temp="eV",
-    vertical_minor_radius="m",
-    z_effective="",
-    zeff_change_from_core_rad="",
-    edge_impurity_species=None,
-    lengyel_overestimation_factor="",
-    upstream_electron_density="n19",
-    edge_impurity_concentration="",
-    edge_impurity_concentration_in_core="",
-    edge_impurity_enrichment="",
-    radas_dir=None,
-    atomic_data=None,
-)
+
+def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
+    """Ensure that all units in units_dictionary are valid."""
+    invalid_units = []
+    for key, units in units_dictionary.items():
+        try:
+            Quantity(1.0, units)
+        except UndefinedUnitError:  # noqa: PERF203
+            warn(f"Undefined units '{units}' for '{key}", stacklevel=3)
+            invalid_units.append(units)
+
+    if invalid_units:
+        raise UndefinedUnitError(invalid_units)  # type:ignore[arg-type]
+
+
+def read_default_units() -> dict[str, str]:
+    """Read in the default_units.yaml file."""
+    with as_file(files("cfspopcon").joinpath("default_units.yaml")) as filepath:
+        with open(filepath) as f:
+            units_dictionary: dict[str, str] = yaml.safe_load(f)
+
+    check_units_are_valid(units_dictionary)
+    return units_dictionary
+
+
+DEFAULT_UNITS = read_default_units()
 
 
 def default_unit(var: str) -> Union[str, None]:

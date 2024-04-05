@@ -3,24 +3,25 @@ import numpy as np
 import xarray as xr
 
 from .. import formulas, named_options
+from ..algorithm_class import Algorithm
 from ..helpers import make_impurities_array
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "core_radiator_concentration",
-    "P_radiated_by_core_radiator",
-    "P_radiation",
-    "core_radiator_concentration",
-    "core_radiator_charge_state",
-    "zeff_change_from_core_rad",
-    "dilution_change_from_core_rad",
-    "z_effective",
-    "dilution",
-]
+from ..unit_handling import Unitfull
 
 
-def run_calc_extrinsic_core_radiator(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "core_radiator_concentration",
+        "P_radiated_by_core_radiator",
+        "P_radiation",
+        "core_radiator_concentration",
+        "core_radiator_charge_state",
+        "zeff_change_from_core_rad",
+        "dilution_change_from_core_rad",
+        "z_effective",
+        "dilution",
+    ]
+)
+def calc_extrinsic_core_radiator(
     minimum_core_radiated_fraction: Unitfull,
     P_in: Unitfull,
     P_radiation: Unitfull,
@@ -36,7 +37,7 @@ def run_calc_extrinsic_core_radiator(
     radiated_power_scalar: Unitfull,
     core_radiator: named_options.AtomicSpecies,
     atomic_data: xr.DataArray,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the concentration and effect of a core radiator required to achieve above a defined core radiative fraction.
 
     Args:
@@ -88,11 +89,14 @@ def run_calc_extrinsic_core_radiator(
     z_effective = z_effective + zeff_change_from_core_rad
     dilution = (dilution - dilution_change_from_core_rad).clip(min=0.0)
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_extrinsic_core_radiator = Algorithm(
-    function=run_calc_extrinsic_core_radiator,
-    return_keys=RETURN_KEYS,
-)
+    return (
+        core_radiator_concentration,
+        P_radiated_by_core_radiator,
+        P_radiation,
+        core_radiator_concentration,
+        core_radiator_charge_state,
+        zeff_change_from_core_rad,
+        dilution_change_from_core_rad,
+        z_effective,
+        dilution,
+    )

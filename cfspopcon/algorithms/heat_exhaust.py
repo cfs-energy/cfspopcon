@@ -2,22 +2,23 @@
 import numpy as np
 
 from .. import formulas, named_options
-from ..unit_handling import Unitfull, convert_to_default_units, ureg
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "PB_over_R",
-    "PBpRnSq",
-    "B_pol_out_mid",
-    "B_t_out_mid",
-    "fieldline_pitch_at_omp",
-    "lambda_q",
-    "q_parallel",
-    "q_perp",
-]
+from ..algorithm_class import Algorithm
+from ..unit_handling import Unitfull, ureg
 
 
-def run_calc_heat_exhaust(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "PB_over_R",
+        "PBpRnSq",
+        "B_pol_out_mid",
+        "B_t_out_mid",
+        "fieldline_pitch_at_omp",
+        "lambda_q",
+        "q_parallel",
+        "q_perp",
+    ]
+)
+def calc_heat_exhaust(
     P_sol: Unitfull,
     magnetic_field_on_axis: Unitfull,
     major_radius: Unitfull,
@@ -30,7 +31,7 @@ def run_calc_heat_exhaust(
     fraction_of_P_SOL_to_divertor: Unitfull,
     lambda_q_scaling: named_options.LambdaQScaling,
     lambda_q_factor: Unitfull = 1.0 * ureg.dimensionless,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the parallel heat flux density upstream and related metrics.
 
     Args:
@@ -68,11 +69,4 @@ def run_calc_heat_exhaust(
     )
     q_perp = P_sol / (2.0 * np.pi * (major_radius + minor_radius) * lambda_q)
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_heat_exhaust = Algorithm(
-    function=run_calc_heat_exhaust,
-    return_keys=RETURN_KEYS,
-)
+    return (PB_over_R, PBpRnSq, B_pol_out_mid, B_t_out_mid, fieldline_pitch_at_omp, lambda_q, q_parallel, q_perp)

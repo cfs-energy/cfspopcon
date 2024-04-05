@@ -67,6 +67,9 @@ testpaths = [
   "tests",
   "docs/doc_sources"
 ]
+markers = [
+    "docs: marks tests as testing the documentation (deselect with '-m \"not docs\"')",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

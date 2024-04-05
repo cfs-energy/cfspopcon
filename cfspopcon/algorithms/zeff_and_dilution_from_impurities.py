@@ -2,24 +2,25 @@
 import xarray as xr
 
 from .. import formulas
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "impurity_charge_state",
-    "z_effective",
-    "dilution",
-    "summed_impurity_density",
-    "average_ion_density",
-]
+from ..algorithm_class import Algorithm
+from ..unit_handling import Unitfull
 
 
-def run_calc_zeff_and_dilution_from_impurities(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "impurity_charge_state",
+        "z_effective",
+        "dilution",
+        "summed_impurity_density",
+        "average_ion_density",
+    ]
+)
+def calc_zeff_and_dilution_from_impurities(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     impurities: xr.DataArray,
     atomic_data: xr.DataArray,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the impact of core impurities on z_effective and dilution.
 
     Args:
@@ -46,11 +47,4 @@ def run_calc_zeff_and_dilution_from_impurities(
     summed_impurity_density = impurities.sum(dim="dim_species") * average_electron_density
     average_ion_density = dilution * average_electron_density
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_zeff_and_dilution_from_impurities = Algorithm(
-    function=run_calc_zeff_and_dilution_from_impurities,
-    return_keys=RETURN_KEYS,
-)
+    return (impurity_charge_state, z_effective, dilution, summed_impurity_density, average_ion_density)

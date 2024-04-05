@@ -1,24 +1,25 @@
 """Calculate toroidal, poloidal, total and normalized beta."""
 from .. import formulas
-from ..unit_handling import Unitfull, convert_to_default_units
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "beta_toroidal",
-    "beta_poloidal",
-    "beta",
-    "normalized_beta",
-]
+from ..algorithm_class import Algorithm
+from ..unit_handling import Unitfull
 
 
-def run_calc_beta(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "beta_toroidal",
+        "beta_poloidal",
+        "beta",
+        "normalized_beta",
+    ]
+)
+def calc_beta(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     average_ion_temp: Unitfull,
     magnetic_field_on_axis: Unitfull,
     plasma_current: Unitfull,
     minor_radius: Unitfull,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate toroidal, poloidal, total and normalized beta.
 
     Args:
@@ -40,11 +41,4 @@ def run_calc_beta(
     beta = formulas.calc_beta_total(beta_toroidal=beta_toroidal, beta_poloidal=beta_poloidal)
     normalized_beta = formulas.calc_beta_normalised(beta, minor_radius, magnetic_field_on_axis, plasma_current)
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_beta = Algorithm(
-    function=run_calc_beta,
-    return_keys=RETURN_KEYS,
-)
+    return beta_toroidal, beta_poloidal, beta, normalized_beta

@@ -3,32 +3,33 @@ from typing import Union
 
 import xarray as xr
 
+from ..algorithm_class import Algorithm
 from ..formulas.scrape_off_layer_model import solve_two_point_model
 from ..named_options import MomentumLossFunction
-from ..unit_handling import Quantity, convert_to_default_units
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "upstream_electron_temp",
-    "target_electron_density",
-    "target_electron_temp",
-    "target_electron_flux",
-    "target_q_parallel",
-]
+from ..unit_handling import Unitfull
 
 
-def run_two_point_model_fixed_fpow(
-    SOL_power_loss_fraction: Union[float, xr.DataArray],
-    q_parallel: Union[Quantity, xr.DataArray],
-    parallel_connection_length: Union[Quantity, xr.DataArray],
-    average_electron_density: Union[Quantity, xr.DataArray],
-    nesep_over_nebar: Union[float, xr.DataArray],
-    toroidal_flux_expansion: Union[float, xr.DataArray],
-    fuel_average_mass_number: Union[Quantity, xr.DataArray],
-    kappa_e0: Union[Quantity, xr.DataArray],
+@Algorithm.register_algorithm(
+    return_keys=[
+        "upstream_electron_temp",
+        "target_electron_density",
+        "target_electron_temp",
+        "target_electron_flux",
+        "target_q_parallel",
+    ]
+)
+def two_point_model_fixed_fpow(
+    SOL_power_loss_fraction: Unitfull,
+    q_parallel: Unitfull,
+    parallel_connection_length: Unitfull,
+    average_electron_density: Unitfull,
+    nesep_over_nebar: Unitfull,
+    toroidal_flux_expansion: Unitfull,
+    fuel_average_mass_number: Unitfull,
+    kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
     raise_error_if_not_converged: bool = False,
-) -> dict[str, Union[float, Quantity, xr.DataArray]]:
+) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed power loss fraction in the SOL.
 
     Args:
@@ -60,11 +61,4 @@ def run_two_point_model_fixed_fpow(
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-two_point_model_fixed_fpow = Algorithm(
-    function=run_two_point_model_fixed_fpow,
-    return_keys=RETURN_KEYS,
-)
+    return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)

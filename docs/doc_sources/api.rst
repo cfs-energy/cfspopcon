@@ -9,7 +9,7 @@ Configuration Enums
 
 Algorithms
 =====================
-.. automodule:: cfspopcon.algorithms
+.. automodule:: cfspopcon.algorithm_class
 
 Internals
 =====================
@@ -20,7 +20,6 @@ But these are internals, so it should usually not be required to interact with a
 .. py:currentmodule:: none
 
 .. autoclass:: cfspopcon.unit_handling.Unitfull
-.. automodule:: cfspopcon.algorithms.algorithm_class
 .. automodule:: cfspopcon.read_atomic_data
 .. automodule:: cfspopcon.formulas
 .. automodule:: cfspopcon.formulas.scrape_off_layer_model

@@ -9,7 +9,7 @@ import numpy.typing as npt
 import pint
 import pint_xarray  # type:ignore[import-untyped]
 import xarray as xr
-from pint.errors import DimensionalityError
+from pint.errors import DimensionalityError, UndefinedUnitError
 from typing_extensions import ParamSpec
 
 ureg = pint_xarray.setup_registry(
@@ -86,6 +86,7 @@ def dimensionless_magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[
 
 __all__ = [
     "DimensionalityError",
+    "UndefinedUnitError",
     "ureg",
     "Quantity",
     "Unit",

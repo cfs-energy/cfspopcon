@@ -2,20 +2,21 @@
 
 import xarray as xr
 
+from ..algorithm_class import Algorithm
 from ..formulas.scrape_off_layer_model import build_L_int_integrator, calc_required_edge_impurity_concentration
 from ..helpers import extend_impurities_array
 from ..named_options import AtomicSpecies
-from ..unit_handling import Unitfull, convert_to_default_units, ureg
-from .algorithm_class import Algorithm
-
-RETURN_KEYS = [
-    "edge_impurity_concentration",
-    "edge_impurity_concentration_in_core",
-    "impurities",
-]
+from ..unit_handling import Unitfull, ureg
 
 
-def run_calc_edge_impurity_concentration(
+@Algorithm.register_algorithm(
+    return_keys=[
+        "edge_impurity_concentration",
+        "edge_impurity_concentration_in_core",
+        "impurities",
+    ]
+)
+def calc_edge_impurity_concentration(
     edge_impurity_species: AtomicSpecies,
     q_parallel: Unitfull,
     SOL_power_loss_fraction: Unitfull,
@@ -29,7 +30,7 @@ def run_calc_edge_impurity_concentration(
     atomic_data: xr.DataArray,
     reference_electron_density: Unitfull = 1.0 * ureg.n20,
     reference_ne_tau: Unitfull = 1.0 * ureg.n20 * ureg.ms,
-) -> dict[str, Unitfull]:
+) -> tuple[Unitfull, ...]:
     """Calculate the impurity concentration required to cool the scrape-off-layer using the Lengyel model.
 
     Args:
@@ -71,11 +72,4 @@ def run_calc_edge_impurity_concentration(
     edge_impurity_concentration_in_core = edge_impurity_concentration / edge_impurity_enrichment
     impurities = extend_impurities_array(impurities, edge_impurity_species, edge_impurity_concentration_in_core)
 
-    local_vars = locals()
-    return {key: convert_to_default_units(local_vars[key], key) for key in RETURN_KEYS}
-
-
-calc_edge_impurity_concentration = Algorithm(
-    function=run_calc_edge_impurity_concentration,
-    return_keys=RETURN_KEYS,
-)
+    return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurities)
