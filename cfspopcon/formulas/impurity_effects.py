@@ -2,7 +2,8 @@
 import numpy as np
 import xarray as xr
 
-from ..named_options import Impurity
+from ..named_options import AtomicSpecies
+from ..read_atomic_data import AtomicData
 from ..unit_handling import ureg, wraps_ufunc
 
 
@@ -19,8 +20,8 @@ from ..unit_handling import ureg, wraps_ufunc
 def calc_impurity_charge_state(
     average_electron_density: float,
     average_electron_temp: float,
-    impurity_species: Impurity,
-    atomic_data: dict[Impurity, xr.DataArray],
+    impurity_species: AtomicSpecies,
+    atomic_data: AtomicData,
 ) -> float:
     """Calculate the impurity charge state of the specified impurity species.
 
@@ -33,10 +34,15 @@ def calc_impurity_charge_state(
     Returns:
         :term:`impurity_charge_state`
     """
-    mean_charge_curve = atomic_data[impurity_species].coronal_mean_Z_interpolator
-    return float(
-        np.squeeze(np.power(10, mean_charge_curve(np.log10(average_electron_temp), np.log10(average_electron_density), grid=True)))
+    average_electron_temp, average_electron_density = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
+        impurity_species, average_electron_temp, average_electron_density  # type:ignore[arg-type]
     )
+    interpolator = atomic_data.coronal_Z_interpolators[impurity_species]
+    interpolated_values = np.power(10, interpolator((np.log10(average_electron_temp), np.log10(average_electron_density))))
+
+    interpolated_values = np.minimum(interpolated_values, impurity_species.value)
+    interpolated_values = np.maximum(interpolated_values, 0)
+    return interpolated_values  # type:ignore[no-any-return]
 
 
 def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:

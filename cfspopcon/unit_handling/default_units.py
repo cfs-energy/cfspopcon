@@ -139,6 +139,8 @@ DEFAULT_UNITS = dict(
     edge_impurity_concentration="",
     edge_impurity_concentration_in_core="",
     edge_impurity_enrichment="",
+    radas_dir=None,
+    atomic_data=None,
 )
 
 

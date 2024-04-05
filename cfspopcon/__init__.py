@@ -9,6 +9,7 @@ from .algorithms.algorithm_class import Algorithm, CompositeAlgorithm
 from .input_file_handling import read_case
 from .plotting import read_plot_style
 from .point_selection import find_coords_of_maximum, find_coords_of_minimum
+from .read_atomic_data import AtomicData
 from .unit_handling import (
     Quantity,
     Unit,
@@ -46,4 +47,5 @@ __all__ = [
     "Algorithm",
     "CompositeAlgorithm",
     "file_io",
+    "AtomicData",
 ]

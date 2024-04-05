@@ -7,7 +7,7 @@ from numpy import float64
 from numpy.polynomial.polynomial import polyval
 from numpy.typing import NDArray
 
-from ...named_options import Impurity
+from ...named_options import AtomicSpecies
 from ...unit_handling import ureg, wraps_ufunc
 from ..helpers import integrate_profile_over_volume
 
@@ -29,7 +29,7 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
     electron_temp_profile: NDArray[float64],
     electron_density_profile: NDArray[float64],
     impurity_concentration: float,
-    impurity_species: Impurity,
+    impurity_species: AtomicSpecies,
     plasma_volume: float,
 ) -> float:
     """Calculation of radiated power, using fits from A.A. Mavrin's 2018 paper.
