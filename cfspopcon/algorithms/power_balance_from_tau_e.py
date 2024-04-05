@@ -11,7 +11,7 @@ RETURN_KEYS = [
 
 def run_calc_power_balance_from_tau_e(
     plasma_stored_energy: Unitfull,
-    average_electron_density: Unitfull,
+    line_averaged_electron_density: Unitfull,
     confinement_time_scalar: Unitfull,
     plasma_current: Unitfull,
     magnetic_field_on_axis: Unitfull,
@@ -29,7 +29,7 @@ def run_calc_power_balance_from_tau_e(
 
     Args:
         plasma_stored_energy: :term:`glossary link<plasma_stored_energy>`
-        average_electron_density: :term:`glossary link<average_electron_density>`
+        line_averaged_electron_density: :term:`glossary link<line_averaged_electron_density>`
         confinement_time_scalar: :term:`glossary link<confinement_time_scalar>`
         plasma_current: :term:`glossary link<plasma_current>`
         magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
@@ -51,7 +51,7 @@ def run_calc_power_balance_from_tau_e(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,
-        average_electron_density=average_electron_density,
+        average_electron_density=line_averaged_electron_density,
         major_radius=major_radius,
         areal_elongation=areal_elongation,
         separatrix_elongation=separatrix_elongation,

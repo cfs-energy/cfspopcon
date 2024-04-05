@@ -21,7 +21,7 @@ def run_two_point_model_fixed_fpow(
     SOL_power_loss_fraction: Union[float, xr.DataArray],
     q_parallel: Union[Quantity, xr.DataArray],
     parallel_connection_length: Union[Quantity, xr.DataArray],
-    average_electron_density: Union[Quantity, xr.DataArray],
+    line_averaged_electron_density: Union[Quantity, xr.DataArray],
     nesep_over_nebar: Union[float, xr.DataArray],
     toroidal_flux_expansion: Union[float, xr.DataArray],
     fuel_average_mass_number: Union[Quantity, xr.DataArray],
@@ -35,7 +35,7 @@ def run_two_point_model_fixed_fpow(
         SOL_power_loss_fraction: :term:`glossary link<SOL_power_loss_fraction>`
         q_parallel: :term:`glossary link<q_parallel>`
         parallel_connection_length: :term:`glossary link<parallel_connection_length>`
-        average_electron_density: :term:`glossary link<average_electron_density>`
+        line_averaged_electron_density: :term:`glossary link<line_averaged_electron_density>`
         nesep_over_nebar: :term:`glossary link<nesep_over_nebar>`
         toroidal_flux_expansion: :term:`glossary link<toroidal_flux_expansion>`
         fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
@@ -50,7 +50,7 @@ def run_two_point_model_fixed_fpow(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=nesep_over_nebar * average_electron_density,
+        upstream_electron_density=nesep_over_nebar * line_averaged_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,

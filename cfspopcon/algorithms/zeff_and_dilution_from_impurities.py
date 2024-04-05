@@ -9,7 +9,7 @@ RETURN_KEYS = [
     "impurity_charge_state",
     "z_effective",
     "dilution",
-    "summed_impurity_density",
+    "summed_impurity_average_density",
     "average_ion_density",
 ]
 
@@ -29,7 +29,7 @@ def run_calc_zeff_and_dilution_from_impurities(
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
-        :term:`impurity_charge_state`, :term:`z_effective`, :term:`dilution`, :term:`summed_impurity_density`, :term:`average_ion_density`
+        :term:`impurity_charge_state`, :term:`z_effective`, :term:`dilution`, :term:`summed_impurity_average_density`, :term:`average_ion_density`
 
     """
     starting_zeff = 1.0
@@ -43,7 +43,7 @@ def run_calc_zeff_and_dilution_from_impurities(
 
     z_effective = starting_zeff + change_in_zeff.sum(dim="dim_species")
     dilution = starting_dilution - change_in_dilution.sum(dim="dim_species")
-    summed_impurity_density = impurities.sum(dim="dim_species") * average_electron_density
+    summed_impurity_average_density = impurities.sum(dim="dim_species") * average_electron_density
     average_ion_density = dilution * average_electron_density
 
     local_vars = locals()
