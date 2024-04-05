@@ -10,6 +10,7 @@ algorithms:
   - calc_zeff_and_dilution_from_impurities
   - calc_plasma_stored_energy
   - calc_power_balance_from_tau_e
+  - calc_average_total_pressure
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -24,6 +25,7 @@ algorithms:
   # increase the power radiated from the core. This increases
   # the fuel dilution and Zeff (computed), as well as degrading
   # core confinement (not yet computed).
+  - calc_mcrf_from_fixed_P_sol
   - calc_extrinsic_core_radiator
   # We then recompute the profiles with the dilution due to the
   # core radiator, and use this to determine the fusion power rate.
@@ -39,8 +41,6 @@ algorithms:
   # a scaling for lambda_q to calculate a corresponding q_parallel, and
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
-  - calc_P_SOL
-  - calc_average_total_pressure
   - calc_heat_exhaust
   - two_point_model_fixed_tet
   # Finally, we calculate several parameters which aren't used in other
@@ -128,6 +128,7 @@ temperature_peaking: 2.5
 # Ratio of volume-averaged temperatures (Ti / Te)
 ion_to_electron_temp_ratio: 1.0
 
+
 # Ratio of confinement-mode threshold power to scaling
 confinement_threshold_scalar: 1.0
 # Confinement enhancement factor
@@ -137,7 +138,9 @@ energy_confinement_scaling: ITER98y2
 
 radiated_power_method: Radas
 radiated_power_scalar: 1.0
-minimum_core_radiated_fraction: 0.0
+
+# Target P_SOL value
+P_sol_target: 50
 
 impurities:
   # Impurity concentration relative to electron density.
