@@ -351,13 +351,6 @@ calc_loop_voltage:
   optionals: []
   returns:
   - loop_voltage
-calc_magnetic_field_on_axis:
-  inputs:
-  - product_of_magnetic_field_and_radius
-  - major_radius
-  optionals: []
-  returns:
-  - magnetic_field_on_axis
 calc_minor_radius_from_inverse_aspect_ratio:
   inputs:
   - major_radius

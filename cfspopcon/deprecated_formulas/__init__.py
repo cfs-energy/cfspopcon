@@ -1,7 +1,6 @@
 """Formulas for POPCONs analysis."""
 
 from . import radiated_power, scrape_off_layer_model
-from .figures_of_merit import calc_normalised_collisionality, calc_peak_pressure, calc_rho_star, calc_triple_product
 from .radiated_power import (
     calc_bremsstrahlung_radiation,
     calc_impurity_radiated_power,

@@ -4,11 +4,6 @@ from .edge_impurity_concentration import calc_edge_impurity_concentration
 from .extrinsic_core_radiator import calc_extrinsic_core_radiator
 from .single_functions import (
     calc_f_rad_core,
-    calc_magnetic_field_on_axis,
-    calc_normalised_collisionality,
-    calc_peak_pressure,
-    calc_rho_star,
-    calc_triple_product,
     require_P_rad_less_than_P_in,
 )
 
