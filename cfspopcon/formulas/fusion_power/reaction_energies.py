@@ -1,26 +1,27 @@
 """Reaction energies and power densities."""
 
-from typing import Any, Callable, Union
+from typing import Callable, Union
 
 from numpy import float64
 from numpy.typing import NDArray
 from scipy import constants  # type: ignore[import-untyped]
 
 from ...named_options import ReactionType
-from ...unit_handling import wraps_ufunc, ureg
+from ...unit_handling import ureg, wraps_ufunc
+
 
 @wraps_ufunc(
-    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction = ureg.dimensionless),
+    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction=ureg.dimensionless),
     return_units=dict(
-        rxn_energy = ureg.MJ,
-        rxn_energy_neut = ureg.MJ,
-        rxn_energy_charged = ureg.MJ,
-        number_power_dens = ureg.MW * ureg.m**3,
-        number_power_dens_neut = ureg.MW * ureg.m**3,
-        number_power_dens_charged = ureg.MW * ureg.m**3,
+        rxn_energy=ureg.MJ,
+        rxn_energy_neut=ureg.MJ,
+        rxn_energy_charged=ureg.MJ,
+        number_power_dens=ureg.MW * ureg.m**3,
+        number_power_dens_neut=ureg.MW * ureg.m**3,
+        number_power_dens_charged=ureg.MW * ureg.m**3,
     ),
     input_core_dims=[("dim_rho",), ()],
-    output_core_dims=[(), (), (), ("dim_rho",), ("dim_rho",), ("dim_rho",)]
+    output_core_dims=[(), (), (), ("dim_rho",), ("dim_rho",), ("dim_rho",)],
 )
 def reaction_energy_DT(
     sigmav: NDArray[float64], heavier_fuel_species_fraction: float
@@ -53,18 +54,19 @@ def reaction_energy_DT(
     # Units: [MJ], [MW*m^3]
     return rxn_energy, rxn_energy_neut, rxn_energy_charged, number_power_dens, number_power_dens_neut, number_power_dens_charged
 
+
 @wraps_ufunc(
-    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction = ureg.dimensionless),
+    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction=ureg.dimensionless),
     return_units=dict(
-        rxn_energy = ureg.MJ,
-        rxn_energy_neut = ureg.MJ,
-        rxn_energy_charged = ureg.MJ,
-        number_power_dens = ureg.MW * ureg.m**3,
-        number_power_dens_neut = ureg.MW * ureg.m**3,
-        number_power_dens_charged = ureg.MW * ureg.m**3,
+        rxn_energy=ureg.MJ,
+        rxn_energy_neut=ureg.MJ,
+        rxn_energy_charged=ureg.MJ,
+        number_power_dens=ureg.MW * ureg.m**3,
+        number_power_dens_neut=ureg.MW * ureg.m**3,
+        number_power_dens_charged=ureg.MW * ureg.m**3,
     ),
     input_core_dims=[("dim_rho",), ()],
-    output_core_dims=[(), (), (), ("dim_rho",), ("dim_rho",), ("dim_rho",)]
+    output_core_dims=[(), (), (), ("dim_rho",), ("dim_rho",), ("dim_rho",)],
 )
 def reaction_energy_DD(
     sigmav: tuple[
@@ -80,7 +82,7 @@ def reaction_energy_DD(
 
     Args:
         sigmav: :math:`\langle \sigma v \rangle` product in cm^3/s.
-        _: Unused placeholder to enable unified call syntax with e.g. :func:`reaction_energy_DT`.
+        heavier_fuel_species_fraction: Unused placeholder to enable unified call syntax with e.g. :func:`reaction_energy_DT`.
 
     Returns:
         Tuple of reaction energies and corresponding power densities.
@@ -101,16 +103,17 @@ def reaction_energy_DD(
     # Units: [MJ], [MW/m^3]
     return rxn_energy, rxn_energy_neut, rxn_energy_charged, number_power_dens, number_power_dens_neut, number_power_dens_charged
 
+
 @wraps_ufunc(
-    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction = ureg.dimensionless),
+    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction=ureg.dimensionless),
     return_units=dict(
-        rxn_energy = ureg.MJ,
-        rxn_energy_neut = ureg.MJ,
-        rxn_energy_charged = ureg.MJ,
-        number_power_dens = ureg.MW * ureg.m**3,
-        number_power_dens_neut = ureg.MW * ureg.m**3,
-        number_power_dens_charged = ureg.MW * ureg.m**3,
-    )
+        rxn_energy=ureg.MJ,
+        rxn_energy_neut=ureg.MJ,
+        rxn_energy_charged=ureg.MJ,
+        number_power_dens=ureg.MW * ureg.m**3,
+        number_power_dens_neut=ureg.MW * ureg.m**3,
+        number_power_dens_charged=ureg.MW * ureg.m**3,
+    ),
 )
 def reaction_energy_DHe3(
     sigmav: NDArray[float64], heavier_fuel_species_fraction: float
@@ -143,16 +146,17 @@ def reaction_energy_DHe3(
     # Units: [MJ], [MW/m^3]
     return rxn_energy, rxn_energy_neut, rxn_energy_charged, number_power_dens, number_power_dens_neut, number_power_dens_charged
 
+
 @wraps_ufunc(
-    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction = ureg.dimensionless),
+    input_units=dict(sigmav=ureg.cm**3 / ureg.s, heavier_fuel_species_fraction=ureg.dimensionless),
     return_units=dict(
-        rxn_energy = ureg.MJ,
-        rxn_energy_neut = ureg.MJ,
-        rxn_energy_charged = ureg.MJ,
-        number_power_dens = ureg.MW * ureg.m**3,
-        number_power_dens_neut = ureg.MW * ureg.m**3,
-        number_power_dens_charged = ureg.MW * ureg.m**3,
-    )
+        rxn_energy=ureg.MJ,
+        rxn_energy_neut=ureg.MJ,
+        rxn_energy_charged=ureg.MJ,
+        number_power_dens=ureg.MW * ureg.m**3,
+        number_power_dens_neut=ureg.MW * ureg.m**3,
+        number_power_dens_charged=ureg.MW * ureg.m**3,
+    ),
 )
 def reaction_energy_pB11(
     sigmav: NDArray[float64], heavier_fuel_species_fraction: float
@@ -185,6 +189,7 @@ def reaction_energy_pB11(
 
     # Units: [MJ], [MW/m^3]
     return rxn_energy, rxn_energy_neut, rxn_energy_charged, number_power_dens, number_power_dens_neut, number_power_dens_charged
+
 
 ENERGY: dict[
     ReactionType,

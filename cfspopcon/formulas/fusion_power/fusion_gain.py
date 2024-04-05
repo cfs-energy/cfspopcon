@@ -4,12 +4,7 @@ from ...unit_handling import Unitfull, ureg
 
 
 @Algorithm.register_algorithm(return_keys=["P_external", "P_launched", "Q"])
-def calc_fusion_gain(
-        P_fusion: Unitfull,
-        P_alpha: Unitfull,
-        P_in: Unitfull,
-        fraction_of_external_power_coupled: Unitfull
-    ) -> Unitfull:
+def calc_fusion_gain(P_fusion: Unitfull, P_alpha: Unitfull, P_in: Unitfull, fraction_of_external_power_coupled: Unitfull) -> Unitfull:
     """Calculate the fusion gain, using the launched power in the denominator.
 
     This is the thermal gain using the launched power.

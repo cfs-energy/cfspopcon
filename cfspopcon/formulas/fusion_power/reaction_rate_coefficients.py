@@ -7,12 +7,10 @@ from numpy import float64
 from numpy.typing import NDArray
 
 from ...named_options import ReactionType
-from ...unit_handling import wraps_ufunc, ureg
+from ...unit_handling import ureg, wraps_ufunc
 
-@wraps_ufunc(
-    input_units=dict(ion_temp_profile=ureg.keV),
-    return_units=dict(sigmav=ureg.cm**3 / ureg.s)
-)
+
+@wraps_ufunc(input_units=dict(ion_temp_profile=ureg.keV), return_units=dict(sigmav=ureg.cm**3 / ureg.s))
 def sigmav_DT(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
     r"""Deuterium-Tritium reaction.
 
@@ -38,10 +36,8 @@ def sigmav_DT(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
     )
     return sigmav  # type: ignore[no-any-return] # [cm^3/s]
 
-@wraps_ufunc(
-    input_units=dict(ion_temp_profile=ureg.keV),
-    return_units=dict(sigmav=ureg.cm**3 / ureg.s)
-)
+
+@wraps_ufunc(input_units=dict(ion_temp_profile=ureg.keV), return_units=dict(sigmav=ureg.cm**3 / ureg.s))
 def sigmav_DT_BoschHale(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
     r"""Deuterium-Tritium reaction.
 
@@ -74,13 +70,14 @@ def sigmav_DT_BoschHale(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
     sigmav = C[1] * theta * np.sqrt(eta / (mr_c2 * ion_temp_profile**3)) * np.exp(-3 * eta)
     return sigmav  # type: ignore[no-any-return] # [cm^3/s]
 
+
 @wraps_ufunc(
     input_units=dict(ion_temp_profile=ureg.keV),
     return_units=dict(
         sigmav_tot=ureg.cm**3 / ureg.s,
         sigmav_1=ureg.cm**3 / ureg.s,
         sigmav_2=ureg.cm**3 / ureg.s,
-    )
+    ),
 )
 def sigmav_DD(ion_temp_profile: NDArray[float64]) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64]]:
     r"""Deuterium-Deuterium reaction.
@@ -133,13 +130,14 @@ def sigmav_DD(ion_temp_profile: NDArray[float64]) -> tuple[NDArray[float64], NDA
     sigmav_tot: NDArray[float64] = sigmav_1 + sigmav_2
     return sigmav_tot, sigmav_1, sigmav_2  # [cm^3/s]
 
+
 @wraps_ufunc(
     input_units=dict(ion_temp_profile=ureg.keV),
     return_units=dict(
         sigmav_tot=ureg.cm**3 / ureg.s,
         sigmav_1=ureg.cm**3 / ureg.s,
         sigmav_2=ureg.cm**3 / ureg.s,
-    )
+    ),
 )
 def sigmav_DD_BoschHale(ion_temp_profile: NDArray[float64]) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64]]:
     r"""Deuterium-Deuterium reaction.
@@ -194,10 +192,8 @@ def sigmav_DD_BoschHale(ion_temp_profile: NDArray[float64]) -> tuple[NDArray[flo
 
     return sigmav_tot, sigmav_1, sigmav_2  # [cm^3/s]
 
-@wraps_ufunc(
-    input_units=dict(ion_temp_profile=ureg.keV),
-    return_units=dict(sigmav=ureg.cm**3 / ureg.s)
-)
+
+@wraps_ufunc(input_units=dict(ion_temp_profile=ureg.keV), return_units=dict(sigmav=ureg.cm**3 / ureg.s))
 def sigmav_DHe3(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
     r"""Deuterium-Helium-3 reaction.
 
@@ -242,10 +238,8 @@ def sigmav_DHe3(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
 
     return sigmav  # [cm^3/s]
 
-@wraps_ufunc(
-    input_units=dict(ion_temp_profile=ureg.keV),
-    return_units=dict(sigmav=ureg.cm**3 / ureg.s)
-)
+
+@wraps_ufunc(input_units=dict(ion_temp_profile=ureg.keV), return_units=dict(sigmav=ureg.cm**3 / ureg.s))
 def sigmav_pB11(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
     r"""Proton (hydrogen)-Boron11 reaction.
 
@@ -327,6 +321,7 @@ def sigmav_pB11(ion_temp_profile: NDArray[float64]) -> NDArray[float64]:
             sigmav[i] = sigmavNRhigh[i] + sigmavR[i]
 
     return sigmav  # [cm^3/s]
+
 
 SIGMAV: dict[
     ReactionType,
