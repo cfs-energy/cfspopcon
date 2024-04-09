@@ -1,10 +1,8 @@
 from ..unit_handling import convert_to_default_units
 from .algorithm_class import Algorithm
-from .single_functions import calc_P_SOL
 
 RETURN_KEYS = [
-    "minimum_core_radiated_fraction"
-    "P_sol"
+    "minimum_core_radiated_fraction", 
 ]
 
 def run_calc_mcrf_from_fixed_P_sol(P_in, P_sol_target):
@@ -25,7 +23,4 @@ def run_calc_mcrf_from_fixed_P_sol(P_in, P_sol_target):
 calc_mcrf_from_fixed_P_sol = Algorithm(
     function=run_calc_mcrf_from_fixed_P_sol,
     return_keys=RETURN_KEYS,
-    calc_P_SOL = Algorithm.from_single_function(
-        lambda P_in, P_radiation: 50, return_keys=["P_sol"], name="calc_P_SOL" 
-    )
 )
