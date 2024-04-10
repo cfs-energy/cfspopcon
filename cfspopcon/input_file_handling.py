@@ -11,8 +11,10 @@ from .algorithms import get_algorithm
 from .algorithms.algorithm_class import Algorithm, CompositeAlgorithm
 from .helpers import convert_named_options
 from .unit_handling import set_default_units
-from freeqdsk import geqdsk
+#from freeqdsk import geqdsk
 import scipy.interpolate
+from .OMFIT import addFluxSurfaces
+from .OMFIT.addFluxSurfaces import OMFITgeqdsk
 
 def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any]]:
     """Read a yaml file corresponding to a given case.
@@ -79,9 +81,11 @@ def read_case(case: Union[str, Path]) -> tuple[dict[str, Any], Union[CompositeAl
         repr_d[key] = xr.DataArray(grid_vals, coords={f"dim_{key}": grid_vals})
 
     if equilibrium_file_path != None:
-        with open(equilibrium_file_path, "r") as f:
-            geqdsk = geqdsk.read(f)
-        eq_input = {}
+        #with open(equilibrium_file_path, "r") as f:
+         #   geqdsk = geqdsk.read(f)
+        geqdsk = OMFITgeqdsk(equilibrium_file_path)
+        print(geqdsk)
+        geqdsk.load(raw=True)
 
         # TO DO: Filling up algorithms that calculate the following variables from the geqdsk file:
         # minor_radius;
