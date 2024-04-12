@@ -86,7 +86,10 @@ extensions = [
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
     "nbsphinx",
+    "autoapi.extension",
 ]
+
+autoapi_dirs = ["../cfspopcon"]
 
 # -- nbsphinx
 exclude_patterns = ["_build", "static"]

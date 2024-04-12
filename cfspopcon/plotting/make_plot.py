@@ -9,8 +9,6 @@ import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
 
-from cfspopcon import __version__
-
 from ..point_selection import build_mask_from_dict, find_coords_of_minimum
 from ..transform import build_transform_function_from_dict
 from ..unit_handling import Quantity, Unit, dimensionless_magnitude
@@ -40,6 +38,8 @@ def make_plot(
 
 def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points: dict, ax: Axes):
     """Make a plot."""
+    from cfspopcon import __version__
+
     fig = ax.figure
     transform_func = build_transform_function_from_dict(dataset, plot_params)
 
