@@ -49,9 +49,9 @@ class DTFusionBoschHale(FusionReaction):
             1 - (ion_temp * (C[2] + ion_temp * (C[4] + ion_temp * C[6]))) / (1 + ion_temp * (C[3] + ion_temp * (C[5] + ion_temp * C[7])))
         )
         eta = (B_G**2 / (4 * theta)) ** (1 / 3)
-        sigmav = C[1] * theta * np.sqrt(eta / (mr_c2 * ion_temp**3)) * np.exp(-3 * eta)
+        sigmav: float = C[1] * theta * np.sqrt(eta / (mr_c2 * ion_temp**3)) * np.exp(-3 * eta)
 
-        return sigmav  # type:ignore[no-any-return]
+        return sigmav
 
     def calc_average_fuel_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
         """Calculate the average mass of the fuel ions.
@@ -113,10 +113,10 @@ class DTFusionHively(DTFusionBoschHale):
         """
         A = [-21.377692, -25.204054, -7.1013427 * 1e-2, 1.9375451 * 1e-4, 4.9246592 * 1e-6, -3.9836572 * 1e-8]
         r = 0.2935
-        sigmav = np.exp(
+        sigmav: float = np.exp(
             A[0] / ion_temp**r + A[1] + A[2] * ion_temp + A[3] * ion_temp**2.0 + A[4] * ion_temp**3.0 + A[5] * ion_temp**4.0
         )
-        return sigmav  # type:ignore[no-any-return]
+        return sigmav
 
 
 class DDFusionBoschHale(FusionReaction):

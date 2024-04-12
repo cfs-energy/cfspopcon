@@ -52,9 +52,9 @@ def calc_bremsstrahlung_radiation(
     fKb = ne20**2 * np.sqrt(electron_temp_profile) * xrel
     Kb = integrate_profile_over_volume.unitless_func(fKb, rho, plasma_volume)  # radial profile factor
 
-    P_brem = 5.35e-3 * z_effective * Kb  # volume-averaged bremsstrahlung radiaton in MW
+    P_brem: float = 5.35e-3 * z_effective * Kb  # volume-averaged bremsstrahlung radiaton in MW
 
-    return P_brem  # type:ignore[no-any-return]
+    return P_brem
 
 
 calc_P_rad_hydrogen_bremsstrahlung = Algorithm.from_single_function(

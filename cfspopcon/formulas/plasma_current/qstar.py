@@ -52,9 +52,10 @@ def calc_plasma_current_from_qstar(
     Returns:
         :term:`plasma_current` [MA]
     """
-    return (  # type:ignore[no-any-return]
+    plasma_current: float = (
         5.0 * ((inverse_aspect_ratio * major_radius) ** 2.0) * (magnetic_field_on_axis / (q_star * major_radius)) * f_shaping
     )
+    return plasma_current
 
 
 @Algorithm.register_algorithm(return_keys=["q_star"])
@@ -85,6 +86,5 @@ def calc_q_star_from_plasma_current(
     Returns:
         :term:`qstar` [~]
     """
-    return (  # type:ignore[no-any-return]
-        5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
-    )
+    qstar: float = 5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
+    return qstar

@@ -116,9 +116,13 @@ def build_L_int_integrator(
     interpolator = InterpolatedUnivariateSpline(electron_temp, magnitude(Lz_sqrt_Te))
 
     def L_int(start_temp: float, stop_temp: float) -> float:
-        return interpolator.integral(start_temp, stop_temp)  # type: ignore[no-any-return]
+        integrated_Lz: float = interpolator.integral(start_temp, stop_temp)
+        return integrated_Lz
 
-    return wraps_ufunc(input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV), return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5))(L_int)  # type: ignore[no-any-return]
+    L_int_integrator: Callable[[Unitfull, Unitfull], Unitfull] = wraps_ufunc(
+        input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV), return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5)
+    )(L_int)
+    return L_int_integrator
 
 
 def calc_required_edge_impurity_concentration(

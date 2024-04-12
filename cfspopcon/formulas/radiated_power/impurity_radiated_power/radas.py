@@ -55,8 +55,8 @@ def calc_impurity_radiated_power_radas(
     Lz = np.power(10, interpolator((np.log10(electron_temp_profile), np.log10(electron_density_profile))))
     radiated_power_profile = electron_density_profile**2 * Lz
 
-    radiated_power = (
+    radiated_power: float = (
         impurity_concentration * integrate_profile_over_volume.unitless_func(radiated_power_profile, rho, plasma_volume) / MW_per_W
     )
 
-    return radiated_power  # type:ignore[no-any-return]
+    return radiated_power

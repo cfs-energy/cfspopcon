@@ -27,4 +27,5 @@ def integrate_profile_over_volume(
          volume_integrated_value [units]
     """
     drho = rho[1] - rho[0]
-    return np.sum(array_per_m3 * 2.0 * rho * drho) * plasma_volume  # type:ignore[no-any-return]
+    result: float = np.sum(array_per_m3 * 2.0 * rho * drho) * plasma_volume
+    return result

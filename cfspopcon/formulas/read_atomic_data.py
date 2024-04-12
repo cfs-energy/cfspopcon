@@ -155,7 +155,8 @@ class AtomicData:
         tiny = np.finfo(np.float64).tiny
 
         def log10_with_floor(x: Union[xr.DataArray, np.ndarray, float]) -> Union[xr.DataArray, np.ndarray, float]:
-            return np.log10(np.maximum(x, tiny))  # type:ignore[no-any-return]
+            floored_log: float = np.log10(np.maximum(x, tiny))
+            return floored_log
 
         # Remove rows or columns with all negative or zero values
         z_values = z_values.where(~np.all(z_values <= 0.0, axis=0), drop=True)
