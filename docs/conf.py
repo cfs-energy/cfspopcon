@@ -90,6 +90,7 @@ extensions = [
 ]
 
 autoapi_dirs = ["../cfspopcon"]
+nitpick_ignore = [("py:class", "Ellipsis")]
 
 # -- nbsphinx
 exclude_patterns = ["_build", "static"]

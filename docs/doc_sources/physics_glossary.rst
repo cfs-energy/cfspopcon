@@ -217,6 +217,7 @@ Physics Glossary
   areal_elongation
     Elongation of the confined region computed using the poloidal area inside the last-closed-flux-surface :math:`\kappa_A = S_{pol} / (\pi a^2)`.
 
+  beta
   beta_toroidal
     Ratio of plasma pressure to magnetic pressure provided by the toroidal magnetic field.
 
@@ -226,6 +227,7 @@ Physics Glossary
   beta_total
     Ratio of plasma pressure to magnetic pressure provided by the total magnetic field.
 
+  normalized_beta
   beta_N
     Ratio of plasma pressure to magnetic pressure provided by the total magnetic field, normalized to :math:`I_MA / a B_0`.
 
@@ -324,6 +326,7 @@ Physics Glossary
   plasma_stored_energy
     Thermal energy in the plasma.
 
+  qstar
   q_star
     Analytical approximation of safety factor at :math:`\rho=0.95`.
 
