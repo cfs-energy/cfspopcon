@@ -63,7 +63,7 @@ To make reading & validating formulas easier, we additionally follow the below g
 - Functions that handle dimensional quantities should use :class:`pint.Quantity`.
 
 Please note, that while we have some checks for docstrings, those checks do not cover all aspects.
-So let's look at a basic example, the :func:`~cfspopcon.formulas.analytical.calc_plasma_volume` function:
+So let's look at a basic example, the :func:`~cfspopcon.formulas.geometry.calc_plasma_volume` function:
 
 .. literalinclude:: ../../cfspopcon/formulas/geometry/analytical.py
   :language: python

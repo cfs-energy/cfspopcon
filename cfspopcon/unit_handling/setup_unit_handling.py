@@ -9,7 +9,7 @@ import numpy.typing as npt
 import pint
 import pint_xarray  # type:ignore[import-untyped]
 import xarray as xr
-from pint.errors import DimensionalityError, UndefinedUnitError
+from pint import DimensionalityError, UndefinedUnitError, UnitStrippedWarning
 from typing_extensions import ParamSpec
 
 ureg = pint_xarray.setup_registry(
@@ -95,4 +95,5 @@ __all__ = [
     "magnitude",
     "suppress_downcast_warning",
     "dimensionless_magnitude",
+    "UnitStrippedWarning",
 ]
