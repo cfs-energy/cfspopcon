@@ -142,9 +142,9 @@ def label_contour(ax: plt.Axes, contour_set: matplotlib.contour.QuadContourSet, 
 
     Returns the first label element, which can be used to construct a legend.
     Works best with contour sets with only one color.
-    >>> contour_labels = dict()
-    >>> contour_labels["key"] = label_contour(...)
-    >>> ax.legend(contour_labels.values(), contour_labels.keys())
+        >>> contour_labels = dict()
+        >>> contour_labels["key"] = label_contour(...)
+        >>> ax.legend(contour_labels.values(), contour_labels.keys())
 
     Inputs:
         ax: the matplotlib axis of the contour plot

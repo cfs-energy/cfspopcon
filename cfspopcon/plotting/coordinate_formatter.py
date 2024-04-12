@@ -1,8 +1,8 @@
 """Adds a readout of the field at the current mouse position for a colormapped field plotted with pcolormesh, contour, quiver, etc.
 
 Usage:
->>> fig, ax = plt.subplots()
->>> ax.format_coord = CoordinateFormatter(x, y, z)
+    >>> fig, ax = plt.subplots()
+    >>> ax.format_coord = CoordinateFormatter(x, y, z)
 """
 import xarray as xr
 
