@@ -142,3 +142,4 @@ radas_dir/*
 
 # Top-level (working) notebooks should not be tracked
 *.ipynb
+docs/autoapi/*

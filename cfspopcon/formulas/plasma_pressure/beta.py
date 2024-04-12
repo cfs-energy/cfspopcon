@@ -19,7 +19,7 @@ def _calc_beta_general(
         >>> T = Quantity(1, "keV")
         >>> B = Quantity(1, "T")
         >>> mu_0 = Quantity(1, "mu_0")
-        >>> ((2*mu_0 * n * T / (B**2)).to('').units
+        >>> (2*mu_0 * n * T / (B**2)).to('').units
         <Unit('dimensionless')>
 
     Args:
