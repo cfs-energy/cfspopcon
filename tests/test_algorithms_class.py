@@ -27,7 +27,7 @@ def how_many_birds(BIRDS):
         local_vars = locals()
         return {key: local_vars[key] for key in BIRDS}
 
-    return Algorithm(function=count_birds, return_keys=BIRDS)
+    return Algorithm(function=count_birds, return_keys=BIRDS, skip_registration=True)
 
 
 @pytest.fixture(scope="session")
@@ -50,7 +50,7 @@ def how_many_animals(ANIMALS):
         local_vars = locals()
         return {key: local_vars[key] for key in ANIMALS}
 
-    return Algorithm(function=count_animals, return_keys=ANIMALS)
+    return Algorithm(function=count_animals, return_keys=ANIMALS, skip_registration=True)
 
 
 def test_algorithm_kw_only():
@@ -58,7 +58,7 @@ def test_algorithm_kw_only():
         return {"p2_2": 10}
 
     with pytest.raises(ValueError, match="Algorithm only supports functions with keyword arguments.*?POSITIONAL_ONLY parameter p1"):
-        _ = Algorithm(function=test, return_keys=["p2_2"])
+        _ = Algorithm(function=test, return_keys=["p2_2"], skip_registration=True)
 
 
 def test_composite_signature(how_many_birds, how_many_animals):
@@ -242,7 +242,9 @@ def test_single_function_algorithm():
         c, d = b, a
         return c, d
 
-    alg = Algorithm.from_single_function(dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True)
+    alg = Algorithm.from_single_function(
+        dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True, skip_registration=True
+    )
 
     result = alg.run(a=1, b=2)
     assert result["c"] == 2
@@ -251,7 +253,9 @@ def test_single_function_algorithm():
     def in_and_out(average_electron_density):
         return average_electron_density * 2
 
-    alg = Algorithm.from_single_function(in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out")
+    alg = Algorithm.from_single_function(
+        in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out", skip_registration=True
+    )
     result = alg.run(average_electron_density=1.2 * ureg.n20)
     assert result["average_electron_density"] == 24.0 * ureg.n19
 

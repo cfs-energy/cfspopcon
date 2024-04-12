@@ -44,24 +44,24 @@ def calc_plasma_surface_area(major_radius: Unitfull, inverse_aspect_ratio: Unitf
     )
 
 
-Algorithm.from_single_function(
+calc_separatrix_elongation_from_areal_elongation = Algorithm.from_single_function(
     func=lambda areal_elongation, elongation_ratio_sep_to_areal: areal_elongation * elongation_ratio_sep_to_areal,
     return_keys=["separatrix_elongation"],
     name="calc_separatrix_elongation_from_areal_elongation",
 )
 
-Algorithm.from_single_function(
+calc_separatrix_triangularity_from_triangularity95 = Algorithm.from_single_function(
     func=lambda triangularity_psi95, triangularity_ratio_sep_to_psi95: triangularity_psi95 * triangularity_ratio_sep_to_psi95,
     return_keys=["separatrix_triangularity"],
     name="calc_separatrix_triangularity_from_triangularity95",
 )
 
-Algorithm.from_single_function(
+calc_minor_radius_from_inverse_aspect_ratio = Algorithm.from_single_function(
     func=lambda major_radius, inverse_aspect_ratio: major_radius * inverse_aspect_ratio,
     return_keys=["minor_radius"],
     name="calc_minor_radius_from_inverse_aspect_ratio",
 )
-Algorithm.from_single_function(
+calc_vertical_minor_radius_from_elongation_and_minor_radius = Algorithm.from_single_function(
     func=lambda minor_radius, separatrix_elongation: minor_radius * separatrix_elongation,
     return_keys=["vertical_minor_radius"],
     name="calc_vertical_minor_radius_from_elongation_and_minor_radius",

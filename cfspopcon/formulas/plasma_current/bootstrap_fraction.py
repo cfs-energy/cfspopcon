@@ -44,7 +44,7 @@ def calc_bootstrap_fraction(
     return bootstrap_fraction
 
 
-Algorithm.from_single_function(
+calc_inductive_plasma_current = Algorithm.from_single_function(
     func=lambda plasma_current, bootstrap_fraction: plasma_current * (1.0 - bootstrap_fraction),
     name="calc_inductive_plasma_current",
     return_keys=["inductive_plasma_current"],

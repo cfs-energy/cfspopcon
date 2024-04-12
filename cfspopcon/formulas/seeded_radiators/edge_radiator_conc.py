@@ -8,8 +8,8 @@ from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import
 from ...algorithm_class import Algorithm
 from ...helpers import extend_impurities_array
 from ...named_options import AtomicSpecies
-from ...read_atomic_data import AtomicData
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
+from ..read_atomic_data import AtomicData
 
 
 @Algorithm.register_algorithm(

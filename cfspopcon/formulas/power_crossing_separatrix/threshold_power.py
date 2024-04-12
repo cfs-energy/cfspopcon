@@ -66,7 +66,7 @@ def calc_LH_transition_threshold_power(
         return P_LH_thresh * scale
 
 
-Algorithm.from_single_function(
+calc_ratio_P_LH = Algorithm.from_single_function(
     func=lambda P_sol, P_LH_thresh: P_sol / P_LH_thresh, return_keys=["ratio_of_P_SOL_to_P_LH"], name="calc_ratio_P_LH"
 )
 
@@ -92,6 +92,6 @@ def calc_LI_transition_threshold_power(plasma_current: float, average_electron_d
     return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
 
 
-Algorithm.from_single_function(
+calc_ratio_P_LI = Algorithm.from_single_function(
     func=lambda P_sol, P_LI_thresh: P_sol / P_LI_thresh, return_keys=["ratio_of_P_SOL_to_P_LI"], name="calc_ratio_P_LI"
 )

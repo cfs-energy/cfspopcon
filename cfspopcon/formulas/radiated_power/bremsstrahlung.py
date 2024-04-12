@@ -57,7 +57,7 @@ def calc_bremsstrahlung_radiation(
     return P_brem  # type:ignore[no-any-return]
 
 
-Algorithm.from_single_function(
+calc_P_rad_hydrogen_bremsstrahlung = Algorithm.from_single_function(
     func=lambda rho, electron_density_profile, electron_temp_profile, plasma_volume: calc_bremsstrahlung_radiation(
         rho, electron_density_profile, electron_temp_profile, 1.0, plasma_volume
     ),

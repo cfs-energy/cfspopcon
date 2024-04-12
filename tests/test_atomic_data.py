@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from cfspopcon.read_atomic_data import AtomicData
+from cfspopcon.formulas.read_atomic_data import AtomicData
 
 
 def test_read_atomic_data():

@@ -4,9 +4,9 @@ from numpy import float64
 from numpy.typing import NDArray
 
 from ....named_options import AtomicSpecies
-from ....read_atomic_data import AtomicData
 from ....unit_handling import ureg, wraps_ufunc
 from ...geometry.volume_integral import integrate_profile_over_volume
+from ...read_atomic_data import AtomicData
 
 
 @wraps_ufunc(

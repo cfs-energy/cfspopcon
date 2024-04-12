@@ -6,10 +6,10 @@ __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, helpers, named_options, unit_handling
 from .algorithm_class import Algorithm, CompositeAlgorithm
+from .formulas.read_atomic_data import AtomicData
 from .input_file_handling import read_case
 from .plotting import read_plot_style
 from .point_selection import find_coords_of_maximum, find_coords_of_minimum
-from .read_atomic_data import AtomicData
 from .unit_handling import (
     Quantity,
     Unit,

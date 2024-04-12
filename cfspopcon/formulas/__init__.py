@@ -10,6 +10,7 @@ from . import (
     plasma_profiles,
     power_crossing_separatrix,
     radiated_power,
+    read_atomic_data,
     scrape_off_layer,
     seeded_radiators,
     zeff_and_dilution,
@@ -29,4 +30,5 @@ __all__ = [
     "auxillary_power",
     "power_crossing_separatrix",
     "seeded_radiators",
+    "read_atomic_data",
 ]

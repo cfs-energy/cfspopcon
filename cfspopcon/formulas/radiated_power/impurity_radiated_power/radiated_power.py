@@ -3,8 +3,8 @@ import numpy as np
 import xarray as xr
 
 from ....named_options import RadiationMethod
-from ....read_atomic_data import AtomicData
 from ....unit_handling import Unitfull, ureg
+from ...read_atomic_data import AtomicData
 from .mavrin_coronal import calc_impurity_radiated_power_mavrin_coronal
 from .mavrin_noncoronal import calc_impurity_radiated_power_mavrin_noncoronal
 from .post_and_jensen import calc_impurity_radiated_power_post_and_jensen

@@ -672,6 +672,28 @@ solve_tau_e_scaling_for_input_power:
   returns:
   - energy_confinement_time
   - P_in
+switch_to_linearised_ohmic_confinement_below_threshold:
+  inputs:
+  - plasma_stored_energy
+  - energy_confinement_time
+  - P_in
+  - average_electron_density
+  - confinement_time_scalar
+  - plasma_current
+  - magnetic_field_on_axis
+  - major_radius
+  - areal_elongation
+  - separatrix_elongation
+  - inverse_aspect_ratio
+  - fuel_average_mass_number
+  - triangularity_psi95
+  - separatrix_triangularity
+  - q_star
+  optionals: []
+  returns:
+  - energy_confinement_time
+  - P_in
+  - SOC_LOC_ratio
 two_point_model_fixed_fpow:
   inputs:
   - SOL_power_loss_fraction

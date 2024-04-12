@@ -22,20 +22,24 @@ class Algorithm:
 
     instances: ClassVar[dict[str, Algorithm]] = dict()
 
-    def __init__(self, function: LabelledReturnFunctionType, return_keys: list[str], name: Optional[str] = None):
+    def __init__(
+        self, function: LabelledReturnFunctionType, return_keys: list[str], name: Optional[str] = None, skip_registration: bool = False
+    ):
         """Initialise an Algorithm.
 
         Args:
             function: a callable function
             return_keys: the arguments which are returned from the function
             name: Descriptive name for algorithm
+            skip_registration: flag to skip adding the Algorithm to 'instances' (useful for testing)
         """
         self._function = function
         self._name = self._function.__name__ if name is None else name
         key = self._name.removeprefix("run_")
         if key in self.instances:
             raise RuntimeError(f"Algorithm {key} has been defined multiple times.")
-        self.instances[key] = self
+        if not skip_registration:
+            self.instances[key] = self
 
         self._signature = inspect.signature(function)
         for p in self._signature.parameters.values():
@@ -122,7 +126,12 @@ class Algorithm:
 
     @classmethod
     def from_single_function(
-        cls, func: Callable, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False
+        cls,
+        func: Callable,
+        return_keys: list[str],
+        name: Optional[str] = None,
+        skip_unit_conversion: bool = False,
+        skip_registration: bool = False,
     ) -> Algorithm:
         """Build an Algorithm which wraps a single function."""
 
@@ -144,7 +153,7 @@ class Algorithm:
 
             return result_dict
 
-        return cls(wrapped_function, return_keys, name=name)
+        return cls(wrapped_function, return_keys, name=name, skip_registration=skip_registration)
 
     @classmethod
     def register_algorithm(

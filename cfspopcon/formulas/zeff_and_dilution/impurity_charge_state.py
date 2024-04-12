@@ -2,8 +2,8 @@
 import numpy as np
 
 from ...named_options import AtomicSpecies
-from ...read_atomic_data import AtomicData
 from ...unit_handling import ureg, wraps_ufunc
+from ..read_atomic_data import AtomicData
 
 
 @wraps_ufunc(
