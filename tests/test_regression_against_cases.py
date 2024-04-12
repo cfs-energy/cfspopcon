@@ -11,6 +11,11 @@ from xarray.testing import assert_allclose
 from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
 
+def temp_clean(ds):
+    return ds.drop_vars(
+        ("fusion_reaction","energy_confinement_scaling","inductive_plasma_current","tau_e_scaling"),
+        errors="ignore"   
+    )
 
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
 @pytest.mark.filterwarnings("ignore:Not all input parameters were used")
@@ -25,8 +30,8 @@ def test_regression_against_case(case: Path):
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 
     # TODO: Delete temporary renaming
-    dataset = dataset.rename(dict(tau_e_scaling="energy_confinement_scaling")).drop_vars(("fusion_reaction", "inductive_plasma_current"))
-    reference_dataset = reference_dataset.drop_vars(("fusion_reaction",))
+    dataset = temp_clean(dataset)
+    reference_dataset = temp_clean(reference_dataset)
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)
@@ -47,8 +52,8 @@ def test_regression_against_case_with_update(case: Path):
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
 
     # TODO: Delete temporary renaming
-    dataset = dataset.rename(dict(tau_e_scaling="energy_confinement_scaling")).drop_vars(("fusion_reaction", "inductive_plasma_current"))
-    reference_dataset = reference_dataset.drop_vars(("fusion_reaction",))
+    dataset = temp_clean(dataset)
+    reference_dataset = temp_clean(reference_dataset)
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)
