@@ -16,15 +16,12 @@ def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], m
 
     For example
         >>> import xarray as xr
-        >>> import matplotlib.pyplot as plt
         >>> import numpy as np
-        >>> from cfspopcon.operational_space import find_coords_of_minimum
+        >>> from cfspopcon.point_selection import find_coords_of_minimum
         >>> x = xr.DataArray(np.linspace(0, 1, num=10), dims="x")
         >>> y = xr.DataArray(np.linspace(-1, 1, num=20), dims="y")
         >>> z = xr.DataArray(np.abs(x + y), coords=dict(x=x, y=y))
-        >>> z.T.plot()
         >>> line = z.isel(find_coords_of_minimum(z, keep_dims="y"))
-        >>> plt.scatter(line.x, line.y)
     """
     large = Quantity(np.inf, array.pint.units)
 
