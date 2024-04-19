@@ -118,9 +118,9 @@ def interpolate_array_onto_new_coords(
         distance_to_points = ((broadcast_mesh_point - stacked_samples) / spacing) ** 2
         distance_to_nearest[index] = np.min(np.sum(distance_to_points, axis=0))
 
-    clipped_array = interpolated_array.where(distance_to_nearest < max_distance).clip(min=array.min(), max=array.max())
+    clipped_array: xr.DataArray = interpolated_array.where(distance_to_nearest < max_distance).clip(min=array.min(), max=array.max())
 
-    return clipped_array  # type:ignore[no-any-return]
+    return clipped_array
 
 
 def build_transform_function_from_dict(dataset: xr.Dataset, plot_params: dict) -> Callable[[xr.DataArray], xr.DataArray]:

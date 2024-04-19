@@ -12,6 +12,10 @@ from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
 
 
+def temp_clean(ds):
+    return ds.drop_vars(("fusion_reaction", "energy_confinement_scaling", "inductive_plasma_current", "tau_e_scaling"), errors="ignore")
+
+
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
 @pytest.mark.filterwarnings("ignore:Not all input parameters were used")
 def test_regression_against_case(case: Path):
@@ -23,6 +27,10 @@ def test_regression_against_case(case: Path):
 
     dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc").load()
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+
+    # TODO: Delete temporary renaming
+    dataset = temp_clean(dataset)
+    reference_dataset = temp_clean(reference_dataset)
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)
@@ -41,6 +49,10 @@ def test_regression_against_case_with_update(case: Path):
 
     dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc").load()
     reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+
+    # TODO: Delete temporary renaming
+    dataset = temp_clean(dataset)
+    reference_dataset = temp_clean(reference_dataset)
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)

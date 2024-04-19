@@ -4,13 +4,11 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithms import get_algorithm
-from cfspopcon.algorithms.algorithm_class import Algorithm, CompositeAlgorithm
-from cfspopcon.named_options import Algorithms
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
 from cfspopcon.unit_handling import ureg
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def BIRDS():
     return [
         "ducks",
@@ -19,7 +17,7 @@ def BIRDS():
     ]
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def how_many_birds(BIRDS):
     def count_birds(things_that_quack: int, things_that_cluck: int = 2) -> dict[str, Any]:
         ducks = things_that_quack
@@ -29,10 +27,10 @@ def how_many_birds(BIRDS):
         local_vars = locals()
         return {key: local_vars[key] for key in BIRDS}
 
-    return Algorithm(function=count_birds, return_keys=BIRDS)
+    return Algorithm(function=count_birds, return_keys=BIRDS, skip_registration=True)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def ANIMALS():
     return [
         "sheep",
@@ -41,7 +39,7 @@ def ANIMALS():
     ]
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def how_many_animals(ANIMALS):
     def count_animals(things_that_baa: int, all_birds: int, new_chickens_per_count: int = 2) -> dict[str, Any]:
         sheep = things_that_baa
@@ -52,7 +50,7 @@ def how_many_animals(ANIMALS):
         local_vars = locals()
         return {key: local_vars[key] for key in ANIMALS}
 
-    return Algorithm(function=count_animals, return_keys=ANIMALS)
+    return Algorithm(function=count_animals, return_keys=ANIMALS, skip_registration=True)
 
 
 def test_algorithm_kw_only():
@@ -60,7 +58,7 @@ def test_algorithm_kw_only():
         return {"p2_2": 10}
 
     with pytest.raises(ValueError, match="Algorithm only supports functions with keyword arguments.*?POSITIONAL_ONLY parameter p1"):
-        _ = Algorithm(function=test, return_keys=["p2_2"])
+        _ = Algorithm(function=test, return_keys=["p2_2"], skip_registration=True)
 
 
 def test_composite_signature(how_many_birds, how_many_animals):
@@ -244,7 +242,9 @@ def test_single_function_algorithm():
         c, d = b, a
         return c, d
 
-    alg = Algorithm.from_single_function(dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True)
+    alg = Algorithm.from_single_function(
+        dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True, skip_registration=True
+    )
 
     result = alg.run(a=1, b=2)
     assert result["c"] == 2
@@ -253,18 +253,20 @@ def test_single_function_algorithm():
     def in_and_out(average_electron_density):
         return average_electron_density * 2
 
-    alg = Algorithm.from_single_function(in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out")
+    alg = Algorithm.from_single_function(
+        in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out", skip_registration=True
+    )
     result = alg.run(average_electron_density=1.2 * ureg.n20)
     assert result["average_electron_density"] == 24.0 * ureg.n19
 
 
 def test_get_algorithm():
     # Pass in Algorithm Enums
-    for key in Algorithms:
-        alg = get_algorithm(key)
-        assert alg._name in [f"run_{key.name}", key.name, "<lambda>"]
+    for key in Algorithm.algorithms():
+        alg = Algorithm.get_algorithm(key)
+        assert alg._name in [f"run_{key}", key, "<lambda>"]
 
     # Pass in strings instead
-    for key in Algorithms:
-        alg = get_algorithm(key.name)
-        assert alg._name in [f"run_{key.name}", key.name, "<lambda>"]
+    for key in Algorithm.algorithms():
+        alg = Algorithm.get_algorithm(key)
+        assert alg._name in [f"run_{key}", key, "<lambda>"]

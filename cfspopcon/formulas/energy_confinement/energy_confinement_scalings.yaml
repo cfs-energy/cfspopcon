@@ -1,0 +1,316 @@
+IModey2:
+  metadata:
+    reference: "Walk, J. R., Pedestal structure and stability in high-performance plasmas on Alcator C-Mod, https://dspace.mit.edu/handle/1721.1/95524, equation 5.2"
+    notes: "Coefficient C adjusted to account for ne in 1e19m^-3"
+    regime: "I-Mode"
+  params:
+    constant: 0.01346
+    mass_ratio_alpha: 0.0
+    field_on_axis_alpha: 0.768
+    plasma_current_alpha: 0.685
+    input_power_alpha: -0.286
+    major_radius_alpha: 0.0
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.0
+    areal_elongation_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.017
+    qstar_alpha: 0.0
+
+ITER89P:
+  metadata:
+    reference: "Yushmanov et al, 'Scalings for tokamak energy confinement' Nuclear Fusion, vol. 30, no. 10, pp. 4-6, 1990."
+    notes: "C is corrected for average_electron_density convention. N.b. The different factor of a_R is because we use inverse_aspect_ratio=a/R instead of a. R^1.2 a^0.3 = R^1.5 inverse_aspect_ratio^0.3."
+    regime: "L-Mode"
+  params:
+    constant: 0.03812775526676551
+    mass_ratio_alpha: 0.5
+    field_on_axis_alpha: 0.2
+    plasma_current_alpha: 0.85
+    input_power_alpha: -0.5
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.3
+    areal_elongation_alpha: 0.0
+    separatrix_elongation_alpha: 0.5
+    average_density_alpha: 0.1
+    qstar_alpha: 0.0
+
+ITER89P_ka:
+  metadata:
+    reference: "Yushmanov et al, 'Scalings for tokamak energy confinement' Nuclear Fusion, vol. 30, no. 10, pp. 4-6, 1990."
+    notes: "C is corrected for average_electron_density convention. Using kappa_A instead of separatrix_elongation, which is likely more accurate for double-nulls. N.b. The different factor of a_R is because we use inverse_aspect_ratio=a/R instead of a. R^1.2 a^0.3 = R^1.5 inverse_aspect_ratio^0.3."
+    regime: "L-Mode"
+  params:
+    constant: 0.03812775526676551
+    mass_ratio_alpha: 0.5
+    field_on_axis_alpha: 0.2
+    plasma_current_alpha: 0.85
+    input_power_alpha: -0.5
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.3
+    areal_elongation_alpha: 0.5
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.1
+    qstar_alpha: 0.0
+
+ITER97L:
+  metadata:
+    reference: "S.M. Kaye et al 1997 Nucl. Fusion 37 1303, 'ITER L mode confinement database'"
+    notes: ""
+    regime: "L-Mode"
+  params:
+    constant: 0.023
+    plasma_current_alpha: 0.96
+    field_on_axis_alpha: 0.03
+    major_radius_alpha: 1.83
+    inverse_aspect_ratio_alpha: -0.06 # inverse_aspect_ratio = (R / minor_radius)^-1
+    areal_elongation_alpha: 0.64
+    average_density_alpha: 0.40
+    mass_ratio_alpha: 0.20 # M_eff
+    input_power_alpha: -0.73
+    triangularity_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+    qstar_alpha: 0.0
+
+ITER98y2:
+  metadata:
+    reference: "ITER Physics Basis Editors 1999 ITER physics basis expert groups on confinement and transport and confinement modelling and database Nucl. Fusion 39 2175-249"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.0562
+    mass_ratio_alpha: 0.19
+    field_on_axis_alpha: 0.15
+    plasma_current_alpha: 0.93
+    input_power_alpha: -0.69
+    major_radius_alpha: 1.97
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.58
+    areal_elongation_alpha: 0.78
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.41
+    qstar_alpha: 0.0
+    C: 0.0562
+    a_A: 0.19
+    a_B: 0.15
+    a_I: 0.93
+    a_P: -0.69
+    a_R: 1.97
+    a_d: 0.0
+    a_e: 0.58
+    a_ka: 0.78
+    a_ks: 0.0
+    a_n: 0.41
+    a_q: 0.0
+
+ITPA_2018_STD5_GLS:
+  metadata:
+    reference: "ITPA 2018 STD5-GLS Verdoolaege et al, 'First Analysis of the Updated ITPA Global H-mode Confinement Database', 2018, International Atomic Energy Agency."
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.042
+    mass_ratio_alpha: 0.47
+    field_on_axis_alpha: 0.068
+    plasma_current_alpha: 1.2
+    input_power_alpha: -0.78
+    major_radius_alpha: 1.6
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.052
+    areal_elongation_alpha: 0.88
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.21
+    qstar_alpha: 0.0
+
+ITPA_2018_STD5_OLS:
+  metadata:
+    reference: "ITPA 2018 STD5-OLS Verdoolaege et al, 'First Analysis of the Updated ITPA Global H-mode Confinement Database', 2018, International Atomic Energy Agency."
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.049
+    mass_ratio_alpha: 0.25
+    field_on_axis_alpha: 0.085
+    plasma_current_alpha: 1.1
+    input_power_alpha: -0.71
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.043
+    areal_elongation_alpha: 0.8
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.19
+    qstar_alpha: 0.0
+
+ITPA_2018_STD5_SEL1_GLS:
+  metadata:
+    reference: "ITPA 2018 STD5-SEL1-GLS Verdoolaege et al, 'First Analysis of the Updated ITPA Global H-mode Confinement Database', 2018, International Atomic Energy Agency."
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.023
+    mass_ratio_alpha: 0.33
+    field_on_axis_alpha: -0.018
+    plasma_current_alpha: 1.3
+    input_power_alpha: -0.79
+    major_radius_alpha: 1.5
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.38
+    areal_elongation_alpha: 1.9
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.17
+    qstar_alpha: 0.0
+
+ITPA_2018_STD5_SEL1_OLS:
+  metadata:
+    reference: "ITPA 2018 STD5-SEL1-OLS Verdoolaege et al, 'First Analysis of the Updated ITPA Global H-mode Confinement Database', 2018, International Atomic Energy Agency."
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.045
+    mass_ratio_alpha: 0.24
+    field_on_axis_alpha: -0.1
+    plasma_current_alpha: 1.3
+    input_power_alpha: -0.71
+    major_radius_alpha: 1.2
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.32
+    areal_elongation_alpha: 1.1
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.13
+    qstar_alpha: 0.0
+
+ITPA_2018_STD5_SEL1_WLS:
+  metadata:
+    reference: "ITPA 2018 STD5-SEL1-WLS Verdoolaege et al, 'First Analysis of the Updated ITPA Global H-mode Confinement Database', 2018, International Atomic Energy Agency."
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.03
+    mass_ratio_alpha: 0.094
+    field_on_axis_alpha: -0.069
+    plasma_current_alpha: 1.3
+    input_power_alpha: -0.64
+    major_radius_alpha: 1.3
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: -0.46
+    areal_elongation_alpha: 1.3
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.19
+    qstar_alpha: 0.0
+
+ITPA_2018_STD5_WLS:
+  metadata:
+    reference: "ITPA 2018 STD5-WLS Verdoolaege et al, 'First Analysis of the Updated ITPA Global H-mode Confinement Database', 2018, International Atomic Energy Agency."
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.04
+    mass_ratio_alpha: 0.25
+    field_on_axis_alpha: 0.11
+    plasma_current_alpha: 0.99
+    input_power_alpha: -0.64
+    major_radius_alpha: 1.7
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.093
+    areal_elongation_alpha: 0.79
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.29
+    qstar_alpha: 0.0
+
+ITPA20_IL_HighZ:
+  metadata:
+    reference: "ITER H20, DB5.2.3, High Z walls only, G. Verdoolaege  et al 2021 Nucl. Fusion 61 076006, 'The updated ITPA global H-mode confinement database: description and analysis'"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.189
+    mass_ratio_alpha: 0.312
+    field_on_axis_alpha: -0.356
+    plasma_current_alpha: 1.485
+    input_power_alpha: -0.6077
+    major_radius_alpha: 0.671
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.0
+    areal_elongation_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.018
+    qstar_alpha: 0.0
+
+ITPA20_IL:
+  metadata:
+    reference: "ITER H20, DB5.2.3, ITER-like discharges, G. Verdoolaege  et al 2021 Nucl. Fusion 61 076006, 'The updated ITPA global H-mode confinement database: description and analysis'"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.067
+    mass_ratio_alpha: 0.3
+    field_on_axis_alpha: -0.13
+    plasma_current_alpha: 1.29
+    input_power_alpha: -0.644
+    major_radius_alpha: 1.19
+    triangularity_alpha: 0.56
+    inverse_aspect_ratio_alpha: 0.0
+    areal_elongation_alpha: 0.67
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.15
+    qstar_alpha: 0.0
+
+ITPA20_STD5:
+  metadata:
+    reference: "ITER H20, DB5.2.3, STD5 discharges, G. Verdoolaege  et al 2021 Nucl. Fusion 61 076006, 'The updated ITPA global H-mode confinement database: description and analysis'"
+    notes: ""
+    regime: "H-Mode"
+  params:
+    constant: 0.053
+    mass_ratio_alpha: 0.2
+    field_on_axis_alpha: 0.22
+    plasma_current_alpha: 0.98
+    input_power_alpha: -0.669
+    major_radius_alpha: 1.71
+    triangularity_alpha: 0.36
+    inverse_aspect_ratio_alpha: 0.35
+    areal_elongation_alpha: 0.80
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.24
+    qstar_alpha: 0.0
+
+LOconstant:
+  metadata:
+    reference: "Linear Ohmic Confinement, from page 2 of J.E. Rice et al 2020 Nucl. Fusion 60 105001, 'Understanding LOC/SOC phenomenology in tokamaks'"
+    notes: ""
+    regime: "LOC"
+  params:
+    constant: 0.0070
+    average_density_alpha: 1.0
+    qstar_alpha: 1.0
+    areal_elongation_alpha: 0.5
+    inverse_aspect_ratio_alpha: 1.0
+    major_radius_alpha: 3.0
+    field_on_axis_alpha: 0.0
+    plasma_current_alpha: 0.0
+    mass_ratio_alpha: 0.0
+    input_power_alpha: 0.0
+    triangularity_alpha: 0.0
+    separatrix_elongation_alpha: 0.0
+  
+H_DS03:
+  metadata:
+    reference: "Electrostatic, GyroBohm-like confinement scaling, eqn 21 from Petty et al 'Feasibility Study of a Compact Ignition Tokamak Based Upon GyroBohm Scaling Physics.' (2003), Fusion Science and Technology, 43"
+    notes: ""
+    regime: "H-mode"
+  params:
+    constant: 0.028
+    plasma_current_alpha: 0.83
+    field_on_axis_alpha: 0.07
+    average_density_alpha: 0.49
+    input_power_alpha: -0.55
+    major_radius_alpha: 2.11
+    inverse_aspect_ratio_alpha: 0.3 # (major_radius/a)^-0.3 = (a/major_radius)^0.3
+    separatrix_elongation_alpha: 0.75
+    mass_ratio_alpha: 0.14 # a_M — isotope mass scaling
+    areal_elongation_alpha: 0.0
+    triangularity_alpha: 0.0
+    qstar_alpha: 0.0
+

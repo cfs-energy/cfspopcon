@@ -271,13 +271,21 @@ def _make_new_sig(
         old_types = [ret_annotation]
 
     if len(old_types) != len(units_list):
-        warnings.warn(
-            (
-                f"Return type annotation {ret_annotation} has {len(old_types)} return values"
-                f", while the return_units: {return_units} specifies {len(return_units)} values"
-            ),
-            stacklevel=3,
-        )
+        if not (
+            # Catches an error where some multiple-return types are handled as strings. These can
+            # be safely ignored.
+            isinstance(ret_annotation, str)
+            and ret_annotation.startswith("tuple")
+            and len(ret_annotation.removeprefix("tuple[").removesuffix("]").split(",")) == len(units_list)
+        ):
+            warnings.warn(
+                (
+                    f"Return type annotation {ret_annotation} has {len(old_types)} return values"
+                    f", while the return_units: {return_units} specifies {len(return_units)} values"
+                ),
+                stacklevel=3,
+            )
+
     ret_types = tuple(xr.DataArray if units_list[i] is not None else old_types[i] for i in range(len(units_list)))
 
     if len(ret_types) == 0:
