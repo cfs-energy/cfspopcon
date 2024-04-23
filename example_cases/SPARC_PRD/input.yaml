@@ -178,7 +178,7 @@ tau_e_scaling: ITER98y2
 radiated_power_method: Radas
 radiated_power_scalar: 1.0
 minimum_core_radiated_fraction: 0.0
-radas_dir: "WORKING_DIR/radas_dir"
+radas_dir: "WORKING_DIR/radas_dir" # previously "radas_dir"
 
 impurities:
   # Impurity concentration relative to electron density.
