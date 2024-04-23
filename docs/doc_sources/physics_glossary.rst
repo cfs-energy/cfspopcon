@@ -200,10 +200,10 @@ Physics Glossary
     Volume-averaged electron density in the confined region :math:`\bar n_e`.
 
   line_averaged_electron_density
-    Electron density averaged over minor and major radius :math:`ne_bar`.
+    Electron density averaged over minor and major radius :math:`\bar n_{e,line}`.
 
   line_averaged_density_frac
-    The assumed ratio between :math:`ne_bar` and :math:`\bar n_e`.
+    The assumed ratio between :math:`\bar n_{e,line}` and :math:`\bar n_e`.
 
   average_electron_temp
     Volume-averaged electron temperature in the confined region :math:`\bar T_e`.
