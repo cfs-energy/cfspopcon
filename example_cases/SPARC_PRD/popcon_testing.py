@@ -14,7 +14,7 @@ P_sol = dataset["P_sol"].to_numpy()
 P_sol_target = dataset["P_sol"].to_numpy()
 np.set_printoptions(threshold=np.Inf)
 
-plot_style = cfspopcon.read_plot_style("./example_cases/SPARC_PRD/plot_popcon.yaml")
+plot_style = cfspopcon.read_plot_style("./example_cases/SPARC_PRD/plot_P_sol_only.yaml")
 cfspopcon.plotting.make_plot(
     dataset,
     plot_style,
