@@ -5,7 +5,7 @@ from pathlib import Path
 import cfspopcon
 from cfspopcon.unit_handling import ureg
 
-input_parameters, algorithm, points, plots  = cfspopcon.read_case("./example_cases/SPARC_PRD/input.yaml")
+input_parameters, algorithm, points, plots  = cfspopcon.read_case("./example_cases/SPARC_PRD/input_constant_P_sol.yaml")
 algorithm.validate_inputs(input_parameters, raise_error_on_missing_inputs=False)
 dataset = xr.Dataset(input_parameters)
 dataset = algorithm.update_dataset(dataset)

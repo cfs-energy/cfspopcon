@@ -370,6 +370,13 @@ calc_loop_voltage:
   optionals: []
   returns:
   - loop_voltage
+calc_mcrf_from_fixed_P_sol:
+  inputs:
+  - P_in
+  - P_sol_target
+  optionals: []
+  returns:
+  - minimum_core_radiated_fraction
 calc_minor_radius_from_inverse_aspect_ratio:
   inputs:
   - major_radius
