@@ -30,7 +30,7 @@ class AtomicData:
     NoncoronalLz = 3
     NoncoronalZ = 4
 
-    def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None: # previously "radas_dir"
+    def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:
         """Initializes the AtomicData object by loading atomic data from the specified directory.
 
         Parameters:
