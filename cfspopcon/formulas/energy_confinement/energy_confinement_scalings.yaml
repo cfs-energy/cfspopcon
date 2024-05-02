@@ -4,18 +4,18 @@ IModey2:
     notes: "Coefficient C adjusted to account for ne in 1e19m^-3"
     regime: "I-Mode"
   params:
-    constant: 0.01346
-    mass_ratio_alpha: 0.0
-    field_on_axis_alpha: 0.768
-    plasma_current_alpha: 0.685
-    input_power_alpha: -0.286
-    major_radius_alpha: 0.0
-    triangularity_alpha: 0.0
-    inverse_aspect_ratio_alpha: 0.0
-    areal_elongation_alpha: 0.0
-    separatrix_elongation_alpha: 0.0
-    average_density_alpha: 0.017
-    qstar_alpha: 0.0
+    constant: 0.014 #orig 0.01346
+    mass_ratio_alpha: 0.0 #orig 0.0
+    field_on_axis_alpha: 0.768 #orig 0.768
+    plasma_current_alpha: 0.685 #orig 0.685
+    input_power_alpha: -0.286 #orig -0.286 same as P_sux alpha?
+    major_radius_alpha: 0.0 #orig 0.0
+    triangularity_alpha: 0.0 #orig 0.0
+    inverse_aspect_ratio_alpha: 0.0 #orig 0.0
+    areal_elongation_alpha: 0.0 #orig 0.0
+    separatrix_elongation_alpha: 0.0 #orig 0.0
+    average_density_alpha: 0.017 #orig 0.017 --> different numbers - check source!!
+    qstar_alpha: 0.0 #orig 0.0
 
 ITER89P:
   metadata:
@@ -61,18 +61,18 @@ ITER97L:
     notes: ""
     regime: "L-Mode"
   params:
-    constant: 0.023
-    plasma_current_alpha: 0.96
-    field_on_axis_alpha: 0.03
-    major_radius_alpha: 1.83
-    inverse_aspect_ratio_alpha: -0.06 # inverse_aspect_ratio = (R / minor_radius)^-1
-    areal_elongation_alpha: 0.64
-    average_density_alpha: 0.40
-    mass_ratio_alpha: 0.20 # M_eff
-    input_power_alpha: -0.73
-    triangularity_alpha: 0.0
-    separatrix_elongation_alpha: 0.0
-    qstar_alpha: 0.0
+    constant: 0.023 #orig 0.023
+    plasma_current_alpha: 0.96 #orig 0.96
+    field_on_axis_alpha: 0.03 #orig 0.03
+    major_radius_alpha: 1.83 #orig 1.83
+    inverse_aspect_ratio_alpha: -0.06 #orig -0.06 # inverse_aspect_ratio = (R / minor_radius)^-1
+    areal_elongation_alpha: 0.64 #orig 0.64
+    average_density_alpha: 0.40 #orig 0.40
+    mass_ratio_alpha: 0.20 #orig 0.20 # M_eff
+    input_power_alpha: -0.73 #orig -0.73
+    triangularity_alpha: 0.0 #orig 0.0
+    separatrix_elongation_alpha: 0.0 #orig 0.0
+    qstar_alpha: 0.0 #orig 0.0
 
 ITER98y2:
   metadata:
@@ -80,30 +80,30 @@ ITER98y2:
     notes: ""
     regime: "H-Mode"
   params:
-    constant: 0.0562
-    mass_ratio_alpha: 0.19
-    field_on_axis_alpha: 0.15
-    plasma_current_alpha: 0.93
-    input_power_alpha: -0.69
-    major_radius_alpha: 1.97
-    triangularity_alpha: 0.0
-    inverse_aspect_ratio_alpha: 0.58
-    areal_elongation_alpha: 0.78
-    separatrix_elongation_alpha: 0.0
-    average_density_alpha: 0.41
-    qstar_alpha: 0.0
-    C: 0.0562
-    a_A: 0.19
-    a_B: 0.15
-    a_I: 0.93
-    a_P: -0.69
-    a_R: 1.97
-    a_d: 0.0
-    a_e: 0.58
-    a_ka: 0.78
-    a_ks: 0.0
-    a_n: 0.41
-    a_q: 0.0
+    constant: 0.0562 #orig0.0562
+    mass_ratio_alpha: 0.19 #orig0.19
+    field_on_axis_alpha: 0.15 #orig0.15
+    plasma_current_alpha: 0.93 #orig0.93
+    input_power_alpha: -0.69 #orig-0.69
+    major_radius_alpha: 1.97 #orig1.97
+    triangularity_alpha: 0.0 #orig0.0
+    inverse_aspect_ratio_alpha: 0.58 #orig0.58
+    areal_elongation_alpha: 0.78 #orig0.78
+    separatrix_elongation_alpha: 0.0 #orig0.0
+    average_density_alpha: 0.41 #orig0.41
+    qstar_alpha: 0.0 #orig0.0
+    C: 0.0562 #orig0.0562
+    a_A: 0.19 #orig0.19
+    a_B: 0.15 #orig0.15
+    a_I: 0.93 #orig0.93
+    a_P: -0.69 #orig-0.69
+    a_R: 1.97 #orig1.97
+    a_d: 0.0 #orig0.0
+    a_e: 0.58 #orig0.58
+    a_ka: 0.78 #orig0.78
+    a_ks: 0.0 #orig0.0
+    a_n: 0.41 #orig0.41
+    a_q: 0.0 #orig0.0
 
 ITPA_2018_STD5_GLS:
   metadata:
