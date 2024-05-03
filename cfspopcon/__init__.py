@@ -4,7 +4,7 @@ from importlib.metadata import metadata
 __version__ = metadata(__package__)["Version"]
 __author__ = metadata(__package__)["Author"]
 
-from . import file_io, formulas, helpers, named_options, unit_handling
+from . import file_io, formulas, helpers, named_options
 from .algorithm_class import Algorithm, CompositeAlgorithm
 from .formulas.read_atomic_data import AtomicData
 from .input_file_handling import read_case
@@ -30,7 +30,6 @@ __all__ = [
     "helpers",
     "named_options",
     "formulas",
-    "unit_handling",
     "ureg",
     "Quantity",
     "Unit",
