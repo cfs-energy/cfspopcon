@@ -6,8 +6,8 @@ import xarray as xr
 from ....algorithm_class import Algorithm
 from ....named_options import MomentumLossFunction
 from ....unit_handling import Unitfull
-from .target_first_model import solve_target_first_two_point_model
 from .model import solve_two_point_model
+from .target_first_model import solve_target_first_two_point_model
 
 
 @Algorithm.register_algorithm(

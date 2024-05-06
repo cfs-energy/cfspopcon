@@ -40,7 +40,6 @@ ipdb = "^0.13.13"
 click = "^8.1.0"
 netcdf4 = "^1.6.5"
 radas = "^2024.3.1"
-sphinx-autoapi = "^3.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"

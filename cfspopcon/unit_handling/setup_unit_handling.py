@@ -9,7 +9,6 @@ import numpy.typing as npt
 import pint
 import pint_xarray  # type:ignore[import-untyped]
 import xarray as xr
-from pint import DimensionalityError, UndefinedUnitError, UnitStrippedWarning
 from typing_extensions import ParamSpec
 
 ureg = pint_xarray.setup_registry(

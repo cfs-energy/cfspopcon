@@ -79,10 +79,8 @@ extensions = [
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
     "nbsphinx",
-    "autoapi.extension",
 ]
 
-autoapi_dirs = ["../cfspopcon"]
 nitpick_ignore = [("py:class", "Ellipsis")]
 
 # -- nbsphinx
@@ -226,7 +224,7 @@ class FunctionWrapperDocumenter(FunctionDocumenter):
         unitless_func = members.get("unitless_func", None)
         if unitless_func is not None:
             unitless_func.object.__doc__ = "A scalar and not unit aware version of the above function."
-            # the unitless function will get documented as a member of the FuncitionWrapper clas
+            # the unitless function will get documented as a member of the FuncitionWrapper class
             # but sphinx pops the first argument because it thinks that's the "self" so we monkey patch around that
             # by prepending a parameter that gets thrown away
             tmp_param = Parameter("tmp", kind=Parameter.POSITIONAL_ONLY)

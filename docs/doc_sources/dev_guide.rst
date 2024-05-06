@@ -83,7 +83,7 @@ This is because all calculations in cfspopcon use explicit unit handling to bett
 The units handling cfspopcon is powered by the `pint <https://pint.readthedocs.io/en/stable/>`_ and `pint-xarray <https://github.com/xarray-contrib/pint-xarray>`_ python packages.
 The type :class:`~cfspopcon.unit_handling.Unitfull`, used in the above function as type annotation, is an alias of :code:`pint.Quantity | xarray.DataArray`.
 
-In addition to the above example, we also recommend having a look at the :mod:`~cfspopcon.formulas` module, which holds many good examples.
+In addition to the above example, we also recommend having a look at the :code:`cfspopcon.formulas` module, which holds many good examples.
 
 
 Pre-Commit Checks
