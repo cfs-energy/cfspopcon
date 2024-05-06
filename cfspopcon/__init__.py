@@ -17,8 +17,6 @@ from .unit_handling import (
     set_default_units,
 )
 
-Algorithm.write_yaml()
-
 # export main classes users should need as well as the option enums
 __all__ = [
     "formulas",

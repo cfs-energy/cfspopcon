@@ -4,7 +4,7 @@ import matplotlib
 import pytest
 from click.testing import CliRunner
 
-from cfspopcon.cli import run_popcon_cli
+from cfspopcon.cli import run_popcon_cli, write_algorithms_yaml
 
 
 @pytest.mark.filterwarnings("ignore:Matplotlib is currently using agg")
@@ -18,3 +18,12 @@ def test_popcon_cli():
         [str(example_case), "--show"],
     )
     assert result.exit_code == 0
+
+
+def test_write_algorithms_yaml(tmpdir):
+
+    test_file = tmpdir.mkdir("test").join("test_popcon_algorithms.yaml")
+    runner = CliRunner()
+    result = runner.invoke(write_algorithms_yaml, ["-o", str(test_file)])
+    assert result.exit_code == 0
+    assert test_file.exists()

@@ -33,6 +33,15 @@ def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, 
             run_popcon(case, show, cli_args)
 
 
+@click.command()
+@click.option("-o", "--output", default="./popcon_algorithms.yaml", type=click.Path(exists=False))
+def write_algorithms_yaml(output: str) -> None:
+    """Write all available algorithms to a yaml helper file."""
+    from cfspopcon import Algorithm
+
+    Algorithm.write_yaml(Path(output))
+
+
 def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
     """Run popcon case.
 
