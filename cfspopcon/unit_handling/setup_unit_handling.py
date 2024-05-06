@@ -9,7 +9,6 @@ import numpy.typing as npt
 import pint
 import pint_xarray  # type:ignore[import-untyped]
 import xarray as xr
-from pint.errors import DimensionalityError, UndefinedUnitError
 from typing_extensions import ParamSpec
 
 ureg = pint_xarray.setup_registry(
@@ -82,17 +81,3 @@ def magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[npt.NDArray[np
 def dimensionless_magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[npt.NDArray[np.float32], float]:
     """Converts the array to dimensionless and returns the magnitude."""
     return magnitude(convert_units(array, ureg.dimensionless))
-
-
-__all__ = [
-    "DimensionalityError",
-    "UndefinedUnitError",
-    "ureg",
-    "Quantity",
-    "Unit",
-    "suppress_downcast_warning",
-    "convert_units",
-    "magnitude",
-    "suppress_downcast_warning",
-    "dimensionless_magnitude",
-]

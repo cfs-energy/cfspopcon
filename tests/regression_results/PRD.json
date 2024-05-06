@@ -43,14 +43,14 @@
             "attrs": {
                 "units": "megawatt * tesla / meter"
             },
-            "data": 168.65172746016378,
+            "data": 168.6517274601637,
             "dims": []
         },
         "PBpRnSq": {
             "attrs": {
                 "units": "megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter"
             },
-            "data": 8.201220420686834,
+            "data": 8.201220420686832,
             "dims": []
         },
         "P_LH_thresh": {
@@ -64,21 +64,21 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 22.55867422246814,
+            "data": 22.55867422246815,
             "dims": []
         },
         "P_auxillary": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 7.70254226898684,
+            "data": 7.702542268986833,
             "dims": []
         },
         "P_external": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 8.90416374116744,
+            "data": 8.904163741167434,
             "dims": []
         },
         "P_fusion": {
@@ -99,14 +99,14 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 9.893515267963823,
+            "data": 9.893515267963815,
             "dims": []
         },
         "P_neutron": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 90.23469688987257,
+            "data": 90.2346968898726,
             "dims": []
         },
         "P_ohmic": {
@@ -127,21 +127,21 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 5.888600602873037,
+            "data": 5.888600602873053,
             "dims": []
         },
         "P_sol": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 25.574237360762545,
+            "data": 25.57423736076253,
             "dims": []
         },
         "Q": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 11.400737559639369,
+            "data": 11.400737559639378,
             "dims": []
         },
         "SOL_momentum_loss_function": {
@@ -244,7 +244,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.187160503756178,
+            "data": 0.18716050375617851,
             "dims": []
         },
         "core_radiator": {
@@ -256,7 +256,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 45.811578389610766,
+            "data": 45.811578389610695,
             "dims": []
         },
         "core_radiator_concentration": {
@@ -291,14 +291,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.08439549568793155,
+            "data": 0.08439549568783736,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.01687909913758631,
+            "data": 0.016879099137567473,
             "dims": []
         },
         "edge_impurity_enrichment": {
@@ -317,7 +317,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.07443197365204651,
+            "data": 0.07443197365204653,
             "dims": []
         },
         "electron_density_peaking": {
@@ -461,11 +461,6 @@
             "data": 1.125,
             "dims": []
         },
-        "energy_confinement_scaling": {
-            "attrs": {},
-            "data": "ITER98y2",
-            "dims": []
-        },
         "energy_confinement_time": {
             "attrs": {
                 "units": "second"
@@ -570,7 +565,7 @@
         },
         "fusion_reaction": {
             "attrs": {},
-            "data": "DT",
+            "data": "DTFusionHively",
             "dims": []
         },
         "fusion_triple_product": {
@@ -601,7 +596,7 @@
             "data": [
                 0.06,
                 0.0031,
-                0.01687909913758631,
+                0.016879099137567473,
                 1.5e-05
             ],
             "dims": [
@@ -614,13 +609,20 @@
             },
             "data": [
                 1.999999947028802,
-                7.999453604288631,
+                7.999453604288636,
                 NaN,
-                58.38306932437463
+                58.38306932437466
             ],
             "dims": [
                 "dim_species"
             ]
+        },
+        "inductive_plasma_current": {
+            "attrs": {
+                "units": "ampere"
+            },
+            "data": 7959184.203864033,
+            "dims": []
         },
         "inverse_aspect_ratio": {
             "attrs": {
@@ -796,14 +798,14 @@
             "attrs": {
                 "units": "megawatt / meter ** 2"
             },
-            "data": 1.6247889257260864,
+            "data": 1.6247889257260868,
             "dims": []
         },
         "neutron_rate": {
             "attrs": {
                 "units": "1 / second"
             },
-            "data": 4.000004825776675e+19,
+            "data": 4.000004825776678e+19,
             "dims": []
         },
         "normalized_beta": {
@@ -899,14 +901,14 @@
             "attrs": {
                 "units": "gigawatt / meter ** 2"
             },
-            "data": 11.45224770393064,
+            "data": 11.452247703930633,
             "dims": []
         },
         "q_perp": {
             "attrs": {
                 "units": "megawatt / meter ** 2"
             },
-            "data": 5937.53261453327,
+            "data": 5937.532614533267,
             "dims": []
         },
         "q_star": {
@@ -932,7 +934,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.0398635591629726,
+            "data": 1.039863559162972,
             "dims": []
         },
         "rho": {
@@ -1041,14 +1043,14 @@
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },
-            "data": 44.859764005555014,
+            "data": 44.85976400555507,
             "dims": []
         },
         "target_electron_flux": {
             "attrs": {
                 "units": "1 / meter ** 2 / second"
             },
-            "data": 1.970618839985637e+25,
+            "data": 1.970618839985639e+25,
             "dims": []
         },
         "target_electron_temp": {
@@ -1062,7 +1064,12 @@
             "attrs": {
                 "units": "gigawatt / meter ** 2"
             },
-            "data": 0.41285375538108154,
+            "data": 0.4128537553810813,
+            "dims": []
+        },
+        "tau_e_scaling": {
+            "attrs": {},
+            "data": "ITER98y2",
             "dims": []
         },
         "temperature_peaking": {
@@ -1125,7 +1132,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.3438275797062609,
+            "data": 1.343827579706261,
             "dims": []
         },
         "zeff_change_from_core_rad": {

@@ -217,6 +217,7 @@ Physics Glossary
   areal_elongation
     Elongation of the confined region computed using the poloidal area inside the last-closed-flux-surface :math:`\kappa_A = S_{pol} / (\pi a^2)`.
 
+  beta
   beta_toroidal
     Ratio of plasma pressure to magnetic pressure provided by the toroidal magnetic field.
 
@@ -226,6 +227,7 @@ Physics Glossary
   beta_total
     Ratio of plasma pressure to magnetic pressure provided by the total magnetic field.
 
+  normalized_beta
   beta_N
     Ratio of plasma pressure to magnetic pressure provided by the total magnetic field, normalized to :math:`I_MA / a B_0`.
 
@@ -324,15 +326,15 @@ Physics Glossary
   plasma_stored_energy
     Thermal energy in the plasma.
 
+  qstar
   q_star
     Analytical approximation of safety factor at :math:`\rho=0.95`.
 
   loop_voltage
     inductive loop voltage
 
-  energy_confinement_scaling
   tau_e_scaling
-    A :class:`~cfspopcon.named_options.ConfinementScaling` indicating which :math:`\tau_e` energy confinement scaling should be used.
+    Which :math:`\tau_e` energy confinement scaling should be used. Should match a confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
 
   energy_confinement_time
     A characteristic time which gives the rate at which the plasma loses energy. In steady-state, :math:`\tau_e=W_p / P_in`.
@@ -369,7 +371,7 @@ Physics Glossary
     Product of the major radius and the (vacuum) magnetic field :math:`B \times R`.
 
   fusion_reaction
-    A :class:`~cfspopcon.named_options.ReactionType` indicating which fusion reaction should be used.
+    A `str` indicating which fusion reaction should be used, should match a class name in `cfspopcon.formulas.fusion_reaction.fusion_data`
 
   heavier_fuel_species_fraction
     Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this is :math:`f_T = n_T/(n_T+n_D)`.

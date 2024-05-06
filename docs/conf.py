@@ -1,11 +1,6 @@
 """Sphinx configuration for cfspopcon."""
-import warnings
-from collections.abc import Mapping
-from inspect import Parameter, Signature, signature
-from types import GenericAlias
-from typing import Any, Union
+from inspect import Parameter, signature
 
-import xarray as xr
 from sphinx.ext.autodoc import ClassDocumenter, FunctionDocumenter
 from sphinx.ext.autodoc.importer import get_class_members
 from sphinx.ext.intersphinx import missing_reference
@@ -13,8 +8,6 @@ from sphinx.util.inspect import stringify_signature
 
 import cfspopcon
 from cfspopcon.algorithm_class import Algorithm
-from cfspopcon import formulas
-from cfspopcon.unit_handling.setup_unit_handling import Quantity, Unit
 
 project = "cfspopcon"
 copyright = "2023, Commonwealth Fusion Systems"
@@ -87,6 +80,8 @@ extensions = [
     "sphinxcontrib.bibtex",
     "nbsphinx",
 ]
+
+nitpick_ignore = [("py:class", "Ellipsis")]
 
 # -- nbsphinx
 exclude_patterns = ["_build", "static"]
@@ -161,7 +156,15 @@ def resolve(app, env, node, contnode):
         # type e.g. cfspopcon.strict_base.T and that is is a :py:attr: so we
         # run into the same case as above. Same sledgehammer approach of
         # just using :py:obj: for any missing links at this tag
-        elif "cfspopcon" in node["reftarget"]:
+        # The additional list of type hints is here because they don't get resolved to
+        # e.g. cfspopcon.algorithm_class.GenericFunctionType, but just the plain type
+        elif "cfspopcon" in node["reftarget"] or node["reftarget"] in [
+            "LabelledReturnFunctionType",
+            "GenericFunctionType",
+            "Params",
+            "Ret",
+            "FunctionType",
+        ]:
             node["reftype"] = "obj"
             ret_node = py.resolve_xref(env, node["refdoc"], app.builder, node["reftype"], node["reftarget"], node, contnode)
 
@@ -176,6 +179,10 @@ def resolve(app, env, node, contnode):
             if s.startswith("pint") and s.endswith("Quantity"):
                 node["reftarget"] = "pint.Quantity"
                 ret_node = missing_reference(app, env, node, contnode)
+
+        elif node["reftarget"] == "matplotlib.pyplot.Axes":
+            node["reftarget"] = "matplotlib.axes.Axes"
+            ret_node = missing_reference(app, env, node, contnode)
 
     return ret_node
 
@@ -217,7 +224,7 @@ class FunctionWrapperDocumenter(FunctionDocumenter):
         unitless_func = members.get("unitless_func", None)
         if unitless_func is not None:
             unitless_func.object.__doc__ = "A scalar and not unit aware version of the above function."
-            # the unitless function will get documented as a member of the FuncitionWrapper clas
+            # the unitless function will get documented as a member of the FuncitionWrapper class
             # but sphinx pops the first argument because it thinks that's the "self" so we monkey patch around that
             # by prepending a parameter that gets thrown away
             tmp_param = Parameter("tmp", kind=Parameter.POSITIONAL_ONLY)

@@ -8,8 +8,9 @@ from warnings import warn
 import numpy as np
 import xarray as xr
 import yaml
+from pint import DimensionalityError, UndefinedUnitError
 
-from .setup_unit_handling import DimensionalityError, Quantity, UndefinedUnitError, convert_units, magnitude
+from .setup_unit_handling import Quantity, convert_units, magnitude
 
 
 def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
