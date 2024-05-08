@@ -14,6 +14,7 @@ from . import (
     scrape_off_layer,
     seeded_radiators,
     zeff_and_dilution,
+    divertor_target,
 )
 
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     "power_crossing_separatrix",
     "seeded_radiators",
     "read_atomic_data",
+    "divertor_target",
 ]
