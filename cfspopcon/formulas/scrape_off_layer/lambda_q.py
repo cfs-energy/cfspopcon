@@ -15,6 +15,7 @@ from ...unit_handling import ureg, wraps_ufunc
         major_radius=ureg.meter,
         B_pol_out_mid=ureg.tesla,
         inverse_aspect_ratio=ureg.dimensionless,
+        lambda_q_factor=ureg.dimensionless,
     ),
 )
 def calc_lambda_q(
@@ -24,6 +25,7 @@ def calc_lambda_q(
     major_radius: float,
     B_pol_out_mid: float,
     inverse_aspect_ratio: float,
+    lambda_q_factor: float = 1.0,
 ) -> float:
     """Calculate SOL heat flux decay length (lambda_q) from a scaling.
 
@@ -34,16 +36,19 @@ def calc_lambda_q(
         major_radius: [m] :term:`glossary link<major_radius>`
         B_pol_out_mid: [T] :term:`glossary link<B_pol_out_mid>`
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        lambda_q_factor: [~] :term:`glossary link<lambda_q_factor>`
 
     Returns:
         :term:`lambda_q` [mm]
     """
     if lambda_q_scaling == LambdaQScaling.Brunner:
-        return float(calc_lambda_q_with_brunner.__wrapped__(average_total_pressure))
+        return lambda_q_factor * float(calc_lambda_q_with_brunner.unitless_func(average_total_pressure))
     elif lambda_q_scaling == LambdaQScaling.EichRegression14:
-        return float(calc_lambda_q_with_eich_regression_14.__wrapped__(B_pol_out_mid))
+        return lambda_q_factor * float(calc_lambda_q_with_eich_regression_14.unitless_func(B_pol_out_mid))
     elif lambda_q_scaling == LambdaQScaling.EichRegression15:
-        return float(calc_lambda_q_with_eich_regression_15.__wrapped__(P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio))
+        return lambda_q_factor * float(
+            calc_lambda_q_with_eich_regression_15.unitless_func(P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio)
+        )
     else:
         raise NotImplementedError(f"No implementation for lambda_q scaling {lambda_q_scaling}")
 

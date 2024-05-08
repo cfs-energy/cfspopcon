@@ -15,7 +15,7 @@ from ...unit_handling import ureg, wraps_ufunc
         surface_area=ureg.m**2,
         fuel_average_mass_number=ureg.amu,
         average_electron_density=ureg.n19,
-        scale=ureg.dimensionless,
+        confinement_threshold_scalar=ureg.dimensionless,
     ),
 )
 def calc_LH_transition_threshold_power(
@@ -26,7 +26,7 @@ def calc_LH_transition_threshold_power(
     surface_area: float,
     fuel_average_mass_number: float,
     average_electron_density: float,
-    scale: float = 1.0,
+    confinement_threshold_scalar: float = 1.0,
 ) -> float:
     """Calculate the threshold power (crossing the separatrix) to transition into H-mode.
 
@@ -41,7 +41,7 @@ def calc_LH_transition_threshold_power(
         surface_area: [m^2] :term:`glossary link<surface_area>`
         fuel_average_mass_number: [amu] :term:`glossary link<fuel_average_mass_number>`
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
-        scale: (optional) scaling factor for P_LH adjustment studies [~]
+        confinement_threshold_scalar: [~] :term:`glossary link<confinement_threshold_scalar>`
 
     Returns:
          :term:`P_LH_thresh` [MW]
@@ -60,10 +60,10 @@ def calc_LH_transition_threshold_power(
 
     if average_electron_density < neMin19:
         P_LH_thresh = _calc_Martin_LH_threshold(electron_density=neMin19)
-        return float(P_LH_thresh * (neMin19 / average_electron_density) ** 2.0) * scale
+        return float(P_LH_thresh * (neMin19 / average_electron_density) ** 2.0) * confinement_threshold_scalar
     else:
         P_LH_thresh = _calc_Martin_LH_threshold(electron_density=average_electron_density)
-        return P_LH_thresh * scale
+        return P_LH_thresh * confinement_threshold_scalar
 
 
 calc_ratio_P_LH = Algorithm.from_single_function(
@@ -74,9 +74,11 @@ calc_ratio_P_LH = Algorithm.from_single_function(
 @Algorithm.register_algorithm(return_keys=["P_LI_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LI_thresh=ureg.MW),
-    input_units=dict(plasma_current=ureg.MA, average_electron_density=ureg.n19, scale=ureg.dimensionless),
+    input_units=dict(plasma_current=ureg.MA, average_electron_density=ureg.n19, confinement_threshold_scalar=ureg.dimensionless),
 )
-def calc_LI_transition_threshold_power(plasma_current: float, average_electron_density: float, scale: float = 1.0) -> float:
+def calc_LI_transition_threshold_power(
+    plasma_current: float, average_electron_density: float, confinement_threshold_scalar: float = 1.0
+) -> float:
     """Calculate the threshold power (crossing the separatrix) to transition into I-mode.
 
     Note: uses scaling described in Fig 5 of ref :cite:`hubbard_threshold_2012`
@@ -84,12 +86,12 @@ def calc_LI_transition_threshold_power(plasma_current: float, average_electron_d
     Args:
         plasma_current: [MA] :term:`glossary link<plasma_current>`
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
-        scale: (optional) scaling factor for P_LI adjustment studies [~]
+        confinement_threshold_scalar: [~] :term:`glossary link<confinement_threshold_scalar>`
 
     Returns:
         :term:`P_LI_thresh` [MW]
     """
-    return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
+    return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * confinement_threshold_scalar
 
 
 calc_ratio_P_LI = Algorithm.from_single_function(

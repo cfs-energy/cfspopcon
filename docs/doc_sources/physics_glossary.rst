@@ -393,3 +393,6 @@ Physics Glossary
 
   edge_impurity_concentration
     Concentration of the edge radiator (impurity density relative to the electron density) in the edge.
+
+  confinement_threshold_scalar
+    Scalar value applied to the confinement threshold (:math:`P_{LH}` or :math:`P_{LI}`), used to study the effect of increasing or decreasing the threshold.
