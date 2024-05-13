@@ -316,8 +316,8 @@ H_DS03:
 
 Experiment MRA (derived from dimless):
   metadata:
-    reference: ""
-    notes: ""
+    reference: "J.W. Hughes et. al 'ACCESS TO EDGE TRANSPORT BARRIERS AND PROJECTIONS OF PEDESTAL PERFORMANCE IN THE SPARC TOKAMAK' 2024 IAEA"
+    notes: "Preliminary, from 2023 presentation by Hubbard, Hughes, Wilks"
     regime: "I-mode"
   params:
     constant: 1.0
@@ -335,8 +335,8 @@ Experiment MRA (derived from dimless):
 
 Experiment MRA (direct regression):
   metadata:
-    reference: ""
-    notes: ""
+    reference: "J.W. Hughes et. al 'ACCESS TO EDGE TRANSPORT BARRIERS AND PROJECTIONS OF PEDESTAL PERFORMANCE IN THE SPARC TOKAMAK' 2024 IAEA"
+    notes: "Preliminary, from 2023 presentation by Hubbard, Hughes, Wilks"
     regime: "I-mode"
   params:
     constant: 0.055
