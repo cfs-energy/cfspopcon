@@ -74,9 +74,9 @@ calc_ratio_P_LH = Algorithm.from_single_function(
 @Algorithm.register_algorithm(return_keys=["P_LI_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LI_thresh=ureg.MW),
-    input_units=dict(plasma_current=ureg.MA, average_electron_density=ureg.n19, scale=ureg.dimensionless),
+    input_units=dict(plasma_current=ureg.MA, average_electron_density=ureg.n19, magnetic_field_on_axis=ureg.T, scale=ureg.dimensionless),
 )
-def calc_LI_transition_threshold_power(plasma_current: float, average_electron_density: float, scale: float = 1.0) -> float:
+def calc_LI_transition_threshold_power(P_LI_option, plasma_current: float, average_electron_density: float, magnetic_field_on_axis=ureg.T, scale: float = 1.0) -> float:
     """Calculate the threshold power (crossing the separatrix) to transition into I-mode.
 
     Note: uses scaling described in Fig 5 of ref :cite:`hubbard_threshold_2012`
@@ -89,7 +89,28 @@ def calc_LI_transition_threshold_power(plasma_current: float, average_electron_d
     Returns:
         :term:`P_LI_thresh` [MW]
     """
-    return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
+
+    def _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, scale):
+        return float(2 * 0.07 * (average_electron_density / 10) * (magnetic_field_on_axis / 2.4) ** 0.39) * scale
+    
+    def _calc_HubbardNF17_LI_threshold(average_electron_density, magnetic_field_on_axis, scale):
+       return float(0.162 * (average_electron_density / 10) * (magnetic_field_on_axis ** 0.262)) * scale
+
+    def _calc_HubbardNF12_LI_threshold(average_electron_density, plasma_current, scale):
+        return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
+    
+
+    if(P_LI_option == "AUG"):
+        P_LI_thresh = _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, scale)
+    
+    if(P_LI_option == "HubbardNF17"):
+        P_LI_thresh = _calc_HubbardNF17_LI_threshold(average_electron_density, magnetic_field_on_axis, scale)
+    
+    if(P_LI_option == "HubbardNF12"):
+        P_LI_thresh = _calc_HubbardNF12_LI_threshold(average_electron_density, plasma_current, scale)
+    
+    return P_LI_thresh
+
 
 
 calc_ratio_P_LI = Algorithm.from_single_function(
