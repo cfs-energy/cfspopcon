@@ -88,7 +88,7 @@ def calc_LI_transition_threshold_power(P_LI_option, plasma_current: float, avera
 
     Returns:
         :term:`P_LI_thresh` [MW]
-    """
+    """ # will add other citations later
 
     def _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, scale):
         return float(2 * 0.07 * (average_electron_density / 10) * (magnetic_field_on_axis / 2.4) ** 0.39) * scale
