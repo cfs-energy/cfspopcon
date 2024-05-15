@@ -79,7 +79,10 @@ calc_ratio_P_LH = Algorithm.from_single_function(
 def calc_LI_transition_threshold_power(P_LI_option, plasma_current: float, average_electron_density: float, magnetic_field_on_axis=ureg.T, scale: float = 1.0) -> float:
     """Calculate the threshold power (crossing the separatrix) to transition into I-mode.
 
-    Note: uses scaling described in Fig 5 of ref :cite:`hubbard_threshold_2012`
+    Note: 
+        AUG option is inspired from :cite:`ryter_i-mode_2016` and :cite:`Happel_2017`
+        HubbardNF12 option uses scaling described in Fig 5 of :cite:`hubbard_threshold_2012`
+        HubbardNF17 option uses scaling described in Fig 6 of :cite:`hubbard_threshold_2017`
 
     Args:
         plasma_current: [MA] :term:`glossary link<plasma_current>`
@@ -88,7 +91,8 @@ def calc_LI_transition_threshold_power(P_LI_option, plasma_current: float, avera
 
     Returns:
         :term:`P_LI_thresh` [MW]
-    """ # will add other citations later
+    """
+
 
     def _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, scale):
         return float(2 * 0.07 * (average_electron_density / 10) * (magnetic_field_on_axis / 2.4) ** 0.39) * scale
