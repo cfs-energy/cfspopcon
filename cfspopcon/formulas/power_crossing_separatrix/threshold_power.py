@@ -81,9 +81,9 @@ def calc_LI_transition_threshold_power(P_LI_option, plasma_current: float, avera
 
     Note: 
         AUG option is inspired from :cite:`ryter_i-mode_2016` and :cite:`Happel_2017`
-        HubbardNF12 option uses scaling described in Fig 5 of :cite:`hubbard_threshold_2012`
         HubbardNF17 option uses scaling described in Fig 6 of :cite:`hubbard_threshold_2017`
-
+        HubbardNF12 option uses scaling described in Fig 5 of :cite:`hubbard_threshold_2012`
+        
     Args:
         plasma_current: [MA] :term:`glossary link<plasma_current>`
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
