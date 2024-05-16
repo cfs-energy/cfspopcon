@@ -17,9 +17,9 @@ FROM jupyter/scipy-notebook:848a82674792
 
 # 2. Install a fortran compiler into this image, so that we
 # can compile the radas headers
-RUN conda install -c conda-forge gfortran -y
+RUN conda install -c conda-forge gfortran==13.2.0 -y
 # 3. Install poetry, which is what we use to build cfspopcon
-RUN pip install poetry
+RUN pip install poetry==1.8.2
 
 # 4. Copy in the files from the local directory
 COPY --chown=$NB_USER:$NB_GID . ./
@@ -28,14 +28,7 @@ COPY --chown=$NB_USER:$NB_GID . ./
 # so we don't have to worry about custom kernels or venvs.
 RUN poetry config virtualenvs.create false
 # 6. Install cfspopcon in the global python environment.
-RUN poetry install
+RUN poetry install --without dev
 
-# 7. Download the radas project
-RUN git clone https://github.com/cfs-energy/radas.git
-# 8. Download atomic data files from OpenADAS
-RUN PYTHONPATH=radas python radas/adas_data/fetch_adas_data.py
-# 9. Run radas to compute Lz and <Z> curves from the atomic data
-RUN PYTHONPATH=radas python radas/run_radas.py
-
-# 10. Copy the results from radas into cfspopcon
-RUN cp radas/cases/*/output/*.nc cfspopcon/atomic_data
+# 7. Run radas to get the atomic data files
+RUN poetry run radas
