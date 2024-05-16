@@ -419,3 +419,33 @@ Physics Glossary
 
   edge_collisionality
     Collisionality at the separatrix.
+
+  critical_alpha_MHD
+    Critical value of :math:`\alpha_{MHD}` used in the separatrix operational space.
+
+  poloidal_sound_larmor_radius
+    The sound Larmor radius using the poloidal magnetic field.
+
+  SepOS_density_limit
+    Less than 1 if an L-mode is below the density limit, according to the separatrix operational space.
+
+  SepOS_LH_transition
+    Less than 1 if in L-mode and greater than 1 if in H-mode, according to the separatrix operational space.
+
+  SepOS_MHD_limit
+    Less than 1 if below the ideal MHD limit, according to the separatrix operational space.
+
+  elongation_psi95
+    Usually denoted :math:`\kappa_{95}`, the elongation at the :math:`\psi_N=0.95` surface.
+
+  ion_heat_diffusivity
+    A heat diffusion constant which gives a heat flux corresponding to an ion temperature gradient.
+
+  temp_scale_length_ratio
+    The ratio of the electron and ion temperature scale lengths at the separatrix.
+
+  sustainment_power_in_ion_channel
+    The power in the ion channel required to maintain the ion temperature gradient at the separatrix.
+
+  sustainment_power_in_electron_channel
+    The power in the electron channel required to maintain the electron temperature at the separatrix.
