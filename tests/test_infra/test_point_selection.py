@@ -1,6 +1,6 @@
 import numpy as np
 
-from cfspopcon.point_selection import find_coords_of_maximum
+from cfspopcon.shaping_and_selection.point_selection import find_coords_of_maximum
 
 
 def test_find_coords(ds):

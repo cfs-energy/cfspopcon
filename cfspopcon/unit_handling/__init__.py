@@ -11,7 +11,9 @@ from .setup_unit_handling import (
     Unit,
     convert_units,
     dimensionless_magnitude,
+    get_units,
     magnitude,
+    magnitude_in_units,
     ureg,
 )
 
@@ -24,6 +26,7 @@ __all__ = [
     "Unitfull",
     "wraps_ufunc",
     "magnitude_in_default_units",
+    "magnitude_in_units",
     "set_default_units",
     "default_unit",
     "convert_to_default_units",
@@ -33,4 +36,5 @@ __all__ = [
     "UnitStrippedWarning",
     "UndefinedUnitError",
     "DimensionalityError",
+    "get_units",
 ]

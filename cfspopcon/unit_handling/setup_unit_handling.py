@@ -56,6 +56,11 @@ def convert_units(array: pint.Quantity, units: Union[str, pint.Unit]) -> pint.Qu
 
 def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Union[xr.DataArray, pint.Quantity]:
     """Convert an array to specified units, handling both Quantities and xr.DataArrays."""
+    if units is None:
+        # Replace None with ureg.dimensionless.
+        # Otherwise, convert_units(Quantity([1.0], ""), None) will fail with an AttributeError
+        units = ureg.dimensionless
+
     if isinstance(array, xr.DataArray):
         if not hasattr(array.pint, "units") or array.pint.units is None:
             array = array.pint.quantify(ureg.dimensionless)
@@ -63,6 +68,8 @@ def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Unio
         return array.pint.to(units)  # type: ignore[no-any-return]
     elif isinstance(array, Quantity):
         return array.to(units)  # type:ignore[no-any-return]
+    elif isinstance(array, float) and Quantity(1.0, units).check("[]"):
+        return (array * ureg.dimensionless).to(units)
     else:
         raise NotImplementedError(f"No implementation for 'convert_units' with an array of type {type(array)} ({array})")
 
@@ -71,13 +78,28 @@ def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Unio
 def magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[npt.NDArray[np.float32], float]:
     """Return the magnitude of an array, handling both Quantities and xr.DataArrays."""
     if isinstance(array, xr.DataArray):
-        return array.values
+        return array.pint.dequantify()  # type: ignore[no-any-return]
     elif isinstance(array, Quantity):
         return array.magnitude  # type: ignore[no-any-return]
     else:
         raise NotImplementedError(f"No implementation for 'magnitude' with an array of type {type(array)} ({array})")
 
 
+def get_units(array: Union[xr.DataArray, pint.Quantity]) -> Any:
+    """Returns the unit of an array, handling both Quantities and xr.DataArrays."""
+    if isinstance(array, xr.DataArray):
+        return array.pint.units
+    elif isinstance(array, Quantity):
+        return array.units
+    else:
+        raise NotImplementedError(f"No implementation for 'get_units' with an array of type {type(array)} ({array})")
+
+
+def magnitude_in_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Union[npt.NDArray[np.float32], float]:
+    """Convert the array to the specified units and then return the magnitude."""
+    return magnitude(convert_units(array, units))
+
+
 def dimensionless_magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[npt.NDArray[np.float32], float]:
     """Converts the array to dimensionless and returns the magnitude."""
-    return magnitude(convert_units(array, ureg.dimensionless))
+    return magnitude_in_units(array, ureg.dimensionless)

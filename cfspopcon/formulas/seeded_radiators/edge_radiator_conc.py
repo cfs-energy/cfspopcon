@@ -24,8 +24,8 @@ def calc_edge_impurity_concentration(
     q_parallel: Unitfull,
     SOL_power_loss_fraction: Unitfull,
     target_electron_temp: Unitfull,
-    upstream_electron_temp: Unitfull,
-    upstream_electron_density: Unitfull,
+    separatrix_electron_temp: Unitfull,
+    separatrix_electron_density: Unitfull,
     kappa_e0: Unitfull,
     lengyel_overestimation_factor: Unitfull,
     edge_impurity_enrichment: Unitfull,
@@ -43,8 +43,8 @@ def calc_edge_impurity_concentration(
         q_parallel: :term:`glossary link<q_parallel>`
         SOL_power_loss_fraction: :term:`glossary link<SOL_power_loss_fraction>`
         target_electron_temp: :term:`glossary link<target_electron_temp>`
-        upstream_electron_temp: :term:`glossary link<upstream_electron_temp>`
-        upstream_electron_density: :term:`glossary link<upstream_electron_density>`
+        separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
+        separatrix_electron_density: :term:`glossary link<separatrix_electron_density>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         impurities: :term:`glossary link<impurities>`
         lengyel_overestimation_factor: :term:`glossary link<lengyel_overestimation_factor>`
@@ -66,8 +66,8 @@ def calc_edge_impurity_concentration(
         q_parallel=q_parallel,
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         target_electron_temp=target_electron_temp,
-        upstream_electron_temp=upstream_electron_temp,
-        upstream_electron_density=upstream_electron_density,
+        separatrix_electron_temp=separatrix_electron_temp,
+        separatrix_electron_density=separatrix_electron_density,
         kappa_e0=kappa_e0,
         lengyel_overestimation_factor=lengyel_overestimation_factor,
     )
@@ -130,8 +130,8 @@ def calc_required_edge_impurity_concentration(
     q_parallel: Unitfull,
     SOL_power_loss_fraction: Unitfull,
     target_electron_temp: Unitfull,
-    upstream_electron_temp: Unitfull,
-    upstream_electron_density: Unitfull,
+    separatrix_electron_temp: Unitfull,
+    separatrix_electron_density: Unitfull,
     kappa_e0: Unitfull,
     lengyel_overestimation_factor: Unitfull,
 ) -> Unitfull:
@@ -152,17 +152,17 @@ def calc_required_edge_impurity_concentration(
         q_parallel: :term:`glossary link<q_parallel>`
         SOL_power_loss_fraction: :term:`glossary link<SOL_power_loss_fraction>`
         target_electron_temp: :term:`glossary link<target_electron_temp>`
-        upstream_electron_temp: :term:`glossary link<upstream_electron_temp>`
-        upstream_electron_density: :term:`glossary link<upstream_electron_density>`
+        separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
+        separatrix_electron_density: :term:`glossary link<separatrix_electron_density>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         lengyel_overestimation_factor: :term:`glossary link<lengyel_overestimation_factor>`
 
     Returns:
         :term:`impurity_concentration`
     """
-    L_int = L_int_integrator(target_electron_temp, upstream_electron_temp)
+    L_int = L_int_integrator(target_electron_temp, separatrix_electron_temp)
 
     numerator = q_parallel**2 - ((1.0 - SOL_power_loss_fraction) * q_parallel) ** 2
-    denominator = 2.0 * kappa_e0 * (upstream_electron_density * upstream_electron_temp) ** 2 * L_int
+    denominator = 2.0 * kappa_e0 * (separatrix_electron_density * separatrix_electron_temp) ** 2 * L_int
 
     return numerator / denominator / lengyel_overestimation_factor

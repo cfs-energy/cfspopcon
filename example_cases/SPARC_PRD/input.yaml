@@ -66,7 +66,7 @@ algorithms:
   # a scaling for lambda_q to calculate a corresponding q_parallel, and
   # then use the two-point-model to determine how much edge seeding we
   # require to protect the divertor.
-  - calculate_power_crossing_separatrix
+  - calc_power_crossing_separatrix
   - calc_average_total_pressure
   - calc_PB_over_R
   - calc_PBpRnSq

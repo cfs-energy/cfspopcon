@@ -5,7 +5,7 @@ import xarray as xr
 
 from ....named_options import MomentumLossFunction
 from ....unit_handling import Unitfull, ureg
-from ..upstream_electron_temp import calc_upstream_electron_temp
+from ..separatrix_electron_temp import calc_separatrix_electron_temp
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
 from .required_power_loss_fraction import calc_required_SOL_power_loss_fraction
 from .separatrix_pressure import calc_upstream_total_pressure
@@ -28,7 +28,7 @@ def solve_target_first_two_point_model(
     target_electron_temp: Unitfull,
     parallel_heat_flux_density: Unitfull,
     parallel_connection_length: Unitfull,
-    upstream_electron_density: Unitfull,
+    separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
     fuel_average_mass_number: Unitfull,
     kappa_e0: Unitfull,
@@ -48,7 +48,7 @@ def solve_target_first_two_point_model(
         target_electron_temp: [eV]
         parallel_heat_flux_density: [GW/m^2]
         parallel_connection_length: [m]
-        upstream_electron_density: [m^-3]
+        separatrix_electron_density: [m^-3]
         toroidal_flux_expansion: [~]
         fuel_average_mass_number: [~]
         kappa_e0: electron heat conductivity constant [W / (eV^3.5 * m)]
@@ -63,11 +63,11 @@ def solve_target_first_two_point_model(
         upstream_mach_number: [~]
 
     Returns:
-        SOL_power_loss_fraction [~], upstream_electron_temp [eV], target_electron_density [m^-3], target_electron_flux [m^-2 s^-1]
+        SOL_power_loss_fraction [~], separatrix_electron_temp [eV], target_electron_density [m^-3], target_electron_flux [m^-2 s^-1]
     """
     SOL_momentum_loss_fraction = calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp)
 
-    upstream_electron_temp = calc_upstream_electron_temp(
+    separatrix_electron_temp = calc_separatrix_electron_temp(
         target_electron_temp=target_electron_temp,
         parallel_heat_flux_density=parallel_heat_flux_density,
         parallel_connection_length=parallel_connection_length,
@@ -76,8 +76,8 @@ def solve_target_first_two_point_model(
     )
 
     upstream_total_pressure = calc_upstream_total_pressure(
-        upstream_electron_density=upstream_electron_density,
-        upstream_electron_temp=upstream_electron_temp,
+        separatrix_electron_density=separatrix_electron_density,
+        separatrix_electron_temp=separatrix_electron_temp,
         upstream_ratio_of_ion_to_electron_temp=upstream_ratio_of_ion_to_electron_temp,
         upstream_ratio_of_electron_to_ion_density=upstream_ratio_of_electron_to_ion_density,
         upstream_mach_number=upstream_mach_number,
@@ -118,4 +118,4 @@ def solve_target_first_two_point_model(
         f_other_target_electron_flux=calc_f_other_target_electron_flux(**f_other_kwargs),
     )
 
-    return SOL_power_loss_fraction, upstream_electron_temp, target_electron_density, target_electron_flux
+    return SOL_power_loss_fraction, separatrix_electron_temp, target_electron_density, target_electron_flux

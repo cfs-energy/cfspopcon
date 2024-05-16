@@ -1,0 +1,74 @@
+algorithms:
+  - calc_cylindrical_edge_safety_factor
+  - calc_alpha_t
+  - calc_critical_alpha_MHD
+  - calc_poloidal_sound_larmor_radius
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_B_tor_omp
+  - calc_B_pol_omp
+  - calc_inverse_aspect_ratio
+  - calc_areal_elongation_from_elongation_at_psi95
+  - calc_plasma_surface_area
+  - calc_power_crossing_separatrix_in_electron_channel
+  - calc_power_crossing_separatrix_in_ion_channel
+
+grid:
+  # input variables in the 'grid' block will be replaced by
+  # a corresponding linspace or logspace of values
+
+  separatrix_electron_temp:
+    # Average electron temperature in eV
+    min: 1.0
+    max: 150.0
+    num: 30
+    spacing: linear
+  
+  separatrix_electron_density:
+    # Average electron density in particles / m^3
+    min: 0.01
+    max: 7.0
+    num: 40
+    spacing: linear
+
+
+points:
+  AUG_SepOS_minTe:
+    minimize:
+      separatrix_electron_temp
+    where:
+      SepOS_LH_transition:
+        min: 1.0
+
+
+plots:
+  "AUG SepOS": CASE_DIR/plot_sepos.yaml
+
+
+# Toroidal field on-axis in Tesla
+magnetic_field_on_axis: 2.5
+# Major radius in metres
+major_radius: 1.65
+# Minor radius in metres
+minor_radius: 0.49
+# Ion mass in amu
+ion_mass: 2.0
+# Plasma current in A
+plasma_current: 0.8e+6
+# Elongation (kappa) at the psiN = 0.95 flux surface
+elongation_psi95: 1.6
+# Ratio of kappaA / kappa95
+elongation_ratio_areal_to_psi95: 1.025
+# Triangularity (delta) at the psiN = 0.95 flux surface
+triangularity_psi95: 0.3
+# Effective ion charge
+z_effective: 1.25
+# Mean ion charge
+mean_ion_charge_state: 1.0
+# Target electron temp in eV
+target_electron_temp: 10.0
+# Fraction of P_SOL going to the outer divertor
+fraction_of_P_SOL_to_divertor: 0.6
+# Ion heat diffusivity (chi_i) in m^2/s
+ion_heat_diffusivity: 0.5
