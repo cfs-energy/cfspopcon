@@ -42,9 +42,9 @@ Plasma Profiles
 --------------------
 .. automodule:: cfspopcon.formulas.plasma_profiles
 
-Power Crossing Separatrix
+Separatrix Conditions
 -------------------------------
-.. automodule:: cfspopcon.formulas.power_crossing_separatrix
+.. automodule:: cfspopcon.formulas.separatrix_conditions
 
 Radiated Power
 --------------------

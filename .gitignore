@@ -134,11 +134,11 @@ dmypy.json
 #macOS metadata
 .DS_Store
 
-# Mess
+# Avoid committing nc files and other working files
 example_cases/**/output/*
 tests/regression_results/test*.nc
 radas_dir/*
 popcon_algorithms.yaml
 
-# Top-level (working) notebooks should not be tracked
-*.ipynb
+# Have an untracked folder for rough working
+untracked/
