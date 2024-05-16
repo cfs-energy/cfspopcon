@@ -85,8 +85,11 @@ def calc_LI_transition_threshold_power(P_LI_option, average_electron_density: fl
         HubbardNF12 option uses scaling described in Fig 5 of :cite:`hubbard_threshold_2012`
         
     Args:
-        plasma_current: [MA] :term:`glossary link<plasma_current>`
+        P_LI_option: String indicating which P_LI scaling is to be used.
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
+        plasma_current: [MA] :term:`glossary link<plasma_current>`
+        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
+        surface_area: [m^2] :term:`glossary link<surface_area>`
         scale: (optional) scaling factor for P_LI adjustment studies [~]
 
     Returns:
@@ -103,6 +106,7 @@ def calc_LI_transition_threshold_power(P_LI_option, average_electron_density: fl
     def _calc_HubbardNF12_LI_threshold(average_electron_density, plasma_current, scale):
         return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * scale
     
+
     if(P_LI_option == "AUG"):
         P_LI_thresh = _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, surface_area, scale)
     
