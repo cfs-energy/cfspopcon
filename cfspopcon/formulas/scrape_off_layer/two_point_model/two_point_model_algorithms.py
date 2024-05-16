@@ -12,7 +12,7 @@ from .target_first_model import solve_target_first_two_point_model
 
 @Algorithm.register_algorithm(
     return_keys=[
-        "upstream_electron_temp",
+        "separatrix_electron_temp",
         "target_electron_density",
         "target_electron_temp",
         "target_electron_flux",
@@ -46,13 +46,13 @@ def two_point_model_fixed_fpow(
         raise_error_if_not_converged: Raise an error if solve does not converge
 
     Returns:
-        :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
+    (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=nesep_over_nebar * average_electron_density,
+        separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,
@@ -62,12 +62,12 @@ def two_point_model_fixed_fpow(
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
+    return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
 
 
 @Algorithm.register_algorithm(
     return_keys=[
-        "upstream_electron_temp",
+        "separatrix_electron_temp",
         "target_electron_density",
         "target_electron_temp",
         "target_electron_flux",
@@ -101,16 +101,16 @@ def two_point_model_fixed_qpart(
         raise_error_if_not_converged: Raise an error if solve does not converge
 
     Returns:
-        :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`,
 
     """
     SOL_power_loss_fraction = (1.0 - target_q_parallel / q_parallel).clip(min=0.0, max=1.0)
 
-    (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
+    (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=nesep_over_nebar * average_electron_density,
+        separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,
@@ -118,12 +118,12 @@ def two_point_model_fixed_qpart(
         raise_error_if_not_converged=raise_error_if_not_converged,
     )
 
-    return (upstream_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
+    return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
 
 
 @Algorithm.register_algorithm(
     return_keys=[
-        "upstream_electron_temp",
+        "separatrix_electron_temp",
         "target_electron_density",
         "SOL_power_loss_fraction",
         "target_electron_flux",
@@ -134,7 +134,7 @@ def two_point_model_fixed_tet(
     target_electron_temp: Unitfull,
     q_parallel: Unitfull,
     parallel_connection_length: Unitfull,
-    upstream_electron_density: Unitfull,
+    separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
     fuel_average_mass_number: Unitfull,
     kappa_e0: Unitfull,
@@ -147,20 +147,25 @@ def two_point_model_fixed_tet(
         q_parallel: :term:`glossary link<q_parallel>`
         parallel_connection_length: :term:`glossary link<parallel_connection_length>`
         average_electron_density: :term:`glossary link<average_electron_density>`
-        upstream_electron_density: :term:`glossary link<upstream_electron_density>`
+        separatrix_electron_density: :term:`glossary link<separatrix_electron_density>`
         toroidal_flux_expansion: :term:`glossary link<toroidal_flux_expansion>`
         fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
 
     Returns:
-        :term:`upstream_electron_temp`, :term:`target_electron_density`, :term:`SOL_power_loss_fraction`, :term:`target_electron_flux`, :term:`target_q_parallel`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`SOL_power_loss_fraction`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (SOL_power_loss_fraction, upstream_electron_temp, target_electron_density, target_electron_flux,) = solve_target_first_two_point_model(
+    (
+        SOL_power_loss_fraction,
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_flux,
+    ) = solve_target_first_two_point_model(
         target_electron_temp=target_electron_temp,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
-        upstream_electron_density=upstream_electron_density,
+        separatrix_electron_density=separatrix_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
         fuel_average_mass_number=fuel_average_mass_number,
         kappa_e0=kappa_e0,
@@ -169,4 +174,4 @@ def two_point_model_fixed_tet(
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    return (upstream_electron_temp, target_electron_density, SOL_power_loss_fraction, target_electron_flux, target_q_parallel)
+    return (separatrix_electron_temp, target_electron_density, SOL_power_loss_fraction, target_electron_flux, target_q_parallel)

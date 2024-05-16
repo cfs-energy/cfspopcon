@@ -64,10 +64,10 @@ Physics Glossary
   upstream
     The point where heat enters the flux-tube being considered for the two-point-model. Usually 'upstream' means the outboard-midplane separatrix.
 
-  upstream_electron_temp
+  separatrix_electron_temp
     The :term:`upstream` electron temperature.
   
-  upstream_electron_density
+  separatrix_electron_density
     The :term:`upstream` electron density.
 
   target_electron_density
@@ -160,6 +160,12 @@ Physics Glossary
   core_radiator_concentration
     Concentration of the :term:`extrinsic<extrinsic impurity>` core radiator required to achieve the desired core radiated power fraction, relative to the electron density :math:`c_{core} = n_{core}/n_e`.
 
+  mean_ion_charge_state
+    Mean charge state of the ions (:math:`n_e / \sum_j n_j`)
+  
+  ion_to_electron_temp_ratio
+    Ratio of electron and ion temperatures, :math:`T_i/T_e`.
+
   electron_density_profile
     A 1D profile of the electron density as a function of :math:`\rho_{pol}`.
 
@@ -243,6 +249,7 @@ Physics Glossary
   f_shaping
     Shaping factor used to compute :math:`q_*`.
 
+  ion_mass
   fuel_average_mass_number
     Average mass of fuel ions, with the average weighted by the relative concentration of each species.
 
@@ -393,3 +400,22 @@ Physics Glossary
 
   edge_impurity_concentration
     Concentration of the edge radiator (impurity density relative to the electron density) in the edge.
+  
+  Lmode_density_limit_condition
+    Condition function for the L-mode density limit (calculated by the separatrix operational space). If $c_{LDL} > 1$, the state is predicted to be unstable.
+  
+  ideal_MHD_limit_condition
+    Condition function for the ideal MHD limit (calculated by the separatrix operational space). If $c_{MHD} > 1$, the state is predicted to be unstable.
+  
+  LH_transition_condition
+    Condition function for the LH limit (calculated by the separatrix operational space). If $c_{LH} > 1$, the state is predicted to be in H-mode.
+  
+  alpha_t
+  alpha_t_turbulence_param
+    Turbulence characterization parameter used by the separatrix operational space.
+  
+  cylindrical_safety_factor
+    Analytical approximation of safety factor at :math:`\rho=0.95` (confusingly, still has some shaping corrections despite being called the 'cylindrical' safety factor).
+
+  edge_collisionality
+    Collisionality at the separatrix.

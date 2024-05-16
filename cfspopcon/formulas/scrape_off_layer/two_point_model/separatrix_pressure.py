@@ -7,8 +7,8 @@ from ....unit_handling import Quantity
 
 
 def calc_upstream_total_pressure(
-    upstream_electron_density: Union[Quantity, xr.DataArray],
-    upstream_electron_temp: Union[Quantity, xr.DataArray],
+    separatrix_electron_density: Union[Quantity, xr.DataArray],
+    separatrix_electron_temp: Union[Quantity, xr.DataArray],
     upstream_ratio_of_ion_to_electron_temp: Union[float, xr.DataArray],
     upstream_ratio_of_electron_to_ion_density: Union[float, xr.DataArray],
     upstream_mach_number: Union[float, xr.DataArray] = 0.0,
@@ -18,8 +18,8 @@ def calc_upstream_total_pressure(
     Same as calc_total_pressure, but with a default value upstream_mach_number=0.0.
 
     Args:
-        upstream_electron_density: [m^-3]
-        upstream_electron_temp: [eV]
+        separatrix_electron_density: [m^-3]
+        separatrix_electron_temp: [eV]
         upstream_ratio_of_ion_to_electron_temp: tau_t = (T_i / T_e) [~]
         upstream_ratio_of_electron_to_ion_density: z_t = (ne / ni) [~]
         upstream_mach_number: M_t = (parallel ion velocity / sound speed) [~]
@@ -28,8 +28,8 @@ def calc_upstream_total_pressure(
         upstream_total_pressure [atm]
     """
     return calc_total_pressure(
-        electron_density=upstream_electron_density,
-        electron_temp=upstream_electron_temp,
+        electron_density=separatrix_electron_density,
+        electron_temp=separatrix_electron_temp,
         ratio_of_ion_to_electron_temp=upstream_ratio_of_ion_to_electron_temp,
         ratio_of_electron_to_ion_density=upstream_ratio_of_electron_to_ion_density,
         mach_number=upstream_mach_number,
