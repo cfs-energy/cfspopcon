@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 from xarray.core.coordinates import DataArrayCoordinates
 
-from .unit_handling import Quantity
+from ..unit_handling import Quantity
 
 
 def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: Optional[xr.DataArray] = None) -> DataArrayCoordinates:
@@ -25,12 +25,13 @@ def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], m
     """
     large = Quantity(np.inf, array.pint.units)
 
-    along_dims = [dim for dim in array.dims if dim not in keep_dims]
-
     if mask is None:
-        point_coords = array.fillna(large).argmin(dim=along_dims)
+        masked_array = array.fillna(large)
     else:
-        point_coords = array.where(mask).fillna(large).argmin(dim=along_dims)
+        masked_array = array.where(mask).fillna(large)
+
+    along_dims = [dim for dim in masked_array.dims if dim not in keep_dims]
+    point_coords = masked_array.argmin(dim=along_dims)
 
     return point_coords  # type:ignore[return-value]
 

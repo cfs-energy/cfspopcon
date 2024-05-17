@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 
 from .helpers import convert_named_options
-from .point_selection import build_mask_from_dict, find_coords_of_minimum
+from .shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_minimum
 from .unit_handling import convert_to_default_units, set_default_units
 
 ignored_keys = [
@@ -39,7 +39,10 @@ def write_dataset_to_netcdf(
     serialized_dataset = dataset.copy()
     for key in ignored_keys:
         assert isinstance(key, str)  # for type-checking
-        serialized_dataset = serialized_dataset.drop_vars(key)
+        # errors="ignore" prevents drop_vars from raising a ValueError if key
+        # is not in serialized_dataset. This is necessary for writing a dataset
+        # that has previously been read from file (i.e. round-trip file I/O)
+        serialized_dataset = serialized_dataset.drop_vars(key, errors="ignore")
 
     for key in serialized_dataset.keys():  # type:ignore[assignment]
         assert isinstance(key, str)
@@ -105,7 +108,7 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
     for key in point.keys():
         if key in ignored_keys:
             assert isinstance(key, str)
-            point = point.drop_vars(key)
+            point = point.drop_vars(key, errors="ignore")
 
     for key in point.keys():
         assert isinstance(key, str)

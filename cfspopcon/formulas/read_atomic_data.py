@@ -168,7 +168,9 @@ class AtomicData:
                 log10_with_floor(z_values.dim_electron_temp),
                 log10_with_floor(z_values.dim_electron_density),
             ),
-            values=log10_with_floor(magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density"))),
+            values=log10_with_floor(
+                magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density")).to_numpy()  # type:ignore[union-attr]
+            ),
             method="cubic",
             bounds_error=True,
         )

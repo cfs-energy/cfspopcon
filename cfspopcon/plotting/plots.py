@@ -9,8 +9,8 @@ import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
 
-from ..point_selection import build_mask_from_dict, find_coords_of_minimum
-from ..transform import build_transform_function_from_dict
+from ..shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_minimum
+from ..shaping_and_selection.transform_coords import build_transform_function_from_dict
 from ..unit_handling import Quantity, Unit, dimensionless_magnitude
 from .coordinate_formatter import CoordinateFormatter
 
