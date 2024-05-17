@@ -10,7 +10,7 @@ import xarray as xr
 import yaml
 from pint import DimensionalityError, UndefinedUnitError
 
-from .setup_unit_handling import Quantity, convert_units, magnitude
+from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
 
 
 def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
@@ -72,7 +72,7 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
         if unit is None:
             return value
 
-        mag = magnitude(convert_units(value, unit))
+        mag = magnitude_in_units(value, unit)
 
     except DimensionalityError as e:
         print(f"Unit conversion failed for {key}. Could not convert '{value}' to '{DEFAULT_UNITS[key]}'")

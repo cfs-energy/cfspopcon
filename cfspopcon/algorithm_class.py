@@ -112,7 +112,9 @@ class Algorithm:
             else:
                 sorted_dataset_keys = ", ".join(sorted(dataset.keys()))  # type:ignore[arg-type]
                 sorted_default_keys = ", ".join(sorted(self.default_keys))
-                raise KeyError(f"Key '{key}' not in dataset keys [{sorted_dataset_keys}] or default values [{sorted_default_keys}]")
+                raise KeyError(
+                    f"KeyError for {self._name}: Key '{key}' not in dataset keys [{sorted_dataset_keys}] or default values [{sorted_default_keys}]"
+                )
 
         result = self._function(**input_values)
         return xr.Dataset(result).merge(dataset, join="left", compat=("override" if allow_overwrite else "no_conflicts"))
