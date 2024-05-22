@@ -26,6 +26,9 @@ fill:
         max: 0.9
       ratio_of_P_SOL_to_P_LH:
         min: 1.0
+      max_flattop_duration:
+        min: 0.0
+        units: seconds
 
 points:
   PRD:
@@ -60,5 +63,11 @@ contour:
     label: "$P_{fusion}$"
     color: "tab:purple"
     levels: [50.0, 100.0, 150.0, 200.0]
+    format: "1.2g"
+
+  max_flattop_duration:
+    label: "$t_{flattop}$"
+    color: "xkcd:pumpkin"
+    levels: [0.0, 1.0, 2.0, 4.0, 6.0, 8.0, 10.0]
     format: "1.2g"
   

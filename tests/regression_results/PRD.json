@@ -226,6 +226,13 @@
             "data": 0.08515124438705672,
             "dims": []
         },
+        "breakdown_flux_consumption": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 0.12840000000000001,
+            "dims": []
+        },
         "confinement_threshold_scalar": {
             "attrs": {
                 "units": "dimensionless"
@@ -273,6 +280,13 @@
             "data": 16.361422316376128,
             "dims": []
         },
+        "cylindrical_safety_factor": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.675118549054515,
+            "dims": []
+        },
         "dilution": {
             "attrs": {
                 "units": "dimensionless"
@@ -318,6 +332,13 @@
                 "units": "dimensionless"
             },
             "data": 0.07443199888196231,
+            "dims": []
+        },
+        "ejima_coefficient": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6,
             "dims": []
         },
         "electron_density_peaking": {
@@ -454,6 +475,20 @@
                 "dim_rho"
             ]
         },
+        "elongation_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.707317073170732,
+            "dims": []
+        },
+        "elongation_ratio_areal_to_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.025,
+            "dims": []
+        },
         "elongation_ratio_sep_to_areal": {
             "attrs": {
                 "units": "dimensionless"
@@ -468,6 +503,20 @@
             "data": 0.6623169006550257,
             "dims": []
         },
+        "external_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 23.59919917115023,
+            "dims": []
+        },
+        "external_inductance": {
+            "attrs": {
+                "units": "henry"
+            },
+            "data": 2.7125516288678424e-06,
+            "dims": []
+        },
         "f_shaping": {
             "attrs": {
                 "units": "dimensionless"
@@ -480,6 +529,13 @@
                 "units": "dimensionless"
             },
             "data": 3.214648364176006,
+            "dims": []
+        },
+        "flux_needed_from_CS_over_rampup": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 34.64464918777696,
             "dims": []
         },
         "fraction_of_P_SOL_to_divertor": {
@@ -624,11 +680,39 @@
             "data": 7959184.1738326065,
             "dims": []
         },
+        "internal_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 11.574036082512393,
+            "dims": []
+        },
+        "internal_inductance": {
+            "attrs": {
+                "units": "henry"
+            },
+            "data": 1.3303489750014244e-06,
+            "dims": []
+        },
+        "internal_inductivity": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.1444952177978316,
+            "dims": []
+        },
         "inverse_aspect_ratio": {
             "attrs": {
                 "units": "dimensionless"
             },
             "data": 0.3081,
+            "dims": []
+        },
+        "invmu_0_dLedR": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.163372412583668,
             "dims": []
         },
         "ion_density_peaking": {
@@ -766,6 +850,13 @@
             "data": 1.85,
             "dims": []
         },
+        "max_flattop_duration": {
+            "attrs": {
+                "units": "second"
+            },
+            "data": 2.353737586193937,
+            "dims": []
+        },
         "minimum_core_radiated_fraction": {
             "attrs": {
                 "units": "dimensionless"
@@ -892,6 +983,13 @@
             "data": 19.79484837055445,
             "dims": []
         },
+        "poloidal_field_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 12.663930174827374,
+            "dims": []
+        },
         "profile_form": {
             "attrs": {},
             "data": "prf",
@@ -935,6 +1033,13 @@
                 "units": "dimensionless"
             },
             "data": 1.0398608412936936,
+            "dims": []
+        },
+        "resistive_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 12.135344108941705,
             "dims": []
         },
         "rho": {
@@ -1004,6 +1109,13 @@
             "data": 0.0022127891680210027,
             "dims": []
         },
+        "safety_factor_on_axis": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1,
+            "dims": []
+        },
         "separatrix_electron_density": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
@@ -1053,6 +1165,11 @@
             "data": 55.536257947812175,
             "dims": []
         },
+        "surface_inductance_coefficients": {
+            "attrs": {},
+            "data": "Barr",
+            "dims": []
+        },
         "target_electron_density": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
@@ -1100,6 +1217,13 @@
             "data": 0.6974,
             "dims": []
         },
+        "total_flux_available_from_CS": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 35,
+            "dims": []
+        },
         "trapped_particle_fraction": {
             "attrs": {
                 "units": "dimensionless"
@@ -1119,6 +1243,25 @@
                 "units": "dimensionless"
             },
             "data": 1.8,
+            "dims": []
+        },
+        "vertical_field_mutual_inductance": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0293853117575016,
+            "dims": []
+        },
+        "vertical_magnetic_field": {
+            "attrs": {
+                "units": "tesla"
+            },
+            "data": 1.1441875312785694,
+            "dims": []
+        },
+        "vertical_magnetic_field_equation": {
+            "attrs": {},
+            "data": "Barr",
             "dims": []
         },
         "vertical_minor_radius": {
