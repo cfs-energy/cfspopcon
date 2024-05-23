@@ -76,26 +76,26 @@ calc_ratio_P_LH = Algorithm.from_single_function(
     return_units=dict(P_LI_thresh=ureg.MW),
     input_units=dict(
         plasma_current=ureg.MA,
-        magnetic_field_on_axis=ureg.T,   
+        magnetic_field_on_axis=ureg.T,
         surface_area=ureg.m**2,
-        average_electron_density=ureg.n19, 
+        average_electron_density=ureg.n19,
         confinement_threshold_scalar=ureg.dimensionless,
         P_LI_option=None,
     ),
 )
 def calc_LI_transition_threshold_power(
-    plasma_current: float, 
+    plasma_current: float,
     magnetic_field_on_axis: float,
     surface_area: float,
-    average_electron_density: float, 
+    average_electron_density: float,
     confinement_threshold_scalar: float = 1.0,
-    P_LI_option: str = "HubbardNF12"
+    P_LI_option: str = "HubbardNF12",
 ) -> float:
     """Calculate the threshold power (crossing the separatrix) to transition into I-mode.
 
     Note:
         "AUG" option is inspired from :cite:`ryter_i-mode_2016` and :cite:`Happel_2017`
-        "HubbardNF17" uses scaling described in Fig 6 of :cite:`hubbard_threshold_2017` 
+        "HubbardNF17" uses scaling described in Fig 6 of :cite:`hubbard_threshold_2017`
         "HubbardNF12" uses scaling described in Fig 5 of ref :cite:`hubbard_threshold_2012`
 
     Args:
@@ -111,36 +111,29 @@ def calc_LI_transition_threshold_power(
     """
 
     def _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, surface_area, confinement_threshold_scalar):
-        return float(0.14 * (average_electron_density / 10) * (magnetic_field_on_axis / 2.4) ** 0.39 * surface_area) * confinement_threshold_scalar
+        return (
+            float(0.14 * (average_electron_density / 10) * (magnetic_field_on_axis / 2.4) ** 0.39 * surface_area)
+            * confinement_threshold_scalar
+        )
 
     def _calc_HubbardNF17_LI_threshold(average_electron_density, magnetic_field_on_axis, surface_area, confinement_threshold_scalar):
-       return float(0.162 * (average_electron_density / 10) * (magnetic_field_on_axis ** 0.262) * surface_area) * confinement_threshold_scalar
+        return (
+            float(0.162 * (average_electron_density / 10) * (magnetic_field_on_axis**0.262) * surface_area) * confinement_threshold_scalar
+        )
 
     def _calc_HubbardNF12_LI_threshold(average_electron_density, plasma_current, confinement_threshold_scalar):
         return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * confinement_threshold_scalar
 
     if P_LI_option == "AUG":
-        P_LI_thresh = _calc_AUG_LI_threshold(
-            average_electron_density, 
-            magnetic_field_on_axis, 
-            surface_area, 
-            confinement_threshold_scalar
-            )
+        P_LI_thresh = _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, surface_area, confinement_threshold_scalar)
 
     elif P_LI_option == "HubbardNF17":
         P_LI_thresh = _calc_HubbardNF17_LI_threshold(
-            average_electron_density, 
-            magnetic_field_on_axis, 
-            surface_area, 
-            confinement_threshold_scalar
-            )
+            average_electron_density, magnetic_field_on_axis, surface_area, confinement_threshold_scalar
+        )
 
     elif P_LI_option == "HubbardNF12":
-        P_LI_thresh = _calc_HubbardNF12_LI_threshold(
-            average_electron_density, 
-            plasma_current, 
-            confinement_threshold_scalar
-            )
+        P_LI_thresh = _calc_HubbardNF12_LI_threshold(average_electron_density, plasma_current, confinement_threshold_scalar)
 
     return float(P_LI_thresh)
 
