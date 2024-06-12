@@ -5,6 +5,7 @@ import xarray as xr
 
 from .named_options import (
     AtomicSpecies,
+    ConfinementPowerScaling,
     LambdaQScaling,
     MomentumLossFunction,
     ProfileForm,
@@ -32,6 +33,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return MomentumLossFunction[val]
     elif key == "radiation_method":
         return RadiationMethod[val]
+    elif key == "confinement_power_scaling":
+        return ConfinementPowerScaling[val]
     else:
         # If the key doesn't match, don't convert the value
         return val
