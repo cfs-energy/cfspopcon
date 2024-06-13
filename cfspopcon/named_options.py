@@ -64,3 +64,12 @@ class LambdaQScaling(Enum):
     Brunner = auto()
     EichRegression14 = auto()
     EichRegression15 = auto()
+
+
+class ConfinementPowerScaling(Enum):
+    """Options for which confinement threshold power scaling to use."""
+
+    I_mode_AUG = auto()
+    I_mode_HubbardNF17 = auto()
+    I_mode_HubbardNF12 = auto()
+    H_mode_Martin = auto()
