@@ -14,7 +14,7 @@ from .named_options import (
 
 def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
     """Given a 'key' matching a named_option, return the corresponding Enum value."""
-    if key == "profile_form":
+    if key in ["temp_profile_form", "density_profile_form"]:
         return ProfileForm[val]
     elif key == "radiated_power_method":
         return RadiationMethod[val]
@@ -22,9 +22,7 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return AtomicSpecies[val]
     elif key == "impurities":
         return make_impurities_array(list(val.keys()), list(val.values()))
-    elif key == "core_radiator":
-        return AtomicSpecies[val]
-    elif key == "edge_impurity_species":
+    elif key in ["core_radiator", "edge_impurity_species"]:
         return AtomicSpecies[val]
     elif key == "lambda_q_scaling":
         return LambdaQScaling[val]

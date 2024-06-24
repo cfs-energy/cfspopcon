@@ -30,7 +30,6 @@ from .numerical_profile_fits import evaluate_density_and_temperature_profile_fit
     ]
 )
 def calc_peaked_profiles(
-    profile_form: ProfileForm,
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     average_ion_temp: Unitfull,
@@ -42,11 +41,12 @@ def calc_peaked_profiles(
     dilution: Unitfull,
     beta_toroidal: Unitfull,
     normalized_inverse_temp_scale_length: Unitfull,
+    density_profile_form: ProfileForm,
+    temp_profile_form: ProfileForm,
 ) -> tuple[Unitfull, ...]:
     """Calculate density peaking and the corresponding density and temperature profiles.
 
     Args:
-        profile_form: :term:`glossary link<profile_form>`
         average_electron_density: :term:`glossary link<average_electron_density>`
         average_electron_temp: :term:`glossary link<average_electron_temp>`
         average_ion_temp: :term:`glossary link<average_ion_temp>`
@@ -58,6 +58,8 @@ def calc_peaked_profiles(
         dilution: :term:`glossary link<dilution>`
         beta_toroidal: :term:`glossary link<beta_toroidal>`
         normalized_inverse_temp_scale_length: :term:`glossary link<normalized_inverse_temp_scale_length>`
+        density_profile_form: :term:`glossary link<density_profile_form>`
+        temp_profile_form: :term:`glossary link<temp_profile_form>`
 
     Returns:
     `effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`, :term:`peak_electron_density`, :term:`peak_electron_temp`, :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`, :term:`electron_temp_profile`, :term:`ion_temp_profile`
@@ -74,17 +76,20 @@ def calc_peaked_profiles(
 
     # Calculate the total fusion power by estimating density and temperature profiles and
     # using this to calculate fusion power profiles.
-    (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile,) = calc_1D_plasma_profiles(
-        profile_form,
-        average_electron_density,
-        average_electron_temp,
-        average_ion_temp,
-        electron_density_peaking,
-        ion_density_peaking,
-        temperature_peaking,
-        dilution,
-        normalized_inverse_temp_scale_length,
+    kwargs = dict(
+        average_electron_density=average_electron_density,
+        average_electron_temp=average_electron_temp,
+        average_ion_temp=average_ion_temp,
+        electron_density_peaking=electron_density_peaking,
+        ion_density_peaking=ion_density_peaking,
+        temperature_peaking=temperature_peaking,
+        dilution=dilution,
+        normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length,
     )
+
+    (rho, electron_density_profile, fuel_ion_density_profile, _, _) = calc_1D_plasma_profiles(density_profile_form, **kwargs)
+
+    (rho, _, _, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(temp_profile_form, **kwargs)
 
     return (
         effective_collisionality,
@@ -186,6 +191,8 @@ def calc_1D_plasma_profiles(
             normalized_inverse_temp_scale_length,
             npoints=npoints,
         )
+    else:
+        raise NotImplementedError(f"No implementation for ProfileForm = {profile_form} (type = {type(profile_form)})")
 
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 

@@ -175,8 +175,11 @@ Physics Glossary
   ion_temp_profile
     A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
 
-  profile_form
-    A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use.
+  temp_profile_form
+    A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use for the temperature profiles.
+  
+  density_profile_form
+    A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use for the density profiles.
 
   z_effective
     The "effective charge" of the ions, defined as :math:`\sum_j Z_j^2 n_j / n_e`.
