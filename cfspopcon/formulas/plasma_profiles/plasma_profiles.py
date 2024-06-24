@@ -1,7 +1,6 @@
 """Estimate 1D plasma profiles of density and temperature."""
 
 from typing import Optional
-from warnings import warn
 
 import numpy as np
 from numpy import float64
@@ -42,9 +41,8 @@ def calc_peaked_profiles(
     dilution: Unitfull,
     beta_toroidal: Unitfull,
     normalized_inverse_temp_scale_length: Unitfull,
-    profile_form: Optional[ProfileForm] = None,
-    density_profile_form: Optional[ProfileForm] = None,
-    temp_profile_form: Optional[ProfileForm] = None,
+    density_profile_form: ProfileForm,
+    temp_profile_form: ProfileForm,
 ) -> tuple[Unitfull, ...]:
     """Calculate density peaking and the corresponding density and temperature profiles.
 
@@ -60,7 +58,6 @@ def calc_peaked_profiles(
         dilution: :term:`glossary link<dilution>`
         beta_toroidal: :term:`glossary link<beta_toroidal>`
         normalized_inverse_temp_scale_length: :term:`glossary link<normalized_inverse_temp_scale_length>`
-        profile_form: :term:`glossary link<profile_form>`
         density_profile_form: :term:`glossary link<density_profile_form>`
         temp_profile_form: :term:`glossary link<temp_profile_form>`
 
@@ -90,20 +87,9 @@ def calc_peaked_profiles(
         normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length,
     )
 
-    if profile_form is not None:
-        if not ((temp_profile_form is None) and (density_profile_form is None)):
-            warn("Ignoring temp_profile_form and/or density_profile_form since profile_form is set.", stacklevel=3)
+    (rho, electron_density_profile, fuel_ion_density_profile, _, _) = calc_1D_plasma_profiles(density_profile_form, **kwargs)
 
-        (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(
-            profile_form, **kwargs
-        )
-    else:
-        if (temp_profile_form is None) or (density_profile_form is None):
-            raise RuntimeError("Must set both temp_profile_form and density_profile_form if not setting profile_form.")
-
-        (rho, electron_density_profile, fuel_ion_density_profile, _, _) = calc_1D_plasma_profiles(density_profile_form, **kwargs)
-
-        (rho, _, _, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(temp_profile_form, **kwargs)
+    (rho, _, _, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(temp_profile_form, **kwargs)
 
     return (
         effective_collisionality,

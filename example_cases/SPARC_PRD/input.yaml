@@ -26,11 +26,7 @@ algorithms:
   - calc_beta_total
   - calc_beta_normalized
   # Calculate peaked profiles
-  - calc_effective_collisionality
-  - calc_electron_density_peaking
-  - calc_ion_density_peaking
-  - calc_temperature_peaking
-  - calc_1D_plasma_profiles
+  - calc_peaked_profiles
   # Once we have the profiles, we can then estimate the power
   # radiated from the confined region.
   - calc_instrinsic_radiated_power_from_core
@@ -43,10 +39,7 @@ algorithms:
   - calc_extrinsic_core_radiator
   # We then recompute the profiles with the dilution due to the
   # core radiator and recompute the profiles.
-  - calc_electron_density_peaking
-  - calc_ion_density_peaking
-  - calc_temperature_peaking
-  - calc_1D_plasma_profiles
+  - calc_peaked_profiles
   # Calculate the fusion power and gain.
   - calc_fusion_power
   - calc_neutron_flux_to_walls
@@ -156,7 +149,8 @@ fusion_reaction: DTFusionHively
 heavier_fuel_species_fraction: 0.5
 
 # What sort of 1D profiles should be assumed?
-profile_form: prf
+density_profile_form: prf
+temp_profile_form: prf
 # Inverse normalized electron temp scale length a / L_Te = a / (Te / grad(Te))
 normalized_inverse_temp_scale_length: 2.5
 # Offset for the electron density peaking factor

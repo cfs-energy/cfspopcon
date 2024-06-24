@@ -14,7 +14,7 @@ from .named_options import (
 
 def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
     """Given a 'key' matching a named_option, return the corresponding Enum value."""
-    if key in ["profile_form", "temp_profile_form", "density_profile_form"]:
+    if key in ["temp_profile_form", "density_profile_form"]:
         return ProfileForm[val]
     elif key == "radiated_power_method":
         return RadiationMethod[val]

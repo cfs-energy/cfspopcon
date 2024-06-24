@@ -175,9 +175,6 @@ Physics Glossary
   ion_temp_profile
     A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
 
-  profile_form
-    A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use.
-  
   temp_profile_form
     A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use for the temperature profiles.
   

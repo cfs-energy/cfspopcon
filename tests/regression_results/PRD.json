@@ -273,6 +273,11 @@
             "data": 16.361422316376128,
             "dims": []
         },
+        "density_profile_form": {
+            "attrs": {},
+            "data": "prf",
+            "dims": []
+        },
         "dilution": {
             "attrs": {
                 "units": "dimensionless"
@@ -892,11 +897,6 @@
             "data": 19.79484837055445,
             "dims": []
         },
-        "profile_form": {
-            "attrs": {},
-            "data": "prf",
-            "dims": []
-        },
         "q_parallel": {
             "attrs": {
                 "units": "gigawatt / meter ** 2"
@@ -1084,6 +1084,11 @@
         "tau_e_scaling": {
             "attrs": {},
             "data": "ITER98y2",
+            "dims": []
+        },
+        "temp_profile_form": {
+            "attrs": {},
+            "data": "prf",
             "dims": []
         },
         "temperature_peaking": {

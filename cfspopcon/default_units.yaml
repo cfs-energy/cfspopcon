@@ -102,7 +102,6 @@ plasma_stored_energy: "MJ"
 plasma_volume: "m**3"
 poloidal_sound_larmor_radius: "mm"
 product_of_magnetic_field_and_radius: "m * T"
-profile_form: null
 density_profile_form: null
 temp_profile_form: null
 q_cylindrical: ""
