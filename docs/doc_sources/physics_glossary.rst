@@ -455,3 +455,6 @@ Physics Glossary
 
   sustainment_power_in_electron_channel
     The power in the electron channel required to maintain the electron temperature at the separatrix.
+  
+  confinement_power_scaling
+    A :class:`~cfspopcon.named_options.ConfinementPowerScaling` indicating which confinement mode power-threshold scaling to use.
