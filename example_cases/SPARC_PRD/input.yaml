@@ -18,6 +18,7 @@ algorithms:
   - calc_plasma_stored_energy
   - read_confinement_scalings
   - solve_tau_e_scaling_for_input_power
+
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -27,10 +28,13 @@ algorithms:
   - calc_beta_normalized
   # Calculate peaked profiles
   - calc_peaked_profiles
-  # Once we have the profiles, we can then estimate the power
-  # radiated from the confined region.
   - calc_instrinsic_radiated_power_from_core
   - require_P_rad_less_than_P_in
+  - calc_power_crossing_separatrix
+  - calc_LH_transition_threshold_power
+  - calc_ratio_P_LH
+  - switch_to_L_mode_confinement_below_threshold
+
   # To control the power crossing the separatrix, we can inject
   # a core radiator (high-Z species like Xenon) to intentionally
   # increase the power radiated from the core. This increases
@@ -92,8 +96,7 @@ algorithms:
   # calculations, but which are useful for characterizing operational
   # points. These can be used later when masking inaccessible operational
   # space, such as regions with f_Greenwald >~ 1.0 or where P_SOL < P_LH.
-  - calc_LH_transition_threshold_power
-  - calc_ratio_P_LH
+
   - calc_greenwald_fraction
   - calc_f_rad_core
   - calc_normalised_collisionality
