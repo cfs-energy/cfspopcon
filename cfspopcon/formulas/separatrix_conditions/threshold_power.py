@@ -60,7 +60,7 @@ def calc_LH_transition_threshold_power(
 
     if confinement_power_scaling == ConfinementPowerScaling.H_mode_Martin:
 
-        #Ryter 2014, equation 3
+        # Ryter 2014, equation 3
         neMin19 = (
             0.7
             * (plasma_current**0.34)
