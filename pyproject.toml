@@ -55,6 +55,8 @@ sphinx-copybutton = "^0.5.2"
 ruff = "^0.5"
 nbmake = "^1.5"
 nbsphinx = "^0.9"
+# Added as workaround for shhinx bibtex issue https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345
+setuptools = "^71.0.3"
 
 [tool.coverage.report]
 fail_under = 82
