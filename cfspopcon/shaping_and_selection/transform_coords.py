@@ -1,4 +1,5 @@
 """Functions to reshape xarrays."""
+
 from collections.abc import Sequence
 from typing import Callable, Optional, Union
 

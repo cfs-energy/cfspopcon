@@ -1,4 +1,5 @@
 """Estimate the density peaking based on scaling from C. Angioni."""
+
 import numpy as np
 import xarray as xr
 

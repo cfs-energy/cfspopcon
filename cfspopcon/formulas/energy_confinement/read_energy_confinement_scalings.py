@@ -1,4 +1,5 @@
 """Read in information about various energy confinement scalings from the energy_confinement_scalings.yaml file."""
+
 from __future__ import annotations
 
 from importlib.resources import as_file, files

@@ -1,4 +1,5 @@
 """Rearrange a tau_e scaling to give a value for the input power, given the stored energy."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

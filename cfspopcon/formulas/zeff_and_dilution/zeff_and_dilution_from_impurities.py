@@ -1,4 +1,5 @@
 """Calculate the impact of core impurities on z_effective and dilution."""
+
 import xarray as xr
 
 from ...algorithm_class import Algorithm

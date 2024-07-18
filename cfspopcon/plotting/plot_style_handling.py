@@ -1,4 +1,5 @@
 """Handling of yaml plot configuration."""
+
 from pathlib import Path
 from typing import Any, Union
 

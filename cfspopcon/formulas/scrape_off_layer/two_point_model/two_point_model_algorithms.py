@@ -1,4 +1,5 @@
 """Algorithms for different formulations of the extended two point model."""
+
 from typing import Union
 
 import xarray as xr
@@ -48,7 +49,12 @@ def two_point_model_fixed_fpow(
     Returns:
         :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
     """
-    (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
+    (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+    ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,
@@ -106,7 +112,12 @@ def two_point_model_fixed_qpart(
     """
     SOL_power_loss_fraction = (1.0 - target_q_parallel / q_parallel).clip(min=0.0, max=1.0)
 
-    (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux,) = solve_two_point_model(
+    (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+    ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         parallel_heat_flux_density=q_parallel,
         parallel_connection_length=parallel_connection_length,

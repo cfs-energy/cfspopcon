@@ -1,4 +1,5 @@
 """Compute all terms in the two-point-model for a fixed SOL power loss fraction."""
+
 from typing import Union
 
 import numpy as np

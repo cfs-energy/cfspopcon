@@ -1,4 +1,5 @@
 """Routines relating the plasma current to an analytical estimate of the 95% safety factor qstar."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm
@@ -109,9 +110,7 @@ def calc_cylindrical_edge_safety_factor(
 
     Gives a slightly different result to our standard q_star calculation.
     """
-    shaping_correction = np.sqrt(
-        (1.0 + elongation_psi95**2 * (1.0 + 2.0 * triangularity_psi95**2 - 1.2 * triangularity_psi95**3)) / 2.0
-    )
+    shaping_correction = np.sqrt((1.0 + elongation_psi95**2 * (1.0 + 2.0 * triangularity_psi95**2 - 1.2 * triangularity_psi95**3)) / 2.0)
 
     poloidal_circumference = 2.0 * np.pi * minor_radius * shaping_correction
 

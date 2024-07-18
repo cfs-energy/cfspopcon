@@ -1,4 +1,5 @@
 """Physics calculations & lumped-parameter models."""
+
 from importlib.metadata import metadata
 
 __version__ = metadata(__package__)["Version"]

@@ -1,4 +1,5 @@
 """Lengyel model to compute the edge impurity concentration."""
+
 from typing import Callable
 
 import numpy as np

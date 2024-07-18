@@ -1,4 +1,5 @@
 """Routines to extract the values of an array along a line of points (typically a contour, but interpolate_onto_line is flexible)."""
+
 import xarray as xr
 from contourpy import contour_generator
 from scipy.interpolate import RegularGridInterpolator  # type:ignore[import-untyped]

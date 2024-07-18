@@ -1,4 +1,5 @@
 """Data for different fusion reactions."""
+
 from __future__ import annotations
 
 from typing import ClassVar
@@ -138,9 +139,7 @@ class DDFusionBoschHale(FusionReaction):
     @staticmethod
     @wraps_ufunc(
         input_units=dict(ion_temp=ureg.keV),
-        return_units=dict(
-            sigmav_combined=ureg.cm**3 / ureg.s, sigmav_DD_to_pT=ureg.cm**3 / ureg.s, sigmav_DD_to_nHe3=ureg.cm**3 / ureg.s
-        ),
+        return_units=dict(sigmav_combined=ureg.cm**3 / ureg.s, sigmav_DD_to_pT=ureg.cm**3 / ureg.s, sigmav_DD_to_nHe3=ureg.cm**3 / ureg.s),
         output_core_dims=[(), (), ()],
     )
     def calc_rate_coefficient(ion_temp: float) -> tuple[float, float, float]:
@@ -269,9 +268,7 @@ class DDFusionHively(DDFusionBoschHale):
     @staticmethod
     @wraps_ufunc(
         input_units=dict(ion_temp=ureg.keV),
-        return_units=dict(
-            sigmav_combined=ureg.cm**3 / ureg.s, sigmav_DD_to_pT=ureg.cm**3 / ureg.s, sigmav_DD_to_nHe3=ureg.cm**3 / ureg.s
-        ),
+        return_units=dict(sigmav_combined=ureg.cm**3 / ureg.s, sigmav_DD_to_pT=ureg.cm**3 / ureg.s, sigmav_DD_to_nHe3=ureg.cm**3 / ureg.s),
         output_core_dims=[(), (), ()],
     )
     def calc_rate_coefficient(ion_temp: float) -> tuple[float, float, float]:
@@ -305,20 +302,10 @@ class DDFusionHively(DDFusionBoschHale):
         r_2 = 0.3725
         # Ti in units of keV, sigmav in units of cm^3/s
         sigmav_DD_to_pT = np.exp(
-            a_1[0] / ion_temp**r_1
-            + a_1[1]
-            + a_1[2] * ion_temp
-            + a_1[3] * ion_temp**2.0
-            + a_1[4] * ion_temp**3.0
-            + a_1[5] * ion_temp**4.0
+            a_1[0] / ion_temp**r_1 + a_1[1] + a_1[2] * ion_temp + a_1[3] * ion_temp**2.0 + a_1[4] * ion_temp**3.0 + a_1[5] * ion_temp**4.0
         )
         sigmav_DD_to_nHe3 = np.exp(
-            a_2[0] / ion_temp**r_2
-            + a_2[1]
-            + a_2[2] * ion_temp
-            + a_2[3] * ion_temp**2.0
-            + a_2[4] * ion_temp**3.0
-            + a_2[5] * ion_temp**4.0
+            a_2[0] / ion_temp**r_2 + a_2[1] + a_2[2] * ion_temp + a_2[3] * ion_temp**2.0 + a_2[4] * ion_temp**3.0 + a_2[5] * ion_temp**4.0
         )
         sigmav_combined = sigmav_DD_to_pT + sigmav_DD_to_nHe3
         return sigmav_combined, sigmav_DD_to_pT, sigmav_DD_to_nHe3

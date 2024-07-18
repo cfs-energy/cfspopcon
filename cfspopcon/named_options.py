@@ -1,4 +1,5 @@
 """Enumerators to constrain options for functions."""
+
 from enum import Enum, auto
 
 

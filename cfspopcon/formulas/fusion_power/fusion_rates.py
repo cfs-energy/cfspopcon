@@ -1,6 +1,5 @@
 """Calculate fusion power and corresponding neutron wall loading."""
 
-
 import xarray as xr
 from numpy import float64
 from numpy.typing import NDArray

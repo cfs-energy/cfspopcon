@@ -1,4 +1,5 @@
 """Calculate the power crossing the separatrix."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

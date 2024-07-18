@@ -1,4 +1,5 @@
 """Routines to calculate the separatrix density."""
+
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull
 

@@ -1,4 +1,5 @@
 """Set up the pint library for unit handling."""
+
 import warnings
 from collections.abc import Callable
 from functools import wraps
@@ -45,13 +46,11 @@ def suppress_downcast_warning(func: Callable[Params, Ret]) -> Callable[Params, R
 
 
 @overload
-def convert_units(array: xr.DataArray, units: Union[str, pint.Unit]) -> xr.DataArray:
-    ...
+def convert_units(array: xr.DataArray, units: Union[str, pint.Unit]) -> xr.DataArray: ...
 
 
 @overload
-def convert_units(array: pint.Quantity, units: Union[str, pint.Unit]) -> pint.Quantity:
-    ...
+def convert_units(array: pint.Quantity, units: Union[str, pint.Unit]) -> pint.Quantity: ...
 
 
 def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Union[xr.DataArray, pint.Quantity]:

@@ -1,4 +1,5 @@
 """Calculate the Greenwald density limit."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

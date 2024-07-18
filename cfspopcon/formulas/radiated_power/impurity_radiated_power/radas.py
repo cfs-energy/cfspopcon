@@ -1,4 +1,5 @@
 """Calculate the impurity radiated power using the radas atomic_data."""
+
 import numpy as np
 from numpy import float64
 from numpy.typing import NDArray

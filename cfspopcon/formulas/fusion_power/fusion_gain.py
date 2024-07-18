@@ -1,4 +1,5 @@
 """Calculate the fusion gain factor."""
+
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull, ureg
 

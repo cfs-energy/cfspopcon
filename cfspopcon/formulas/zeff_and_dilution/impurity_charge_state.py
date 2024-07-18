@@ -1,4 +1,5 @@
 """Calculate the mean charge state of an impurity for given plasma conditions."""
+
 import numpy as np
 
 from ...named_options import AtomicSpecies

@@ -1,4 +1,5 @@
 """Defines the wraps_ufunc decorator used to perform unit conversions and dimension handling."""
+
 import functools
 import warnings
 from collections.abc import Callable, Mapping, Sequence, Set
@@ -263,7 +264,7 @@ def _make_new_sig(
     units_list = list(return_units.values())
 
     # extract the types from the tuple
-    if isinstance(ret_annotation, GenericAlias) and ret_annotation.__origin__ == tuple:
+    if isinstance(ret_annotation, GenericAlias) and ret_annotation.__origin__ is tuple:
         old_types: list[Any] = list(ret_annotation.__args__)
     elif ret_annotation == Parameter.empty:
         old_types = [Any for _ in range(len(units_list))]

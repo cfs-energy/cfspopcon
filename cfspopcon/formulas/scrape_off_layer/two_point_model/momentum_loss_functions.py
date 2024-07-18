@@ -2,6 +2,7 @@
 
 See Figure 15 of :cite:`stangeby_2018`.
 """
+
 import numpy as np
 
 from ....named_options import MomentumLossFunction

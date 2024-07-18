@@ -1,4 +1,5 @@
 """Module defining the AtomicData class, used for interfacing with radas files."""
+
 from pathlib import Path
 from typing import Optional, Union
 

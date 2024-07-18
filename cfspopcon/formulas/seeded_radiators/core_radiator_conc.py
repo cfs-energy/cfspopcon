@@ -1,4 +1,5 @@
 """Calculate the concentration and effect of a core radiator required to achieve above a defined core radiative fraction."""
+
 import numpy as np
 import xarray as xr
 
@@ -67,9 +68,11 @@ def calc_extrinsic_core_radiator(
     P_radiation = np.maximum(minimum_core_radiated_fraction * P_in, P_radiation)
 
     P_rad_per_core_radiator = radiated_power_scalar * radiated_power.impurity_radiated_power.calc_impurity_radiated_power(
-        radiated_power_method=named_options.RadiationMethod.Radas
-        if radiated_power_method == named_options.RadiationMethod.Inherent
-        else radiated_power_method,
+        radiated_power_method=(
+            named_options.RadiationMethod.Radas
+            if radiated_power_method == named_options.RadiationMethod.Inherent
+            else radiated_power_method
+        ),
         rho=rho,
         electron_temp_profile=electron_temp_profile,
         electron_density_profile=electron_density_profile,

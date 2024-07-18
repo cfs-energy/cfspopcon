@@ -1,4 +1,5 @@
 """Functions for saving results to file and loading those files."""
+
 import json
 from pathlib import Path
 from typing import Any, Literal

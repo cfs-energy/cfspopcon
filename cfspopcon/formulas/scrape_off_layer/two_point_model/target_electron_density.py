@@ -1,4 +1,5 @@
 """Routines to calculate the target electron density, following the 2-point-model method of Stangeby, PPCF 2018."""
+
 from typing import Union
 
 import xarray as xr
@@ -38,10 +39,7 @@ def calc_target_electron_density_basic(
         target_electron_density_basic [m^-3]
     """
     return (
-        sheath_heat_transmission_factor**2
-        / (32.0 * fuel_average_mass_number)
-        * upstream_total_pressure**3
-        / parallel_heat_flux_density**2
+        sheath_heat_transmission_factor**2 / (32.0 * fuel_average_mass_number) * upstream_total_pressure**3 / parallel_heat_flux_density**2
     )
 
 

@@ -1,4 +1,5 @@
 """Calculate the normalized collisionality."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

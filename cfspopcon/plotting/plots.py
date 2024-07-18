@@ -1,4 +1,5 @@
 """Plot creation functions."""
+
 from pathlib import Path
 from typing import Optional
 

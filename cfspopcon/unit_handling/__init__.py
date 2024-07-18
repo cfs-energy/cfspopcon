@@ -1,4 +1,5 @@
 """Uses pint and xarray to enable unit-handling over multi-dimensional arrays."""
+
 from typing import Union
 
 import xarray as xr

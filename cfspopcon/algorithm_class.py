@@ -1,4 +1,5 @@
 """Defines a class for different POPCON algorithms."""
+
 from __future__ import annotations
 
 import inspect

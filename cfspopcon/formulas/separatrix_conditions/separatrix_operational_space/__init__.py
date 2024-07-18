@@ -1,4 +1,5 @@
 """The separatrix operational space, as defined in :cite:`Eich_2021`."""
+
 from .density_limit import calc_SepOS_L_mode_density_limit
 from .LH_transition import calc_SepOS_LH_transition
 from .MHD_limit import calc_SepOS_ideal_MHD_limit

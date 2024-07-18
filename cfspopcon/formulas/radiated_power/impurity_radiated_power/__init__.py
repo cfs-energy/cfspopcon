@@ -1,4 +1,5 @@
 """Calculate the radiated power due to fuel and impurity species."""
+
 from .mavrin_coronal import calc_impurity_radiated_power_mavrin_coronal
 from .mavrin_noncoronal import calc_impurity_radiated_power_mavrin_noncoronal
 from .post_and_jensen import calc_impurity_radiated_power_post_and_jensen
