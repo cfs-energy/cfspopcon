@@ -37,7 +37,7 @@ def calc_impurity_charge_state(
     average_electron_temp, average_electron_density = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
         impurity_species,
         average_electron_temp,
-        average_electron_density,  # type:ignore[arg-type]
+        average_electron_density,
     )
     interpolator = atomic_data.coronal_Z_interpolators[impurity_species]
     interpolated_values = np.power(10, interpolator((np.log10(average_electron_temp), np.log10(average_electron_density))))

@@ -236,14 +236,14 @@ class AtomicData:
 
     def eval_interpolator(
         self,
-        electron_density: Union[xr.DataArray, np.ndarray],
-        electron_temp: Union[xr.DataArray, np.ndarray],
+        electron_density: Union[xr.DataArray, np.ndarray, float],
+        electron_temp: Union[xr.DataArray, np.ndarray, float],
         kind: int,
         species: Union[str, AtomicSpecies],
         ne_tau: float = np.inf,
         allow_extrapolation: bool = False,
         grid: bool = True,
-        coords: Optional[dict[str, np.ndarray]] = None,
+        coords: Optional[dict[str, Union[xr.DataArray, np.ndarray, float]]] = None,
     ) -> xr.DataArray:
         """Evaluates the interpolator for given electron densities and temperatures, returning interpolated values.
 
@@ -276,7 +276,7 @@ class AtomicData:
         if coords is None:
             coords = dict(
                 dim_electron_density=electron_density,
-                dim_electron_temp=electron_temp,  # type: ignore[dict-item]
+                dim_electron_temp=electron_temp,
             )  # Prepare coordinates for the result DataArray
 
         # Handle optional extrapolation
@@ -299,9 +299,9 @@ class AtomicData:
     def nearest_neighbour_off_grid(
         self,
         species: AtomicSpecies,
-        electron_temp: Union[xr.DataArray, np.ndarray],
-        electron_density: Union[xr.DataArray, np.ndarray],
-    ) -> tuple[Union[xr.DataArray, np.ndarray], Union[xr.DataArray, np.ndarray]]:
+        electron_temp: Union[xr.DataArray, np.ndarray, float],
+        electron_density: Union[xr.DataArray, np.ndarray, float],
+    ) -> tuple[Union[xr.DataArray, np.ndarray, float], Union[xr.DataArray, np.ndarray, float]]:
         """Replaces off-grid points with their nearest on-grid neighbour."""
         max_temp, min_temp, max_density, min_density = self.grid_limits[species]
         electron_temp = np.minimum(electron_temp, max_temp)
@@ -313,15 +313,15 @@ class AtomicData:
     def assert_on_grid(
         self,
         species: AtomicSpecies,
-        electron_temp: Union[xr.DataArray, np.ndarray],
-        electron_density: Union[xr.DataArray, np.ndarray],
+        electron_temp: Union[xr.DataArray, np.ndarray, float],
+        electron_density: Union[xr.DataArray, np.ndarray, float],
     ) -> None:
         """Raises an AssertionError if any points are off-grid."""
         max_temp, min_temp, max_density, min_density = self.grid_limits[species]
-        assert electron_temp.max() <= max_temp, f"{electron_temp.max()} > {max_temp}"
-        assert electron_temp.min() >= min_temp, f"{electron_temp.min()} < {min_temp}"
-        assert electron_density.max() <= max_density, f"{electron_density.max()} > {max_density}"
-        assert electron_density.min() >= min_density, f"{electron_density.min()} < {min_density}"
+        assert np.max(electron_temp) <= max_temp, f"{np.max(electron_temp)} > {max_temp}"
+        assert np.min(electron_temp) >= min_temp, f"{np.min(electron_temp)} < {min_temp}"
+        assert np.max(electron_density) <= max_density, f"{np.max(electron_density)} > {max_density}"
+        assert np.min(electron_density) >= min_density, f"{np.min(electron_density)} < {min_density}"
 
 
 @Algorithm.register_algorithm(return_keys=["atomic_data"])
