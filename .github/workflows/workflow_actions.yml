@@ -60,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']  # should test the versions we allow for in pyproject.toml
+        python-version: ['3.9', '3.10', '3.11', '3.12']  # should test the versions we allow for in pyproject.toml
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
