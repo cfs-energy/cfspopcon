@@ -22,13 +22,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Poetry
         run: curl -sSL https://install.python-poetry.org | python - --version 1.8.2
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'poetry'
@@ -38,7 +38,7 @@ jobs:
 
       - name: Cache radas results
         id: radas
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./radas_dir
           key: radas-${{ hashFiles('poetry.lock')}}
@@ -48,7 +48,7 @@ jobs:
         run: poetry run radas
       
       - name: Upload radas artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: radas_dir
           path: ./radas_dir
@@ -65,7 +65,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install pandoc
         run: sudo apt-get update && sudo apt-get install pandoc
@@ -74,7 +74,7 @@ jobs:
         run: curl -sSL https://install.python-poetry.org | python - --version 1.8.2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'poetry'
@@ -82,7 +82,7 @@ jobs:
       - name: Setup
         run: poetry install
 
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v4
         id: radas
         with:
           path: ./radas_dir
@@ -101,7 +101,7 @@ jobs:
           MPLBACKEND=Agg poetry run pytest --no-cov tests/test_regression_against_cases.py
       
       - name: Upload regression results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: regression_results
@@ -135,7 +135,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Poetry
         run: curl -sSL https://install.python-poetry.org | python - --version 1.8.2
@@ -143,7 +143,7 @@ jobs:
       - name: Poetry build
         run: poetry build
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: pypi-build
           path: ./dist
@@ -158,7 +158,7 @@ jobs:
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
