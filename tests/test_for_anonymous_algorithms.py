@@ -4,7 +4,6 @@ from importlib import import_module
 
 
 def import_all_submodules(importable, module, prefix):
-
     for module in module.__all__:
         prefix = f"cfspopcon.formulas.{module}"
         importable.append(module)
@@ -17,13 +16,11 @@ def import_all_submodules(importable, module, prefix):
 
 
 def test_for_anonymous_algorithms():
-
     importable = []
     import_all_submodules(importable, cfspopcon.formulas, "cfspopcon.formulas")
 
     not_found = 0
     for name, _ in Algorithm.instances.items():
-
         if name not in importable:
             print(f"Cannot import {name} from cfspopcon.formulas. Algorithms must be importable.")
             not_found += 1

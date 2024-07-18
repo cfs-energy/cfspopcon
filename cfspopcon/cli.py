@@ -1,6 +1,7 @@
 #!.venv/bin/python
 # Run this script from the repository directory.
 """CLI for cfspopcon."""
+
 from pathlib import Path
 
 import click

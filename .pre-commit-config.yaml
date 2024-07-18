@@ -9,15 +9,15 @@ repos:
         exclude: ".*getting_started.ipynb"
 -   repo: local
     hooks:
-      - id: black
-        name: Black
-        entry: poetry run black
+      - id: ruff_format
+        name: ruff_format 
+        entry: poetry run ruff format
         language: system
         types: [python]
 -   repo: local
     hooks:
-      - id: ruff
-        name: ruff
+      - id: ruff_check
+        name: ruff_check
         entry: poetry run ruff check
         language: system
         types: [python]

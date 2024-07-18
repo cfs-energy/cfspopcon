@@ -165,7 +165,6 @@ class Algorithm:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""  # noqa: D402
 
         def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
-
             Algorithm.from_single_function(
                 func, return_keys=return_keys, name=name if name is not None else func.__name__, skip_unit_conversion=skip_unit_conversion
             )

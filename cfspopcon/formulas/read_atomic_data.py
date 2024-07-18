@@ -275,7 +275,8 @@ class AtomicData:
 
         if coords is None:
             coords = dict(
-                dim_electron_density=electron_density, dim_electron_temp=electron_temp  # type: ignore[dict-item]
+                dim_electron_density=electron_density,
+                dim_electron_temp=electron_temp,  # type: ignore[dict-item]
             )  # Prepare coordinates for the result DataArray
 
         # Handle optional extrapolation

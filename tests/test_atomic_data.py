@@ -33,7 +33,6 @@ def test_key_to_enum(atomic_data):
 
 
 def test_eval_interpolator(atomic_data):
-
     species = "helium"
     species = atomic_data.key_to_enum(species)
     kind = AtomicData.NoncoronalLz
