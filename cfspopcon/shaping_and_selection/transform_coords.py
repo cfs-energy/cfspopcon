@@ -80,9 +80,12 @@ def interpolate_array_onto_new_coords(
     """
     coords, coord_spacing = dict(), dict()
     for key, coord_array in new_coords.items():
+        coord_array_min = magnitude(coord_array.min()).item()  # type:ignore[union-attr]
+        coord_array_max = magnitude(coord_array.max()).item()  # type:ignore[union-attr]
+
         coords[key], coord_spacing[key] = np.linspace(
-            start=coord_min.get(key, magnitude(coord_array.min())) if coord_min else magnitude(coord_array.min()),
-            stop=coord_max.get(key, magnitude(coord_array.max())) if coord_max else magnitude(coord_array.max()),
+            start=coord_min.get(key, coord_array_min) if coord_min else coord_array_min,
+            stop=coord_max.get(key, coord_array_max) if coord_max else coord_array_max,
             num=resolution.get(key, default_resolution) if resolution else default_resolution,
             retstep=True,
         )
