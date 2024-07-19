@@ -55,3 +55,4 @@ Jupyter notebooks provide a convenient way of demonstrating and documenting feat
 .. toctree::
 
   separatrix_operational_space
+  time_independent_inductance_and_fluxes

@@ -93,7 +93,7 @@ jobs:
         run: exit 1
 
       - name: Tests
-        run: MPLBACKEND=Agg poetry run pytest tests --nbmake example_cases
+        run: MPLBACKEND=Agg poetry run pytest tests --nbmake example_cases -m "not docs"
 
       - name: Tests with new regression results
         run: |

@@ -74,3 +74,22 @@ class ConfinementPowerScaling(Enum):
     I_mode_HubbardNF17 = auto()
     I_mode_HubbardNF12 = auto()
     H_mode_Martin = auto()
+
+
+class VertMagneticFieldEq(Enum):
+    """Vertical magnetic field equation from various papers.
+
+    NOTE: the choice of Barr vs. Mitarai also affects invmu_0_dLedR and the vertical_magnetic_field_mutual_inductance.
+    """
+
+    Mit_and_Taka_Eq13 = auto()
+    Barr = auto()
+    Jean = auto()
+    MagneticFusionEnergyFormulary = auto()
+
+
+class SurfaceInductanceCoeffs(Enum):
+    """Coefficients to calculate external inductance components."""
+
+    Hirshman = auto()
+    Barr = auto()

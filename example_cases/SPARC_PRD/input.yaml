@@ -54,6 +54,22 @@ algorithms:
   - calc_loop_voltage
   - calc_ohmic_power
   - calc_auxillary_power
+  # We compute the inductances and then flux to get the max_flux_for_flattop
+  - calc_elongation_at_psi95_from_areal_elongation
+  - calc_cylindrical_edge_safety_factor
+  - calc_internal_inductivity
+  - calc_internal_inductance_for_cylindrical
+  - calc_external_inductance
+  - calc_vertical_field_mutual_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+  - calc_internal_flux
+  - calc_external_flux
+  - calc_resistive_flux
+  - calc_poloidal_field_flux
+  - calc_flux_needed_from_solenoid_over_rampup
+  - calc_max_flattop_duration
+  - calc_breakdown_flux_consumption
   # Once we have the power input into and radiated from the confined
   # region, we can determine the power crossing the separatrix. We use
   # a scaling for lambda_q to calculate a corresponding q_parallel, and
@@ -134,6 +150,8 @@ inverse_aspect_ratio: 0.3081
 areal_elongation: 1.75
 # Ratio of separatrix_elongation to kappa_A
 elongation_ratio_sep_to_areal: 1.125
+# Ratio of kappaA / kappa95
+elongation_ratio_areal_to_psi95: 1.025
 # Triangularity at rho_pol = 0.95
 triangularity_psi95: 0.3
 # Ratio of separatrix_triangularity to delta_95
@@ -208,3 +226,14 @@ edge_impurity_species: Argon
 lengyel_overestimation_factor: 4.3
 # Ratio of edge impurity concentration in the edge to in the core (c_edge / c_core)
 edge_impurity_enrichment: 5.0
+
+# What set of fitting coefficients for the surface inductance?
+surface_inductance_coefficients: Barr
+# How much flux is availble from the CS for ramp-up and flattop? [Wb]
+total_flux_available_from_CS: 35
+# What is the scaling law factor for resistive flux consumption over the ramp-up?
+ejima_coefficient: 0.6
+# safety-factor on axis
+safety_factor_on_axis: 1
+# Which vertical magnetic field equation based on toroidal force balance?
+vertical_magnetic_field_equation: Barr
