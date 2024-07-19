@@ -2,6 +2,7 @@
 # Run this script from the repository directory.
 """CLI for cfspopcon."""
 
+import warnings
 from pathlib import Path
 
 import click
@@ -12,6 +13,7 @@ from ipdb import launch_ipdb_on_exception  # type:ignore[import-untyped]
 from cfspopcon import file_io
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.plotting import make_plot, read_plot_style
+from cfspopcon.unit_handling import UnitStrippedWarning
 
 
 @click.command()
@@ -31,7 +33,9 @@ def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, 
         run_popcon(case, show, cli_args)
     else:
         with launch_ipdb_on_exception():
-            run_popcon(case, show, cli_args)
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", category=UnitStrippedWarning)
+                run_popcon(case, show, cli_args)
 
 
 @click.command()

@@ -8,7 +8,10 @@ from ...unit_handling import Unitfull
 
 @Algorithm.register_algorithm(return_keys=["plasma_volume"])
 def calc_plasma_volume(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull) -> Unitfull:
-    """Calculate the plasma volume inside the last-closed-flux-surface.
+    """Calculate the plasma volume inside an up-down symmetrical last-closed-flux-surface.
+
+    Geometric formulas for system codes including the effect of negative triangularity :cite: `sauter`
+    NOTE: delta=1.0 is assumed since this was found to give a closer match to 2D equilibria from FreeGS.
 
     Args:
         major_radius: [m] :term:`glossary link<major_radius>`
@@ -45,10 +48,32 @@ def calc_plasma_surface_area(major_radius: Unitfull, inverse_aspect_ratio: Unitf
     )
 
 
+@Algorithm.register_algorithm(return_keys=["poloidal_circumference"])
+def calc_plasma_poloidal_circumference(minor_radius: Unitfull, areal_elongation: Unitfull) -> Unitfull:
+    """Calculate the plasma poloidal circumference at the last-closed-flux-surface.
+
+    Geometric formulas for system codes including the effect of negative triangularity :cite: `sauter`
+
+    Args:
+        minor_radius: [m] :term:`glossary link<minor_radius>`
+        areal_elongation: [~] :term:`glossary link<areal_elongation>`
+
+    Returns:
+        :term:`poloidal_circumference` [m]
+    """
+    return 2 * np.pi * minor_radius * (1 + 0.55 * (areal_elongation - 1))
+
+
 calc_areal_elongation_from_elongation_at_psi95 = Algorithm.from_single_function(
     func=lambda elongation_psi95, elongation_ratio_areal_to_psi95: elongation_psi95 * elongation_ratio_areal_to_psi95,
     return_keys=["areal_elongation"],
     name="calc_areal_elongation_from_elongation_at_psi95",
+)
+
+calc_elongation_at_psi95_from_areal_elongation = Algorithm.from_single_function(
+    func=lambda areal_elongation, elongation_ratio_areal_to_psi95: areal_elongation / elongation_ratio_areal_to_psi95,
+    return_keys=["elongation_psi95"],
+    name="calc_elongation_at_psi95_from_areal_elongation",
 )
 
 calc_separatrix_elongation_from_areal_elongation = Algorithm.from_single_function(

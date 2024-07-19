@@ -43,14 +43,14 @@
             "attrs": {
                 "units": "megawatt * tesla / meter"
             },
-            "data": 168.651286658729,
+            "data": 168.65128665872916,
             "dims": []
         },
         "PBpRnSq": {
             "attrs": {
                 "units": "megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter"
             },
-            "data": 8.201198985331366,
+            "data": 8.201198985331375,
             "dims": []
         },
         "P_LH_thresh": {
@@ -113,7 +113,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 1.201621870421675,
+            "data": 1.2016218704216755,
             "dims": []
         },
         "P_radiated_by_core_radiator": {
@@ -127,14 +127,14 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 5.888665804510131,
+            "data": 5.888665804510104,
             "dims": []
         },
         "P_sol": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 25.57417051792202,
+            "data": 25.57417051792205,
             "dims": []
         },
         "Q": {
@@ -226,6 +226,13 @@
             "data": 0.08515124438705672,
             "dims": []
         },
+        "breakdown_flux_consumption": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 0.12840000000000001,
+            "dims": []
+        },
         "confinement_threshold_scalar": {
             "attrs": {
                 "units": "dimensionless"
@@ -244,7 +251,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.18716258585726014,
+            "data": 0.1871625858572593,
             "dims": []
         },
         "core_radiator": {
@@ -256,7 +263,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 45.811693483863834,
+            "data": 45.811693483863785,
             "dims": []
         },
         "core_radiator_concentration": {
@@ -270,7 +277,14 @@
             "attrs": {
                 "units": "second"
             },
-            "data": 16.361422316376128,
+            "data": 16.361422316376125,
+            "dims": []
+        },
+        "cylindrical_safety_factor": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.675118549054515,
             "dims": []
         },
         "density_profile_form": {
@@ -296,14 +310,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.08439527531343577,
+            "data": 0.08439527531343582,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.016879055062687155,
+            "data": 0.016879055062687165,
             "dims": []
         },
         "edge_impurity_enrichment": {
@@ -322,7 +336,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.07443199888196231,
+            "data": 0.07443199888196234,
+            "dims": []
+        },
+        "ejima_coefficient": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.6,
             "dims": []
         },
         "electron_density_peaking": {
@@ -459,6 +480,20 @@
                 "dim_rho"
             ]
         },
+        "elongation_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.707317073170732,
+            "dims": []
+        },
+        "elongation_ratio_areal_to_psi95": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.025,
+            "dims": []
+        },
         "elongation_ratio_sep_to_areal": {
             "attrs": {
                 "units": "dimensionless"
@@ -473,6 +508,20 @@
             "data": 0.6623169006550257,
             "dims": []
         },
+        "external_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 23.59919917115023,
+            "dims": []
+        },
+        "external_inductance": {
+            "attrs": {
+                "units": "henry"
+            },
+            "data": 2.7125516288678424e-06,
+            "dims": []
+        },
         "f_shaping": {
             "attrs": {
                 "units": "dimensionless"
@@ -485,6 +534,13 @@
                 "units": "dimensionless"
             },
             "data": 3.214648364176006,
+            "dims": []
+        },
+        "flux_needed_from_CS_over_rampup": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 34.64464918777696,
             "dims": []
         },
         "fraction_of_P_SOL_to_divertor": {
@@ -601,7 +657,7 @@
             "data": [
                 0.06,
                 0.0031,
-                0.016879055062687155,
+                0.016879055062687165,
                 1.5e-05
             ],
             "dims": [
@@ -614,9 +670,9 @@
             },
             "data": [
                 2.0,
-                7.999462489512545,
+                7.999462489512549,
                 NaN,
-                58.38308823843492
+                58.38308823843495
             ],
             "dims": [
                 "dim_species"
@@ -629,11 +685,39 @@
             "data": 7959184.1738326065,
             "dims": []
         },
+        "internal_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 11.574036082512393,
+            "dims": []
+        },
+        "internal_inductance": {
+            "attrs": {
+                "units": "henry"
+            },
+            "data": 1.3303489750014244e-06,
+            "dims": []
+        },
+        "internal_inductivity": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.1444952177978316,
+            "dims": []
+        },
         "inverse_aspect_ratio": {
             "attrs": {
                 "units": "dimensionless"
             },
             "data": 0.3081,
+            "dims": []
+        },
+        "invmu_0_dLedR": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 2.163372412583668,
             "dims": []
         },
         "ion_density_peaking": {
@@ -754,7 +838,7 @@
             "attrs": {
                 "units": "volt"
             },
-            "data": 0.15097299474137624,
+            "data": 0.1509729947413763,
             "dims": []
         },
         "magnetic_field_on_axis": {
@@ -769,6 +853,13 @@
                 "units": "meter"
             },
             "data": 1.85,
+            "dims": []
+        },
+        "max_flattop_duration": {
+            "attrs": {
+                "units": "second"
+            },
+            "data": 2.3537375861939362,
             "dims": []
         },
         "minimum_core_radiated_fraction": {
@@ -789,7 +880,7 @@
             "attrs": {
                 "units": "meter * ohm"
             },
-            "data": 2.914700219539591e-09,
+            "data": 2.9147002195395917e-09,
             "dims": []
         },
         "nesep_over_nebar": {
@@ -831,7 +922,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.02374933951284897,
+            "data": 0.023749339512848973,
             "dims": []
         },
         "parallel_connection_length": {
@@ -897,18 +988,25 @@
             "data": 19.79484837055445,
             "dims": []
         },
+        "poloidal_field_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 12.663930174827374,
+            "dims": []
+        },
         "q_parallel": {
             "attrs": {
                 "units": "gigawatt / meter ** 2"
             },
-            "data": 11.452217172785142,
+            "data": 11.452217172785154,
             "dims": []
         },
         "q_perp": {
             "attrs": {
                 "units": "megawatt / meter ** 2"
             },
-            "data": 5937.516785354856,
+            "data": 5937.516785354863,
             "dims": []
         },
         "q_star": {
@@ -934,7 +1032,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.0398608412936936,
+            "data": 1.0398608412936947,
+            "dims": []
+        },
+        "resistive_flux": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 12.135344108941705,
             "dims": []
         },
         "rho": {
@@ -1004,6 +1109,13 @@
             "data": 0.0022127891680210027,
             "dims": []
         },
+        "safety_factor_on_axis": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1,
+            "dims": []
+        },
         "separatrix_electron_density": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
@@ -1015,7 +1127,7 @@
             "attrs": {
                 "units": "electron_volt"
             },
-            "data": 299.0648656105671,
+            "data": 299.0648656105672,
             "dims": []
         },
         "separatrix_elongation": {
@@ -1053,11 +1165,16 @@
             "data": 55.536257947812175,
             "dims": []
         },
+        "surface_inductance_coefficients": {
+            "attrs": {},
+            "data": "Barr",
+            "dims": []
+        },
         "target_electron_density": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },
-            "data": 44.85972984158249,
+            "data": 44.85972984158246,
             "dims": []
         },
         "target_electron_flux": {
@@ -1078,7 +1195,7 @@
             "attrs": {
                 "units": "gigawatt / meter ** 2"
             },
-            "data": 0.4128534409629233,
+            "data": 0.41285344096292376,
             "dims": []
         },
         "tau_e_scaling": {
@@ -1105,6 +1222,13 @@
             "data": 0.6974,
             "dims": []
         },
+        "total_flux_available_from_CS": {
+            "attrs": {
+                "units": "weber"
+            },
+            "data": 35,
+            "dims": []
+        },
         "trapped_particle_fraction": {
             "attrs": {
                 "units": "dimensionless"
@@ -1126,6 +1250,25 @@
             "data": 1.8,
             "dims": []
         },
+        "vertical_field_mutual_inductance": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 1.0293853117575016,
+            "dims": []
+        },
+        "vertical_magnetic_field": {
+            "attrs": {
+                "units": "tesla"
+            },
+            "data": 1.1441875312785694,
+            "dims": []
+        },
+        "vertical_magnetic_field_equation": {
+            "attrs": {},
+            "data": "Barr",
+            "dims": []
+        },
         "vertical_minor_radius": {
             "attrs": {
                 "units": "meter"
@@ -1137,7 +1280,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.3438280352182543,
+            "data": 1.3438280352182546,
             "dims": []
         },
         "zeff_change_from_core_rad": {
