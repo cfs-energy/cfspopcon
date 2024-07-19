@@ -43,7 +43,7 @@ def calc_external_flux(plasma_current: Unitfull, external_inductance: Unitfull) 
 
 
 @Algorithm.register_algorithm(return_keys=["resistive_flux"])
-def calc_resistive_flux(plasma_current: Unitfull, major_radius: Unitfull, ejima_coefficient: Unitfull = 0.4) -> Unitfull:
+def calc_resistive_flux(plasma_current: Unitfull, major_radius: Unitfull, ejima_coefficient: Unitfull) -> Unitfull:
     """Calculate the resistive flux.
 
     Chapter 8: Plasma operation and control: Physics cite:`Gribov_2007`
