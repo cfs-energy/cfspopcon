@@ -1,4 +1,5 @@
 """Define default units for writing to/from disk."""
+
 from collections.abc import Iterable
 from importlib.resources import as_file, files
 from numbers import Number
@@ -90,18 +91,15 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
 
 
 @overload
-def set_default_units(value: Number, key: str) -> Quantity:
-    ...
+def set_default_units(value: Number, key: str) -> Quantity: ...
 
 
 @overload
-def set_default_units(value: xr.DataArray, key: str) -> xr.DataArray:
-    ...
+def set_default_units(value: xr.DataArray, key: str) -> xr.DataArray: ...
 
 
 @overload
-def set_default_units(value: Any, key: str) -> Any:
-    ...
+def set_default_units(value: Any, key: str) -> Any: ...
 
 
 def set_default_units(value: Any, key: str) -> Any:
@@ -141,18 +139,15 @@ def set_default_units(value: Any, key: str) -> Any:
 
 
 @overload
-def convert_to_default_units(value: float, key: str) -> float:
-    ...
+def convert_to_default_units(value: float, key: str) -> float: ...
 
 
 @overload
-def convert_to_default_units(value: xr.DataArray, key: str) -> xr.DataArray:
-    ...
+def convert_to_default_units(value: xr.DataArray, key: str) -> xr.DataArray: ...
 
 
 @overload
-def convert_to_default_units(value: Quantity, key: str) -> Quantity:
-    ...
+def convert_to_default_units(value: Quantity, key: str) -> Quantity: ...
 
 
 def convert_to_default_units(value: Union[float, Quantity, xr.DataArray], key: str) -> Union[float, Quantity, xr.DataArray]:

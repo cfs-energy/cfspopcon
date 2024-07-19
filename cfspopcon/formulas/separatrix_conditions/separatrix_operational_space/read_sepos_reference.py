@@ -1,4 +1,5 @@
 """Reads results from the original SepOS paper (:cite:`Eich_2021`) as a reference."""
+
 from importlib.resources import as_file, files
 
 import yaml

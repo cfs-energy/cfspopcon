@@ -1,4 +1,5 @@
 """Routines to calculate the auxillary (non-Ohmic, non-fusion) power."""
+
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull, ureg
 

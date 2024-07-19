@@ -1,6 +1,5 @@
 """Calculate fusion power and corresponding neutron wall loading."""
 
-
 import xarray as xr
 from numpy import float64
 from numpy.typing import NDArray
@@ -111,9 +110,7 @@ def calc_neutron_flux_to_walls(
     energy_to_neutrals_per_reaction = reaction.calc_energy_to_neutrals_per_reaction()
 
     # Prevent division by zero.
-    neutron_rate = xr.where(
-        energy_to_neutrals_per_reaction > 0, P_neutron / energy_to_neutrals_per_reaction, 0.0
-    )  # type:ignore[no-untyped-call]
+    neutron_rate = xr.where(energy_to_neutrals_per_reaction > 0, P_neutron / energy_to_neutrals_per_reaction, 0.0)  # type:ignore[no-untyped-call]
 
     return neutron_power_flux_to_walls, neutron_rate
 

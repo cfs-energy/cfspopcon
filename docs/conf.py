@@ -1,4 +1,5 @@
 """Sphinx configuration for cfspopcon."""
+
 from inspect import Parameter, signature
 
 from sphinx.ext.autodoc import ClassDocumenter, FunctionDocumenter

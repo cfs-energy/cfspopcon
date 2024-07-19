@@ -97,7 +97,6 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
 
     for key, val in repr_d.items():
         if isinstance(val, str):
-
             for replace_key, replace_path in path_mappings.items():
                 if replace_key in val:
                     path_val = Path(val.replace(replace_key, str(replace_path.absolute()))).absolute()

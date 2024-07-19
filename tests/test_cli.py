@@ -23,7 +23,6 @@ def test_popcon_cli():
 
 @pytest.mark.cli
 def test_write_algorithms_yaml(tmpdir):
-
     test_file = tmpdir.mkdir("test").join("test_popcon_algorithms.yaml")
     runner = CliRunner()
     result = runner.invoke(write_algorithms_yaml, ["-o", str(test_file)])

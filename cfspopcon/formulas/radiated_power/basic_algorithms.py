@@ -1,4 +1,5 @@
 """Basic algorithms to operate on the radiated power."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

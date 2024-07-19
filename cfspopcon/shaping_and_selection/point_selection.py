@@ -1,4 +1,5 @@
 """Routines to find the coordinates of the minimum or maximum value of a field."""
+
 from collections.abc import Sequence
 from typing import Optional
 

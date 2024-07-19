@@ -1,4 +1,5 @@
 """Routines to calculate the target electron temperature, following the 2-point-model method of Stangeby, PPCF 2018."""
+
 from typing import Union
 
 import xarray as xr

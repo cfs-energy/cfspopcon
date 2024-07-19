@@ -1,4 +1,5 @@
 """Compute all terms in the two-point-model for a fixed target electron temperature."""
+
 from typing import Union
 
 import xarray as xr

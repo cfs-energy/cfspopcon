@@ -1,4 +1,5 @@
 """Shared functions used for computing the separatrix operational space."""
+
 import numpy as np
 
 from ....algorithm_class import Algorithm

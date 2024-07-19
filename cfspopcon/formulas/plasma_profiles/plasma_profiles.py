@@ -224,9 +224,7 @@ def calc_analytic_profiles(
     """
     rho = np.linspace(0, 1, num=npoints, endpoint=False)
 
-    electron_density_profile = (
-        average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
-    )
+    electron_density_profile = average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
     fuel_ion_density_profile = (
         average_electron_density * dilution * (ion_density_peaking) * ((1.0 - rho**2.0) ** (ion_density_peaking - 1.0))
     )

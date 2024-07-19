@@ -1,4 +1,5 @@
 """Calculate rho_star, which gives the radio of the device size to the Larmor radius."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

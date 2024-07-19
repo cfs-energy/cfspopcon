@@ -1,4 +1,5 @@
 """Constructors and helper functions."""
+
 from typing import Any, Union
 
 import xarray as xr

@@ -1,4 +1,5 @@
 """Calculate a function which is used to determine the LH transition."""
+
 import numpy as np
 
 from ....algorithm_class import Algorithm

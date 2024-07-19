@@ -1,4 +1,5 @@
 """Calculate simple metrics for the heat exhaust challenge."""
+
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull
 

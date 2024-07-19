@@ -1,4 +1,5 @@
 """Routines to calculate the plasma temperature."""
+
 from ...algorithm_class import Algorithm
 
 calc_average_ion_temp_from_temperature_ratio = Algorithm.from_single_function(

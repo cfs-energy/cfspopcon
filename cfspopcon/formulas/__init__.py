@@ -1,4 +1,5 @@
 """Formulas used for the POPCON analysis."""
+
 from . import (
     auxillary_power,
     energy_confinement,

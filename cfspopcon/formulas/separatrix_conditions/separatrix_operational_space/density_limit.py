@@ -1,4 +1,5 @@
 """Calculate a function which is used to determine the L-mode density limit."""
+
 from ....algorithm_class import Algorithm
 from ....unit_handling import Unitfull
 from .shared import (

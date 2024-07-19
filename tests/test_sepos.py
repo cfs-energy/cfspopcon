@@ -171,7 +171,6 @@ def poloidal_sound_larmor_radius(
     separatrix_electron_temp,
     ion_mass,
 ):
-
     return sepos.calc_poloidal_sound_larmor_radius(
         minor_radius=minor_radius,
         elongation_psi95=elongation_psi95,
@@ -238,7 +237,6 @@ def test_LH_transition_condition(
     LH_transition_condition,
     scalar_case,
 ):
-
     if scalar_case:
         assert np.isclose(dmag(LH_transition_condition), 1.13663158)
 
@@ -269,7 +267,6 @@ def ideal_MHD_limit_condition(
 
 
 def test_ideal_MHD_limit_condition(ideal_MHD_limit_condition, scalar_case):
-
     if scalar_case:
         assert np.isclose(dmag(ideal_MHD_limit_condition), 0.37363964)
 

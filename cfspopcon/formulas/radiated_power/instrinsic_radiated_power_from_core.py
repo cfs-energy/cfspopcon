@@ -1,4 +1,5 @@
 """Calculate the power radiated from the confined region due to the fuel and impurity species."""
+
 import xarray as xr
 
 from ... import named_options

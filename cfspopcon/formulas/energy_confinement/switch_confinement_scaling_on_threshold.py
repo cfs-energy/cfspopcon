@@ -1,4 +1,5 @@
 """Switch the confinement scaling used if below a threshold power or density."""
+
 import xarray as xr
 
 from ...algorithm_class import Algorithm

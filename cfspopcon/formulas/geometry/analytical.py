@@ -1,4 +1,5 @@
 """Plasma geometry (inside the last-closed-flux-surface)."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm

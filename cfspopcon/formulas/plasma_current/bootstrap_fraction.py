@@ -1,4 +1,5 @@
 """Formulas to calculate the bootstrap fraction."""
+
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull
 

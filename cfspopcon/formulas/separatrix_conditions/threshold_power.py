@@ -59,14 +59,9 @@ def calc_LH_transition_threshold_power(
         )
 
     if confinement_power_scaling == ConfinementPowerScaling.H_mode_Martin:
-
         # Ryter 2014, equation 3
         neMin19 = (
-            0.7
-            * (plasma_current**0.34)
-            * (magnetic_field_on_axis**0.62)
-            * (minor_radius**-0.95)
-            * ((major_radius / minor_radius) ** 0.4)
+            0.7 * (plasma_current**0.34) * (magnetic_field_on_axis**0.62) * (minor_radius**-0.95) * ((major_radius / minor_radius) ** 0.4)
         )
 
         if average_electron_density < neMin19:

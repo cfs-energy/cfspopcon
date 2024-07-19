@@ -1,4 +1,5 @@
 """Compute the total radiated power."""
+
 import numpy as np
 import xarray as xr
 

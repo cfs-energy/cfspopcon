@@ -1,10 +1,6 @@
-[tool.black]
-line-length = 140
-target-version = ['py39', 'py310', 'py311']
-
 [tool.poetry]
 name = "cfspopcon"
-version = "6.0.0dev"
+version = "6.0.0"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"
@@ -15,6 +11,7 @@ classifiers = [
 "Programming Language :: Python :: 3.9",
 "Programming Language :: Python :: 3.10",
 "Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
 "Programming Language :: Python :: 3 :: Only",
 "Topic :: Scientific/Engineering :: Physics",
 "License :: OSI Approved :: MIT License",
@@ -26,39 +23,40 @@ popcon = 'cfspopcon.cli:run_popcon_cli'
 popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
-numpy = "^1.22.4"
-pandas = "^1.4"
+python = ">=3.9,<3.13"
+numpy = "^2.0"
+pandas = "^2.2"
 scipy = "^1.8"
 seaborn = "^0.12"
 pyyaml = "^6.0"
 toml = "^0.10.2"
-typing-extensions = "^4.0.1"
-pint = "^0.22"
-xarray = "^2023.4.1"
-pint-xarray = "^0.3"
+typing-extensions = "^4.12"
+pint = "^0.24"
+xarray = "^2024"
+pint-xarray = "^0.4"
 ipdb = "^0.13.13"
 click = "^8.1.0"
-netcdf4 = "^1.6.5"
-radas = "^2024.3.1"
+netcdf4 = "^1.7"
+radas = ">2024.3.1"
 contourpy = "^1.2.1"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^2.20.0"
-black = "^22.10.0"
-pytest = "^7.2.0"
-coverage = "^6.5.0"
-pytest-cov = "^4.0.0"
+pre-commit = "^3.7"
+pytest = "^8.2"
+coverage = "^7.6"
+pytest-cov = "^5.0"
 types-pyyaml = "^6.0.12.2"
-pandas-stubs = "^1.5.1.221024"
-mypy = "^1.4.1"
+pandas-stubs = "^2.0"
+mypy = "^1.10"
 sphinx = "^7.3.7"
 sphinx-rtd-theme = "^2.0.0"
 sphinxcontrib-bibtex = "^2.6.1"
 sphinx-copybutton = "^0.5.2"
-ruff = "^0.0.292"
-nbmake = "^1.4.3"
-nbsphinx = "^0.9.3"
+ruff = "^0.5"
+nbmake = "^1.5"
+nbsphinx = "^0.9"
+# Added as workaround for shhinx bibtex issue https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345
+setuptools = "^71.0.3"
 
 [tool.coverage.report]
 fail_under = 82
@@ -88,7 +86,7 @@ exclude = [
 ]
 
 [tool.ruff]
-select = [
+lint.select = [
   "A", # avoid shadowing
   "B", # flake8-bugbear
   "C4", # comprehensions 
@@ -111,14 +109,15 @@ select = [
   "W", # pycodestyle warnings
   ]
 
-ignore = [
+lint.ignore = [
   "E501", # Never enforce line length violations, we have black for that.
   "PLR0913", #ignore limit on number of args
   "PLR2004", #ignore magic values warning, at least for now
   "C408", # use {} instead of dict(), but we use dict heavily, for now leave it
+  "ISC001",
 ]
-pyupgrade.keep-runtime-typing=true
-pydocstyle.convention = "google"
+lint.pyupgrade.keep-runtime-typing=true
+lint.pydocstyle.convention = "google"
 target-version = "py39"
 line-length = 140
 

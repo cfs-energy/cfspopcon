@@ -1,4 +1,5 @@
 """Routines to calculate the resistivity and resistive (Ohmic) heating."""
+
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 

@@ -6,7 +6,6 @@ from cfspopcon.shaping_and_selection.line_selection import interpolate_onto_line
 
 
 def test_extract_values_along_contour():
-
     x_vals = np.linspace(-5, 5, num=500)
     y_vals = np.linspace(-4, 4, num=400)
 

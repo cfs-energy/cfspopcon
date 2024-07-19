@@ -6,6 +6,7 @@ Usage:
     >>> fig, ax = plt.subplots()
     >>> ax.format_coord = CoordinateFormatter(...)
 """
+
 import xarray as xr
 
 

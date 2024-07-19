@@ -1,4 +1,5 @@
 """Calculate the ratio of magnetic to plasma (kinetic) pressure."""
+
 import numpy as np
 
 from ...algorithm_class import Algorithm
