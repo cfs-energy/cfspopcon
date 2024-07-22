@@ -36,9 +36,12 @@ algorithms:
   # increase the power radiated from the core. This increases
   # the fuel dilution and Zeff (computed), as well as degrading
   # core confinement (not yet computed).
-  - calc_extrinsic_core_radiator
+  - calc_min_P_radiation_from_fraction
+  - calc_P_radiation_from_core_seeded_impurity
+  - calc_core_seeded_impurity_concentration
   # We then recompute the profiles with the dilution due to the
   # core radiator and recompute the profiles.
+  - calc_zeff_and_dilution_due_to_impurities
   - calc_peaked_profiles
   # Calculate the fusion power and gain.
   - calc_fusion_power

@@ -9,6 +9,7 @@ from cfspopcon.cli import run_popcon_cli, write_algorithms_yaml
 
 @pytest.mark.cli
 @pytest.mark.filterwarnings("ignore:Matplotlib is currently using agg")
+@pytest.mark.filterwarnings("ignore:FigureCanvasAgg is non-interactive")
 def test_popcon_cli():
     matplotlib.use("Agg")
 

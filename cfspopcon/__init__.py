@@ -7,7 +7,7 @@ __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
 from .algorithm_class import Algorithm, CompositeAlgorithm
-from .formulas.read_atomic_data import AtomicData
+from .formulas.atomic_data import AtomicData
 from .input_file_handling import read_case
 from .plotting import read_plot_style
 from .unit_handling import (

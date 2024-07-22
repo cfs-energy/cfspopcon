@@ -10,6 +10,8 @@ from .impurity_charge_state import calc_impurity_charge_state
 @Algorithm.register_algorithm(
     return_keys=[
         "impurity_charge_state",
+        "change_in_zeff",
+        "change_in_dilution",
         "z_effective",
         "dilution",
         "summed_impurity_density",
@@ -31,7 +33,7 @@ def calc_zeff_and_dilution_due_to_impurities(
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
-        :term:`impurity_charge_state`, :term:`z_effective`, :term:`dilution`, :term:`summed_impurity_density`, :term:`average_ion_density`
+        :term:`impurity_charge_state`, :term:`change_in_zeff`, :term:`change_in_dilution`, :term:`z_effective`, :term:`dilution`, :term:`summed_impurity_density`, :term:`average_ion_density`
 
     """
     starting_zeff = 1.0
@@ -48,7 +50,7 @@ def calc_zeff_and_dilution_due_to_impurities(
     summed_impurity_density = impurities.sum(dim="dim_species") * average_electron_density
     average_ion_density = dilution * average_electron_density
 
-    return (impurity_charge_state, z_effective, dilution, summed_impurity_density, average_ion_density)
+    return impurity_charge_state, change_in_zeff, change_in_dilution, z_effective, dilution, summed_impurity_density, average_ion_density
 
 
 def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:

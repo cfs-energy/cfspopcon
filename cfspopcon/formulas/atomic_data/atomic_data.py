@@ -7,9 +7,9 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import RegularGridInterpolator  # type: ignore[import-untyped]
 
-from ..algorithm_class import Algorithm
-from ..named_options import AtomicSpecies
-from ..unit_handling import magnitude
+from ...algorithm_class import Algorithm
+from ...named_options import AtomicSpecies
+from ...unit_handling import magnitude
 
 
 class AtomicData:

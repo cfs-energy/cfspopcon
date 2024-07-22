@@ -17,6 +17,7 @@
                 "Helium",
                 "Oxygen",
                 "Argon",
+                "Xenon",
                 "Tungsten"
             ],
             "dims": [
@@ -116,18 +117,18 @@
             "data": 1.2016218704216768,
             "dims": []
         },
-        "P_radiated_by_core_radiator": {
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 0.0,
-            "dims": []
-        },
         "P_radiation": {
             "attrs": {
                 "units": "megawatt"
             },
             "data": 5.8886658045102305,
+            "dims": []
+        },
+        "P_radiation_from_core_seeded_impurity": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 0.0,
             "dims": []
         },
         "P_sol": {
@@ -233,6 +234,36 @@
             "data": 0.12840000000000001,
             "dims": []
         },
+        "change_in_dilution": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                0.12,
+                0.024798333717489005,
+                NaN,
+                0.0,
+                0.0008757463235765251
+            ],
+            "dims": [
+                "dim_species"
+            ]
+        },
+        "change_in_zeff": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                0.12,
+                0.1735750066579794,
+                NaN,
+                0.0,
+                0.0502530285602768
+            ],
+            "dims": [
+                "dim_species"
+            ]
+        },
         "confinement_threshold_scalar": {
             "attrs": {
                 "units": "dimensionless"
@@ -259,14 +290,7 @@
             "data": "Xenon",
             "dims": []
         },
-        "core_radiator_charge_state": {
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 45.811693483863905,
-            "dims": []
-        },
-        "core_radiator_concentration": {
+        "core_seeded_impurity_concentration": {
             "attrs": {
                 "units": "dimensionless"
             },
@@ -297,13 +321,6 @@
                 "units": "dimensionless"
             },
             "data": 0.8543259199589345,
-            "dims": []
-        },
-        "dilution_change_from_core_rad": {
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0,
             "dims": []
         },
         "edge_impurity_concentration": {
@@ -665,6 +682,7 @@
                 0.06,
                 0.0031,
                 0.01687905506268707,
+                0.0,
                 1.5e-05
             ],
             "dims": [
@@ -679,6 +697,7 @@
                 2.0,
                 7.999462489512582,
                 NaN,
+                45.811693483863905,
                 58.38308823843501
             ],
             "dims": [
@@ -867,6 +886,13 @@
                 "units": "second"
             },
             "data": 2.3537375861939336,
+            "dims": []
+        },
+        "min_P_radiation": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 0.0,
             "dims": []
         },
         "minimum_core_radiated_fraction": {
@@ -1289,18 +1315,11 @@
             },
             "data": 1.3438280352182561,
             "dims": []
-        },
-        "zeff_change_from_core_rad": {
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0,
-            "dims": []
         }
     },
     "dims": {
-        "dim_0": 4,
+        "dim_0": 5,
         "dim_rho": 50,
-        "dim_species": 4
+        "dim_species": 5
     }
 }

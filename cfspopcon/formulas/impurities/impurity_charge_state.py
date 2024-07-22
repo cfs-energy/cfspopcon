@@ -2,11 +2,13 @@
 
 import numpy as np
 
+from ...algorithm_class import Algorithm
 from ...named_options import AtomicSpecies
 from ...unit_handling import ureg, wraps_ufunc
-from ..read_atomic_data import AtomicData
+from ..atomic_data import AtomicData
 
 
+@Algorithm.register_algorithm(return_keys=["impurity_charge_state"])
 @wraps_ufunc(
     return_units=dict(mean_charge_state=ureg.dimensionless),
     input_units=dict(

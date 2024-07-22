@@ -10,7 +10,7 @@ from ...algorithm_class import Algorithm
 from ...helpers import extend_impurities_array
 from ...named_options import AtomicSpecies
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
-from ..read_atomic_data import AtomicData
+from ..atomic_data import AtomicData
 
 
 @Algorithm.register_algorithm(
@@ -62,7 +62,7 @@ def calc_edge_impurity_concentration(
         reference_ne_tau=reference_ne_tau,
     )
 
-    edge_impurity_concentration = calc_required_edge_impurity_concentration(
+    edge_impurity_concentration = calc_edge_impurity_concentration_from_lengyel(
         L_int_integrator=L_int_integrator,
         q_parallel=q_parallel,
         SOL_power_loss_fraction=SOL_power_loss_fraction,
@@ -126,7 +126,7 @@ def build_L_int_integrator(
     return L_int_integrator
 
 
-def calc_required_edge_impurity_concentration(
+def calc_edge_impurity_concentration_from_lengyel(
     L_int_integrator: Callable[[Unitfull, Unitfull], Unitfull],
     q_parallel: Unitfull,
     SOL_power_loss_fraction: Unitfull,
