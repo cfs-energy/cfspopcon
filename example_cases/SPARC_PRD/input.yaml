@@ -113,14 +113,14 @@ grid:
     # Average electron density in 1e19 particles / m^3
     min: 1.0
     max: 40.0
-    num: 40
+    num: 100
     spacing: linear
 
   average_electron_temp:
     # Average electron temperature in keV
     min: 5.0
     max: 20.0
-    num: 30
+    num: 100
     spacing: linear
 
 points:
@@ -189,6 +189,7 @@ confinement_threshold_scalar: 1.0
 confinement_time_scalar: 1.0
 # Name of the tau_e scaling used
 tau_e_scaling: ITER98y2
+tau_e_L_mode_scaling: ITER89P
 
 radiated_power_method: Radas
 radiated_power_scalar: 1.0

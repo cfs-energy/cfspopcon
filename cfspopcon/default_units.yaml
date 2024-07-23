@@ -117,6 +117,8 @@ poloidal_circumference: "m"
 poloidal_field_flux: "weber"
 poloidal_sound_larmor_radius: "mm"
 product_of_magnetic_field_and_radius: "m * T"
+density_profile_form: null
+temp_profile_form: null
 q_cylindrical: ""
 q_parallel: "GW / m**2"
 q_perp: "MW / m**2"
@@ -154,6 +156,7 @@ target_electron_temp: "eV"
 target_q_parallel: "GW / m**2"
 tau_e_scaling_uses_P_in: null
 tau_e_scaling: null
+tau_e_L_mode_scaling: null
 temp_profile_form: null
 temperature_peaking: ""
 toroidal_flux_expansion: ""

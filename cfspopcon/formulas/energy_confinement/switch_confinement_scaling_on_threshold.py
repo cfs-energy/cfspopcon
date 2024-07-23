@@ -90,6 +90,7 @@ def switch_to_L_mode_confinement_below_threshold(
     separatrix_triangularity: Unitfull,
     q_star: Unitfull,
     ratio_of_P_SOL_to_P_LH: Unitfull,
+    tau_e_L_mode_scaling: Unitfull,
 ) -> tuple[Unitfull, ...]:
     """Switch to the L-mode scaling if Psol < PLH
 
@@ -110,11 +111,12 @@ def switch_to_L_mode_confinement_below_threshold(
         separatrix_triangularity: :term:`glossary link<separatrix_triangularity>`
         q_star: :term:`glossary link<q_star>`
         ratio_of_P_SOL_to_P_LH: :term:`glossary link<ratio_of_P_SOL_to_P_LH>`
+        tau_e_L_mode_scaling: :term:`glossary link<tau_e_L_mode_scaling>`
 
     Returns:
         :term:`energy_confinement_time`, :term:`P_in`
     """
-    tau_e_89P, P_in_89P = solve_tau_e_scaling_for_input_power(
+    tau_e_L_mode, P_in_L_mode = solve_tau_e_scaling_for_input_power(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,
@@ -128,11 +130,11 @@ def switch_to_L_mode_confinement_below_threshold(
         separatrix_triangularity=separatrix_triangularity,
         plasma_stored_energy=plasma_stored_energy,
         q_star=q_star,
-        tau_e_scaling="ITER89P",
+        tau_e_scaling=tau_e_L_mode_scaling,
     )
 
     # Use L-mode confinement if Psol < PLH
-    energy_confinement_time = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, tau_e_89P, energy_confinement_time)  # type:ignore[no-untyped-call]
-    P_in = xr.where(ratio_of_P_SOL_to_P_LH > 1.0, P_in_89P, P_in)  # type:ignore[no-untyped-call]
+    energy_confinement_time = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, tau_e_L_mode, energy_confinement_time)  # type:ignore[no-untyped-call]
+    P_in = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, P_in_L_mode, P_in)  # type:ignore[no-untyped-call]
 
     return energy_confinement_time, P_in
