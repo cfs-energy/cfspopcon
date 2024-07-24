@@ -1,6 +1,11 @@
 import numpy as np
 
-from cfspopcon.unit_handling import Quantity, convert_to_default_units, dimensionless_magnitude, ureg
+from cfspopcon.unit_handling import (
+    Quantity,
+    convert_to_default_units,
+    dimensionless_magnitude,
+    ureg,
+)
 
 
 def test_conversion_of_dimensionless():

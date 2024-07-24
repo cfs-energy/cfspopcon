@@ -7,7 +7,10 @@ from ...unit_handling import Quantity, Unitfull, convert_units, ureg, wraps_ufun
 
 
 def _calc_beta_general(
-    average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull, magnetic_field: Unitfull
+    average_electron_density: Unitfull,
+    average_electron_temp: Unitfull,
+    average_ion_temp: Unitfull,
+    magnetic_field: Unitfull,
 ) -> Unitfull:
     """Calculate the average ratio of the plasma pressure to the magnetic pressure due to a magnetic_field.
 
@@ -35,13 +38,20 @@ def _calc_beta_general(
     mu_0 = Quantity(1, "mu_0")
     # to make the result dimensionless
     unit_conversion_factor = 2 * mu_0
-    ret = unit_conversion_factor * (average_electron_density * (average_electron_temp + average_ion_temp)) / (magnetic_field**2)
+    ret = (
+        unit_conversion_factor
+        * (average_electron_density * (average_electron_temp + average_ion_temp))
+        / (magnetic_field**2)
+    )
     return convert_units(ret, ureg.dimensionless)
 
 
 @Algorithm.register_algorithm(return_keys=["beta_toroidal"])
 def calc_beta_toroidal(
-    average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull
+    average_electron_density: Unitfull,
+    average_electron_temp: Unitfull,
+    average_ion_temp: Unitfull,
+    magnetic_field_on_axis: Unitfull,
 ) -> Unitfull:
     """Calculate the average ratio of the plasma pressure to the magnetic pressure due to the toroidal field.
 
@@ -57,7 +67,12 @@ def calc_beta_toroidal(
     Returns:
          :term:`beta_toroidal` [~]
     """
-    return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=magnetic_field_on_axis)
+    return _calc_beta_general(
+        average_electron_density,
+        average_electron_temp,
+        average_ion_temp,
+        magnetic_field=magnetic_field_on_axis,
+    )
 
 
 @Algorithm.register_algorithm(return_keys=["beta_poloidal"])
@@ -100,7 +115,12 @@ def calc_beta_poloidal(
     units_conversion_factor = mu_0 / (2 * np.pi)
     B_pol = units_conversion_factor * plasma_current / minor_radius
 
-    return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=B_pol)
+    return _calc_beta_general(
+        average_electron_density,
+        average_electron_temp,
+        average_ion_temp,
+        magnetic_field=B_pol,
+    )
 
 
 @Algorithm.register_algorithm(return_keys=["beta"])
@@ -120,7 +140,12 @@ def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitful
 
 
 @Algorithm.register_algorithm(return_keys=["normalized_beta"])
-def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:
+def calc_beta_normalized(
+    beta: Unitfull,
+    minor_radius: Unitfull,
+    magnetic_field_on_axis: Unitfull,
+    plasma_current: Unitfull,
+) -> Unitfull:
     """Normalize beta to stability (Troyon) parameters.
 
     See section 6.18 in Wesson :cite:`wesson_tokamaks_2011`.
@@ -144,9 +169,13 @@ def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_
 @Algorithm.register_algorithm(return_keys=["troyon_max_beta"])
 @wraps_ufunc(
     return_units=dict(troyon_max_beta=ureg.percent),
-    input_units=dict(minor_radius=ureg.m, magnetic_field_on_axis=ureg.T, plasma_current=ureg.MA),
+    input_units=dict(
+        minor_radius=ureg.m, magnetic_field_on_axis=ureg.T, plasma_current=ureg.MA
+    ),
 )
-def calc_troyon_limit(minor_radius: float, magnetic_field_on_axis: float, plasma_current: float) -> float:
+def calc_troyon_limit(
+    minor_radius: float, magnetic_field_on_axis: float, plasma_current: float
+) -> float:
     """Calculate the maximum value for beta, according to the Troyon limit.
 
     Args:

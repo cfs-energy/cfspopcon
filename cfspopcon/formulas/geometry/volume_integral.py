@@ -8,7 +8,9 @@ from ...unit_handling import ureg, wraps_ufunc
 
 
 @wraps_ufunc(
-    input_units=dict(array_per_m3=ureg.m**-3, rho=ureg.dimensionless, plasma_volume=ureg.m**3),
+    input_units=dict(
+        array_per_m3=ureg.m**-3, rho=ureg.dimensionless, plasma_volume=ureg.m**3
+    ),
     return_units=dict(volume_integrated_value=ureg.dimensionless),
     input_core_dims=[("dim_rho",), ("dim_rho",), ()],
 )

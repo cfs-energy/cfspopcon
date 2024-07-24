@@ -57,7 +57,9 @@ def default_unit(var: str) -> Union[str, None]:
         ) from None
 
 
-def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -> Union[float, list[float], Any]:
+def magnitude_in_default_units(
+    value: Union[Quantity, xr.DataArray], key: str
+) -> Union[float, list[float], Any]:
     """Convert values to default units and then return the magnitude.
 
     Args:
@@ -76,7 +78,9 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
         mag = magnitude_in_units(value, unit)
 
     except DimensionalityError as e:
-        print(f"Unit conversion failed for {key}. Could not convert '{value}' to '{DEFAULT_UNITS[key]}'")
+        print(
+            f"Unit conversion failed for {key}. Could not convert '{value}' to '{DEFAULT_UNITS[key]}'"
+        )
         raise e
 
     # single value arrays -> float
@@ -91,15 +95,18 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
 
 
 @overload
-def set_default_units(value: Number, key: str) -> Quantity: ...
+def set_default_units(value: Number, key: str) -> Quantity:
+    ...
 
 
 @overload
-def set_default_units(value: xr.DataArray, key: str) -> xr.DataArray: ...
+def set_default_units(value: xr.DataArray, key: str) -> xr.DataArray:
+    ...
 
 
 @overload
-def set_default_units(value: Any, key: str) -> Any: ...
+def set_default_units(value: Any, key: str) -> Any:
+    ...
 
 
 def set_default_units(value: Any, key: str) -> Any:
@@ -139,18 +146,23 @@ def set_default_units(value: Any, key: str) -> Any:
 
 
 @overload
-def convert_to_default_units(value: float, key: str) -> float: ...
+def convert_to_default_units(value: float, key: str) -> float:
+    ...
 
 
 @overload
-def convert_to_default_units(value: xr.DataArray, key: str) -> xr.DataArray: ...
+def convert_to_default_units(value: xr.DataArray, key: str) -> xr.DataArray:
+    ...
 
 
 @overload
-def convert_to_default_units(value: Quantity, key: str) -> Quantity: ...
+def convert_to_default_units(value: Quantity, key: str) -> Quantity:
+    ...
 
 
-def convert_to_default_units(value: Union[float, Quantity, xr.DataArray], key: str) -> Union[float, Quantity, xr.DataArray]:
+def convert_to_default_units(
+    value: Union[float, Quantity, xr.DataArray], key: str
+) -> Union[float, Quantity, xr.DataArray]:
     """Convert an array or scalar to default units."""
     unit = DEFAULT_UNITS[key]
     if unit is None:
@@ -158,4 +170,6 @@ def convert_to_default_units(value: Union[float, Quantity, xr.DataArray], key: s
     elif isinstance(value, (xr.DataArray, Quantity)):
         return convert_units(value, unit)
     else:
-        raise NotImplementedError(f"No implementation for 'convert_to_default_units' with an array of type {type(value)} ({value})")
+        raise NotImplementedError(
+            f"No implementation for 'convert_to_default_units' with an array of type {type(value)} ({value})"
+        )

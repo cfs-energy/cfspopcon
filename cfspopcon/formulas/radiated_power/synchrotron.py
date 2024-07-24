@@ -90,7 +90,11 @@ def calc_synchrotron_radiation(
         * Gs
     )
 
-    P_sync_r = 6.25e-3 * ne20 * electron_temp_profile * magnetic_field_on_axis**2 * Phi
-    P_sync: float = integrate_profile_over_volume.unitless_func(P_sync_r, rho, plasma_volume)
+    P_sync_r = (
+        6.25e-3 * ne20 * electron_temp_profile * magnetic_field_on_axis**2 * Phi
+    )
+    P_sync: float = integrate_profile_over_volume.unitless_func(
+        P_sync_r, rho, plasma_volume
+    )
 
     return P_sync

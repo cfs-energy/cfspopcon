@@ -20,10 +20,17 @@ def test_regression_against_case(case: Path):
     case_name = case.parent.stem
 
     dataset = algorithm.run(**input_parameters).merge(input_parameters)
-    write_dataset_to_netcdf(dataset, Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc")
+    write_dataset_to_netcdf(
+        dataset,
+        Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc",
+    )
 
-    dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc").load()
-    reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+    dataset = read_dataset_from_netcdf(
+        Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc"
+    ).load()
+    reference_dataset = read_dataset_from_netcdf(
+        Path(__file__).parent / "regression_results" / f"{case_name}_result.nc"
+    ).load()
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)
@@ -39,10 +46,17 @@ def test_regression_against_case_with_update(case: Path):
     dataset = xr.Dataset(input_parameters)
 
     dataset = algorithm.update_dataset(dataset)
-    write_dataset_to_netcdf(dataset, Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc")
+    write_dataset_to_netcdf(
+        dataset,
+        Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc",
+    )
 
-    dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc").load()
-    reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+    dataset = read_dataset_from_netcdf(
+        Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc"
+    ).load()
+    reference_dataset = read_dataset_from_netcdf(
+        Path(__file__).parent / "regression_results" / f"{case_name}_result.nc"
+    ).load()
 
     dataset, reference_dataset = xr.align(dataset, reference_dataset)
     assert_allclose(dataset, reference_dataset)

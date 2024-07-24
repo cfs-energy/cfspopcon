@@ -18,10 +18,21 @@ from cfspopcon.unit_handling import UnitStrippedWarning
 
 @click.command()
 @click.argument("case", type=click.Path(exists=True))
-@click.option("--dict", "-d", "kwargs", type=(str, str), multiple=True, help="Command-line arguments, takes precedence over config.")
-@click.option("--show", is_flag=True, help="Display an interactive figure of the result.")
+@click.option(
+    "--dict",
+    "-d",
+    "kwargs",
+    type=(str, str),
+    multiple=True,
+    help="Command-line arguments, takes precedence over config.",
+)
+@click.option(
+    "--show", is_flag=True, help="Display an interactive figure of the result."
+)
 @click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher.")
-def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, str]]) -> None:
+def run_popcon_cli(
+    case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, str]]
+) -> None:
     """Run POPCON from the command line.
 
     This function uses "Click" to develop the command line interface. You can execute it using
@@ -39,7 +50,9 @@ def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, 
 
 
 @click.command()
-@click.option("-o", "--output", default="./popcon_algorithms.yaml", type=click.Path(exists=False))
+@click.option(
+    "-o", "--output", default="./popcon_algorithms.yaml", type=click.Path(exists=False)
+)
 def write_algorithms_yaml(output: str) -> None:
     """Write all available algorithms to a yaml helper file."""
     from cfspopcon import Algorithm
@@ -62,20 +75,31 @@ def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
     algorithm.validate_inputs(dataset)
     dataset = algorithm.update_dataset(dataset)
 
-    output_dir = Path(case) / "output" if Path(case).is_dir() else Path(case).parent / "output"
+    output_dir = (
+        Path(case) / "output" if Path(case).is_dir() else Path(case).parent / "output"
+    )
     output_dir.mkdir(exist_ok=True)
 
     file_io.write_dataset_to_netcdf(dataset, filepath=output_dir / "dataset.nc")
 
     if points is not None:
         for point, point_params in points.items():
-            file_io.write_point_to_file(dataset, point, point_params, output_dir=output_dir)
+            file_io.write_point_to_file(
+                dataset, point, point_params, output_dir=output_dir
+            )
 
     # Plot the results
     if plots is not None:
         for plot_name, plot_style in plots.items():
             print(f"Plotting {plot_name}")
-            make_plot(dataset, read_plot_style(plot_style), points, title=plot_name, output_dir=output_dir, save_name=plot_style.stem)
+            make_plot(
+                dataset,
+                read_plot_style(plot_style),
+                points,
+                title=plot_name,
+                output_dir=output_dir,
+                save_name=plot_style.stem,
+            )
 
     print("Done")
     if show:

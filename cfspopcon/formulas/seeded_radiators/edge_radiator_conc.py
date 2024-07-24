@@ -4,7 +4,9 @@ from typing import Callable
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
+from scipy.interpolate import (
+    InterpolatedUnivariateSpline,
+)  # type:ignore[import-untyped]
 
 from ...algorithm_class import Algorithm
 from ...helpers import extend_impurities_array
@@ -73,10 +75,18 @@ def calc_edge_impurity_concentration(
         lengyel_overestimation_factor=lengyel_overestimation_factor,
     )
 
-    edge_impurity_concentration_in_core = edge_impurity_concentration / edge_impurity_enrichment
-    impurities = extend_impurities_array(impurities, edge_impurity_species, edge_impurity_concentration_in_core)
+    edge_impurity_concentration_in_core = (
+        edge_impurity_concentration / edge_impurity_enrichment
+    )
+    impurities = extend_impurities_array(
+        impurities, edge_impurity_species, edge_impurity_concentration_in_core
+    )
 
-    return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurities)
+    return (
+        edge_impurity_concentration,
+        edge_impurity_concentration_in_core,
+        impurities,
+    )
 
 
 def build_L_int_integrator(
@@ -102,12 +112,18 @@ def build_L_int_integrator(
     if isinstance(impurity_species, xr.DataArray):
         impurity_species = impurity_species.item()
 
-    electron_density_ref = magnitude(convert_units(reference_electron_density, ureg.m**-3))
+    electron_density_ref = magnitude(
+        convert_units(reference_electron_density, ureg.m**-3)
+    )
     ne_tau_ref = magnitude(convert_units(reference_ne_tau, ureg.m**-3 * ureg.s))
 
     Lz_curve = (
         atomic_data.get_dataset(impurity_species)
-        .equilibrium_Lz.sel(dim_electron_density=electron_density_ref, method="nearest", tolerance=1e-6 * electron_density_ref)
+        .equilibrium_Lz.sel(
+            dim_electron_density=electron_density_ref,
+            method="nearest",
+            tolerance=1e-6 * electron_density_ref,
+        )
         .sel(dim_ne_tau=ne_tau_ref, method="nearest", tolerance=1e-6 * ne_tau_ref)
     )
 
@@ -121,7 +137,8 @@ def build_L_int_integrator(
         return integrated_Lz
 
     L_int_integrator: Callable[[Unitfull, Unitfull], Unitfull] = wraps_ufunc(
-        input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV), return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5)
+        input_units=dict(start_temp=ureg.eV, stop_temp=ureg.eV),
+        return_units=dict(L_int=ureg.W * ureg.m**3 * ureg.eV**1.5),
     )(L_int)
     return L_int_integrator
 
@@ -164,6 +181,11 @@ def calc_required_edge_impurity_concentration(
     L_int = L_int_integrator(target_electron_temp, separatrix_electron_temp)
 
     numerator = q_parallel**2 - ((1.0 - SOL_power_loss_fraction) * q_parallel) ** 2
-    denominator = 2.0 * kappa_e0 * (separatrix_electron_density * separatrix_electron_temp) ** 2 * L_int
+    denominator = (
+        2.0
+        * kappa_e0
+        * (separatrix_electron_density * separatrix_electron_temp) ** 2
+        * L_int
+    )
 
     return numerator / denominator / lengyel_overestimation_factor

@@ -129,12 +129,15 @@ def solve_tau_e_scaling_for_input_power(
         * separatrix_elongation**scaling.separatrix_elongation_alpha
         * inverse_aspect_ratio**scaling.inverse_aspect_ratio_alpha
         * fuel_average_mass_number**scaling.mass_ratio_alpha
-        * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity])) ** scaling.triangularity_alpha
+        * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity]))
+        ** scaling.triangularity_alpha
         * q_star**scaling.qstar_alpha
     )
 
     if gamma > 0.0:
-        P_tau = (plasma_stored_energy / gamma) ** (1.0 / (1.0 + scaling.input_power_alpha))
+        P_tau = (plasma_stored_energy / gamma) ** (
+            1.0 / (1.0 + scaling.input_power_alpha)
+        )
     else:
         P_tau = np.inf
 

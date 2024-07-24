@@ -28,7 +28,9 @@ def test_label_contour(z):
     CS = z.plot.contour(ax=ax, colors=["r"])
 
     contour_labels = dict()
-    contour_labels["z"] = plotting.label_contour(ax=ax, contour_set=CS, format_spec="3.2f", fontsize=12)
+    contour_labels["z"] = plotting.label_contour(
+        ax=ax, contour_set=CS, format_spec="3.2f", fontsize=12
+    )
 
     ax.legend(contour_labels.values(), contour_labels.keys())
 

@@ -64,34 +64,50 @@ def calc_extrinsic_core_radiator(
 
     """
     # Force P_radiated_by_core_radiator to be >= 0.0 (core radiator cannot reduce radiated power)
-    P_radiated_by_core_radiator = np.maximum(minimum_core_radiated_fraction * P_in - P_radiation, 0.0)
+    P_radiated_by_core_radiator = np.maximum(
+        minimum_core_radiated_fraction * P_in - P_radiation, 0.0
+    )
     P_radiation = np.maximum(minimum_core_radiated_fraction * P_in, P_radiation)
 
-    P_rad_per_core_radiator = radiated_power_scalar * radiated_power.impurity_radiated_power.calc_impurity_radiated_power(
-        radiated_power_method=(
-            named_options.RadiationMethod.Radas
-            if radiated_power_method == named_options.RadiationMethod.Inherent
-            else radiated_power_method
-        ),
-        rho=rho,
-        electron_temp_profile=electron_temp_profile,
-        electron_density_profile=electron_density_profile,
-        impurities=make_impurities_array(core_radiator, 1.0),
-        plasma_volume=plasma_volume,
-        atomic_data=atomic_data.item(),
-    ).sum(dim="dim_species")
+    P_rad_per_core_radiator = (
+        radiated_power_scalar
+        * radiated_power.impurity_radiated_power.calc_impurity_radiated_power(
+            radiated_power_method=(
+                named_options.RadiationMethod.Radas
+                if radiated_power_method == named_options.RadiationMethod.Inherent
+                else radiated_power_method
+            ),
+            rho=rho,
+            electron_temp_profile=electron_temp_profile,
+            electron_density_profile=electron_density_profile,
+            impurities=make_impurities_array(core_radiator, 1.0),
+            plasma_volume=plasma_volume,
+            atomic_data=atomic_data.item(),
+        ).sum(dim="dim_species")
+    )
     core_radiator_concentration = xr.where(  # type:ignore[no-untyped-call]
-        P_radiated_by_core_radiator > 0, P_radiated_by_core_radiator / P_rad_per_core_radiator, 0.0
+        P_radiated_by_core_radiator > 0,
+        P_radiated_by_core_radiator / P_rad_per_core_radiator,
+        0.0,
     )
 
-    core_radiator_charge_state = zeff_and_dilution.impurity_charge_state.calc_impurity_charge_state(
-        average_electron_density, average_electron_temp, core_radiator, atomic_data.item()
+    core_radiator_charge_state = (
+        zeff_and_dilution.impurity_charge_state.calc_impurity_charge_state(
+            average_electron_density,
+            average_electron_temp,
+            core_radiator,
+            atomic_data.item(),
+        )
     )
-    zeff_change_from_core_rad = zeff_and_dilution.zeff_and_dilution_from_impurities.calc_change_in_zeff(
-        core_radiator_charge_state, core_radiator_concentration
+    zeff_change_from_core_rad = (
+        zeff_and_dilution.zeff_and_dilution_from_impurities.calc_change_in_zeff(
+            core_radiator_charge_state, core_radiator_concentration
+        )
     )
-    dilution_change_from_core_rad = zeff_and_dilution.zeff_and_dilution_from_impurities.calc_change_in_dilution(
-        core_radiator_charge_state, core_radiator_concentration
+    dilution_change_from_core_rad = (
+        zeff_and_dilution.zeff_and_dilution_from_impurities.calc_change_in_dilution(
+            core_radiator_charge_state, core_radiator_concentration
+        )
     )
 
     z_effective = z_effective + zeff_change_from_core_rad

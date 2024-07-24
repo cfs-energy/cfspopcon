@@ -14,7 +14,12 @@ from .unit_handling import set_default_units
 
 def read_case(
     case: Union[str, Path], kwargs: Optional[dict[str, str]] = None
-) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
+) -> tuple[
+    dict[str, Any],
+    Union[CompositeAlgorithm, Algorithm],
+    dict[str, Any],
+    dict[str, Path],
+]:
     """Read a yaml file corresponding to a given case.
 
     case should be passed either as a complete filepath to an input.yaml file or to
@@ -42,7 +47,11 @@ def read_case(
     algorithm_list = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
 
     # why doesn't mypy deduce the below without hint?
-    algorithm: Union[Algorithm, CompositeAlgorithm] = CompositeAlgorithm(algorithm_list) if len(algorithm_list) > 1 else algorithm_list[0]
+    algorithm: Union[Algorithm, CompositeAlgorithm] = (
+        CompositeAlgorithm(algorithm_list)
+        if len(algorithm_list) > 1
+        else algorithm_list[0]
+    )
 
     points = repr_d.pop("points", dict())
     plots = repr_d.pop("plots", dict())
@@ -63,11 +72,19 @@ def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
         grid_spacing = grid_spec.get("spacing", "linear")
 
         if grid_spacing == "linear":
-            grid_vals = np.linspace(grid_spec["min"], grid_spec["max"], num=grid_spec["num"])
+            grid_vals = np.linspace(
+                grid_spec["min"], grid_spec["max"], num=grid_spec["num"]
+            )
         elif grid_spacing == "log":
-            grid_vals = np.logspace(np.log10(grid_spec["min"]), np.log10(grid_spec["max"]), num=grid_spec["num"])
+            grid_vals = np.logspace(
+                np.log10(grid_spec["min"]),
+                np.log10(grid_spec["max"]),
+                num=grid_spec["num"],
+            )
         else:
-            raise NotImplementedError(f"No implementation for grid with {grid_spec['spacing']} spacing.")
+            raise NotImplementedError(
+                f"No implementation for grid with {grid_spec['spacing']} spacing."
+            )
 
         repr_d[key] = xr.DataArray(grid_vals, coords={f"dim_{key}": grid_vals})
 
@@ -81,7 +98,9 @@ def process_named_options(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def
             repr_d[key] = convert_named_options(key=key, val=val)
 
 
-def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-untyped-def]
+def process_paths(
+    repr_d: dict[str, Any], input_file: Path
+):  # type:ignore[no-untyped-def]
     """Process path tags, up to a maximum of one tag per input variable.
 
     Allowed tags are:
@@ -99,7 +118,9 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
         if isinstance(val, str):
             for replace_key, replace_path in path_mappings.items():
                 if replace_key in val:
-                    path_val = Path(val.replace(replace_key, str(replace_path.absolute()))).absolute()
+                    path_val = Path(
+                        val.replace(replace_key, str(replace_path.absolute()))
+                    ).absolute()
                     repr_d[key] = path_val
                     break
 

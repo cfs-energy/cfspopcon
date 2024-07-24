@@ -65,9 +65,17 @@ def calc_peaked_profiles(
     `effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`, :term:`peak_electron_density`, :term:`peak_electron_temp`, :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`, :term:`electron_temp_profile`, :term:`ion_temp_profile`
 
     """
-    effective_collisionality = calc_effective_collisionality(average_electron_density, average_electron_temp, major_radius, z_effective)
-    ion_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
-    electron_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=electron_density_peaking_offset)
+    effective_collisionality = calc_effective_collisionality(
+        average_electron_density, average_electron_temp, major_radius, z_effective
+    )
+    ion_density_peaking = calc_density_peaking(
+        effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset
+    )
+    electron_density_peaking = calc_density_peaking(
+        effective_collisionality,
+        beta_toroidal,
+        nu_noffset=electron_density_peaking_offset,
+    )
 
     peak_electron_density = average_electron_density * electron_density_peaking
     peak_fuel_ion_density = average_electron_density * dilution * ion_density_peaking
@@ -87,9 +95,17 @@ def calc_peaked_profiles(
         normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length,
     )
 
-    (rho, electron_density_profile, fuel_ion_density_profile, _, _) = calc_1D_plasma_profiles(density_profile_form, **kwargs)
+    (
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        _,
+        _,
+    ) = calc_1D_plasma_profiles(density_profile_form, **kwargs)
 
-    (rho, _, _, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(temp_profile_form, **kwargs)
+    (rho, _, _, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(
+        temp_profile_form, **kwargs
+    )
 
     return (
         effective_collisionality,
@@ -108,7 +124,13 @@ def calc_peaked_profiles(
 
 
 @Algorithm.register_algorithm(
-    return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
+    return_keys=[
+        "rho",
+        "electron_density_profile",
+        "fuel_ion_density_profile",
+        "electron_temp_profile",
+        "ion_temp_profile",
+    ]
 )
 @wraps_ufunc(
     return_units=dict(
@@ -130,7 +152,13 @@ def calc_peaked_profiles(
         normalized_inverse_temp_scale_length=ureg.dimensionless,
         npoints=None,
     ),
-    output_core_dims=[("dim_rho",), ("dim_rho",), ("dim_rho",), ("dim_rho",), ("dim_rho",)],
+    output_core_dims=[
+        ("dim_rho",),
+        ("dim_rho",),
+        ("dim_rho",),
+        ("dim_rho",),
+        ("dim_rho",),
+    ],
 )
 def calc_1D_plasma_profiles(
     profile_form: ProfileForm,
@@ -143,7 +171,13 @@ def calc_1D_plasma_profiles(
     dilution: float,
     normalized_inverse_temp_scale_length: Optional[float] = None,
     npoints: int = 50,
-) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64]]:
+) -> tuple[
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+]:
     """Estimate density and temperature profiles.
 
     Args:
@@ -165,7 +199,13 @@ def calc_1D_plasma_profiles(
         ValueError: if profile_form == prf and normalized_inverse_temp_scale_length is not set
     """
     if profile_form == ProfileForm.analytic:
-        rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = calc_analytic_profiles(
+        (
+            rho,
+            electron_density_profile,
+            fuel_ion_density_profile,
+            electron_temp_profile,
+            ion_temp_profile,
+        ) = calc_analytic_profiles(
             average_electron_density,
             average_electron_temp,
             average_ion_temp,
@@ -178,9 +218,17 @@ def calc_1D_plasma_profiles(
 
     elif profile_form == ProfileForm.prf:
         if normalized_inverse_temp_scale_length is None:
-            raise ValueError("normalized_inverse_temp_scale_length must be set if using profile_form = prf")
+            raise ValueError(
+                "normalized_inverse_temp_scale_length must be set if using profile_form = prf"
+            )
 
-        rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = calc_prf_profiles(
+        (
+            rho,
+            electron_density_profile,
+            fuel_ion_density_profile,
+            electron_temp_profile,
+            ion_temp_profile,
+        ) = calc_prf_profiles(
             average_electron_density,
             average_electron_temp,
             average_ion_temp,
@@ -192,9 +240,17 @@ def calc_1D_plasma_profiles(
             npoints=npoints,
         )
     else:
-        raise NotImplementedError(f"No implementation for ProfileForm = {profile_form} (type = {type(profile_form)})")
+        raise NotImplementedError(
+            f"No implementation for ProfileForm = {profile_form} (type = {type(profile_form)})"
+        )
 
-    return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
+    return (
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
+    )
 
 
 def calc_analytic_profiles(
@@ -206,7 +262,13 @@ def calc_analytic_profiles(
     temperature_peaking: float,
     dilution: float,
     npoints: int = 50,
-) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64]]:
+) -> tuple[
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+]:
     """Estimate density and temperature profiles using a simple analytic fit.
 
     Args:
@@ -224,14 +286,35 @@ def calc_analytic_profiles(
     """
     rho = np.linspace(0, 1, num=npoints, endpoint=False)
 
-    electron_density_profile = average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
-    fuel_ion_density_profile = (
-        average_electron_density * dilution * (ion_density_peaking) * ((1.0 - rho**2.0) ** (ion_density_peaking - 1.0))
+    electron_density_profile = (
+        average_electron_density
+        * electron_density_peaking
+        * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
     )
-    electron_temp_profile = average_electron_temp * temperature_peaking * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
-    ion_temp_profile = average_ion_temp * temperature_peaking * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
+    fuel_ion_density_profile = (
+        average_electron_density
+        * dilution
+        * (ion_density_peaking)
+        * ((1.0 - rho**2.0) ** (ion_density_peaking - 1.0))
+    )
+    electron_temp_profile = (
+        average_electron_temp
+        * temperature_peaking
+        * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
+    )
+    ion_temp_profile = (
+        average_ion_temp
+        * temperature_peaking
+        * ((1.0 - rho**2.0) ** (temperature_peaking - 1.0))
+    )
 
-    return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
+    return (
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
+    )
 
 
 def calc_prf_profiles(
@@ -244,7 +327,13 @@ def calc_prf_profiles(
     dilution: float,
     normalized_inverse_temp_scale_length: float,
     npoints: int = 50,
-) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64]]:
+) -> tuple[
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+    NDArray[float64],
+]:
     """Estimate density and temperature profiles using profiles from Pablo Rodriguez-Fernandez.
 
     Args:
@@ -263,7 +352,11 @@ def calc_prf_profiles(
     """
     rho = np.linspace(0, 1, num=npoints, endpoint=False)
 
-    rho, electron_temp_profile, electron_density_profile = evaluate_density_and_temperature_profile_fits(
+    (
+        rho,
+        electron_temp_profile,
+        electron_density_profile,
+    ) = evaluate_density_and_temperature_profile_fits(
         average_electron_temp,
         average_electron_density,
         temperature_peaking,
@@ -272,7 +365,11 @@ def calc_prf_profiles(
         rho=rho,
         dataset="PRF",
     )
-    rho, ion_temp_profile, fuel_ion_density_profile = evaluate_density_and_temperature_profile_fits(
+    (
+        rho,
+        ion_temp_profile,
+        fuel_ion_density_profile,
+    ) = evaluate_density_and_temperature_profile_fits(
         average_ion_temp,
         average_electron_density * dilution,
         temperature_peaking,
@@ -282,4 +379,10 @@ def calc_prf_profiles(
         dataset="PRF",
     )
 
-    return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
+    return (
+        rho,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
+    )

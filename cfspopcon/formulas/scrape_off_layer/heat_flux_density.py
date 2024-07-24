@@ -26,7 +26,9 @@ def calc_B_pol_omp(plasma_current: float, minor_radius: float) -> float:
 
 
 @Algorithm.register_algorithm(return_keys=["B_t_out_mid"])
-def calc_B_tor_omp(magnetic_field_on_axis: Unitfull, major_radius: Unitfull, minor_radius: Unitfull) -> Unitfull:
+def calc_B_tor_omp(
+    magnetic_field_on_axis: Unitfull, major_radius: Unitfull, minor_radius: Unitfull
+) -> Unitfull:
     """Calculate the toroidal magnetic field at the outboard midplane.
 
     Args:
@@ -41,7 +43,9 @@ def calc_B_tor_omp(magnetic_field_on_axis: Unitfull, major_radius: Unitfull, min
 
 
 @Algorithm.register_algorithm(return_keys=["fieldline_pitch_at_omp"])
-def calc_fieldline_pitch_at_omp(B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull) -> Unitfull:
+def calc_fieldline_pitch_at_omp(
+    B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull
+) -> Unitfull:
     """Calculate the pitch of the magnetic field at the outboard midplane.
 
     Args:
@@ -84,11 +88,18 @@ def calc_parallel_heat_flux_density(
       q_parallel [GW/m^2]
     """
     upstream_major_radius = major_radius + minor_radius
-    return P_sol * fraction_of_P_SOL_to_divertor / (2.0 * np.pi * upstream_major_radius * lambda_q) * fieldline_pitch_at_omp
+    return (
+        P_sol
+        * fraction_of_P_SOL_to_divertor
+        / (2.0 * np.pi * upstream_major_radius * lambda_q)
+        * fieldline_pitch_at_omp
+    )
 
 
 @Algorithm.register_algorithm(return_keys=["q_perp"])
-def calc_q_perp(P_sol: Unitfull, major_radius: Unitfull, minor_radius: Unitfull, lambda_q: Unitfull) -> Unitfull:
+def calc_q_perp(
+    P_sol: Unitfull, major_radius: Unitfull, minor_radius: Unitfull, lambda_q: Unitfull
+) -> Unitfull:
     """Calculate the perpendicular heat flux at the outboard midplane.
 
     Args:

@@ -63,13 +63,17 @@ def wraps_ufunc(  # noqa: PLR0915
     input_keys = list(input_units.keys())
 
     if not isinstance(pass_as_kwargs, tuple):
-        raise ValueError(f"pass_as_kwargs must be passed as a tuple of keys, not {str(type(pass_as_kwargs))[1:-1]}")
+        raise ValueError(
+            f"pass_as_kwargs must be passed as a tuple of keys, not {str(type(pass_as_kwargs))[1:-1]}"
+        )
 
     pass_as_positional_args = [key for key in input_keys if key not in pass_as_kwargs]
     for arg in pass_as_kwargs:
         kwarg_position = input_keys.index(arg)
         if kwarg_position < len(pass_as_positional_args):
-            raise ValueError(f"Argument {arg} in pass_as_kwargs appears before the positional args {pass_as_positional_args}")
+            raise ValueError(
+                f"Argument {arg} in pass_as_kwargs appears before the positional args {pass_as_positional_args}"
+            )
 
     if input_core_dims is not None:
         if not len(input_core_dims) == len(pass_as_positional_args):
@@ -88,10 +92,16 @@ def wraps_ufunc(  # noqa: PLR0915
                 f"Keys for input_units {input_units.keys()} did not match func_parameters {func_parameters.keys()} (n.b. order matters!)"
             )
 
-        default_values = {key: val.default for key, val in func_parameters.items() if val.default is not Parameter.empty}
+        default_values = {
+            key: val.default
+            for key, val in func_parameters.items()
+            if val.default is not Parameter.empty
+        }
 
         @functools.wraps(func)
-        def popcon_ufunc_wrapped_call(*args: Any, **kwargs: Any) -> Any:  # noqa: PLR0912
+        def popcon_ufunc_wrapped_call(
+            *args: Any, **kwargs: Any
+        ) -> Any:  # noqa: PLR0912
             """Transform args and kwargs, then call the inner function."""
             # if anything goes wrong we can do some extra work to provide a better error below
             try:
@@ -103,7 +113,14 @@ def wraps_ufunc(  # noqa: PLR0915
                     )
 
                 args_dict = {**args_dict, **kwargs}
-                args_dict = {**args_dict, **{key: val for key, val in default_values.items() if key not in args_dict.keys()}}
+                args_dict = {
+                    **args_dict,
+                    **{
+                        key: val
+                        for key, val in default_values.items()
+                        if key not in args_dict.keys()
+                    },
+                }
 
                 args_dict = _return_magnitude_in_specified_units(args_dict, input_units)
 
@@ -111,7 +128,9 @@ def wraps_ufunc(  # noqa: PLR0915
                 for i, key in enumerate(pass_as_positional_args):
                     arg = args_dict[key]
                     if not isinstance(arg, xr.DataArray):
-                        positional_args.append(xr.DataArray(arg).expand_dims(input_core_dims[i]))
+                        positional_args.append(
+                            xr.DataArray(arg).expand_dims(input_core_dims[i])
+                        )
                     else:
                         positional_args.append(arg)
 
@@ -128,7 +147,9 @@ def wraps_ufunc(  # noqa: PLR0915
                     # Assume that the function return None
                     return function_return.item()
 
-                function_return = _convert_return_to_quantities(function_return, return_units)
+                function_return = _convert_return_to_quantities(
+                    function_return, return_units
+                )
 
                 function_return = list(function_return.values())
 
@@ -167,28 +188,40 @@ def wraps_ufunc(  # noqa: PLR0915
                     raise e
 
         # more meaningfull alias to the scalar non-unit version of the function
-        popcon_ufunc_wrapped_call.unitless_func = popcon_ufunc_wrapped_call.__wrapped__  # type:ignore[attr-defined]
-        popcon_ufunc_wrapped_call.__signature__ = _make_new_sig(func_signature, input_units, return_units)  # type:ignore[attr-defined]
+        popcon_ufunc_wrapped_call.unitless_func = (
+            popcon_ufunc_wrapped_call.__wrapped__
+        )  # type:ignore[attr-defined]
+        popcon_ufunc_wrapped_call.__signature__ = _make_new_sig(
+            func_signature, input_units, return_units
+        )  # type:ignore[attr-defined]
         return popcon_ufunc_wrapped_call
 
     return _wraps_ufunc
 
 
-def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Union[str, Unit, None]]:
+def _check_units(
+    units_dict: dict[str, Union[str, Unit, None]]
+) -> dict[str, Union[str, Unit, None]]:
     for key, unit in units_dict.items():
         if unit is None:
             pass
         elif isinstance(unit, str):
             units_dict[key] = ureg(unit).units
         elif not isinstance(unit, Unit):
-            raise TypeError(f"wraps_ufunc units for {key} must by of type str or Unit, not {str(type(unit))[1:-1]} (value was {unit})")
+            raise TypeError(
+                f"wraps_ufunc units for {key} must by of type str or Unit, not {str(type(unit))[1:-1]} (value was {unit})"
+            )
 
     return units_dict
 
 
-def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
+def _return_magnitude_in_specified_units(
+    vals: Any, units_mapping: dict[str, Union[str, Unit, None]]
+) -> dict[str, Any]:
     if not set(vals.keys()) == set(units_mapping):
-        raise ValueError(f"Argument keys {vals.keys()} did not match units_mapping keys {units_mapping.keys()}")
+        raise ValueError(
+            f"Argument keys {vals.keys()} did not match units_mapping keys {units_mapping.keys()}"
+        )
 
     converted_vals = {}
 
@@ -209,17 +242,23 @@ def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Uni
             converted_vals[key] = val
 
         else:
-            raise NotImplementedError(f"Cannot convert {key} of type {str(type(val))[1:-1]} to units {unit}")
+            raise NotImplementedError(
+                f"Cannot convert {key} of type {str(type(val))[1:-1]} to units {unit}"
+            )
 
     return converted_vals
 
 
-def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
+def _convert_return_to_quantities(
+    vals: Any, units_mapping: dict[str, Union[str, Unit, None]]
+) -> dict[str, Any]:
     if not isinstance(vals, tuple):
         vals = (vals,)
 
     if not len(vals) == len(units_mapping):
-        raise ValueError(f"Number of returned values ({len(vals)}) did not match length of units_mapping ({len(units_mapping)})")
+        raise ValueError(
+            f"Number of returned values ({len(vals)}) did not match length of units_mapping ({len(units_mapping)})"
+        )
     vals = dict(zip(units_mapping.keys(), vals))
 
     converted_vals = {}
@@ -258,7 +297,9 @@ def _make_new_sig(
         if unit is None:
             new_parameters.append(param)
         else:
-            new_parameters.append(param.replace(annotation=Union[Quantity, xr.DataArray]))
+            new_parameters.append(
+                param.replace(annotation=Union[Quantity, xr.DataArray])
+            )
 
     # update return annotation
     units_list = list(return_units.values())
@@ -277,7 +318,8 @@ def _make_new_sig(
             # be safely ignored.
             isinstance(ret_annotation, str)
             and ret_annotation.startswith("tuple")
-            and len(ret_annotation.removeprefix("tuple[").removesuffix("]").split(",")) == len(units_list)
+            and len(ret_annotation.removeprefix("tuple[").removesuffix("]").split(","))
+            == len(units_list)
         ):
             warnings.warn(
                 (
@@ -287,7 +329,10 @@ def _make_new_sig(
                 stacklevel=3,
             )
 
-    ret_types = tuple(xr.DataArray if units_list[i] is not None else old_types[i] for i in range(len(units_list)))
+    ret_types = tuple(
+        xr.DataArray if units_list[i] is not None else old_types[i]
+        for i in range(len(units_list))
+    )
 
     if len(ret_types) == 0:
         new_ret_ann: Union[type, None, GenericAlias] = None

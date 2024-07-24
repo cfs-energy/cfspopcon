@@ -10,7 +10,11 @@ from xarray.core.coordinates import DataArrayCoordinates
 from ..unit_handling import Quantity
 
 
-def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: Optional[xr.DataArray] = None) -> DataArrayCoordinates:
+def find_coords_of_minimum(
+    array: xr.DataArray,
+    keep_dims: Sequence[str] = [],
+    mask: Optional[xr.DataArray] = None,
+) -> DataArrayCoordinates:
     """Find the coordinates the minimum value of array.
 
     These coordinates can be used to find the value of other arrays at the same point.
@@ -37,7 +41,11 @@ def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], m
     return point_coords  # type:ignore[return-value]
 
 
-def find_coords_of_maximum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: Optional[xr.DataArray] = None) -> DataArrayCoordinates:
+def find_coords_of_maximum(
+    array: xr.DataArray,
+    keep_dims: Sequence[str] = [],
+    mask: Optional[xr.DataArray] = None,
+) -> DataArrayCoordinates:
     """Find the coordinates of the maximum value of array."""
     return find_coords_of_minimum(-array, keep_dims=keep_dims, mask=mask)
 

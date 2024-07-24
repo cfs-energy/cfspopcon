@@ -68,7 +68,13 @@ def two_point_model_fixed_fpow(
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
+    return (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+        target_q_parallel,
+    )
 
 
 @Algorithm.register_algorithm(
@@ -110,7 +116,9 @@ def two_point_model_fixed_qpart(
         :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`,
 
     """
-    SOL_power_loss_fraction = (1.0 - target_q_parallel / q_parallel).clip(min=0.0, max=1.0)
+    SOL_power_loss_fraction = (1.0 - target_q_parallel / q_parallel).clip(
+        min=0.0, max=1.0
+    )
 
     (
         separatrix_electron_temp,
@@ -129,7 +137,13 @@ def two_point_model_fixed_qpart(
         raise_error_if_not_converged=raise_error_if_not_converged,
     )
 
-    return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
+    return (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+        SOL_power_loss_fraction,
+    )
 
 
 @Algorithm.register_algorithm(
@@ -185,4 +199,10 @@ def two_point_model_fixed_tet(
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    return (separatrix_electron_temp, target_electron_density, SOL_power_loss_fraction, target_electron_flux, target_q_parallel)
+    return (
+        separatrix_electron_temp,
+        target_electron_density,
+        SOL_power_loss_fraction,
+        target_electron_flux,
+        target_q_parallel,
+    )

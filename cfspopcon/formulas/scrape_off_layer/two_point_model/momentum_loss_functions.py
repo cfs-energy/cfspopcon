@@ -9,7 +9,9 @@ from ....named_options import MomentumLossFunction
 from ....unit_handling import Quantity, ureg, wraps_ufunc
 
 
-def _calc_SOL_momentum_loss_fraction(A: float, Tstar: float, n: float, target_electron_temp: float) -> float:
+def _calc_SOL_momentum_loss_fraction(
+    A: float, Tstar: float, n: float, target_electron_temp: float
+) -> float:
     """Calculates the fraction of momentum lost in the SOL, for a generic SOL momentum loss function.
 
     This is equation 33 of :cite:`stangeby_2018`, rearranged for $f^{total}_{mom-loss}$
@@ -21,7 +23,9 @@ def _calc_SOL_momentum_loss_fraction(A: float, Tstar: float, n: float, target_el
     return_units=dict(momentum_loss_fraction=ureg.dimensionless),
     input_units=dict(key=None, target_electron_temp=ureg.eV),
 )
-def calc_SOL_momentum_loss_fraction(key: MomentumLossFunction, target_electron_temp: Quantity) -> float:
+def calc_SOL_momentum_loss_fraction(
+    key: MomentumLossFunction, target_electron_temp: Quantity
+) -> float:
     """Calculate the fraction of momentum lost in the SOL.
 
     The coefficients come from figure captions in :cite:`stangeby_2018`

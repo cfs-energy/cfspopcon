@@ -19,7 +19,9 @@ def BIRDS():
 
 @pytest.fixture(scope="session")
 def how_many_birds(BIRDS):
-    def count_birds(things_that_quack: int, things_that_cluck: int = 2) -> dict[str, Any]:
+    def count_birds(
+        things_that_quack: int, things_that_cluck: int = 2
+    ) -> dict[str, Any]:
         ducks = things_that_quack
         chooks = things_that_cluck
         all_birds = ducks + chooks
@@ -41,7 +43,9 @@ def ANIMALS():
 
 @pytest.fixture(scope="session")
 def how_many_animals(ANIMALS):
-    def count_animals(things_that_baa: int, all_birds: int, new_chickens_per_count: int = 2) -> dict[str, Any]:
+    def count_animals(
+        things_that_baa: int, all_birds: int, new_chickens_per_count: int = 2
+    ) -> dict[str, Any]:
         sheep = things_that_baa
 
         all_birds = all_birds + new_chickens_per_count
@@ -50,14 +54,19 @@ def how_many_animals(ANIMALS):
         local_vars = locals()
         return {key: local_vars[key] for key in ANIMALS}
 
-    return Algorithm(function=count_animals, return_keys=ANIMALS, skip_registration=True)
+    return Algorithm(
+        function=count_animals, return_keys=ANIMALS, skip_registration=True
+    )
 
 
 def test_algorithm_kw_only():
     def test(p1, p2, /, p_or_kw, *, kw):
         return {"p2_2": 10}
 
-    with pytest.raises(ValueError, match="Algorithm only supports functions with keyword arguments.*?POSITIONAL_ONLY parameter p1"):
+    with pytest.raises(
+        ValueError,
+        match="Algorithm only supports functions with keyword arguments.*?POSITIONAL_ONLY parameter p1",
+    ):
         _ = Algorithm(function=test, return_keys=["p2_2"], skip_registration=True)
 
 
@@ -99,14 +108,24 @@ def test_dummy_composite_algorithm(how_many_birds, BIRDS, how_many_animals, ANIM
     count_the_farm = how_many_birds + how_many_animals
 
     assert set(count_the_farm.return_keys) == set(BIRDS).union(set(ANIMALS))
-    assert set(count_the_farm.input_keys) == {"things_that_quack", "things_that_cluck", "things_that_baa", "new_chickens_per_count"}
-    assert set(count_the_farm.required_input_keys) == {"things_that_quack", "things_that_baa"}
+    assert set(count_the_farm.input_keys) == {
+        "things_that_quack",
+        "things_that_cluck",
+        "things_that_baa",
+        "new_chickens_per_count",
+    }
+    assert set(count_the_farm.required_input_keys) == {
+        "things_that_quack",
+        "things_that_baa",
+    }
 
     with contextlib.redirect_stdout(None):
         repr(count_the_farm)
 
     with pytest.warns():
-        result = count_the_farm.run(things_that_quack=1, things_that_baa=4, crocodiles=3)
+        result = count_the_farm.run(
+            things_that_quack=1, things_that_baa=4, crocodiles=3
+        )
 
     assert result["all_birds"] == 5  # N.b. this includes the new chickens
     assert result["ducks"] == 1
@@ -148,13 +167,17 @@ def test_dummy_composite_algorithm(how_many_birds, BIRDS, how_many_animals, ANIM
 
 def test_composite_of_composite(how_many_birds: Algorithm, how_many_animals: Algorithm):
     # add of Algorihtm + Composite should flatten into Composite of all Algorithms
-    count_the_farm = how_many_birds + CompositeAlgorithm([how_many_animals, how_many_animals])
+    count_the_farm = how_many_birds + CompositeAlgorithm(
+        [how_many_animals, how_many_animals]
+    )
     # thus the lenght of algorithms should be 3
     assert len(count_the_farm.algorithms) == 3
 
     ds = xr.Dataset(dict(things_that_quack=1, things_that_baa=4, crocodiles=3))
     ds = count_the_farm.update_dataset(ds)
-    assert ds["all_animals"] == 11  # Each time we count how many animals, we get two new chickens
+    assert (
+        ds["all_animals"] == 11
+    )  # Each time we count how many animals, we get two new chickens
 
     # test the flattening of composites in __init__ and __add__
     comp = CompositeAlgorithm([how_many_birds, count_the_farm])
@@ -189,7 +212,9 @@ def test_composite_of_composite(how_many_birds: Algorithm, how_many_animals: Alg
 
     # missing + unused  now
     input_ds = input_ds.drop_vars("things_that_baa")
-    with pytest.raises(RuntimeError, match="Missing input parameters.*Also had unused.*"):
+    with pytest.raises(
+        RuntimeError, match="Missing input parameters.*Also had unused.*"
+    ):
         count_the_farm.validate_inputs(
             input_ds,
             quiet=False,
@@ -199,7 +224,9 @@ def test_composite_of_composite(how_many_birds: Algorithm, how_many_animals: Alg
 
     # missing only
     input_ds = input_ds.drop_vars("crocodiles")
-    with pytest.raises(RuntimeError, match="Missing input parameters .things_that_baa.."):
+    with pytest.raises(
+        RuntimeError, match="Missing input parameters .things_that_baa.."
+    ):
         count_the_farm.validate_inputs(
             input_ds,
             quiet=False,
@@ -208,7 +235,9 @@ def test_composite_of_composite(how_many_birds: Algorithm, how_many_animals: Alg
         )
 
     wrong_order_comp = how_many_animals + how_many_birds
-    with pytest.raises(RuntimeError, match="Algorithms out of order. all_birds needed by Algorithm.*"):
+    with pytest.raises(
+        RuntimeError, match="Algorithms out of order. all_birds needed by Algorithm.*"
+    ):
         wrong_order_comp.validate_inputs(
             input_ds,
             quiet=False,
@@ -243,7 +272,11 @@ def test_single_function_algorithm():
         return c, d
 
     alg = Algorithm.from_single_function(
-        dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True, skip_registration=True
+        dummy_func,
+        return_keys=["c", "d"],
+        name="test_dummy",
+        skip_unit_conversion=True,
+        skip_registration=True,
     )
 
     result = alg.run(a=1, b=2)
@@ -254,7 +287,10 @@ def test_single_function_algorithm():
         return average_electron_density * 2
 
     alg = Algorithm.from_single_function(
-        in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out", skip_registration=True
+        in_and_out,
+        return_keys=["average_electron_density"],
+        name="test_dummy_in_and_out",
+        skip_registration=True,
     )
     result = alg.run(average_electron_density=1.2 * ureg.n20)
     assert result["average_electron_density"] == 24.0 * ureg.n19

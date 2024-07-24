@@ -89,7 +89,14 @@ def calc_power_crossing_separatrix_in_electron_channel(
 
     L_parallel = np.pi * cylindrical_safety_factor * major_radius
 
-    A_SOL = 2.0 * np.pi * (major_radius + minor_radius) * lambda_q * B_pol_out_mid / B_t_out_mid
+    A_SOL = (
+        2.0
+        * np.pi
+        * (major_radius + minor_radius)
+        * lambda_q
+        * B_pol_out_mid
+        / B_t_out_mid
+    )
 
     P_SOL_e = (
         2.0

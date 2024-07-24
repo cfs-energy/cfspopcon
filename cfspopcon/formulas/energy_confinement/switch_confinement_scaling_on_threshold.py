@@ -7,7 +7,9 @@ from ...unit_handling import Unitfull
 from .solve_for_input_power import solve_tau_e_scaling_for_input_power
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in", "SOC_LOC_ratio"])
+@Algorithm.register_algorithm(
+    return_keys=["energy_confinement_time", "P_in", "SOC_LOC_ratio"]
+)
 def switch_to_linearised_ohmic_confinement_below_threshold(
     plasma_stored_energy: Unitfull,
     energy_confinement_time: Unitfull,
@@ -66,7 +68,9 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
 
     # Use Linearized Ohmic Confinement if it gives worse energy confinement.
     SOC_LOC_ratio = energy_confinement_time / tau_e_LOC
-    energy_confinement_time = xr.where(SOC_LOC_ratio > 1.0, tau_e_LOC, energy_confinement_time)  # type:ignore[no-untyped-call]
+    energy_confinement_time = xr.where(
+        SOC_LOC_ratio > 1.0, tau_e_LOC, energy_confinement_time
+    )  # type:ignore[no-untyped-call]
     P_in = xr.where(SOC_LOC_ratio > 1.0, P_in_LOC, P_in)  # type:ignore[no-untyped-call]
 
     return (energy_confinement_time, P_in, SOC_LOC_ratio)
@@ -134,7 +138,11 @@ def switch_to_L_mode_confinement_below_threshold(
     )
 
     # Use L-mode confinement if Psol < PLH
-    energy_confinement_time = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, tau_e_L_mode, energy_confinement_time)  # type:ignore[no-untyped-call]
-    P_in = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, P_in_L_mode, P_in)  # type:ignore[no-untyped-call]
+    energy_confinement_time = xr.where(
+        ratio_of_P_SOL_to_P_LH < 1.0, tau_e_L_mode, energy_confinement_time
+    )  # type:ignore[no-untyped-call]
+    P_in = xr.where(
+        ratio_of_P_SOL_to_P_LH < 1.0, P_in_L_mode, P_in
+    )  # type:ignore[no-untyped-call]
 
     return energy_confinement_time, P_in

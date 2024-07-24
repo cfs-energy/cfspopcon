@@ -172,13 +172,29 @@ def resolve(app, env, node, contnode):
             "FunctionType",
         ]:
             node["reftype"] = "obj"
-            ret_node = py.resolve_xref(env, node["refdoc"], app.builder, node["reftype"], node["reftarget"], node, contnode)
+            ret_node = py.resolve_xref(
+                env,
+                node["refdoc"],
+                app.builder,
+                node["reftype"],
+                node["reftarget"],
+                node,
+                contnode,
+            )
 
         # patch Self return types to point to the class the function is defined
         # on
         elif "typing_ext" in node["reftarget"]:
             node["reftarget"] = node["py:class"]
-            ret_node = py.resolve_xref(env, node["refdoc"], app.builder, node["reftype"], node["reftarget"], node, contnode)
+            ret_node = py.resolve_xref(
+                env,
+                node["refdoc"],
+                app.builder,
+                node["reftype"],
+                node["reftarget"],
+                node,
+                contnode,
+            )
 
         elif "pint" in node["reftarget"]:
             s = node["reftarget"]
@@ -215,7 +231,9 @@ class FunctionWrapperDocumenter(FunctionDocumenter):
 
     @classmethod
     def can_document_member(cls, member, membername, isattr, parent):
-        return super().can_document_member(member, membername, isattr, parent) and hasattr(member, "unitless_func")
+        return super().can_document_member(
+            member, membername, isattr, parent
+        ) and hasattr(member, "unitless_func")
 
     def format_args(self):
         fw = self.object
@@ -226,16 +244,26 @@ class FunctionWrapperDocumenter(FunctionDocumenter):
         super(FunctionDocumenter, self).document_members(all_members)
 
     def get_object_members(self, want_all: bool):
-        members = get_class_members(self.object, self.objpath, self.get_attr, self.config.autodoc_inherit_docstrings)
+        members = get_class_members(
+            self.object,
+            self.objpath,
+            self.get_attr,
+            self.config.autodoc_inherit_docstrings,
+        )
         unitless_func = members.get("unitless_func", None)
         if unitless_func is not None:
-            unitless_func.object.__doc__ = "A scalar and not unit aware version of the above function."
+            unitless_func.object.__doc__ = (
+                "A scalar and not unit aware version of the above function."
+            )
             # the unitless function will get documented as a member of the FuncitionWrapper class
             # but sphinx pops the first argument because it thinks that's the "self" so we monkey patch around that
             # by prepending a parameter that gets thrown away
             tmp_param = Parameter("tmp", kind=Parameter.POSITIONAL_ONLY)
             s = signature(unitless_func.object)
-            new_sig = s.replace(parameters=[tmp_param, *s.parameters.values()], return_annotation=s.return_annotation)
+            new_sig = s.replace(
+                parameters=[tmp_param, *s.parameters.values()],
+                return_annotation=s.return_annotation,
+            )
             unitless_func.object.__signature__ = new_sig
         return False, [unitless_func]
 
@@ -256,8 +284,17 @@ class AlgDocumenter(ClassDocumenter):
         super(ClassDocumenter, self).add_directive_header(sig)
 
     def get_object_members(self, want_all: bool):
-        members = get_class_members(self.object, self.objpath, self.get_attr, self.config.autodoc_inherit_docstrings)
-        return False, [m for k, m in members.items() if k in {"run", "update_dataset", "return_keys"}]
+        members = get_class_members(
+            self.object,
+            self.objpath,
+            self.get_attr,
+            self.config.autodoc_inherit_docstrings,
+        )
+        return False, [
+            m
+            for k, m in members.items()
+            if k in {"run", "update_dataset", "return_keys"}
+        ]
 
     def format_signature(self, **kwargs) -> str:
         return ""

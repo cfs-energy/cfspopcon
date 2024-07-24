@@ -1,6 +1,12 @@
 """Routines to calculate the scrape-off-layer conditions and check divertor survivability."""
 
-from .heat_flux_density import calc_B_pol_omp, calc_B_tor_omp, calc_fieldline_pitch_at_omp, calc_parallel_heat_flux_density, calc_q_perp
+from .heat_flux_density import (
+    calc_B_pol_omp,
+    calc_B_tor_omp,
+    calc_fieldline_pitch_at_omp,
+    calc_parallel_heat_flux_density,
+    calc_q_perp,
+)
 from .lambda_q import calc_lambda_q
 from .separatrix_density import calc_separatrix_electron_density
 from .two_point_model import (

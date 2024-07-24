@@ -45,13 +45,16 @@ def calc_fusion_power(
         )
 
     power_density_factor = reaction.calc_power_density(
-        ion_temp=ion_temp_profile, heavier_fuel_species_fraction=heavier_fuel_species_fraction
+        ion_temp=ion_temp_profile,
+        heavier_fuel_species_fraction=heavier_fuel_species_fraction,
     )
     neutral_power_density_factor = reaction.calc_power_density_to_neutrals(
-        ion_temp=ion_temp_profile, heavier_fuel_species_fraction=heavier_fuel_species_fraction
+        ion_temp=ion_temp_profile,
+        heavier_fuel_species_fraction=heavier_fuel_species_fraction,
     )
     charged_power_density_factor = reaction.calc_power_density_to_charged(
-        ion_temp=ion_temp_profile, heavier_fuel_species_fraction=heavier_fuel_species_fraction
+        ion_temp=ion_temp_profile,
+        heavier_fuel_species_fraction=heavier_fuel_species_fraction,
     )
 
     total_fusion_power = _integrate_power(
@@ -78,7 +81,9 @@ def calc_fusion_power(
     return total_fusion_power, fusion_power_to_neutral, fusion_power_to_charged
 
 
-@Algorithm.register_algorithm(return_keys=["neutron_power_flux_to_walls", "neutron_rate"])
+@Algorithm.register_algorithm(
+    return_keys=["neutron_power_flux_to_walls", "neutron_rate"]
+)
 def calc_neutron_flux_to_walls(
     P_neutron: float,
     surface_area: float,
@@ -110,7 +115,11 @@ def calc_neutron_flux_to_walls(
     energy_to_neutrals_per_reaction = reaction.calc_energy_to_neutrals_per_reaction()
 
     # Prevent division by zero.
-    neutron_rate = xr.where(energy_to_neutrals_per_reaction > 0, P_neutron / energy_to_neutrals_per_reaction, 0.0)  # type:ignore[no-untyped-call]
+    neutron_rate = xr.where(
+        energy_to_neutrals_per_reaction > 0,
+        P_neutron / energy_to_neutrals_per_reaction,
+        0.0,
+    )  # type:ignore[no-untyped-call]
 
     return neutron_power_flux_to_walls, neutron_rate
 
@@ -134,6 +143,9 @@ def _integrate_power(
     """
     power_density = power_density_factor * fuel_density * fuel_density
 
-    power = integrate_profile_over_volume(power_density / ureg.MW, rho, plasma_volume) * ureg.MW
+    power = (
+        integrate_profile_over_volume(power_density / ureg.MW, rho, plasma_volume)
+        * ureg.MW
+    )
 
     return power

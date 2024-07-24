@@ -38,20 +38,33 @@ def calc_zeff_and_dilution_due_to_impurities(
     starting_dilution = 1.0
 
     impurity_charge_state = calc_impurity_charge_state(
-        average_electron_density, average_electron_temp, impurities.dim_species, atomic_data.item()
+        average_electron_density,
+        average_electron_temp,
+        impurities.dim_species,
+        atomic_data.item(),
     )
     change_in_zeff = calc_change_in_zeff(impurity_charge_state, impurities)
     change_in_dilution = calc_change_in_dilution(impurity_charge_state, impurities)
 
     z_effective = starting_zeff + change_in_zeff.sum(dim="dim_species")
     dilution = starting_dilution - change_in_dilution.sum(dim="dim_species")
-    summed_impurity_density = impurities.sum(dim="dim_species") * average_electron_density
+    summed_impurity_density = (
+        impurities.sum(dim="dim_species") * average_electron_density
+    )
     average_ion_density = dilution * average_electron_density
 
-    return (impurity_charge_state, z_effective, dilution, summed_impurity_density, average_ion_density)
+    return (
+        impurity_charge_state,
+        z_effective,
+        dilution,
+        summed_impurity_density,
+        average_ion_density,
+    )
 
 
-def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
+def calc_change_in_zeff(
+    impurity_charge_state: float, impurity_concentration: xr.DataArray
+) -> xr.DataArray:
     """Calculate the change in the effective charge due to the specified impurities.
 
     Args:
@@ -61,10 +74,14 @@ def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr
     Returns:
         change in zeff [~]
     """
-    return impurity_charge_state * (impurity_charge_state - 1.0) * impurity_concentration
+    return (
+        impurity_charge_state * (impurity_charge_state - 1.0) * impurity_concentration
+    )
 
 
-def calc_change_in_dilution(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
+def calc_change_in_dilution(
+    impurity_charge_state: float, impurity_concentration: xr.DataArray
+) -> xr.DataArray:
     """Calculate the change in n_fuel/n_e due to the specified impurities.
 
     Args:

@@ -7,7 +7,11 @@ from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
 @Algorithm.register_algorithm(return_keys=["f_shaping"])
-def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, triangularity_psi95: Unitfull) -> Unitfull:
+def calc_f_shaping_for_qstar(
+    inverse_aspect_ratio: Unitfull,
+    areal_elongation: Unitfull,
+    triangularity_psi95: Unitfull,
+) -> Unitfull:
     """Calculate the shaping function.
 
     Equation A11 from ITER Physics Basis Ch. 1. Eqn. A-11 :cite:`editors_iter_1999`
@@ -22,8 +26,20 @@ def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: U
     Returns:
         :term:`f_shaping` [~]
     """
-    return ((1.0 + areal_elongation**2.0 * (1.0 + 2.0 * triangularity_psi95**2.0 - 1.2 * triangularity_psi95**3.0)) / 2.0) * (
-        (1.17 - 0.65 * inverse_aspect_ratio) / (1.0 - inverse_aspect_ratio**2.0) ** 2.0
+    return (
+        (
+            1.0
+            + areal_elongation**2.0
+            * (
+                1.0
+                + 2.0 * triangularity_psi95**2.0
+                - 1.2 * triangularity_psi95**3.0
+            )
+        )
+        / 2.0
+    ) * (
+        (1.17 - 0.65 * inverse_aspect_ratio)
+        / (1.0 - inverse_aspect_ratio**2.0) ** 2.0
     )
 
 
@@ -39,7 +55,11 @@ def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: U
     return_units=dict(plasma_current=ureg.MA),
 )
 def calc_plasma_current_from_qstar(
-    magnetic_field_on_axis: float, major_radius: float, inverse_aspect_ratio: float, q_star: float, f_shaping: float
+    magnetic_field_on_axis: float,
+    major_radius: float,
+    inverse_aspect_ratio: float,
+    q_star: float,
+    f_shaping: float,
 ) -> float:
     """Calculate the plasma current in mega-amperes.
 
@@ -56,7 +76,10 @@ def calc_plasma_current_from_qstar(
         :term:`plasma_current` [MA]
     """
     plasma_current: float = (
-        5.0 * ((inverse_aspect_ratio * major_radius) ** 2.0) * (magnetic_field_on_axis / (q_star * major_radius)) * f_shaping
+        5.0
+        * ((inverse_aspect_ratio * major_radius) ** 2.0)
+        * (magnetic_field_on_axis / (q_star * major_radius))
+        * f_shaping
     )
     return plasma_current
 
@@ -73,7 +96,11 @@ def calc_plasma_current_from_qstar(
     return_units=dict(q_star=ureg.dimensionless),
 )
 def calc_q_star_from_plasma_current(
-    magnetic_field_on_axis: float, major_radius: float, inverse_aspect_ratio: float, plasma_current: float, f_shaping: float
+    magnetic_field_on_axis: float,
+    major_radius: float,
+    inverse_aspect_ratio: float,
+    plasma_current: float,
+    f_shaping: float,
 ) -> float:
     """Calculate an analytical estimate for the edge safety factor q_star.
 
@@ -89,7 +116,13 @@ def calc_q_star_from_plasma_current(
     Returns:
         :term:`qstar` [~]
     """
-    qstar: float = 5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
+    qstar: float = (
+        5.0
+        * (inverse_aspect_ratio * major_radius) ** 2.0
+        * magnetic_field_on_axis
+        / (plasma_current * major_radius)
+        * f_shaping
+    )
     return qstar
 
 
@@ -110,10 +143,23 @@ def calc_cylindrical_edge_safety_factor(
 
     Gives a slightly different result to our standard q_star calculation.
     """
-    shaping_correction = np.sqrt((1.0 + elongation_psi95**2 * (1.0 + 2.0 * triangularity_psi95**2 - 1.2 * triangularity_psi95**3)) / 2.0)
+    shaping_correction = np.sqrt(
+        (
+            1.0
+            + elongation_psi95**2
+            * (1.0 + 2.0 * triangularity_psi95**2 - 1.2 * triangularity_psi95**3)
+        )
+        / 2.0
+    )
 
     poloidal_circumference = 2.0 * np.pi * minor_radius * shaping_correction
 
     average_B_pol = ureg.mu_0 * plasma_current / poloidal_circumference
 
-    return magnetic_field_on_axis / average_B_pol * minor_radius / major_radius * shaping_correction
+    return (
+        magnetic_field_on_axis
+        / average_B_pol
+        * minor_radius
+        / major_radius
+        * shaping_correction
+    )

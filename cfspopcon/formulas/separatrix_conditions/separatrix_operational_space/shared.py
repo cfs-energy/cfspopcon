@@ -7,7 +7,13 @@ from ....unit_handling import Quantity, Unitfull, ureg, wraps_ufunc
 from ...metrics.larmor_radius import calc_larmor_radius
 
 
-def calc_ideal_MHD_wavenumber(beta_e: Unitfull, epsilon_hat: Unitfull, omega_B: Unitfull, tau_i: Unitfull, alpha_t: Unitfull) -> Unitfull:
+def calc_ideal_MHD_wavenumber(
+    beta_e: Unitfull,
+    epsilon_hat: Unitfull,
+    omega_B: Unitfull,
+    tau_i: Unitfull,
+    alpha_t: Unitfull,
+) -> Unitfull:
     """Calculate k_ideal, which gives the spatial scale of ideal MHD modes.
 
     Equation G.3 from :cite:`Eich_2021`.
@@ -18,7 +24,9 @@ def calc_ideal_MHD_wavenumber(beta_e: Unitfull, epsilon_hat: Unitfull, omega_B: 
     return np.sqrt(beta_e * epsilon_hat * omega_B**1.5 * (1.0 + tau_i) / alpha_t)
 
 
-def calc_resistive_ballooning_wavenumber(critical_alpha_MHD: Unitfull, alpha_t: Unitfull, omega_B: Unitfull) -> Unitfull:
+def calc_resistive_ballooning_wavenumber(
+    critical_alpha_MHD: Unitfull, alpha_t: Unitfull, omega_B: Unitfull
+) -> Unitfull:
     """Calculate k_RBM, which gives the spatial scale of resistive ballooning modes.
 
     This is the square root of the right-hand-side of equation 4 from :cite:`Eich_2021`.
@@ -43,14 +51,24 @@ def calc_electromagnetic_wavenumber(beta_e: Unitfull, mu: Unitfull) -> Unitfull:
     return np.sqrt(beta_e / mu)
 
 
-def calc_electron_beta(electron_density: Unitfull, electron_temp: Unitfull, magnetic_field_strength: Unitfull) -> Unitfull:
+def calc_electron_beta(
+    electron_density: Unitfull,
+    electron_temp: Unitfull,
+    magnetic_field_strength: Unitfull,
+) -> Unitfull:
     """Calculate the electron beta (beta_e).
 
     N.b. this is NOT the electron dynamical beta, which does not have the factor of 2.
 
     Row 5, table 2 from :cite:`Eich_2021`, corrected for factor of 2
     """
-    return 2.0 * ureg.mu_0 * electron_density * electron_temp / magnetic_field_strength**2
+    return (
+        2.0
+        * ureg.mu_0
+        * electron_density
+        * electron_temp
+        / magnetic_field_strength**2
+    )
 
 
 def calc_electron_to_ion_mass_ratio(ion_mass: Unitfull) -> Unitfull:
@@ -61,7 +79,9 @@ def calc_electron_to_ion_mass_ratio(ion_mass: Unitfull) -> Unitfull:
     return Quantity(1, ureg.electron_mass) / ion_mass
 
 
-def calc_curvature_drive(perpendicular_decay_length: Unitfull, major_radius: Unitfull) -> Unitfull:
+def calc_curvature_drive(
+    perpendicular_decay_length: Unitfull, major_radius: Unitfull
+) -> Unitfull:
     """Calculate the curvature (interchange) drive term.
 
     Row 6, table 2 from :cite:`Eich_2021`
@@ -72,7 +92,11 @@ def calc_curvature_drive(perpendicular_decay_length: Unitfull, major_radius: Uni
     return 2.0 * perpendicular_decay_length / major_radius
 
 
-def calc_squared_scale_ratio(safety_factor: Unitfull, major_radius: Unitfull, perpendicular_decay_length: Unitfull) -> Unitfull:
+def calc_squared_scale_ratio(
+    safety_factor: Unitfull,
+    major_radius: Unitfull,
+    perpendicular_decay_length: Unitfull,
+) -> Unitfull:
     """Calculate the squared ratio of the parallel to perpendicular length scales.
 
     From text at top of right column on page 12 of :cite:`Eich_2021`
@@ -81,7 +105,9 @@ def calc_squared_scale_ratio(safety_factor: Unitfull, major_radius: Unitfull, pe
 
 
 @Algorithm.register_algorithm(return_keys=["critical_alpha_MHD"])
-def calc_critical_alpha_MHD(elongation_psi95: Unitfull, triangularity_psi95: Unitfull) -> Unitfull:
+def calc_critical_alpha_MHD(
+    elongation_psi95: Unitfull, triangularity_psi95: Unitfull
+) -> Unitfull:
     """Calculate the critical value of alpha_MHD.
 
     Equation K.5 from :cite:`Eich_2021`
@@ -113,7 +139,13 @@ def calc_poloidal_sound_larmor_radius(
     Returns:
         :term:`poloidal_sound_larmor_radius`
     """
-    poloidal_circumference = 2.0 * np.pi * minor_radius * (1 + 0.55 * (elongation_psi95 - 1)) * (1 + 0.08 * triangularity_psi95**2)
+    poloidal_circumference = (
+        2.0
+        * np.pi
+        * minor_radius
+        * (1 + 0.55 * (elongation_psi95 - 1))
+        * (1 + 0.08 * triangularity_psi95**2)
+    )
     B_pol_avg = ureg.mu_0 * plasma_current / poloidal_circumference
     return calc_larmor_radius(
         species_temperature=separatrix_electron_temp,
@@ -132,7 +164,10 @@ def calc_electron_pressure_decay_length_Eich2021H(
     return 1.2 * (1 + factor * alpha_t**1.9) * poloidal_sound_larmor_radius
 
 
-@wraps_ufunc(input_units=dict(alpha_t=ureg.dimensionless), return_units=dict(electron_pressure_decay_length=ureg.mm))
+@wraps_ufunc(
+    input_units=dict(alpha_t=ureg.dimensionless),
+    return_units=dict(electron_pressure_decay_length=ureg.mm),
+)
 def calc_electron_pressure_decay_length_Manz2023L(alpha_t: float) -> float:
     """Calculate the L-mode electron pressure decay length.
 
@@ -141,7 +176,9 @@ def calc_electron_pressure_decay_length_Manz2023L(alpha_t: float) -> float:
     return 17.3 * alpha_t**0.298  # type:ignore[no-any-return]
 
 
-def calc_lambda_q_Eich2020H(alpha_t: Unitfull, poloidal_sound_larmor_radius: Unitfull) -> Unitfull:
+def calc_lambda_q_Eich2020H(
+    alpha_t: Unitfull, poloidal_sound_larmor_radius: Unitfull
+) -> Unitfull:
     """Calculate the H-mode heat flux decay length.
 
     Equation 22 from :cite:`Eich_2020`, then using lambda_q = 2/7 lambda_Te (equation A1)

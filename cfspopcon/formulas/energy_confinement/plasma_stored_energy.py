@@ -28,7 +28,10 @@ def calc_plasma_stored_energy(
     """
     Wp = (
         (3.0 / 2.0)
-        * ((average_electron_density * average_electron_temp) + ((average_ion_density + summed_impurity_density) * average_ion_temp))
+        * (
+            (average_electron_density * average_electron_temp)
+            + ((average_ion_density + summed_impurity_density) * average_ion_temp)
+        )
         * plasma_volume
     )
 

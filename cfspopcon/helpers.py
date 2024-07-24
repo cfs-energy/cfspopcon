@@ -41,7 +41,9 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
 
 def make_impurities_array(
     species_list: Union[list[Union[str, AtomicSpecies]], Union[str, AtomicSpecies]],
-    concentrations_list: Union[list[Union[float, xr.DataArray]], Union[float, xr.DataArray]],
+    concentrations_list: Union[
+        list[Union[float, xr.DataArray]], Union[float, xr.DataArray]
+    ],
 ) -> xr.DataArray:
     """Make an xr.DataArray with impurity species and their corresponding concentrations.
 
@@ -61,7 +63,9 @@ def make_impurities_array(
         ]
 
     if not len(species_list) == len(concentrations_list):
-        raise ValueError(f"Dimension mismatch. Input was species list [{species_list}], concentrations list [{concentrations_list}]")
+        raise ValueError(
+            f"Dimension mismatch. Input was species list [{species_list}], concentrations list [{concentrations_list}]"
+        )
 
     array = xr.DataArray()
     for species, concentration in zip(species_list, concentrations_list):
@@ -76,7 +80,9 @@ def make_impurities_array_from_kwargs(**kwargs: Any) -> xr.DataArray:
 
 
 def extend_impurities_array(
-    array: xr.DataArray, species: Union[str, AtomicSpecies], concentration: Union[float, xr.DataArray]
+    array: xr.DataArray,
+    species: Union[str, AtomicSpecies],
+    concentration: Union[float, xr.DataArray],
 ) -> xr.DataArray:
     """Append a new element to the impurities array.
 
@@ -92,10 +98,16 @@ def extend_impurities_array(
 
     if not isinstance(concentration, xr.DataArray):
         concentration = xr.DataArray(concentration)
-    concentration = concentration.expand_dims("dim_species").assign_coords(dim_species=[species])
+    concentration = concentration.expand_dims("dim_species").assign_coords(
+        dim_species=[species]
+    )
 
     if array.ndim == 0:
         return concentration
     else:
-        other_species = array.sel(dim_species=[s for s in array.dim_species if s != species])
-        return xr.concat((other_species, concentration), dim="dim_species").sortby("dim_species")
+        other_species = array.sel(
+            dim_species=[s for s in array.dim_species if s != species]
+        )
+        return xr.concat((other_species, concentration), dim="dim_species").sortby(
+            "dim_species"
+        )

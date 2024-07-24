@@ -54,21 +54,33 @@ def calc_LH_transition_threshold_power(
     def _calc_Martin_LH_threshold(electron_density: float) -> float:
         _DEUTERIUM_MASS_NUMBER = 2.0
 
-        return float(0.0488 * ((electron_density / 10.0) ** 0.717) * (magnetic_field_on_axis**0.803) * (surface_area**0.941)) * (
-            _DEUTERIUM_MASS_NUMBER / fuel_average_mass_number
-        )
+        return float(
+            0.0488
+            * ((electron_density / 10.0) ** 0.717)
+            * (magnetic_field_on_axis**0.803)
+            * (surface_area**0.941)
+        ) * (_DEUTERIUM_MASS_NUMBER / fuel_average_mass_number)
 
     if confinement_power_scaling == ConfinementPowerScaling.H_mode_Martin:
         # Ryter 2014, equation 3
         neMin19 = (
-            0.7 * (plasma_current**0.34) * (magnetic_field_on_axis**0.62) * (minor_radius**-0.95) * ((major_radius / minor_radius) ** 0.4)
+            0.7
+            * (plasma_current**0.34)
+            * (magnetic_field_on_axis**0.62)
+            * (minor_radius**-0.95)
+            * ((major_radius / minor_radius) ** 0.4)
         )
 
         if average_electron_density < neMin19:
             P_LH_thresh = _calc_Martin_LH_threshold(electron_density=neMin19)
-            return float(P_LH_thresh * (neMin19 / average_electron_density) ** 2.0) * confinement_threshold_scalar
+            return (
+                float(P_LH_thresh * (neMin19 / average_electron_density) ** 2.0)
+                * confinement_threshold_scalar
+            )
         else:
-            P_LH_thresh = _calc_Martin_LH_threshold(electron_density=average_electron_density)
+            P_LH_thresh = _calc_Martin_LH_threshold(
+                electron_density=average_electron_density
+            )
             return P_LH_thresh * confinement_threshold_scalar
 
     else:
@@ -78,7 +90,9 @@ def calc_LH_transition_threshold_power(
 
 
 calc_ratio_P_LH = Algorithm.from_single_function(
-    func=lambda P_sol, P_LH_thresh: P_sol / P_LH_thresh, return_keys=["ratio_of_P_SOL_to_P_LH"], name="calc_ratio_P_LH"
+    func=lambda P_sol, P_LH_thresh: P_sol / P_LH_thresh,
+    return_keys=["ratio_of_P_SOL_to_P_LH"],
+    name="calc_ratio_P_LH",
 )
 
 
@@ -122,35 +136,71 @@ def calc_LI_transition_threshold_power(
     """
 
     def _calc_AUG_LI_threshold(
-        average_electron_density: float, magnetic_field_on_axis: float, surface_area: float, confinement_threshold_scalar: float
+        average_electron_density: float,
+        magnetic_field_on_axis: float,
+        surface_area: float,
+        confinement_threshold_scalar: float,
     ) -> float:
         return (
-            float(0.14 * (average_electron_density / 10) * (magnetic_field_on_axis / 2.4) ** 0.39 * surface_area)
+            float(
+                0.14
+                * (average_electron_density / 10)
+                * (magnetic_field_on_axis / 2.4) ** 0.39
+                * surface_area
+            )
             * confinement_threshold_scalar
         )
 
     def _calc_HubbardNF17_LI_threshold(
-        average_electron_density: float, magnetic_field_on_axis: float, surface_area: float, confinement_threshold_scalar: float
+        average_electron_density: float,
+        magnetic_field_on_axis: float,
+        surface_area: float,
+        confinement_threshold_scalar: float,
     ) -> float:
         return (
-            float(0.162 * (average_electron_density / 10) * (magnetic_field_on_axis**0.262) * surface_area) * confinement_threshold_scalar
+            float(
+                0.162
+                * (average_electron_density / 10)
+                * (magnetic_field_on_axis**0.262)
+                * surface_area
+            )
+            * confinement_threshold_scalar
         )
 
     def _calc_HubbardNF12_LI_threshold(
-        average_electron_density: float, plasma_current: float, confinement_threshold_scalar: float
+        average_electron_density: float,
+        plasma_current: float,
+        confinement_threshold_scalar: float,
     ) -> float:
-        return float(2.11 * plasma_current**0.94 * ((average_electron_density / 10.0) ** 0.65)) * confinement_threshold_scalar
+        return (
+            float(
+                2.11
+                * plasma_current**0.94
+                * ((average_electron_density / 10.0) ** 0.65)
+            )
+            * confinement_threshold_scalar
+        )
 
     if confinement_power_scaling == ConfinementPowerScaling.I_mode_AUG:
-        P_LI_thresh = _calc_AUG_LI_threshold(average_electron_density, magnetic_field_on_axis, surface_area, confinement_threshold_scalar)
+        P_LI_thresh = _calc_AUG_LI_threshold(
+            average_electron_density,
+            magnetic_field_on_axis,
+            surface_area,
+            confinement_threshold_scalar,
+        )
 
     elif confinement_power_scaling == ConfinementPowerScaling.I_mode_HubbardNF17:
         P_LI_thresh = _calc_HubbardNF17_LI_threshold(
-            average_electron_density, magnetic_field_on_axis, surface_area, confinement_threshold_scalar
+            average_electron_density,
+            magnetic_field_on_axis,
+            surface_area,
+            confinement_threshold_scalar,
         )
 
     elif confinement_power_scaling == ConfinementPowerScaling.I_mode_HubbardNF12:
-        P_LI_thresh = _calc_HubbardNF12_LI_threshold(average_electron_density, plasma_current, confinement_threshold_scalar)
+        P_LI_thresh = _calc_HubbardNF12_LI_threshold(
+            average_electron_density, plasma_current, confinement_threshold_scalar
+        )
 
     else:
         raise NotImplementedError(
@@ -161,5 +211,7 @@ def calc_LI_transition_threshold_power(
 
 
 calc_ratio_P_LI = Algorithm.from_single_function(
-    func=lambda P_sol, P_LI_thresh: P_sol / P_LI_thresh, return_keys=["ratio_of_P_SOL_to_P_LI"], name="calc_ratio_P_LI"
+    func=lambda P_sol, P_LI_thresh: P_sol / P_LI_thresh,
+    return_keys=["ratio_of_P_SOL_to_P_LI"],
+    name="calc_ratio_P_LI",
 )

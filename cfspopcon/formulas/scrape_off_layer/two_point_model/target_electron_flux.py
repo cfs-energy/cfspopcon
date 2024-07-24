@@ -16,7 +16,11 @@ def calc_target_electron_flux(
 
     Components are calculated using the other functions in this file.
     """
-    return target_electron_flux_basic * f_vol_loss_target_electron_flux * f_other_target_electron_flux
+    return (
+        target_electron_flux_basic
+        * f_vol_loss_target_electron_flux
+        * f_other_target_electron_flux
+    )
 
 
 def calc_target_electron_flux_basic(
@@ -38,7 +42,12 @@ def calc_target_electron_flux_basic(
     Returns:
         target_electron_flux_basic [m^-2 s^-1]
     """
-    return sheath_heat_transmission_factor / (8.0 * fuel_average_mass_number) * upstream_total_pressure**2 / parallel_heat_flux_density
+    return (
+        sheath_heat_transmission_factor
+        / (8.0 * fuel_average_mass_number)
+        * upstream_total_pressure**2
+        / parallel_heat_flux_density
+    )
 
 
 def calc_f_vol_loss_target_electron_flux(
@@ -80,7 +89,14 @@ def calc_f_other_target_electron_flux(
         f_other_target_electron_flux [~]
     """
     return (
-        (2.0 / (1.0 + target_ratio_of_ion_to_electron_temp / target_ratio_of_electron_to_ion_density))
+        (
+            2.0
+            / (
+                1.0
+                + target_ratio_of_ion_to_electron_temp
+                / target_ratio_of_electron_to_ion_density
+            )
+        )
         * 4.0
         * target_mach_number**2
         / (1.0 + target_mach_number**2) ** 2

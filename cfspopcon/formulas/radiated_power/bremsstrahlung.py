@@ -50,9 +50,13 @@ def calc_bremsstrahlung_radiation(
     )  # relativistic correction factor
 
     fKb = ne20**2 * np.sqrt(electron_temp_profile) * xrel
-    Kb = integrate_profile_over_volume.unitless_func(fKb, rho, plasma_volume)  # radial profile factor
+    Kb = integrate_profile_over_volume.unitless_func(
+        fKb, rho, plasma_volume
+    )  # radial profile factor
 
-    P_brem: float = 5.35e-3 * z_effective * Kb  # volume-averaged bremsstrahlung radiaton in MW
+    P_brem: float = (
+        5.35e-3 * z_effective * Kb
+    )  # volume-averaged bremsstrahlung radiaton in MW
 
     return P_brem
 

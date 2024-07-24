@@ -54,14 +54,20 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
     zimp = np.array([2, 3, 4, 6, 7, 8, 10, 18, 36, 54, 74])
 
     if impurity_Z not in zimp:  # pragma: no cover
-        warnings.warn(f"Mavrin 2018 line radiation calculation not supported for impurity with Z={impurity_Z}", stacklevel=3)
+        warnings.warn(
+            f"Mavrin 2018 line radiation calculation not supported for impurity with Z={impurity_Z}",
+            stacklevel=3,
+        )
         return np.nan
 
     # If trying to evaluate for a temperature outside of the given range, assume nearest neighbor
     # and throw a warning
-    if any(electron_density_profile < 0.1) or any(electron_density_profile > 100):  # pragma: no cover
+    if any(electron_density_profile < 0.1) or any(
+        electron_density_profile > 100
+    ):  # pragma: no cover
         warnings.warn(
-            "Mavrin 2018 line radiation calculation is only valid between 0.1-100keV. Using nearest neighbor extrapolation.", stacklevel=3
+            "Mavrin 2018 line radiation calculation is only valid between 0.1-100keV. Using nearest neighbor extrapolation.",
+            stacklevel=3,
         )
     electron_density_profile = np.maximum(electron_density_profile, 0.1)
     electron_density_profile = np.minimum(electron_density_profile, 100)
@@ -177,7 +183,8 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
 
     for i in range(len(radc)):
         it = np.nonzero(
-            (electron_density_profile >= temperature_bin_borders[i]) & (electron_density_profile < temperature_bin_borders[i + 1])
+            (electron_density_profile >= temperature_bin_borders[i])
+            & (electron_density_profile < temperature_bin_borders[i + 1])
         )[0]
         if it.size > 0:
             log10_Lz[it] = polyval(Tlog[it], radc[i])  # type: ignore[no-untyped-call]
@@ -186,7 +193,15 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
     radrate[np.isnan(radrate)] = 0
 
     # 1e38 factor to account for the fact that our n_e values are electron_density_profile values
-    qRad = radrate * electron_temp_profile * electron_temp_profile * impurity_concentration * 1e38  # W / (m^3 s)
-    radiated_power = integrate_profile_over_volume.unitless_func(qRad, rho, plasma_volume)  # [W]
+    qRad = (
+        radrate
+        * electron_temp_profile
+        * electron_temp_profile
+        * impurity_concentration
+        * 1e38
+    )  # W / (m^3 s)
+    radiated_power = integrate_profile_over_volume.unitless_func(
+        qRad, rho, plasma_volume
+    )  # [W]
 
     return float(radiated_power) / 1e6  # MW

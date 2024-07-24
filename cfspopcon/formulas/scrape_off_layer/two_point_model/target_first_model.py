@@ -22,7 +22,10 @@ from .target_electron_flux import (
     calc_target_electron_flux,
     calc_target_electron_flux_basic,
 )
-from .target_electron_temp import calc_f_other_target_electron_temp, calc_target_electron_temp_basic
+from .target_electron_temp import (
+    calc_f_other_target_electron_temp,
+    calc_target_electron_temp_basic,
+)
 
 
 def solve_target_first_two_point_model(
@@ -66,7 +69,9 @@ def solve_target_first_two_point_model(
     Returns:
         SOL_power_loss_fraction [~], separatrix_electron_temp [eV], target_electron_density [m^-3], target_electron_flux [m^-2 s^-1]
     """
-    SOL_momentum_loss_fraction = calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp)
+    SOL_momentum_loss_fraction = calc_SOL_momentum_loss_fraction(
+        SOL_momentum_loss_function, target_electron_temp
+    )
 
     separatrix_electron_temp = calc_separatrix_electron_temp(
         target_electron_temp=target_electron_temp,
@@ -100,23 +105,43 @@ def solve_target_first_two_point_model(
 
     SOL_power_loss_fraction = calc_required_SOL_power_loss_fraction(
         target_electron_temp_basic=calc_target_electron_temp_basic(**f_basic_kwargs),
-        f_other_target_electron_temp=calc_f_other_target_electron_temp(**f_other_kwargs),
+        f_other_target_electron_temp=calc_f_other_target_electron_temp(
+            **f_other_kwargs
+        ),
         SOL_momentum_loss_fraction=SOL_momentum_loss_fraction,
         required_target_electron_temp=target_electron_temp,
     )
 
-    f_vol_loss_kwargs = dict(SOL_power_loss_fraction=SOL_power_loss_fraction, SOL_momentum_loss_fraction=SOL_momentum_loss_fraction)
+    f_vol_loss_kwargs = dict(
+        SOL_power_loss_fraction=SOL_power_loss_fraction,
+        SOL_momentum_loss_fraction=SOL_momentum_loss_fraction,
+    )
 
     target_electron_density = calc_target_electron_density(
-        target_electron_density_basic=calc_target_electron_density_basic(**f_basic_kwargs),
-        f_vol_loss_target_electron_density=calc_f_vol_loss_target_electron_density(**f_vol_loss_kwargs),
-        f_other_target_electron_density=calc_f_other_target_electron_density(**f_other_kwargs),
+        target_electron_density_basic=calc_target_electron_density_basic(
+            **f_basic_kwargs
+        ),
+        f_vol_loss_target_electron_density=calc_f_vol_loss_target_electron_density(
+            **f_vol_loss_kwargs
+        ),
+        f_other_target_electron_density=calc_f_other_target_electron_density(
+            **f_other_kwargs
+        ),
     )
 
     target_electron_flux = calc_target_electron_flux(
         target_electron_flux_basic=calc_target_electron_flux_basic(**f_basic_kwargs),
-        f_vol_loss_target_electron_flux=calc_f_vol_loss_target_electron_flux(**f_vol_loss_kwargs),
-        f_other_target_electron_flux=calc_f_other_target_electron_flux(**f_other_kwargs),
+        f_vol_loss_target_electron_flux=calc_f_vol_loss_target_electron_flux(
+            **f_vol_loss_kwargs
+        ),
+        f_other_target_electron_flux=calc_f_other_target_electron_flux(
+            **f_other_kwargs
+        ),
     )
 
-    return SOL_power_loss_fraction, separatrix_electron_temp, target_electron_density, target_electron_flux
+    return (
+        SOL_power_loss_fraction,
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_flux,
+    )

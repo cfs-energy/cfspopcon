@@ -16,7 +16,11 @@ def calc_target_electron_temp(
 
     Components are calculated using the other functions in this file.
     """
-    return target_electron_temp_basic * f_vol_loss_target_electron_temp * f_other_target_electron_temp
+    return (
+        target_electron_temp_basic
+        * f_vol_loss_target_electron_temp
+        * f_other_target_electron_temp
+    )
 
 
 def calc_target_electron_temp_basic(
@@ -58,7 +62,9 @@ def calc_f_vol_loss_target_electron_temp(
     Returns:
         f_vol_loss_target_electron_temp [~]
     """
-    return (1.0 - SOL_power_loss_fraction) ** 2 / (1.0 - SOL_momentum_loss_fraction) ** 2
+    return (1.0 - SOL_power_loss_fraction) ** 2 / (
+        1.0 - SOL_momentum_loss_fraction
+    ) ** 2
 
 
 def calc_f_other_target_electron_temp(
@@ -83,7 +89,14 @@ def calc_f_other_target_electron_temp(
         f_other_target_electron_temp [~]
     """
     return (
-        ((1.0 + target_ratio_of_ion_to_electron_temp / target_ratio_of_electron_to_ion_density) / 2.0)
+        (
+            (
+                1.0
+                + target_ratio_of_ion_to_electron_temp
+                / target_ratio_of_electron_to_ion_density
+            )
+            / 2.0
+        )
         * ((1.0 + target_mach_number**2) ** 2 / (4.0 * target_mach_number**2))
         * toroidal_flux_expansion**-2
     )

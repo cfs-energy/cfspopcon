@@ -59,5 +59,8 @@ def calc_total_pressure(
         upstream_total_pressure [atm]
     """
     return (
-        (1.0 + mach_number**2) * electron_density * electron_temp * (1.0 + ratio_of_ion_to_electron_temp / ratio_of_electron_to_ion_density)
+        (1.0 + mach_number**2)
+        * electron_density
+        * electron_temp
+        * (1.0 + ratio_of_ion_to_electron_temp / ratio_of_electron_to_ion_density)
     )

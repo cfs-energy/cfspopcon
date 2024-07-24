@@ -39,21 +39,28 @@ def suppress_downcast_warning(func: Callable[Params, Ret]) -> Callable[Params, R
     @wraps(func)
     def wrapper(*args: Params.args, **kwargs: Params.kwargs) -> Ret:
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", message="The unit of the quantity is stripped when downcasting to ndarray.")
+            warnings.filterwarnings(
+                "ignore",
+                message="The unit of the quantity is stripped when downcasting to ndarray.",
+            )
             return func(*args, **kwargs)
 
     return wrapper
 
 
 @overload
-def convert_units(array: xr.DataArray, units: Union[str, pint.Unit]) -> xr.DataArray: ...
+def convert_units(array: xr.DataArray, units: Union[str, pint.Unit]) -> xr.DataArray:
+    ...
 
 
 @overload
-def convert_units(array: pint.Quantity, units: Union[str, pint.Unit]) -> pint.Quantity: ...
+def convert_units(array: pint.Quantity, units: Union[str, pint.Unit]) -> pint.Quantity:
+    ...
 
 
-def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Union[xr.DataArray, pint.Quantity]:
+def convert_units(
+    array: Union[xr.DataArray, pint.Quantity], units: Any
+) -> Union[xr.DataArray, pint.Quantity]:
     """Convert an array to specified units, handling both Quantities and xr.DataArrays."""
     if units is None:
         # Replace None with ureg.dimensionless.
@@ -70,18 +77,24 @@ def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Unio
     elif isinstance(array, float) and Quantity(1.0, units).check("[]"):
         return (array * ureg.dimensionless).to(units)
     else:
-        raise NotImplementedError(f"No implementation for 'convert_units' with an array of type {type(array)} ({array})")
+        raise NotImplementedError(
+            f"No implementation for 'convert_units' with an array of type {type(array)} ({array})"
+        )
 
 
 @suppress_downcast_warning
-def magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[npt.NDArray[np.float32], float]:
+def magnitude(
+    array: Union[xr.DataArray, pint.Quantity]
+) -> Union[npt.NDArray[np.float32], float]:
     """Return the magnitude of an array, handling both Quantities and xr.DataArrays."""
     if isinstance(array, xr.DataArray):
         return array.pint.dequantify()  # type: ignore[no-any-return]
     elif isinstance(array, Quantity):
         return array.magnitude  # type: ignore[no-any-return]
     else:
-        raise NotImplementedError(f"No implementation for 'magnitude' with an array of type {type(array)} ({array})")
+        raise NotImplementedError(
+            f"No implementation for 'magnitude' with an array of type {type(array)} ({array})"
+        )
 
 
 def get_units(array: Union[xr.DataArray, pint.Quantity]) -> Any:
@@ -91,14 +104,20 @@ def get_units(array: Union[xr.DataArray, pint.Quantity]) -> Any:
     elif isinstance(array, Quantity):
         return array.units
     else:
-        raise NotImplementedError(f"No implementation for 'get_units' with an array of type {type(array)} ({array})")
+        raise NotImplementedError(
+            f"No implementation for 'get_units' with an array of type {type(array)} ({array})"
+        )
 
 
-def magnitude_in_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Union[npt.NDArray[np.float32], float]:
+def magnitude_in_units(
+    array: Union[xr.DataArray, pint.Quantity], units: Any
+) -> Union[npt.NDArray[np.float32], float]:
     """Convert the array to the specified units and then return the magnitude."""
     return magnitude(convert_units(array, units))
 
 
-def dimensionless_magnitude(array: Union[xr.DataArray, pint.Quantity]) -> Union[npt.NDArray[np.float32], float]:
+def dimensionless_magnitude(
+    array: Union[xr.DataArray, pint.Quantity]
+) -> Union[npt.NDArray[np.float32], float]:
     """Converts the array to dimensionless and returns the magnitude."""
     return magnitude_in_units(array, ureg.dimensionless)

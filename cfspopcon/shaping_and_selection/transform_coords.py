@@ -48,7 +48,9 @@ def order_dimensions(
 
     if units is not None:
         for dim, processed_dim in zip(dims, processed_dims):
-            array[processed_dim] = magnitude(template[dim.lstrip("dim_")].pint.to(units[dim]))
+            array[processed_dim] = magnitude(
+                template[dim.lstrip("dim_")].pint.to(units[dim])
+            )
 
     if order_for_plotting:
         processed_dims = processed_dims[::-1]
@@ -86,14 +88,21 @@ def interpolate_array_onto_new_coords(
         coords[key], coord_spacing[key] = np.linspace(
             start=coord_min.get(key, coord_array_min) if coord_min else coord_array_min,
             stop=coord_max.get(key, coord_array_max) if coord_max else coord_array_max,
-            num=resolution.get(key, default_resolution) if resolution else default_resolution,
+            num=resolution.get(key, default_resolution)
+            if resolution
+            else default_resolution,
             retstep=True,
         )
 
     mesh_coords = tuple(np.meshgrid(*coords.values(), indexing="ij"))
 
     broadcast_arrays = xr.broadcast(*(*list(new_coords.values()), array))
-    sample_points = tuple([np.ravel(magnitude(broadcast_array)) for broadcast_array in broadcast_arrays[:-1]])
+    sample_points = tuple(
+        [
+            np.ravel(magnitude(broadcast_array))
+            for broadcast_array in broadcast_arrays[:-1]
+        ]
+    )
     array = broadcast_arrays[-1]
 
     interpolated_array = xr.DataArray(
@@ -117,17 +126,23 @@ def interpolate_array_onto_new_coords(
     for index in np.ndindex(tuple(mesh_shape)):
         # Iterate over each grid point
         mesh_point = [mesh_coords[dimension][index] for dimension in range(len(index))]
-        broadcast_mesh_point = np.broadcast_to(np.expand_dims(mesh_point, axis=-1), stacked_samples.shape)
+        broadcast_mesh_point = np.broadcast_to(
+            np.expand_dims(mesh_point, axis=-1), stacked_samples.shape
+        )
 
         distance_to_points = ((broadcast_mesh_point - stacked_samples) / spacing) ** 2
         distance_to_nearest[index] = np.min(np.sum(distance_to_points, axis=0))
 
-    clipped_array: xr.DataArray = interpolated_array.where(distance_to_nearest < max_distance).clip(min=array.min(), max=array.max())
+    clipped_array: xr.DataArray = interpolated_array.where(
+        distance_to_nearest < max_distance
+    ).clip(min=array.min(), max=array.max())
 
     return clipped_array
 
 
-def build_transform_function_from_dict(dataset: xr.Dataset, plot_params: dict) -> Callable[[xr.DataArray], xr.DataArray]:
+def build_transform_function_from_dict(
+    dataset: xr.Dataset, plot_params: dict
+) -> Callable[[xr.DataArray], xr.DataArray]:
     """Build a function which can be called on a field to return an array with transformed coordinates.
 
     The simplest function is a transpose function, which makes sure that the dimensions are correctly ordered
@@ -147,7 +162,13 @@ def build_transform_function_from_dict(dataset: xr.Dataset, plot_params: dict) -
             ydim: plot_params["coords"]["y"].get("units"),
         }
 
-        return lambda array: order_dimensions(array, dims=(xdim, ydim), units=units, template=dataset, order_for_plotting=True)
+        return lambda array: order_dimensions(
+            array,
+            dims=(xdim, ydim),
+            units=units,
+            template=dataset,
+            order_for_plotting=True,
+        )
 
     elif "new_coords" in plot_params:
         new_coords, new_coord_min, new_coord_max, new_coord_res = {}, {}, {}, {}
@@ -156,7 +177,9 @@ def build_transform_function_from_dict(dataset: xr.Dataset, plot_params: dict) -
             new_coord = plot_params["new_coords"][coord]
             new_key = new_coord["dimension"]
             field = dataset[new_key]
-            new_coords[new_key] = field.pint.to(new_coord.get("units", field.pint.units))
+            new_coords[new_key] = field.pint.to(
+                new_coord.get("units", field.pint.units)
+            )
             if "min" in new_coord:
                 new_coord_min[new_key] = new_coord["min"]
             if "max" in new_coord:
@@ -174,4 +197,6 @@ def build_transform_function_from_dict(dataset: xr.Dataset, plot_params: dict) -
         )
 
     else:
-        raise NotImplementedError("Must provide either 'coords' or 'new_coords' for the transform function.")
+        raise NotImplementedError(
+            "Must provide either 'coords' or 'new_coords' for the transform function."
+        )

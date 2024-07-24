@@ -5,7 +5,9 @@ import xarray as xr
 from cfspopcon.unit_handling import Quantity, ureg, get_units
 from cfspopcon.unit_handling import dimensionless_magnitude as dmag
 from cfspopcon.unit_handling import magnitude_in_units as umag
-from cfspopcon.formulas.separatrix_conditions import separatrix_operational_space as sepos
+from cfspopcon.formulas.separatrix_conditions import (
+    separatrix_operational_space as sepos,
+)
 from cfspopcon import formulas
 
 
@@ -28,7 +30,10 @@ def scalar_case(density_vector, temp_vector):
 def separatrix_electron_density(density_vector):
     if density_vector:
         ne_sep = np.linspace(0.01, 7.0, num=40) * 1e19
-        return xr.DataArray(Quantity(ne_sep, ureg.m**-3), coords=dict(dim_separatrix_electron_density=ne_sep))
+        return xr.DataArray(
+            Quantity(ne_sep, ureg.m**-3),
+            coords=dict(dim_separatrix_electron_density=ne_sep),
+        )
     else:
         return Quantity(1.62, ureg.n19)
 
@@ -37,7 +42,9 @@ def separatrix_electron_density(density_vector):
 def separatrix_electron_temp(temp_vector):
     if temp_vector:
         te_sep = np.linspace(1, 150, num=30)
-        return xr.DataArray(Quantity(te_sep, ureg.eV), coords=dict(dim_separatrix_electron_temp=te_sep))
+        return xr.DataArray(
+            Quantity(te_sep, ureg.eV), coords=dict(dim_separatrix_electron_temp=te_sep)
+        )
     else:
         return Quantity(57.5, ureg.eV)
 
@@ -158,7 +165,13 @@ def critical_alpha_MHD(elongation_psi95, triangularity_psi95):
 
 @pytest.fixture()
 def B_pol_avg(minor_radius, elongation_psi95, triangularity_psi95, plasma_current):
-    poloidal_circumference = 2.0 * np.pi * minor_radius * (1 + 0.55 * (elongation_psi95 - 1)) * (1 + 0.08 * triangularity_psi95**2)
+    poloidal_circumference = (
+        2.0
+        * np.pi
+        * minor_radius
+        * (1 + 0.55 * (elongation_psi95 - 1))
+        * (1 + 0.08 * triangularity_psi95**2)
+    )
     return ureg.mu_0 * plasma_current / poloidal_circumference
 
 
@@ -300,7 +313,9 @@ def test_power_crossing_separatrix_in_ion_channel(
     scalar_case,
 ):
     if scalar_case:
-        assert np.isclose(umag(power_crossing_separatrix_in_ion_channel, ureg.MW), 0.18876955)
+        assert np.isclose(
+            umag(power_crossing_separatrix_in_ion_channel, ureg.MW), 0.18876955
+        )
 
 
 @pytest.fixture()
@@ -399,7 +414,9 @@ def test_power_crossing_separatrix_in_electron_channel(
     scalar_case,
 ):
     if scalar_case:
-        assert np.isclose(umag(power_crossing_separatrix_in_electron_channel, ureg.MW), 0.67949193)
+        assert np.isclose(
+            umag(power_crossing_separatrix_in_electron_channel, ureg.MW), 0.67949193
+        )
 
 
 def test_interpolation_onto_LH_transition(
@@ -411,20 +428,32 @@ def test_interpolation_onto_LH_transition(
     separatrix_electron_density,
     separatrix_electron_temp,
 ):
-    from cfspopcon.shaping_and_selection import find_coords_of_contour, interpolate_onto_line
+    from cfspopcon.shaping_and_selection import (
+        find_coords_of_contour,
+        interpolate_onto_line,
+    )
 
     if not (density_vector and temp_vector):
         return
 
     contour_x, contour_y = find_coords_of_contour(
-        LH_transition_condition, x_coord="dim_separatrix_electron_density", y_coord="dim_separatrix_electron_temp", level=1.0
+        LH_transition_condition,
+        x_coord="dim_separatrix_electron_density",
+        y_coord="dim_separatrix_electron_temp",
+        level=1.0,
     )
 
-    interpolate_onto_line(power_crossing_separatrix_in_electron_channel, contour_x, contour_y)
-    interpolate_onto_line(power_crossing_separatrix_in_ion_channel, contour_x, contour_y)
+    interpolate_onto_line(
+        power_crossing_separatrix_in_electron_channel, contour_x, contour_y
+    )
+    interpolate_onto_line(
+        power_crossing_separatrix_in_ion_channel, contour_x, contour_y
+    )
 
     temp_min = np.min(contour_y.values) * get_units(separatrix_electron_temp)
-    density_min = contour_x.values[np.argmin(contour_y.values)] * get_units(separatrix_electron_density)
+    density_min = contour_x.values[np.argmin(contour_y.values)] * get_units(
+        separatrix_electron_density
+    )
 
     assert np.isclose(umag(temp_min, ureg.eV), 53.10463924)
     assert np.isclose(umag(density_min, ureg.n19), 2.16076923)

@@ -60,7 +60,12 @@ def solve_two_point_model(
     raise_error_if_not_converged: bool = True,
     # Print information about the solve to terminal
     quiet: bool = True,
-) -> tuple[Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray]]:
+) -> tuple[
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+    Union[Quantity, xr.DataArray],
+]:
     """Calculate the upstream and target electron temperature and target electron density according to the extended two-point-model.
 
     Args:
@@ -99,7 +104,9 @@ def solve_two_point_model(
         target_mach_number=target_mach_number,
         toroidal_flux_expansion=toroidal_flux_expansion,
     )
-    f_other_target_electron_density = calc_f_other_target_electron_density(**f_other_kwargs)
+    f_other_target_electron_density = calc_f_other_target_electron_density(
+        **f_other_kwargs
+    )
     f_other_target_electron_temp = calc_f_other_target_electron_temp(**f_other_kwargs)
     f_other_target_electron_flux = calc_f_other_target_electron_flux(**f_other_kwargs)
 
@@ -127,7 +134,9 @@ def solve_two_point_model(
 
         f_vol_loss_kwargs = dict(
             SOL_power_loss_fraction=SOL_power_loss_fraction,
-            SOL_momentum_loss_fraction=calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp),
+            SOL_momentum_loss_fraction=calc_SOL_momentum_loss_fraction(
+                SOL_momentum_loss_function, target_electron_temp
+            ),
         )
 
         f_basic_kwargs = dict(
@@ -137,11 +146,17 @@ def solve_two_point_model(
             sheath_heat_transmission_factor=sheath_heat_transmission_factor,
         )
 
-        target_electron_density_basic = calc_target_electron_density_basic(**f_basic_kwargs)
+        target_electron_density_basic = calc_target_electron_density_basic(
+            **f_basic_kwargs
+        )
         target_electron_temp_basic = calc_target_electron_temp_basic(**f_basic_kwargs)
 
-        f_vol_loss_target_electron_density = calc_f_vol_loss_target_electron_density(**f_vol_loss_kwargs)
-        f_vol_loss_target_electron_temp = calc_f_vol_loss_target_electron_temp(**f_vol_loss_kwargs)
+        f_vol_loss_target_electron_density = calc_f_vol_loss_target_electron_density(
+            **f_vol_loss_kwargs
+        )
+        f_vol_loss_target_electron_temp = calc_f_vol_loss_target_electron_temp(
+            **f_vol_loss_kwargs
+        )
 
         new_target_electron_density = calc_target_electron_density(
             target_electron_density_basic=target_electron_density_basic,
@@ -161,19 +176,39 @@ def solve_two_point_model(
             target_electron_temp = new_target_electron_temp
             continue
 
-        change_in_separatrix_electron_temp = new_separatrix_electron_temp - separatrix_electron_temp
-        change_in_target_electron_density = new_target_electron_density - target_electron_density
+        change_in_separatrix_electron_temp = (
+            new_separatrix_electron_temp - separatrix_electron_temp
+        )
+        change_in_target_electron_density = (
+            new_target_electron_density - target_electron_density
+        )
         change_in_target_electron_temp = new_target_electron_temp - target_electron_temp
 
-        separatrix_electron_temp = separatrix_electron_temp + upstream_temp_relaxation * change_in_separatrix_electron_temp
-        target_electron_density = target_electron_density + target_electron_density_relaxation * change_in_target_electron_density
-        target_electron_temp = target_electron_temp + target_temp_relaxation * change_in_target_electron_temp
+        separatrix_electron_temp = (
+            separatrix_electron_temp
+            + upstream_temp_relaxation * change_in_separatrix_electron_temp
+        )
+        target_electron_density = (
+            target_electron_density
+            + target_electron_density_relaxation * change_in_target_electron_density
+        )
+        target_electron_temp = (
+            target_electron_temp
+            + target_temp_relaxation * change_in_target_electron_temp
+        )
 
         if np.all(
             [
-                np.abs(change_in_separatrix_electron_temp / separatrix_electron_temp).max() < upstream_temp_max_residual,
-                np.abs(change_in_target_electron_density / target_electron_density).max() < target_electron_density_max_residual,
-                np.abs(change_in_target_electron_temp / target_electron_temp).max() < target_temp_max_residual,
+                np.abs(
+                    change_in_separatrix_electron_temp / separatrix_electron_temp
+                ).max()
+                < upstream_temp_max_residual,
+                np.abs(
+                    change_in_target_electron_density / target_electron_density
+                ).max()
+                < target_electron_density_max_residual,
+                np.abs(change_in_target_electron_temp / target_electron_temp).max()
+                < target_temp_max_residual,
             ]
         ):
             if not quiet:
@@ -184,7 +219,9 @@ def solve_two_point_model(
             raise RuntimeError("Iterative solve did not converge.")
 
     target_electron_flux_basic = calc_target_electron_flux_basic(**f_basic_kwargs)
-    f_vol_loss_target_electron_flux = calc_f_vol_loss_target_electron_flux(**f_vol_loss_kwargs)
+    f_vol_loss_target_electron_flux = calc_f_vol_loss_target_electron_flux(
+        **f_vol_loss_kwargs
+    )
 
     target_electron_flux = calc_target_electron_flux(
         target_electron_flux_basic=target_electron_flux_basic,
@@ -193,18 +230,42 @@ def solve_two_point_model(
     )
 
     mask = (
-        (np.abs(change_in_separatrix_electron_temp / separatrix_electron_temp) < upstream_temp_max_residual)
-        & (np.abs(change_in_target_electron_density / target_electron_density) < target_electron_density_max_residual)
-        & (np.abs(change_in_target_electron_temp / target_electron_temp) < target_temp_max_residual)
+        (
+            np.abs(change_in_separatrix_electron_temp / separatrix_electron_temp)
+            < upstream_temp_max_residual
+        )
+        & (
+            np.abs(change_in_target_electron_density / target_electron_density)
+            < target_electron_density_max_residual
+        )
+        & (
+            np.abs(change_in_target_electron_temp / target_electron_temp)
+            < target_temp_max_residual
+        )
     )
 
     number_nonconverged = np.count_nonzero(~mask)
     if number_nonconverged > 0 and not quiet:
-        print(f"{number_nonconverged} values did not converge in {max_iterations} iterations.")
+        print(
+            f"{number_nonconverged} values did not converge in {max_iterations} iterations."
+        )
 
-    separatrix_electron_temp = xr.where(mask, separatrix_electron_temp, np.nan)  # type:ignore[no-untyped-call]
-    target_electron_density = xr.where(mask, target_electron_density, np.nan)  # type:ignore[no-untyped-call]
-    target_electron_temp = xr.where(mask, target_electron_temp, np.nan)  # type:ignore[no-untyped-call]
-    target_electron_flux = xr.where(mask, target_electron_flux, np.nan)  # type:ignore[no-untyped-call]
+    separatrix_electron_temp = xr.where(
+        mask, separatrix_electron_temp, np.nan
+    )  # type:ignore[no-untyped-call]
+    target_electron_density = xr.where(
+        mask, target_electron_density, np.nan
+    )  # type:ignore[no-untyped-call]
+    target_electron_temp = xr.where(
+        mask, target_electron_temp, np.nan
+    )  # type:ignore[no-untyped-call]
+    target_electron_flux = xr.where(
+        mask, target_electron_flux, np.nan
+    )  # type:ignore[no-untyped-call]
 
-    return separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux
+    return (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+    )

@@ -6,7 +6,12 @@ import xarray as xr
 from pint import DimensionalityError, UndefinedUnitError, UnitStrippedWarning
 
 from .decorator import wraps_ufunc
-from .default_units import convert_to_default_units, default_unit, magnitude_in_default_units, set_default_units
+from .default_units import (
+    convert_to_default_units,
+    default_unit,
+    magnitude_in_default_units,
+    set_default_units,
+)
 from .setup_unit_handling import (
     Quantity,
     Unit,

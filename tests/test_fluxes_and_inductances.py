@@ -30,7 +30,9 @@ from cfspopcon.formulas.plasma_current.flux_consumption.inductance_analytical_fu
     calc_fh,
     calc_fh_Sum_Cb,
 )
-from cfspopcon.formulas.plasma_current.flux_consumption.inductances import set_surface_inductance_coeffs
+from cfspopcon.formulas.plasma_current.flux_consumption.inductances import (
+    set_surface_inductance_coeffs,
+)
 from cfspopcon.named_options import SurfaceInductanceCoeffs, VertMagneticFieldEq
 from cfspopcon.unit_handling import magnitude_in_units as umag
 from cfspopcon.unit_handling import ureg
@@ -39,26 +41,40 @@ from cfspopcon.unit_handling import ureg
 def test_calc_flux_internal():
     internal_inductance = calc_internal_inductance_for_cylindrical(1.85 * ureg.m, 0.8)
     internal_flux = calc_internal_flux(8.7e6 * ureg.A, internal_inductance)
-    np.testing.assert_allclose(umag(internal_flux, ureg.weber), 8.090229405928559, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        umag(internal_flux, ureg.weber), 8.090229405928559, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_flux_external():
     coeffs = SurfaceInductanceCoeffs.Barr
-    external_inductance = calc_external_inductance(0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs)
+    external_inductance = calc_external_inductance(
+        0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs
+    )
     external_flux = calc_external_flux(8.7e6 * ureg.A, external_inductance)
-    np.testing.assert_allclose(umag(external_flux, ureg.weber), 24.21256335948457, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        umag(external_flux, ureg.weber), 24.21256335948457, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_flux_PF():
     coeffs = SurfaceInductanceCoeffs.Barr
-    vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(0.3, 1.7, coeffs)
-    poloidal_field_flux = calc_poloidal_field_flux(vertical_field_mutual_inductance, 0.6 * ureg.T, 1.85 * ureg.m)
-    np.testing.assert_allclose(umag(poloidal_field_flux, ureg.weber), 6.629771312025196, rtol=1e-5, atol=0)
+    vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(
+        0.3, 1.7, coeffs
+    )
+    poloidal_field_flux = calc_poloidal_field_flux(
+        vertical_field_mutual_inductance, 0.6 * ureg.T, 1.85 * ureg.m
+    )
+    np.testing.assert_allclose(
+        umag(poloidal_field_flux, ureg.weber), 6.629771312025196, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_flux_resistive():
     resistive_flux = calc_resistive_flux(8.7e6 * ureg.A, 1.85 * ureg.m, 0.45)
-    np.testing.assert_allclose(umag(resistive_flux, ureg.weber), 9.10150808166963, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        umag(resistive_flux, ureg.weber), 9.10150808166963, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_internal_inductivity():
@@ -67,40 +83,77 @@ def test_calc_internal_inductivity():
     magnetic_field_on_axis = 12.2  # * ureg.T
     minor_radius = 0.3 * 1.85  # * ureg.m
 
-    cylindrical_safety_factor = 2 * np.pi * minor_radius**2 * magnetic_field_on_axis / (constants.mu_0 * major_radius * plasma_current)
+    cylindrical_safety_factor = (
+        2
+        * np.pi
+        * minor_radius**2
+        * magnetic_field_on_axis
+        / (constants.mu_0 * major_radius * plasma_current)
+    )
 
     internal_inductivity = calc_internal_inductivity(cylindrical_safety_factor, 1.01)
-    np.testing.assert_allclose(internal_inductivity, 0.5814953402118008, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        internal_inductivity, 0.5814953402118008, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_vertical_field_mutual_inductance():
     coeffs = SurfaceInductanceCoeffs.Barr
-    vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(0.3, 1.7, coeffs)
-    np.testing.assert_allclose(vertical_field_mutual_inductance, 1.027670685052496, rtol=1e-5, atol=0)
+    vertical_field_mutual_inductance = calc_vertical_field_mutual_inductance(
+        0.3, 1.7, coeffs
+    )
+    np.testing.assert_allclose(
+        vertical_field_mutual_inductance, 1.027670685052496, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_vertical_magnetic_field():
     coeffs = SurfaceInductanceCoeffs.Barr
-    external_inductance = calc_external_inductance(0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs)
-    vertical_magnetic_field_equation = VertMagneticFieldEq.Barr
-    invmu_0_dLedR = calc_invmu_0_dLedR(0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, coeffs)
-    vertical_magnetic_field = calc_vertical_magnetic_field(
-        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, 8.7e6 * ureg.A, invmu_0_dLedR, vertical_magnetic_field_equation, coeffs
+    external_inductance = calc_external_inductance(
+        0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs
     )
-    np.testing.assert_allclose(umag(vertical_magnetic_field, ureg.tesla), 1.1286206938400316, rtol=1e-5, atol=0)
+    vertical_magnetic_field_equation = VertMagneticFieldEq.Barr
+    invmu_0_dLedR = calc_invmu_0_dLedR(
+        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, coeffs
+    )
+    vertical_magnetic_field = calc_vertical_magnetic_field(
+        0.3,
+        1.7,
+        0.3,
+        0.8,
+        external_inductance,
+        1.85 * ureg.m,
+        8.7e6 * ureg.A,
+        invmu_0_dLedR,
+        vertical_magnetic_field_equation,
+        coeffs,
+    )
+    np.testing.assert_allclose(
+        umag(vertical_magnetic_field, ureg.tesla), 1.1286206938400316, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_external_inductance():
     coeffs = SurfaceInductanceCoeffs.Barr
-    external_inductance = calc_external_inductance(0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs)
-    np.testing.assert_allclose(umag(external_inductance, ureg.henry), 2.78305325971087e-06, rtol=1e-5, atol=0)
+    external_inductance = calc_external_inductance(
+        0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs
+    )
+    np.testing.assert_allclose(
+        umag(external_inductance, ureg.henry), 2.78305325971087e-06, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_invmu_0_dLedR():
     coeffs = SurfaceInductanceCoeffs.Barr
-    external_inductance = calc_external_inductance(0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs)
-    invmu_0_dLedR = calc_invmu_0_dLedR(0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, coeffs)
-    np.testing.assert_allclose(umag(invmu_0_dLedR, ureg.dimensionless), 2.1999405545602646, rtol=1e-5, atol=0)
+    external_inductance = calc_external_inductance(
+        0.3, 1.7, 0.3, 1.85 * ureg.m, 0.8, coeffs
+    )
+    invmu_0_dLedR = calc_invmu_0_dLedR(
+        0.3, 1.7, 0.3, 0.8, external_inductance, 1.85 * ureg.m, coeffs
+    )
+    np.testing.assert_allclose(
+        umag(invmu_0_dLedR, ureg.dimensionless), 2.1999405545602646, rtol=1e-5, atol=0
+    )
 
 
 def test_calc_fa():
@@ -117,23 +170,48 @@ def test_calc_fa_Sum_Ne():
 
 def test_calc_fa_Sums_Na():
     coeffs = SurfaceInductanceCoeffs.Barr
-    np.testing.assert_allclose(calc_fa_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[0], 1.4293250376924287, rtol=1e-5, atol=0)
-    np.testing.assert_allclose(calc_fa_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[1], 4.559771647300995, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        calc_fa_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[0],
+        1.4293250376924287,
+        rtol=1e-5,
+        atol=0,
+    )
+    np.testing.assert_allclose(
+        calc_fa_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[1],
+        4.559771647300995,
+        rtol=1e-5,
+        atol=0,
+    )
 
 
 def test_calc_fb():
     coeffs = SurfaceInductanceCoeffs.Barr
-    np.testing.assert_allclose(calc_fb(0.3, coeffs=set_surface_inductance_coeffs(coeffs)), 0.08132941228621908, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        calc_fb(0.3, coeffs=set_surface_inductance_coeffs(coeffs)),
+        0.08132941228621908,
+        rtol=1e-5,
+        atol=0,
+    )
 
 
 def test_calc_fb_Sum_Nb():
     coeffs = SurfaceInductanceCoeffs.Barr
-    np.testing.assert_allclose(calc_fb_Sum_Nb(0.3, coeffs=set_surface_inductance_coeffs(coeffs)), -0.003446225999999998, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        calc_fb_Sum_Nb(0.3, coeffs=set_surface_inductance_coeffs(coeffs)),
+        -0.003446225999999998,
+        rtol=1e-5,
+        atol=0,
+    )
 
 
 def test_calc_fc():
     coeffs = SurfaceInductanceCoeffs.Barr
-    np.testing.assert_allclose(calc_fc(0.3, coeffs=set_surface_inductance_coeffs(coeffs)), 0.970874542, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        calc_fc(0.3, coeffs=set_surface_inductance_coeffs(coeffs)),
+        0.970874542,
+        rtol=1e-5,
+        atol=0,
+    )
 
 
 def test_calc_fc_Sum_Nc():
@@ -168,8 +246,18 @@ def test_calc_fg_Sum_Ne():
 
 def test_calc_fg_Sums_Na():
     coeffs = SurfaceInductanceCoeffs.Barr
-    np.testing.assert_allclose(calc_fg_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[0], 3.4517083961540482, rtol=1e-5, atol=0)
-    np.testing.assert_allclose(calc_fg_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[1], 11.39453620447642, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(
+        calc_fg_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[0],
+        3.4517083961540482,
+        rtol=1e-5,
+        atol=0,
+    )
+    np.testing.assert_allclose(
+        calc_fg_Sums_Na(0.3, coeffs=set_surface_inductance_coeffs(coeffs))[1],
+        11.39453620447642,
+        rtol=1e-5,
+        atol=0,
+    )
 
 
 def test_calc_fh():
@@ -216,12 +304,20 @@ def test_inductances_against_hirshman():
     for i, aspect_ratio in enumerate(aspect_ratio_tests):
         R0 = aspect_ratio * ureg.m
 
-        vertical_mutual_inductance = calc_vertical_field_mutual_inductance(1 / aspect_ratio, kappa, coeffs)
+        vertical_mutual_inductance = calc_vertical_field_mutual_inductance(
+            1 / aspect_ratio, kappa, coeffs
+        )
         normalized_external_inductance = umag(
-            (calc_external_inductance(1 / aspect_ratio, kappa, 0, R0, 0, coeffs) / (constants.mu_0 * aspect_ratio)), ureg.henry
+            (
+                calc_external_inductance(1 / aspect_ratio, kappa, 0, R0, 0, coeffs)
+                / (constants.mu_0 * aspect_ratio)
+            ),
+            ureg.henry,
         )
 
-        assert np.isclose(vertical_mutual_inductance, vertical_mutual_inductance_ref[i], rtol=2e-2)
+        assert np.isclose(
+            vertical_mutual_inductance, vertical_mutual_inductance_ref[i], rtol=2e-2
+        )
         assert np.isclose(
             normalized_external_inductance,
             normalized_external_inductance_ref[i],
@@ -289,4 +385,6 @@ def test_vertical_magnetic_field_against_Eq13():
         surface_inductance_coefficients=surface_inductance_coefficients,
     )
 
-    np.testing.assert_allclose(umag(Bv_Mitarai[17:-1], "tesla"), umag(Bv_Mit13[17:-1], "tesla"), rtol=2e-2)
+    np.testing.assert_allclose(
+        umag(Bv_Mitarai[17:-1], "tesla"), umag(Bv_Mit13[17:-1], "tesla"), rtol=2e-2
+    )

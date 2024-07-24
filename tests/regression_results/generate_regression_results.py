@@ -17,7 +17,11 @@ if __name__ == "__main__":
 
         dataset = algorithm.update_dataset(dataset)
 
-        write_dataset_to_netcdf(dataset, Path(__file__).parent / f"{case.parent.stem}_result.nc")
+        write_dataset_to_netcdf(
+            dataset, Path(__file__).parent / f"{case.parent.stem}_result.nc"
+        )
 
         for point, point_params in points.items():
-            write_point_to_file(dataset, point, point_params, output_dir=Path(__file__).parent)
+            write_point_to_file(
+                dataset, point, point_params, output_dir=Path(__file__).parent
+            )

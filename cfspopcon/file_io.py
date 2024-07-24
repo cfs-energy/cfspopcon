@@ -8,7 +8,10 @@ import numpy as np
 import xarray as xr
 
 from .helpers import convert_named_options
-from .shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_minimum
+from .shaping_and_selection.point_selection import (
+    build_mask_from_dict,
+    find_coords_of_minimum,
+)
 from .unit_handling import convert_to_default_units, set_default_units
 
 ignored_keys = [
@@ -34,7 +37,9 @@ def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray:
 
 
 def write_dataset_to_netcdf(
-    dataset: xr.Dataset, filepath: Path, netcdf_writer: Literal["netcdf4", "scipy", "h5netcdf"] = "netcdf4"
+    dataset: xr.Dataset,
+    filepath: Path,
+    netcdf_writer: Literal["netcdf4", "scipy", "h5netcdf"] = "netcdf4",
 ) -> None:
     """Write a dataset to a NetCDF file."""
     serialized_dataset = dataset.copy()
@@ -91,19 +96,25 @@ def read_dataset_from_netcdf(filepath: Path) -> xr.Dataset:
     return dataset
 
 
-def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path) -> None:
+def write_point_to_file(
+    dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path
+) -> None:
     """Write the analysis values at the named points to a json file."""
     mask = build_mask_from_dict(dataset, point_params)
 
     if "minimize" not in point_params.keys() and "maximize" not in point_params.keys():
-        raise ValueError(f"Need to provide either minimize or maximize in point specification. Keys were {point_params.keys()}")
+        raise ValueError(
+            f"Need to provide either minimize or maximize in point specification. Keys were {point_params.keys()}"
+        )
 
     if "minimize" in point_params.keys():
         array = dataset[point_params["minimize"]]
     else:
         array = -dataset[point_params["maximize"]]
 
-    point_coords = find_coords_of_minimum(array, keep_dims=point_params.get("keep_dims", []), mask=mask)
+    point_coords = find_coords_of_minimum(
+        array, keep_dims=point_params.get("keep_dims", []), mask=mask
+    )
 
     point = dataset.isel(point_coords)
     for key in point.keys():

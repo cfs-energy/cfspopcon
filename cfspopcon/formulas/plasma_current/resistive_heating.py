@@ -5,7 +5,9 @@ from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
 @Algorithm.register_algorithm(return_keys=["P_ohmic"])
-def calc_ohmic_power(inductive_plasma_current: Unitfull, loop_voltage: Unitfull) -> Unitfull:
+def calc_ohmic_power(
+    inductive_plasma_current: Unitfull, loop_voltage: Unitfull
+) -> Unitfull:
     """Calculate the Ohmic heating power.
 
     Args:
@@ -19,7 +21,10 @@ def calc_ohmic_power(inductive_plasma_current: Unitfull, loop_voltage: Unitfull)
 
 
 @Algorithm.register_algorithm(return_keys=["spitzer_resistivity"])
-@wraps_ufunc(input_units=dict(average_electron_temp=ureg.keV), return_units=dict(spitzer_resistivity=ureg.ohm * ureg.m))
+@wraps_ufunc(
+    input_units=dict(average_electron_temp=ureg.keV),
+    return_units=dict(spitzer_resistivity=ureg.ohm * ureg.m),
+)
 def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
     """Calculate the parallel Spitzer loop resistivity assuming the Coulomb logarithm = 17 and Z=1.
 
@@ -35,7 +40,9 @@ def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
 
 
 @Algorithm.register_algorithm(return_keys=["trapped_particle_fraction"])
-def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, definition: int = 3) -> Unitfull:
+def calc_resistivity_trapped_enhancement(
+    inverse_aspect_ratio: Unitfull, definition: int = 3
+) -> Unitfull:
     """Calculate the enhancement of the plasma resistivity due to trapped particles.
 
     Definition 1 is the denominator of eta_n (neoclassical resistivity) on p801 of Wesson :cite:`wesson_tokamaks_2011`
@@ -51,20 +58,30 @@ def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, definit
         NotImplementedError: if definition doesn't match an implementation
     """
     if definition == 1:
-        trapped_particle_fraction = 1 / ((1.0 - (inverse_aspect_ratio**0.5)) ** 2.0)  # pragma: nocover
+        trapped_particle_fraction = 1 / (
+            (1.0 - (inverse_aspect_ratio**0.5)) ** 2.0
+        )  # pragma: nocover
     elif definition == 2:
-        trapped_particle_fraction = 2 / (1.0 - 1.31 * (inverse_aspect_ratio**0.5) + 0.46 * inverse_aspect_ratio)  # pragma: nocover
+        trapped_particle_fraction = 2 / (
+            1.0 - 1.31 * (inverse_aspect_ratio**0.5) + 0.46 * inverse_aspect_ratio
+        )  # pragma: nocover
     elif definition == 3:
-        trapped_particle_fraction = 0.609 / (0.609 - 0.785 * (inverse_aspect_ratio**0.5) + 0.269 * inverse_aspect_ratio)
+        trapped_particle_fraction = 0.609 / (
+            0.609 - 0.785 * (inverse_aspect_ratio**0.5) + 0.269 * inverse_aspect_ratio
+        )
     else:
-        raise NotImplementedError(f"No implementation {definition} for calc_resistivity_trapped_enhancement.")  # pragma: nocover
+        raise NotImplementedError(
+            f"No implementation {definition} for calc_resistivity_trapped_enhancement."
+        )  # pragma: nocover
 
     return trapped_particle_fraction
 
 
 @Algorithm.register_algorithm(return_keys=["neoclassical_loop_resistivity"])
 def calc_neoclassical_loop_resistivity(
-    spitzer_resistivity: Unitfull, z_effective: Unitfull, trapped_particle_fraction: Unitfull
+    spitzer_resistivity: Unitfull,
+    z_effective: Unitfull,
+    trapped_particle_fraction: Unitfull,
 ) -> Unitfull:
     """Calculate the neoclassical loop resistivity including impurity ions.
 
@@ -93,7 +110,11 @@ def calc_neoclassical_loop_resistivity(
     return_units=dict(current_relaxation_time=ureg.s),
 )
 def calc_current_relaxation_time(
-    major_radius: float, inverse_aspect_ratio: float, areal_elongation: float, average_electron_temp: float, z_effective: float
+    major_radius: float,
+    inverse_aspect_ratio: float,
+    areal_elongation: float,
+    average_electron_temp: float,
+    z_effective: float,
 ) -> float:
     """Calculate the current relaxation time.
 
@@ -110,7 +131,11 @@ def calc_current_relaxation_time(
         :term:`current_relaxation_time` [s]
     """
     return float(
-        1.4 * ((major_radius * inverse_aspect_ratio) ** 2.0) * areal_elongation * (average_electron_temp**1.5) / z_effective
+        1.4
+        * ((major_radius * inverse_aspect_ratio) ** 2.0)
+        * areal_elongation
+        * (average_electron_temp**1.5)
+        / z_effective
     )  # [s]
 
 
@@ -138,5 +163,7 @@ def calc_loop_voltage(
     """
     Iind = inductive_plasma_current  # Inductive plasma current [A]
 
-    _term1 = 2 * major_radius / (minor_radius**2 * areal_elongation)  # Toroidal length over plasma cross-section surface area [1/m]
+    _term1 = (
+        2 * major_radius / (minor_radius**2 * areal_elongation)
+    )  # Toroidal length over plasma cross-section surface area [1/m]
     return Iind * _term1 * neoclassical_loop_resistivity

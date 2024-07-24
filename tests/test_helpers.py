@@ -34,7 +34,9 @@ def test_impurity_array_helpers():
 
     make_impurities_array(xr.DataArray("tungsten"), array)
 
-    from_lists = make_impurities_array([named_options.AtomicSpecies.Tungsten, "Xenon"], [array, 2 * array])
+    from_lists = make_impurities_array(
+        [named_options.AtomicSpecies.Tungsten, "Xenon"], [array, 2 * array]
+    )
     from_kwargs = make_impurities_array_from_kwargs(tungsten=array, xenon=2 * array)
 
     assert from_lists.equals(from_kwargs)

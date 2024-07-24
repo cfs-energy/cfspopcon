@@ -44,7 +44,9 @@ def calc_SepOS_LH_transition(
     Returns:
         :term:`SepOS_LH_transition`
     """
-    beta_e = calc_electron_beta(separatrix_electron_density, separatrix_electron_temp, magnetic_field_on_axis)
+    beta_e = calc_electron_beta(
+        separatrix_electron_density, separatrix_electron_temp, magnetic_field_on_axis
+    )
     mu = calc_electron_to_ion_mass_ratio(ion_mass)
 
     electron_pressure_decay_length = calc_electron_pressure_decay_length_Eich2021H(
@@ -52,13 +54,24 @@ def calc_SepOS_LH_transition(
     )
 
     k_EM = calc_electromagnetic_wavenumber(beta_e=beta_e, mu=mu)
-    omega_B = calc_curvature_drive(perpendicular_decay_length=electron_pressure_decay_length, major_radius=major_radius)
+    omega_B = calc_curvature_drive(
+        perpendicular_decay_length=electron_pressure_decay_length,
+        major_radius=major_radius,
+    )
 
-    flow_shear_stabilisation = critical_alpha_MHD * k_EM / (1.0 + (alpha_t * k_EM / critical_alpha_MHD) ** 2)
+    flow_shear_stabilisation = (
+        critical_alpha_MHD * k_EM / (1.0 + (alpha_t * k_EM / critical_alpha_MHD) ** 2)
+    )
 
     electron_turbulence_destabilisation = 0.5 * alpha_t
     kinetic_turbulence_destabilisation = k_EM**2 * alpha_t
-    ion_turbulence_destabilisation = critical_alpha_MHD / (2.0 * k_EM**2) * np.sqrt(omega_B)
-    total_destabilisation = electron_turbulence_destabilisation + ion_turbulence_destabilisation + kinetic_turbulence_destabilisation
+    ion_turbulence_destabilisation = (
+        critical_alpha_MHD / (2.0 * k_EM**2) * np.sqrt(omega_B)
+    )
+    total_destabilisation = (
+        electron_turbulence_destabilisation
+        + ion_turbulence_destabilisation
+        + kinetic_turbulence_destabilisation
+    )
 
     return flow_shear_stabilisation / total_destabilisation

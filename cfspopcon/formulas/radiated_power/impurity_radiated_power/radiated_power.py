@@ -48,10 +48,16 @@ def calc_impurity_radiated_power(
     elif radiated_power_method == RadiationMethod.MavrinCoronal:
         P_rad_impurity = calc_impurity_radiated_power_mavrin_coronal(**P_rad_kwargs)
     elif radiated_power_method == RadiationMethod.MavrinNoncoronal:
-        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(**P_rad_kwargs, tau_i=np.inf * ureg.s)
+        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(
+            **P_rad_kwargs, tau_i=np.inf * ureg.s
+        )
     elif radiated_power_method == RadiationMethod.Radas:
-        P_rad_impurity = calc_impurity_radiated_power_radas(**P_rad_kwargs, atomic_data=atomic_data)
+        P_rad_impurity = calc_impurity_radiated_power_radas(
+            **P_rad_kwargs, atomic_data=atomic_data
+        )
     else:
-        raise NotImplementedError(f"No implementation for radiated_power_method = {radiated_power_method}")
+        raise NotImplementedError(
+            f"No implementation for radiated_power_method = {radiated_power_method}"
+        )
 
     return P_rad_impurity  # type:ignore[no-any-return]

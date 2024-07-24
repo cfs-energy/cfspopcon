@@ -42,15 +42,23 @@ def calc_lambda_q(
         :term:`lambda_q` [mm]
     """
     if lambda_q_scaling == LambdaQScaling.Brunner:
-        return lambda_q_factor * float(calc_lambda_q_with_brunner.unitless_func(average_total_pressure))
+        return lambda_q_factor * float(
+            calc_lambda_q_with_brunner.unitless_func(average_total_pressure)
+        )
     elif lambda_q_scaling == LambdaQScaling.EichRegression14:
-        return lambda_q_factor * float(calc_lambda_q_with_eich_regression_14.unitless_func(B_pol_out_mid))
+        return lambda_q_factor * float(
+            calc_lambda_q_with_eich_regression_14.unitless_func(B_pol_out_mid)
+        )
     elif lambda_q_scaling == LambdaQScaling.EichRegression15:
         return lambda_q_factor * float(
-            calc_lambda_q_with_eich_regression_15.unitless_func(P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio)
+            calc_lambda_q_with_eich_regression_15.unitless_func(
+                P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio
+            )
         )
     else:
-        raise NotImplementedError(f"No implementation for lambda_q scaling {lambda_q_scaling}")
+        raise NotImplementedError(
+            f"No implementation for lambda_q scaling {lambda_q_scaling}"
+        )
 
 
 @wraps_ufunc(
@@ -65,7 +73,10 @@ def calc_lambda_q_with_brunner(average_total_pressure: float) -> float:
     return float(0.91 * average_total_pressure**-0.48)
 
 
-@wraps_ufunc(return_units=dict(lambda_q=ureg.millimeter), input_units=dict(B_pol_out_mid=ureg.tesla))
+@wraps_ufunc(
+    return_units=dict(lambda_q=ureg.millimeter),
+    input_units=dict(B_pol_out_mid=ureg.tesla),
+)
 def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float) -> float:
     """Return lambda_q according to Eich regression 14.
 
@@ -83,12 +94,19 @@ def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float) -> float:
         inverse_aspect_ratio=ureg.dimensionless,
     ),
 )
-def calc_lambda_q_with_eich_regression_15(P_sol: float, major_radius: float, B_pol_out_mid: float, inverse_aspect_ratio: float) -> float:
+def calc_lambda_q_with_eich_regression_15(
+    P_sol: float, major_radius: float, B_pol_out_mid: float, inverse_aspect_ratio: float
+) -> float:
     """Return lambda_q according to Eich regression 15.
 
     #15 in Table 3 in :cite:`eich_scaling_2013`
     """
-    lambda_q = 1.35 * major_radius**0.04 * B_pol_out_mid**-0.92 * inverse_aspect_ratio**0.42
+    lambda_q = (
+        1.35
+        * major_radius**0.04
+        * B_pol_out_mid**-0.92
+        * inverse_aspect_ratio**0.42
+    )
     if P_sol > 0:
         return float(lambda_q * P_sol**-0.02)
     else:

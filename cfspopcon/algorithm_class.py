@@ -24,7 +24,11 @@ class Algorithm:
     instances: ClassVar[dict[str, Algorithm]] = dict()
 
     def __init__(
-        self, function: LabelledReturnFunctionType, return_keys: list[str], name: Optional[str] = None, skip_registration: bool = False
+        self,
+        function: LabelledReturnFunctionType,
+        return_keys: list[str],
+        name: Optional[str] = None,
+        skip_registration: bool = False,
     ):
         """Initialise an Algorithm.
 
@@ -56,11 +60,15 @@ class Algorithm:
         self.return_keys = return_keys
 
         self.default_values = {
-            key: val.default for key, val in self._signature.parameters.items() if val.default is not inspect.Parameter.empty
+            key: val.default
+            for key, val in self._signature.parameters.items()
+            if val.default is not inspect.Parameter.empty
         }
         self.default_keys = list(self.default_values.keys())
 
-        self.required_input_keys = [key for key in self.input_keys if key not in self.default_keys]
+        self.required_input_keys = [
+            key for key in self.input_keys if key not in self.default_keys
+        ]
 
         self.__doc__ = self._make_docstring()
 
@@ -69,7 +77,12 @@ class Algorithm:
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
         return_string = (
-            f"Algorithm: {self._name}\n" + "Inputs:\n" + ", ".join(self.input_keys) + "\n" + "Outputs:\n" + ", ".join(self.return_keys)
+            f"Algorithm: {self._name}\n"
+            + "Inputs:\n"
+            + ", ".join(self.input_keys)
+            + "\n"
+            + "Outputs:\n"
+            + ", ".join(self.return_keys)
         )
         return return_string
 
@@ -95,7 +108,9 @@ class Algorithm:
 
         return run
 
-    def update_dataset(self, dataset: xr.Dataset, allow_overwrite: bool = True) -> xr.Dataset:
+    def update_dataset(
+        self, dataset: xr.Dataset, allow_overwrite: bool = True
+    ) -> xr.Dataset:
         """Retrieve inputs from passed dataset and return a new dataset combining input and output quantities.
 
         Args:
@@ -111,16 +126,24 @@ class Algorithm:
             elif key in self.default_keys:
                 input_values[key] = self.default_values[key]
             else:
-                sorted_dataset_keys = ", ".join(sorted(dataset.keys()))  # type:ignore[arg-type]
+                sorted_dataset_keys = ", ".join(
+                    sorted(dataset.keys())
+                )  # type:ignore[arg-type]
                 sorted_default_keys = ", ".join(sorted(self.default_keys))
                 raise KeyError(
                     f"KeyError for {self._name}: Key '{key}' not in dataset keys [{sorted_dataset_keys}] or default values [{sorted_default_keys}]"
                 )
 
         result = self._function(**input_values)
-        return xr.Dataset(result).merge(dataset, join="left", compat=("override" if allow_overwrite else "no_conflicts"))
+        return xr.Dataset(result).merge(
+            dataset,
+            join="left",
+            compat=("override" if allow_overwrite else "no_conflicts"),
+        )
 
-    def __add__(self, other: Union[Algorithm, CompositeAlgorithm]) -> CompositeAlgorithm:
+    def __add__(
+        self, other: Union[Algorithm, CompositeAlgorithm]
+    ) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this Algorithm and another Algorithm or CompositeAlgorithm."""
         if isinstance(other, CompositeAlgorithm):
             return CompositeAlgorithm(algorithms=[self, *other.algorithms])
@@ -150,33 +173,54 @@ class Algorithm:
                 if skip_unit_conversion:
                     result_dict[key] = result[i]
                 elif isinstance(result[i], float):
-                    result_dict[key] = convert_to_default_units(Quantity(result[i], ureg.dimensionless), key)
+                    result_dict[key] = convert_to_default_units(
+                        Quantity(result[i], ureg.dimensionless), key
+                    )
                 else:
                     result_dict[key] = convert_to_default_units(result[i], key)
 
             return result_dict
 
-        return cls(wrapped_function, return_keys, name=name if name is not None else func.__name__, skip_registration=skip_registration)
+        return cls(
+            wrapped_function,
+            return_keys,
+            name=name if name is not None else func.__name__,
+            skip_registration=skip_registration,
+        )
 
     @classmethod
     def register_algorithm(
-        cls, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False
+        cls,
+        return_keys: list[str],
+        name: Optional[str] = None,
+        skip_unit_conversion: bool = False,
     ) -> GenericFunctionType:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""  # noqa: D402
 
         def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
             Algorithm.from_single_function(
-                func, return_keys=return_keys, name=name if name is not None else func.__name__, skip_unit_conversion=skip_unit_conversion
+                func,
+                return_keys=return_keys,
+                name=name if name is not None else func.__name__,
+                skip_unit_conversion=skip_unit_conversion,
             )
             return func
 
         return function_wrapper
 
     def validate_inputs(
-        self, configuration: Union[dict, xr.Dataset], quiet: bool = False, raise_error_on_missing_inputs: bool = False
+        self,
+        configuration: Union[dict, xr.Dataset],
+        quiet: bool = False,
+        raise_error_on_missing_inputs: bool = False,
     ) -> bool:
         """Check that all required inputs are defined, and warn if inputs are unused."""
-        return _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
+        return _validate_inputs(
+            self,
+            configuration,
+            quiet=quiet,
+            raise_error_on_missing_inputs=raise_error_on_missing_inputs,
+        )
 
     @classmethod
     def write_yaml(cls, filepath: Path) -> None:
@@ -221,15 +265,26 @@ class Algorithm:
 class CompositeAlgorithm:
     """A class which combined multiple Algorithms into a single object which behaves like an Algorithm."""
 
-    def __init__(self, algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]], name: Optional[str] = None):
+    def __init__(
+        self,
+        algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]],
+        name: Optional[str] = None,
+    ):
         """Initialise a CompositeAlgorithm, combining several other Algorithms.
 
         Args:
             algorithms: a list of Algorithms, in the order that they should be executed.
             name: a name used to refer to the composite algorithm.
         """
-        if not (isinstance(algorithms, Sequence) and all(isinstance(alg, (Algorithm, CompositeAlgorithm)) for alg in algorithms)):
-            raise TypeError("Should pass a list of algorithms or composites to CompositeAlgorithm.")
+        if not (
+            isinstance(algorithms, Sequence)
+            and all(
+                isinstance(alg, (Algorithm, CompositeAlgorithm)) for alg in algorithms
+            )
+        ):
+            raise TypeError(
+                "Should pass a list of algorithms or composites to CompositeAlgorithm."
+            )
 
         self.algorithms: list[Algorithm] = []
 
@@ -335,20 +390,33 @@ class CompositeAlgorithm:
                     if parameter in alg.input_keys:
                         needed_by[parameter].append(alg._name)
 
-            error_string = ", ".join(f"{key} needed by [{', '.join(val)}]" for key, val in needed_by.items())
-            raise TypeError(f"CompositeAlgorithm.run() missing arguments: {error_string}")
+            error_string = ", ".join(
+                f"{key} needed by [{', '.join(val)}]" for key, val in needed_by.items()
+            )
+            raise TypeError(
+                f"CompositeAlgorithm.run() missing arguments: {error_string}"
+            )
         if parameters_extra:
-            warn(f"Not all input parameters were used. Unused parameters: [{', '.join(parameters_extra)}]", stacklevel=3)
+            warn(
+                f"Not all input parameters were used. Unused parameters: [{', '.join(parameters_extra)}]",
+                stacklevel=3,
+            )
 
         for alg in self.algorithms:
-            alg_kwargs = {key: result[key] for key in result.keys() if key in alg.input_keys}
+            alg_kwargs = {
+                key: result[key] for key in result.keys() if key in alg.input_keys
+            }
 
             alg_result = alg.run(**alg_kwargs)
-            result.update(alg_result)  # type:ignore[arg-type]  # dict.update() doesn't like KeysView[Hashable]
+            result.update(
+                alg_result
+            )  # type:ignore[arg-type]  # dict.update() doesn't like KeysView[Hashable]
 
         return xr.Dataset(result)
 
-    def update_dataset(self, dataset: xr.Dataset, allow_overwrite: bool = True) -> xr.Dataset:
+    def update_dataset(
+        self, dataset: xr.Dataset, allow_overwrite: bool = True
+    ) -> xr.Dataset:
         """Retrieve inputs from passed dataset and return a new dataset combining input and output quantities.
 
         N.b. will not throw a warning if the dataset contains unused elements.
@@ -364,7 +432,9 @@ class CompositeAlgorithm:
 
         return dataset
 
-    def __add__(self, other: Union[Algorithm, CompositeAlgorithm]) -> CompositeAlgorithm:
+    def __add__(
+        self, other: Union[Algorithm, CompositeAlgorithm]
+    ) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this CompositeAlgorithm and another Algorithm or CompositeAlgorithm."""
         if isinstance(other, Algorithm):
             return CompositeAlgorithm(algorithms=[*self.algorithms, other])
@@ -423,11 +493,21 @@ class CompositeAlgorithm:
                 if not quiet:
                     warn(message, stacklevel=3)
 
-            _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
+            _validate_inputs(
+                self,
+                configuration,
+                quiet=quiet,
+                raise_error_on_missing_inputs=raise_error_on_missing_inputs,
+            )
 
             return False
         else:
-            return _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
+            return _validate_inputs(
+                self,
+                configuration,
+                quiet=quiet,
+                raise_error_on_missing_inputs=raise_error_on_missing_inputs,
+            )
 
 
 def _validate_inputs(

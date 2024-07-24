@@ -5,7 +5,12 @@ from ...unit_handling import Unitfull, ureg
 
 
 @Algorithm.register_algorithm(return_keys=["P_external", "P_launched", "Q"])
-def calc_fusion_gain(P_fusion: Unitfull, P_alpha: Unitfull, P_in: Unitfull, fraction_of_external_power_coupled: Unitfull) -> Unitfull:
+def calc_fusion_gain(
+    P_fusion: Unitfull,
+    P_alpha: Unitfull,
+    P_in: Unitfull,
+    fraction_of_external_power_coupled: Unitfull,
+) -> Unitfull:
     """Calculate the fusion gain, using the launched power in the denominator.
 
     This is the thermal gain using the launched power.
@@ -35,7 +40,11 @@ def calc_fusion_gain(P_fusion: Unitfull, P_alpha: Unitfull, P_in: Unitfull, frac
 
 
 @Algorithm.register_algorithm(return_keys=["fusion_triple_product"])
-def calc_triple_product(peak_fuel_ion_density: Unitfull, peak_ion_temp: Unitfull, energy_confinement_time: Unitfull) -> Unitfull:
+def calc_triple_product(
+    peak_fuel_ion_density: Unitfull,
+    peak_ion_temp: Unitfull,
+    energy_confinement_time: Unitfull,
+) -> Unitfull:
     """Calculate the fusion triple product.
 
     Args:

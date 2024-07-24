@@ -49,15 +49,27 @@ def calc_impurity_radiated_power_radas(
     """
     MW_per_W = 1e6
 
-    electron_temp_profile, electron_density_profile = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
+    (
+        electron_temp_profile,
+        electron_density_profile,
+    ) = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
         impurity_species, electron_temp_profile, electron_density_profile
     )
     interpolator = atomic_data.coronal_Lz_interpolators[impurity_species]
-    Lz = np.power(10, interpolator((np.log10(electron_temp_profile), np.log10(electron_density_profile))))
+    Lz = np.power(
+        10,
+        interpolator(
+            (np.log10(electron_temp_profile), np.log10(electron_density_profile))
+        ),
+    )
     radiated_power_profile = electron_density_profile**2 * Lz
 
     radiated_power: float = (
-        impurity_concentration * integrate_profile_over_volume.unitless_func(radiated_power_profile, rho, plasma_volume) / MW_per_W
+        impurity_concentration
+        * integrate_profile_over_volume.unitless_func(
+            radiated_power_profile, rho, plasma_volume
+        )
+        / MW_per_W
     )
 
     return radiated_power

@@ -14,10 +14,16 @@ class RadiationMethod(Enum):
     """Methods to calculate radiation losses."""
 
     Inherent = "Bremsstrahlung and synchrotron radiation only"
-    PostJensen = "Impurity radiation, using a coronal equilibrium model from Post & Jensen 1977"
-    MavrinCoronal = "Impurity radiation, using a coronal equilibrium model from Mavrin 2018"
+    PostJensen = (
+        "Impurity radiation, using a coronal equilibrium model from Post & Jensen 1977"
+    )
+    MavrinCoronal = (
+        "Impurity radiation, using a coronal equilibrium model from Mavrin 2018"
+    )
     MavrinNoncoronal = "Impurity radiation, using a non-coronal model from Mavrin 2017"
-    Radas = "Impurity line and bremsstrahlung radiation, using coronal Lz curves from Radas"
+    Radas = (
+        "Impurity line and bremsstrahlung radiation, using coronal Lz curves from Radas"
+    )
 
 
 class AtomicSpecies(Enum):

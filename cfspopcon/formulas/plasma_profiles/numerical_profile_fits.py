@@ -91,7 +91,9 @@ def evaluate_density_and_temperature_profile_fits(
     width_ped: float = 0.05,
     rho: Optional[NDArray[np.float64]] = None,
     dataset: str = "PRF",
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:  # TODO: fill out docstring
+) -> tuple[
+    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
+]:  # TODO: fill out docstring
     """Evaluate temperature-density profile fits."""
     # ---- Get interpolator functions corresponding to this dataset
     width_interpolator = get_df_interpolator(dataset=dataset, df_name="width")
@@ -102,8 +104,12 @@ def evaluate_density_and_temperature_profile_fits(
     aLn = aLT_interpolator(x_a, nu_n)[0]
 
     # ---- Evaluate profiles
-    x, T, _ = evaluate_profile(T_avol, width_ped=width_ped, aLT_core=aLT, width_axis=x_a, rho=rho)
-    x, n, _ = evaluate_profile(n_avol, width_ped=width_ped, aLT_core=aLn, width_axis=x_a, rho=rho)
+    x, T, _ = evaluate_profile(
+        T_avol, width_ped=width_ped, aLT_core=aLT, width_axis=x_a, rho=rho
+    )
+    x, n, _ = evaluate_profile(
+        n_avol, width_ped=width_ped, aLT_core=aLn, width_axis=x_a, rho=rho
+    )
 
     return x, T, n
 
@@ -141,7 +147,9 @@ def evaluate_profile(
     #         - Because width_ped and Teped in my function represent the top values, I need to rescale them
     #         - The tanh does not result exactly in the top value (since it's an asymptote), so I need to correct for it
 
-    wped_tanh = width_ped / 1.5  # The pedestal width in the tanh formula is 50% inside the pedestal-top width
+    wped_tanh = (
+        width_ped / 1.5
+    )  # The pedestal width in the tanh formula is 50% inside the pedestal-top width
     Tedge_aux = 1 / 2 * (1 + np.tanh((1 - x - (wped_tanh / 2)) / (wped_tanh / 2)))
     Tedge = Tedge_aux[int(ix_c) :] / Tedge_aux[ix_c]
 
@@ -150,7 +158,9 @@ def evaluate_profile(
     Tcore = Tcore_aux[ix_a : int(ix_c)]
 
     # ~~~~ Axis
-    Taxis_aux = np.e ** (aLT_core * (-1 / 2 * x**2 / width_axis - 1 / 2 * width_axis + 1 - width_ped))
+    Taxis_aux = np.e ** (
+        aLT_core * (-1 / 2 * x**2 / width_axis - 1 / 2 * width_axis + 1 - width_ped)
+    )
     Taxis = Taxis_aux[:ix_a]
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -165,7 +175,8 @@ def evaluate_profile(
         1
         / aLT_core**2
         * (
-            (width_axis * aLT_core * np.e ** (width_axis * aLT_core / 2) + 1) * np.e ** (-aLT_core * (width_axis + width_ped - 1))
+            (width_axis * aLT_core * np.e ** (width_axis * aLT_core / 2) + 1)
+            * np.e ** (-aLT_core * (width_axis + width_ped - 1))
             + aLT_core * width_ped
             - aLT_core
             - 1
@@ -212,6 +223,10 @@ def get_datasets() -> list[str]:
     Returns:
          [str]*N, list of names of valid datasets
     """
-    datasets = [f.name for f in plasma_profiles_directory.iterdir() if (f.is_dir() and not f.name.startswith("_"))]
+    datasets = [
+        f.name
+        for f in plasma_profiles_directory.iterdir()
+        if (f.is_dir() and not f.name.startswith("_"))
+    ]
 
     return datasets

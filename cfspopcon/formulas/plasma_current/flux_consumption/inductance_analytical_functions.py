@@ -7,7 +7,9 @@ from ....unit_handling import Unitfull
 from ....unit_handling import dimensionless_magnitude as dmag
 
 
-def calc_fa_Sums_Na(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> tuple[Unitfull, Unitfull]:
+def calc_fa_Sums_Na(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> tuple[Unitfull, Unitfull]:
     """Calculate the sums for equation 17 on page 6 in Barr (2018).
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -32,13 +34,19 @@ def calc_fa_Sums_Na(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray
     def func2(sqrt_eps: float) -> float:
         return float(np.sum(a[2:] * sqrt_eps**m))
 
-    sum1 = xr.apply_ufunc(func1, dmag(sqrt_aspect_ratio), vectorize=True)  # type:ignore[arg-type]
-    sum2 = xr.apply_ufunc(func2, dmag(sqrt_aspect_ratio), vectorize=True)  # type:ignore[arg-type]
+    sum1 = xr.apply_ufunc(
+        func1, dmag(sqrt_aspect_ratio), vectorize=True
+    )  # type:ignore[arg-type]
+    sum2 = xr.apply_ufunc(
+        func2, dmag(sqrt_aspect_ratio), vectorize=True
+    )  # type:ignore[arg-type]
 
     return sum1, sum2
 
 
-def calc_fa_Sum_Ne(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fa_Sum_Ne(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate a sum for eq. 17 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -59,7 +67,9 @@ def calc_fa_Sum_Ne(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
     return xr.apply_ufunc(func, dmag(inverse_aspect_ratio), vectorize=True)
 
 
-def calc_fb_Sum_Nb(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fb_Sum_Nb(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate the sum for eq. 18 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -81,7 +91,9 @@ def calc_fb_Sum_Nb(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
     return xr.apply_ufunc(func, dmag(inverse_aspect_ratio), vectorize=True)
 
 
-def calc_fc_Sum_Nc(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fc_Sum_Nc(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate the sum for eq. 18 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -102,7 +114,9 @@ def calc_fc_Sum_Nc(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
     return xr.apply_ufunc(func, dmag(inverse_aspect_ratio), vectorize=True)
 
 
-def calc_fd_Sum_Nd(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fd_Sum_Nd(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate the sum for eq. 20 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -123,7 +137,9 @@ def calc_fd_Sum_Nd(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
     return xr.apply_ufunc(func, dmag(inverse_aspect_ratio), vectorize=True)
 
 
-def calc_fg_Sums_Na(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fg_Sums_Na(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate sums for eq. 22 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -143,7 +159,9 @@ def calc_fg_Sums_Na(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray
     return sum1, sum2
 
 
-def calc_fg_Sum_Ce(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fg_Sum_Ce(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate a sum for eq. 22 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -164,7 +182,9 @@ def calc_fg_Sum_Ce(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
     return xr.apply_ufunc(func, dmag(inverse_aspect_ratio), vectorize=True)
 
 
-def calc_fh_Sum_Cb(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fh_Sum_Cb(
+    inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
+) -> Unitfull:
     """Calculate a sum for eq. 23 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -186,7 +206,10 @@ def calc_fh_Sum_Cb(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]
 
 
 def calc_fa(
-    inverse_aspect_ratio: Unitfull, beta_poloidal: Unitfull, internal_inductivity: Unitfull, coeffs: dict[str, np.ndarray]
+    inverse_aspect_ratio: Unitfull,
+    beta_poloidal: Unitfull,
+    internal_inductivity: Unitfull,
+    coeffs: dict[str, np.ndarray],
 ) -> Unitfull:
     """Calculate eq. 17 on page 6 in :cite:`Barr_2018`.
 
@@ -206,7 +229,8 @@ def calc_fa(
     return (
         ((1 + fa_Sums_[0]) * np.log(8 / inverse_aspect_ratio))
         - (2 + fa_Sums_[1])
-        + (beta_poloidal + internal_inductivity / 2) * calc_fa_Sum_Ne(inverse_aspect_ratio, coeffs=coeffs)
+        + (beta_poloidal + internal_inductivity / 2)
+        * calc_fa_Sum_Ne(inverse_aspect_ratio, coeffs=coeffs)
     )
 
 
@@ -224,7 +248,11 @@ def calc_fb(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Un
     """
     b = coeffs["b"]
 
-    return b[0] * np.sqrt(inverse_aspect_ratio) * (1 + calc_fb_Sum_Nb(inverse_aspect_ratio, coeffs=coeffs))
+    return (
+        b[0]
+        * np.sqrt(inverse_aspect_ratio)
+        * (1 + calc_fb_Sum_Nb(inverse_aspect_ratio, coeffs=coeffs))
+    )
 
 
 def calc_fc(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
@@ -258,13 +286,20 @@ def calc_fd(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray]) -> Un
          functional term [~]
     """
     d = coeffs["d"]
-    fd = d[0] * inverse_aspect_ratio * (1 + calc_fd_Sum_Nd(inverse_aspect_ratio, coeffs=coeffs))
+    fd = (
+        d[0]
+        * inverse_aspect_ratio
+        * (1 + calc_fd_Sum_Nd(inverse_aspect_ratio, coeffs=coeffs))
+    )
 
     return fd
 
 
 def calc_fg(
-    inverse_aspect_ratio: Unitfull, beta_poloidal: Unitfull, internal_inductivity: Unitfull, coeffs: dict[str, np.ndarray]
+    inverse_aspect_ratio: Unitfull,
+    beta_poloidal: Unitfull,
+    internal_inductivity: Unitfull,
+    coeffs: dict[str, np.ndarray],
 ) -> Unitfull:
     """Calculate eq. 22 on page 6 in :cite:`Barr_2018`.
 
@@ -285,11 +320,16 @@ def calc_fg(
         -(1 / inverse_aspect_ratio)
         + np.log(8 / inverse_aspect_ratio) * fg_Sums_[0]
         - fg_Sums_[1]
-        + (beta_poloidal + (internal_inductivity / 2)) * calc_fg_Sum_Ce(inverse_aspect_ratio, coeffs=coeffs)
+        + (beta_poloidal + (internal_inductivity / 2))
+        * calc_fg_Sum_Ce(inverse_aspect_ratio, coeffs=coeffs)
     )
 
 
-def calc_fh(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, coeffs: dict[str, np.ndarray]) -> Unitfull:
+def calc_fh(
+    inverse_aspect_ratio: Unitfull,
+    areal_elongation: Unitfull,
+    coeffs: dict[str, np.ndarray],
+) -> Unitfull:
     """Calculate eq. 23 on page 6 in :cite:`Barr_2018`.
 
     A power-balance model for local helicity injection startup in a spherical tokamak :cite:`Barr_2018`
@@ -304,4 +344,6 @@ def calc_fh(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, coeffs: 
     """
     b = coeffs["b"]
 
-    return -1 + ((areal_elongation * b[0]) / np.sqrt(inverse_aspect_ratio)) * (1 / 2 + calc_fh_Sum_Cb(inverse_aspect_ratio, coeffs=coeffs))
+    return -1 + ((areal_elongation * b[0]) / np.sqrt(inverse_aspect_ratio)) * (
+        1 / 2 + calc_fh_Sum_Cb(inverse_aspect_ratio, coeffs=coeffs)
+    )

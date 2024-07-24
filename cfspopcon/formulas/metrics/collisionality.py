@@ -6,7 +6,10 @@ from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull, convert_units, ureg, wraps_ufunc
 
 
-@wraps_ufunc(input_units=dict(electron_density=ureg.m**-3, electron_temp=ureg.eV), return_units=dict(coulomb_log=ureg.dimensionless))
+@wraps_ufunc(
+    input_units=dict(electron_density=ureg.m**-3, electron_temp=ureg.eV),
+    return_units=dict(coulomb_log=ureg.dimensionless),
+)
 def calc_coulomb_logarithm(electron_density: float, electron_temp: float) -> float:
     """Calculate the Coulomb logarithm, for electron-electron or electron-ion collisions.
 
@@ -86,8 +89,13 @@ def calc_alpha_t(
     Returns:
         :term:`alpha_t`
     """
-    coulomb_log = calc_coulomb_logarithm(electron_density=separatrix_electron_density, electron_temp=separatrix_electron_temp)
-    ion_sound_speed = np.sqrt(mean_ion_charge_state * separatrix_electron_temp / ion_mass)
+    coulomb_log = calc_coulomb_logarithm(
+        electron_density=separatrix_electron_density,
+        electron_temp=separatrix_electron_temp,
+    )
+    ion_sound_speed = np.sqrt(
+        mean_ion_charge_state * separatrix_electron_temp / ion_mass
+    )
     nu_ei = calc_electron_ion_collision_freq(
         electron_density=separatrix_electron_density,
         electron_temp=separatrix_electron_temp,
@@ -150,7 +158,9 @@ def calc_edge_collisionality(
     return 100.0 * alpha_t / cylindrical_safety_factor
 
 
-def calc_electron_electron_collision_freq(electron_density: Unitfull, electron_temp: Unitfull, coulomb_log: Unitfull) -> Unitfull:
+def calc_electron_electron_collision_freq(
+    electron_density: Unitfull, electron_temp: Unitfull, coulomb_log: Unitfull
+) -> Unitfull:
     """Calculate the electron-electron collision frequency, using equation B1 from from :cite:`Eich_2020`."""
     nu_ee = (
         (4.0 / 3.0)
@@ -158,16 +168,27 @@ def calc_electron_electron_collision_freq(electron_density: Unitfull, electron_t
         * electron_density
         * ureg.e**4
         * coulomb_log
-        / ((4.0 * np.pi * ureg.epsilon_0) ** 2 * np.sqrt(1.0 * ureg.electron_mass) * electron_temp**1.5)
+        / (
+            (4.0 * np.pi * ureg.epsilon_0) ** 2
+            * np.sqrt(1.0 * ureg.electron_mass)
+            * electron_temp**1.5
+        )
     )
     return nu_ee
 
 
 def calc_electron_ion_collision_freq(
-    electron_density: Unitfull, electron_temp: Unitfull, coulomb_log: Unitfull, z_effective: Unitfull
+    electron_density: Unitfull,
+    electron_temp: Unitfull,
+    coulomb_log: Unitfull,
+    z_effective: Unitfull,
 ) -> Unitfull:
     """Calculate the electron-ion collision frequency, using equation B2 from from :cite:`Eich_2020`."""
-    nu_ee = calc_electron_electron_collision_freq(electron_density, electron_temp, coulomb_log)
-    z_effective_correction = (1.0 - 0.569) * np.exp(-(((z_effective - 1.0) / 3.25) ** 0.85)) + 0.569
+    nu_ee = calc_electron_electron_collision_freq(
+        electron_density, electron_temp, coulomb_log
+    )
+    z_effective_correction = (1.0 - 0.569) * np.exp(
+        -(((z_effective - 1.0) / 3.25) ** 0.85)
+    ) + 0.569
 
     return nu_ee * z_effective_correction * z_effective

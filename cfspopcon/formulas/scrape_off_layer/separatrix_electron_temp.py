@@ -29,5 +29,12 @@ def calc_separatrix_electron_temp(
         separatrix_electron_temp [eV]
     """
     return (
-        target_electron_temp**3.5 + 3.5 * (SOL_conduction_fraction * parallel_heat_flux_density * parallel_connection_length / kappa_e0)
+        target_electron_temp**3.5
+        + 3.5
+        * (
+            SOL_conduction_fraction
+            * parallel_heat_flux_density
+            * parallel_connection_length
+            / kappa_e0
+        )
     ) ** (2.0 / 7.0)

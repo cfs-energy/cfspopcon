@@ -38,15 +38,48 @@ def test_eval_interpolator(atomic_data):
     kind = AtomicData.NoncoronalLz
     dataset = atomic_data[species]
 
-    Ne = np.logspace(np.log10(dataset.dim_electron_density.min().item() * 1.1), np.log10(dataset.dim_electron_density.max().item() * 0.9))
-    Te = np.logspace(np.log10(dataset.dim_electron_temp.min().item() * 1.1), np.log10(dataset.dim_electron_temp.max().item() * 0.9))
-
-    atomic_data.eval_interpolator(electron_density=Ne, electron_temp=Te, kind=kind, species=species, allow_extrapolation=True, ne_tau=1e19)
-    atomic_data.eval_interpolator(electron_density=Ne, electron_temp=Te, kind=kind, species=species, allow_extrapolation=False, ne_tau=1e19)
-
-    with pytest.raises(ValueError):
-        atomic_data.eval_interpolator(electron_density=Ne, electron_temp=Te, kind=kind, species=species, ne_tau=1e19, grid=False)
+    Ne = np.logspace(
+        np.log10(dataset.dim_electron_density.min().item() * 1.1),
+        np.log10(dataset.dim_electron_density.max().item() * 0.9),
+    )
+    Te = np.logspace(
+        np.log10(dataset.dim_electron_temp.min().item() * 1.1),
+        np.log10(dataset.dim_electron_temp.max().item() * 0.9),
+    )
 
     atomic_data.eval_interpolator(
-        electron_density=Ne, electron_temp=Te, kind=kind, species=species, ne_tau=1e19, grid=False, coords=dict(rho=np.linspace(0, 1))
+        electron_density=Ne,
+        electron_temp=Te,
+        kind=kind,
+        species=species,
+        allow_extrapolation=True,
+        ne_tau=1e19,
+    )
+    atomic_data.eval_interpolator(
+        electron_density=Ne,
+        electron_temp=Te,
+        kind=kind,
+        species=species,
+        allow_extrapolation=False,
+        ne_tau=1e19,
+    )
+
+    with pytest.raises(ValueError):
+        atomic_data.eval_interpolator(
+            electron_density=Ne,
+            electron_temp=Te,
+            kind=kind,
+            species=species,
+            ne_tau=1e19,
+            grid=False,
+        )
+
+    atomic_data.eval_interpolator(
+        electron_density=Ne,
+        electron_temp=Te,
+        kind=kind,
+        species=species,
+        ne_tau=1e19,
+        grid=False,
+        coords=dict(rho=np.linspace(0, 1)),
     )

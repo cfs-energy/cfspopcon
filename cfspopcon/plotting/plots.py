@@ -10,7 +10,10 @@ import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
 
-from ..shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_minimum
+from ..shaping_and_selection.point_selection import (
+    build_mask_from_dict,
+    find_coords_of_minimum,
+)
 from ..shaping_and_selection.transform_coords import build_transform_function_from_dict
 from ..unit_handling import Quantity, Unit, dimensionless_magnitude
 from .coordinate_formatter import CoordinateFormatter
@@ -28,23 +31,31 @@ def make_plot(
     """Given a dictionary corresponding to a plotting style, build a standard plot from the results of the POPCON."""
     if plot_params["type"] == "popcon":
         if ax is None:
-            _, ax = plt.subplots(figsize=plot_params["figsize"], dpi=plot_params["show_dpi"])
+            _, ax = plt.subplots(
+                figsize=plot_params["figsize"], dpi=plot_params["show_dpi"]
+            )
         fig, ax = make_popcon_plot(dataset, title, plot_params, points, ax=ax)
     else:
-        raise NotImplementedError(f"No plotting method for type '{plot_params['type']}'")
+        raise NotImplementedError(
+            f"No plotting method for type '{plot_params['type']}'"
+        )
 
     if save_name is not None:
         fig.savefig(output_dir / save_name)
 
 
-def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points: dict, ax: Axes):
+def make_popcon_plot(
+    dataset: xr.Dataset, title: str, plot_params: dict, points: dict, ax: Axes
+):
     """Make a plot."""
     from cfspopcon import __version__
 
     fig = ax.figure
     transform_func = build_transform_function_from_dict(dataset, plot_params)
 
-    coords = plot_params["coords"] if "coords" in plot_params else plot_params["new_coords"]
+    coords = (
+        plot_params["coords"] if "coords" in plot_params else plot_params["new_coords"]
+    )
     legend_elements = dict()
 
     if "fill" in plot_params:
@@ -80,10 +91,16 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
             transformed_field = transform_func(field.where(mask))
 
             contour_set = transformed_field.plot.contour(
-                ax=ax, levels=subplot_params["levels"], colors=[subplot_params["color"]], linestyles=[subplot_params.get("line", "solid")]
+                ax=ax,
+                levels=subplot_params["levels"],
+                colors=[subplot_params["color"]],
+                linestyles=[subplot_params.get("line", "solid")],
             )
             legend_entry = label_contour(
-                ax, contour_set, fontsize=subplot_params.get("fontsize", 10.0), format_spec=subplot_params.get("format", "")
+                ax,
+                contour_set,
+                fontsize=subplot_params.get("fontsize", 10.0),
+                format_spec=subplot_params.get("format", ""),
             )
 
             legend_elements[subplot_params["label"]] = legend_entry
@@ -94,8 +111,13 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
 
         mask = build_mask_from_dict(dataset, point_params)
 
-        if "minimize" not in point_params.keys() and "maximize" not in point_params.keys():
-            raise ValueError(f"Need to provide either minimize or maximize in point specification. Keys were {point_params.keys()}")
+        if (
+            "minimize" not in point_params.keys()
+            and "maximize" not in point_params.keys()
+        ):
+            raise ValueError(
+                f"Need to provide either minimize or maximize in point specification. Keys were {point_params.keys()}"
+            )
 
         if "minimize" in point_params.keys():
             field = dataset[point_params["minimize"]]
@@ -104,7 +126,9 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
 
         transformed_field = transform_func(field.where(mask))
 
-        point_coords = find_coords_of_minimum(transformed_field, keep_dims=point_params.get("keep_dims", []))
+        point_coords = find_coords_of_minimum(
+            transformed_field, keep_dims=point_params.get("keep_dims", [])
+        )
 
         point = transformed_field.isel(point_coords)
         plotting_coords = []
@@ -138,7 +162,12 @@ def units_to_string(units: Unit) -> str:
         return f"[{units:~P}]"
 
 
-def label_contour(ax: plt.Axes, contour_set: matplotlib.contour.QuadContourSet, format_spec: str = "1.1f", fontsize: float = 10.0):
+def label_contour(
+    ax: plt.Axes,
+    contour_set: matplotlib.contour.QuadContourSet,
+    format_spec: str = "1.1f",
+    fontsize: float = 10.0,
+):
     """Add in-line labels to contours.
 
     Returns the first label element, which can be used to construct a legend.

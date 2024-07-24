@@ -43,7 +43,11 @@ class ConfinementScaling:
 @Algorithm.register_algorithm(return_keys=[])
 def read_confinement_scalings() -> None:
     """Reads the energy confinement scalings from an energy_confinement_scalings.yaml file."""
-    with as_file(files("cfspopcon.formulas.energy_confinement").joinpath("energy_confinement_scalings.yaml")) as filepath:
+    with as_file(
+        files("cfspopcon.formulas.energy_confinement").joinpath(
+            "energy_confinement_scalings.yaml"
+        )
+    ) as filepath:
         with open(filepath) as f:
             data = yaml.safe_load(f)
 

@@ -6,7 +6,12 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.unit_handling import UnitStrippedWarning, dimensionless_magnitude, ureg, wraps_ufunc
+from cfspopcon.unit_handling import (
+    UnitStrippedWarning,
+    dimensionless_magnitude,
+    ureg,
+    wraps_ufunc,
+)
 
 
 def check_equal(a, b, **kwargs):
@@ -36,7 +41,9 @@ def test_wraps_simple():
 def test_wraps_with_too_many_input_units():
     with pytest.raises(ValueError):
 
-        @wraps_ufunc(return_units=dict(result=ureg.m), input_units=dict(a=ureg.m, b=ureg.mm))
+        @wraps_ufunc(
+            return_units=dict(result=ureg.m), input_units=dict(a=ureg.m, b=ureg.mm)
+        )
         def in_and_out(a):
             return a
 
@@ -72,7 +79,11 @@ def test_jumbled_inputs():
 
 @pytest.mark.filterwarnings("error")
 def test_pass_as_kwargs():
-    @wraps_ufunc(return_units=dict(result=ureg.m), input_units=dict(a=ureg.m, b=ureg.m), pass_as_kwargs=("a", "b"))
+    @wraps_ufunc(
+        return_units=dict(result=ureg.m),
+        input_units=dict(a=ureg.m, b=ureg.m),
+        pass_as_kwargs=("a", "b"),
+    )
     def add_together(a, b):
         return a + b
 
@@ -83,7 +94,11 @@ def test_pass_as_kwargs():
 def test_pass_as_kwargs_in_wrong_order():
     with pytest.raises(ValueError):
 
-        @wraps_ufunc(return_units=dict(result=ureg.m), input_units=dict(a=ureg.m, b=ureg.m), pass_as_kwargs=("a"))
+        @wraps_ufunc(
+            return_units=dict(result=ureg.m),
+            input_units=dict(a=ureg.m, b=ureg.m),
+            pass_as_kwargs=("a"),
+        )
         def add_together(a, b):
             return a + b
 
@@ -117,7 +132,11 @@ def test_multiple_return():
 
 @pytest.mark.filterwarnings("error")
 def test_multiple_return_with_wrong_number_of_units():
-    @wraps_ufunc(return_units=dict(a=ureg.m), input_units=dict(a=ureg.m, b=ureg.m), output_core_dims=[(), ()])
+    @wraps_ufunc(
+        return_units=dict(a=ureg.m),
+        input_units=dict(a=ureg.m, b=ureg.m),
+        output_core_dims=[(), ()],
+    )
     def swap(a, b):
         return b, a
 
@@ -161,7 +180,8 @@ def test_illegal_chained_call_input():
         return simple_function(x)
 
     with pytest.raises(
-        RuntimeError, match=r".*Calling `wraps_ufunc` decorated function from within.*\n.*\n.*\n.*simple_function.unitless_func.*"
+        RuntimeError,
+        match=r".*Calling `wraps_ufunc` decorated function from within.*\n.*\n.*\n.*simple_function.unitless_func.*",
     ):
         simple_function2(10 * ureg.m)
 

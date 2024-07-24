@@ -12,11 +12,15 @@ def test_docs():
     popcon_directory = files("cfspopcon")
 
     doctest_output = subprocess.run(
-        args=["make", "-C", str(popcon_directory.joinpath("../docs")), "doctest"], capture_output=True, check=True
+        args=["make", "-C", str(popcon_directory.joinpath("../docs")), "doctest"],
+        capture_output=True,
+        check=True,
     )
 
     linkcheck_output = subprocess.run(
-        args=["make", "-C", str(popcon_directory.joinpath("../docs")), "linkcheck"], capture_output=True, check=True
+        args=["make", "-C", str(popcon_directory.joinpath("../docs")), "linkcheck"],
+        capture_output=True,
+        check=True,
     )
 
     if len(doctest_output.stderr) > 0:

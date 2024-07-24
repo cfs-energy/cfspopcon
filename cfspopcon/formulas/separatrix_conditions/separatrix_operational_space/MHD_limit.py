@@ -52,17 +52,33 @@ def calc_SepOS_ideal_MHD_limit(
         alpha_t=alpha_t, poloidal_sound_larmor_radius=poloidal_sound_larmor_radius
     )
 
-    omega_B = calc_curvature_drive(perpendicular_decay_length=electron_pressure_decay_length, major_radius=major_radius)
+    omega_B = calc_curvature_drive(
+        perpendicular_decay_length=electron_pressure_decay_length,
+        major_radius=major_radius,
+    )
     beta_e = calc_electron_beta(
-        electron_density=separatrix_electron_density, electron_temp=separatrix_electron_temp, magnetic_field_strength=magnetic_field_on_axis
+        electron_density=separatrix_electron_density,
+        electron_temp=separatrix_electron_temp,
+        magnetic_field_strength=magnetic_field_on_axis,
     )
     epsilon_hat = calc_squared_scale_ratio(
-        safety_factor=cylindrical_safety_factor, major_radius=major_radius, perpendicular_decay_length=electron_pressure_decay_length
+        safety_factor=cylindrical_safety_factor,
+        major_radius=major_radius,
+        perpendicular_decay_length=electron_pressure_decay_length,
     )
 
     k_ideal = calc_ideal_MHD_wavenumber(
-        beta_e=beta_e, epsilon_hat=epsilon_hat, omega_B=omega_B, tau_i=ion_to_electron_temp_ratio, alpha_t=alpha_t
+        beta_e=beta_e,
+        epsilon_hat=epsilon_hat,
+        omega_B=omega_B,
+        tau_i=ion_to_electron_temp_ratio,
+        alpha_t=alpha_t,
     )
-    k_RBM = calc_resistive_ballooning_wavenumber(critical_alpha_MHD=critical_alpha_MHD, alpha_t=alpha_t, omega_B=omega_B) * k_RBM_factor
+    k_RBM = (
+        calc_resistive_ballooning_wavenumber(
+            critical_alpha_MHD=critical_alpha_MHD, alpha_t=alpha_t, omega_B=omega_B
+        )
+        * k_RBM_factor
+    )
 
     return convert_units(k_ideal / k_RBM, ureg.dimensionless)

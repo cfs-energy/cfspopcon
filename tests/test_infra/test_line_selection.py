@@ -2,7 +2,10 @@ import numpy as np
 import xarray as xr
 from cfspopcon.unit_handling import ureg, Quantity, magnitude, convert_units
 
-from cfspopcon.shaping_and_selection.line_selection import interpolate_onto_line, find_coords_of_contour
+from cfspopcon.shaping_and_selection.line_selection import (
+    interpolate_onto_line,
+    find_coords_of_contour,
+)
 
 
 def test_extract_values_along_contour():
@@ -16,14 +19,22 @@ def test_extract_values_along_contour():
     level = Quantity(1200.0, ureg.W)
 
     x_mesh, y_mesh = np.meshgrid(x_vals, y_vals)
-    z_vals = xr.DataArray(np.sqrt(x_mesh**2 + y_mesh**2), coords={y_coord: y_vals, x_coord: x_vals}).pint.quantify(units)
+    z_vals = xr.DataArray(
+        np.sqrt(x_mesh**2 + y_mesh**2), coords={y_coord: y_vals, x_coord: x_vals}
+    ).pint.quantify(units)
 
-    contour_x, contour_y = find_coords_of_contour(z_vals, x_coord=x_coord, y_coord=y_coord, level=level)
-
-    assert np.allclose(np.sqrt(contour_x**2 + contour_y**2), level.magnitude / 1e3, rtol=1e-3)
+    contour_x, contour_y = find_coords_of_contour(
+        z_vals, x_coord=x_coord, y_coord=y_coord, level=level
+    )
 
     assert np.allclose(
-        magnitude(convert_units(interpolate_onto_line(z_vals, contour_x, contour_y), units)),
+        np.sqrt(contour_x**2 + contour_y**2), level.magnitude / 1e3, rtol=1e-3
+    )
+
+    assert np.allclose(
+        magnitude(
+            convert_units(interpolate_onto_line(z_vals, contour_x, contour_y), units)
+        ),
         magnitude(convert_units(level, units)),
         rtol=1e-3,
     )

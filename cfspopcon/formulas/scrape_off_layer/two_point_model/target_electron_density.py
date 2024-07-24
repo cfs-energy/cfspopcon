@@ -16,7 +16,11 @@ def calc_target_electron_density(
 
     Components are calculated using the other functions in this file.
     """
-    return target_electron_density_basic * f_vol_loss_target_electron_density * f_other_target_electron_density
+    return (
+        target_electron_density_basic
+        * f_vol_loss_target_electron_density
+        * f_other_target_electron_density
+    )
 
 
 def calc_target_electron_density_basic(
@@ -39,7 +43,10 @@ def calc_target_electron_density_basic(
         target_electron_density_basic [m^-3]
     """
     return (
-        sheath_heat_transmission_factor**2 / (32.0 * fuel_average_mass_number) * upstream_total_pressure**3 / parallel_heat_flux_density**2
+        sheath_heat_transmission_factor**2
+        / (32.0 * fuel_average_mass_number)
+        * upstream_total_pressure**3
+        / parallel_heat_flux_density**2
     )
 
 
@@ -58,7 +65,9 @@ def calc_f_vol_loss_target_electron_density(
     Returns:
         f_vol_loss_target_electron_density [~]
     """
-    return (1.0 - SOL_momentum_loss_fraction) ** 3 / (1.0 - SOL_power_loss_fraction) ** 2
+    return (1.0 - SOL_momentum_loss_fraction) ** 3 / (
+        1.0 - SOL_power_loss_fraction
+    ) ** 2
 
 
 def calc_f_other_target_electron_density(
@@ -83,7 +92,15 @@ def calc_f_other_target_electron_density(
         f_other_target_electron_density [~]
     """
     return (
-        (4.0 / (1.0 + target_ratio_of_ion_to_electron_temp / target_ratio_of_electron_to_ion_density) ** 2)
+        (
+            4.0
+            / (
+                1.0
+                + target_ratio_of_ion_to_electron_temp
+                / target_ratio_of_electron_to_ion_density
+            )
+            ** 2
+        )
         * 8.0
         * target_mach_number**2
         / (1.0 + target_mach_number**2) ** 3

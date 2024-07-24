@@ -41,15 +41,24 @@ def calc_SepOS_L_mode_density_limit(
     Returns:
         :term:`SepOS_density_limit`
     """
-    electron_pressure_decay_length = calc_electron_pressure_decay_length_Manz2023L(alpha_t=alpha_t)
+    electron_pressure_decay_length = calc_electron_pressure_decay_length_Manz2023L(
+        alpha_t=alpha_t
+    )
 
-    omega_B = calc_curvature_drive(perpendicular_decay_length=electron_pressure_decay_length, major_radius=major_radius)
+    omega_B = calc_curvature_drive(
+        perpendicular_decay_length=electron_pressure_decay_length,
+        major_radius=major_radius,
+    )
     beta_e = calc_electron_beta(
-        electron_density=separatrix_electron_density, electron_temp=separatrix_electron_temp, magnetic_field_strength=magnetic_field_on_axis
+        electron_density=separatrix_electron_density,
+        electron_temp=separatrix_electron_temp,
+        magnetic_field_strength=magnetic_field_on_axis,
     )
     mu = calc_electron_to_ion_mass_ratio(ion_mass=ion_mass)
 
     k_EM = calc_electromagnetic_wavenumber(beta_e=beta_e, mu=mu)
-    k_RBM = calc_resistive_ballooning_wavenumber(critical_alpha_MHD=critical_alpha_MHD, alpha_t=alpha_t, omega_B=omega_B)
+    k_RBM = calc_resistive_ballooning_wavenumber(
+        critical_alpha_MHD=critical_alpha_MHD, alpha_t=alpha_t, omega_B=omega_B
+    )
 
     return k_EM / k_RBM

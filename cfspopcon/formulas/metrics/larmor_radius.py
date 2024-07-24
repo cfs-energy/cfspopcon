@@ -6,17 +6,26 @@ from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull, ureg
 
 
-def calc_larmor_radius(species_temperature: Unitfull, magnetic_field_strength: Unitfull, species_mass: Unitfull) -> Unitfull:
+def calc_larmor_radius(
+    species_temperature: Unitfull,
+    magnetic_field_strength: Unitfull,
+    species_mass: Unitfull,
+) -> Unitfull:
     """Calculate the Larmor radius.
 
     Equation 1 from :cite:`Eich_2020`
     """
-    return np.sqrt(species_temperature * species_mass) / (ureg.e * magnetic_field_strength)
+    return np.sqrt(species_temperature * species_mass) / (
+        ureg.e * magnetic_field_strength
+    )
 
 
 @Algorithm.register_algorithm(return_keys=["rho_star"])
 def calc_rho_star(
-    fuel_average_mass_number: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull, minor_radius: Unitfull
+    fuel_average_mass_number: Unitfull,
+    average_ion_temp: Unitfull,
+    magnetic_field_on_axis: Unitfull,
+    minor_radius: Unitfull,
 ) -> Unitfull:
     """Calculate rho* (normalized gyroradius).
 
@@ -32,7 +41,9 @@ def calc_rho_star(
          rho_star [~]
     """
     rho_s = calc_larmor_radius(
-        species_temperature=average_ion_temp, magnetic_field_strength=magnetic_field_on_axis, species_mass=fuel_average_mass_number
+        species_temperature=average_ion_temp,
+        magnetic_field_strength=magnetic_field_on_axis,
+        species_mass=fuel_average_mass_number,
     )
 
     return rho_s / minor_radius
