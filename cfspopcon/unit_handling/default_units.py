@@ -30,7 +30,6 @@ class DefaultUnits:
         Returns: Unit
         """
         if len(cls.unit_dictionary) == 0:
-            print("Reading defaults")
             # If the unit_dictionary dictionary is empty, read units from the default file.
             cls.read_units_from_file()
 
