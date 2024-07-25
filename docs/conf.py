@@ -40,6 +40,7 @@ linkcheck_ignore = [
     r"https://github.com/cfs-energy/cfspopcon/blob/main/docs/doc_sources/getting_started.ipynb",
     r"https://doi.org/10.13182/FST43-67",
     r"https://www.tandfonline.com/doi/full/10.13182/FST43-67",
+    r"https://www-internal.psfc.mit.edu/research/alcator/data/fst_cmod.pdf",
 ]
 linkcheck_retries = 5
 linkcheck_timeout = 120
