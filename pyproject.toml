@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cfspopcon"
-version = "6.0.0"
+version = "6.0.1"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"
@@ -37,7 +37,7 @@ pint-xarray = "^0.4"
 ipdb = "^0.13.13"
 click = "^8.1.0"
 netcdf4 = "^1.7"
-radas = ">2024.3.1"
+radas = ">2024.7.1"
 contourpy = "^1.2.1"
 
 [tool.poetry.group.dev.dependencies]
