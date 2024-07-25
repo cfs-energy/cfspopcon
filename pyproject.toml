@@ -53,6 +53,7 @@ sphinx-rtd-theme = "^2.0.0"
 sphinxcontrib-bibtex = "^2.6.1"
 sphinx-copybutton = "^0.5.2"
 ruff = "^0.5"
+pickleshare = "^0.7.5"
 nbmake = "^1.5"
 nbsphinx = "^0.9"
 # Added as workaround for shhinx bibtex issue https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345
