@@ -8,6 +8,7 @@ from cfspopcon.helpers import (
     make_impurities_array,
     make_impurities_array_from_kwargs,
 )
+from cfspopcon.named_options import AtomicSpecies
 
 
 def test_convert_named_options():
@@ -48,3 +49,15 @@ def test_impurity_array_helpers():
         from_lists = make_impurities_array("Xenon", [array, 2 * array, 3 * array])
     with pytest.raises(ValueError):
         from_lists = make_impurities_array(["Xenon", "tungsten"], [array])
+
+    array2 = make_impurities_array_from_kwargs(
+        helium = xr.DataArray([0.1, 0.2], dims=('a')),
+        tungsten = xr.DataArray([0.3, 0.4], dims=('b')),
+    )
+
+    ds = xr.Dataset(data_vars=dict(array1 = array, array2 = array2))
+
+    ds["array2"] = extend_impurities_array(ds["array2"], "nitrogen", 1e-3)
+
+    assert xr.testing.assert_allclose(ds["array2"].sel(dim_species=AtomicSpecies.Helium).isel(a=0, b=1), 0.1)
+    assert xr.testing.assert_allclose(ds["array2"].sel(dim_species=AtomicSpecies.Tungsten).isel(a=1, b=1), 0.4)
