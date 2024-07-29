@@ -21,7 +21,7 @@ GenericFunctionType = Callable[..., Any]
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    instances: ClassVar[dict[str, Algorithm]] = dict()
+    instances: ClassVar[dict[str, Union[Algorithm, CompositeAlgorithm]]] = dict()
 
     def __init__(
         self, function: LabelledReturnFunctionType, return_keys: list[str], name: Optional[str] = None, skip_registration: bool = False
@@ -36,11 +36,11 @@ class Algorithm:
         """
         self._function = function
         self._name = self._function.__name__ if name is None else name
-        key = self._name.removeprefix("run_")
-        if key in self.instances:
-            raise RuntimeError(f"Algorithm {key} has been defined multiple times.")
+
+        if self._name in self.instances:
+            raise RuntimeError(f"Algorithm {self._name} has been defined multiple times.")
         if not skip_registration:
-            self.instances[key] = self
+            self.instances[self._name] = self
 
         self._signature = inspect.signature(function)
         for p in self._signature.parameters.values():
@@ -203,7 +203,7 @@ class Algorithm:
         return list(cls.instances.keys())
 
     @classmethod
-    def get_algorithm(cls, key: str) -> Algorithm:
+    def get_algorithm(cls, key: str) -> Union[Algorithm, CompositeAlgorithm]:
         """Retrieves an algorithm by name."""
         if key not in cls.algorithms():
             error_message = (
@@ -221,17 +221,25 @@ class Algorithm:
 class CompositeAlgorithm:
     """A class which combined multiple Algorithms into a single object which behaves like an Algorithm."""
 
-    def __init__(self, algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]], name: Optional[str] = None):
+    def __init__(  # noqa: PLR0912
+        self, algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]], name: Optional[str] = None, register: bool = False
+    ):
         """Initialise a CompositeAlgorithm, combining several other Algorithms.
 
         Args:
             algorithms: a list of Algorithms, in the order that they should be executed.
             name: a name used to refer to the composite algorithm.
+            register: flag register a named CompositeAlgorithm to 'Algorithm.instances' (ignored if name = None)
         """
         if not (isinstance(algorithms, Sequence) and all(isinstance(alg, (Algorithm, CompositeAlgorithm)) for alg in algorithms)):
             raise TypeError("Should pass a list of algorithms or composites to CompositeAlgorithm.")
 
         self.algorithms: list[Algorithm] = []
+
+        if (name is not None) and (register):
+            if name in Algorithm.instances:
+                raise RuntimeError(f"Algorithm {name} has been defined multiple times.")
+            Algorithm.instances[name] = self
 
         # flattens composite algorithms into their respective list of plain Algorithms
         for alg in algorithms:
@@ -241,6 +249,7 @@ class CompositeAlgorithm:
                 self.algorithms.extend(alg.algorithms)
 
         self.input_keys: list[str] = []
+        self.default_keys: list[str] = []
         self.required_input_keys: list[str] = []
         self.return_keys: list[str] = []
         pars: list[inspect.Parameter] = []
@@ -253,7 +262,9 @@ class CompositeAlgorithm:
             for key in alg.default_keys:
                 if key not in self.return_keys:
                     self.input_keys.append(key)
+                    self.default_keys.append(key)
                     pars.append(alg_sig.parameters[key])
+
             for key in alg.required_input_keys:
                 if key not in self.return_keys:
                     self.input_keys.append(key)

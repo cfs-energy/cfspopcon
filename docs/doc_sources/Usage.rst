@@ -46,6 +46,16 @@ static representation below:
 
   getting_started
 
+More detailed documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We also provide interactive examples for POPCON functionality using Jupyter notebooks, since this lets us ensure that our documentation always produces runnable code. You can find extended
+examples listed below:
+
+.. toctree::
+
+  understanding_algorithms
+
 Other example notebooks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
