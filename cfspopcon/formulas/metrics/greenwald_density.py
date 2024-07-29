@@ -3,33 +3,23 @@
 import numpy as np
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import ureg, wraps_ufunc
+from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
 @Algorithm.register_algorithm(return_keys=["greenwald_fraction"])
-@wraps_ufunc(
-    return_units=dict(greenwald_fraction=ureg.dimensionless),
-    input_units=dict(
-        average_electron_density=ureg.n20, inverse_aspect_ratio=ureg.dimensionless, major_radius=ureg.m, plasma_current=ureg.MA
-    ),
-)
-def calc_greenwald_fraction(
-    average_electron_density: float, inverse_aspect_ratio: float, major_radius: float, plasma_current: float
-) -> float:
+def calc_greenwald_fraction(average_electron_density: Unitfull, greenwald_density_limit: Unitfull) -> Unitfull:
     """Calculate the fraction of the Greenwald density limit.
 
     Args:
         average_electron_density: [1e20 m^-3] :term:`glossary link<average_electron_density>`
-        inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        greenwald_density_limit: [1e20 m^-3] :term:`glossary link<greenwald_density_limit>`
         major_radius: [m] :term:`glossary link<major_radius>`
         plasma_current: [MA] :term:`glossary link<plasma_current>`
 
     Returns:
         :term:`greenwald_fraction` [~]
     """
-    n_Greenwald = calc_greenwald_density_limit.unitless_func(plasma_current, inverse_aspect_ratio * major_radius)
-
-    return float(average_electron_density / n_Greenwald)
+    return average_electron_density / greenwald_density_limit
 
 
 @Algorithm.register_algorithm(return_keys=["greenwald_density_limit"])
@@ -42,6 +32,20 @@ def calc_greenwald_density_limit(plasma_current: float, minor_radius: float) -> 
         minor_radius: [m] :term:`glossary link<minor_radius>`
 
     Returns:
-        nG Greenwald density limit [n20]
+        :term:`greenwald_density_limit` [1e20 m^-3]
     """
     return plasma_current / (np.pi * minor_radius**2)
+
+
+@Algorithm.register_algorithm(return_keys=["average_electron_density"])
+def calc_average_electron_density_from_greenwald_fraction(greenwald_fraction: Unitfull, greenwald_density_limit: Unitfull) -> Unitfull:
+    """Calculate the average electron density corresponding to a given Greenwald fraction.
+
+    Args:
+        greenwald_fraction: :term:`glossary link<greenwald_fraction>`
+        greenwald_density_limit: :term:`glossary link<greenwald_density_limit>`
+
+    Returns:
+        :term:`average_electron_density` [1e20 m^-3]
+    """
+    return greenwald_fraction * greenwald_density_limit

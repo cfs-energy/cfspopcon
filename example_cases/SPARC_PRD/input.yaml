@@ -94,6 +94,7 @@ algorithms:
   # space, such as regions with f_Greenwald >~ 1.0 or where P_SOL < P_LH.
   - calc_LH_transition_threshold_power
   - calc_ratio_P_LH
+  - calc_greenwald_density_limit
   - calc_greenwald_fraction
   - calc_f_rad_core
   - calc_normalised_collisionality

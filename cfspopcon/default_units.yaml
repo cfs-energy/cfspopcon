@@ -51,6 +51,7 @@ fuel_average_mass_number: "amu"
 fuel_ion_density_profile: "n19"
 fusion_reaction: null
 fusion_triple_product: "n20 * keV * s"
+greenwald_density_limit: "n19"
 greenwald_fraction: ""
 heavier_fuel_species_fraction: ""
 impurities: ""
