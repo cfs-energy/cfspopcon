@@ -7,6 +7,7 @@ from .collisionality import (
     calc_normalised_collisionality,
 )
 from .greenwald_density import (
+    calc_average_electron_density_from_greenwald_fraction,
     calc_greenwald_density_limit,
     calc_greenwald_fraction,
 )
@@ -30,4 +31,5 @@ __all__ = [
     "calc_larmor_radius",
     "calc_alpha_t",
     "calc_edge_collisionality",
+    "calc_average_electron_density_from_greenwald_fraction",
 ]

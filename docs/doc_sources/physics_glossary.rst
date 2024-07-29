@@ -521,3 +521,7 @@ Physics Glossary
   
   confinement_power_scaling
     A :class:`~cfspopcon.named_options.ConfinementPowerScaling` indicating which confinement mode power-threshold scaling to use.
+
+  greenwald_density_limit
+    The highest volume-averaged density which can be achieved before a density-limit disruption is triggered.
+  
