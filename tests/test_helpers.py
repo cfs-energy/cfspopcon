@@ -1,5 +1,6 @@
 import pytest
 import xarray as xr
+import numpy as np
 
 from cfspopcon import named_options
 from cfspopcon.helpers import (
@@ -59,5 +60,5 @@ def test_impurity_array_helpers():
 
     ds["array2"] = extend_impurities_array(ds["array2"], "nitrogen", 1e-3)
 
-    assert xr.testing.assert_allclose(ds["array2"].sel(dim_species=AtomicSpecies.Helium).isel(a=0, b=1), 0.1)
-    assert xr.testing.assert_allclose(ds["array2"].sel(dim_species=AtomicSpecies.Tungsten).isel(a=1, b=1), 0.4)
+    assert np.isclose(ds["array2"].sel(dim_species=AtomicSpecies.Helium).isel(a=0, b=1).item(), 0.1)
+    assert np.isclose(ds["array2"].sel(dim_species=AtomicSpecies.Tungsten).isel(a=1, b=1).item(), 0.4)
