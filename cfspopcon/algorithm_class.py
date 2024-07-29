@@ -222,21 +222,21 @@ class CompositeAlgorithm:
     """A class which combined multiple Algorithms into a single object which behaves like an Algorithm."""
 
     def __init__(  # noqa: PLR0912
-        self, algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]], name: Optional[str] = None, skip_registration: bool = False
+        self, algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]], name: Optional[str] = None, register: bool = False
     ):
         """Initialise a CompositeAlgorithm, combining several other Algorithms.
 
         Args:
             algorithms: a list of Algorithms, in the order that they should be executed.
             name: a name used to refer to the composite algorithm.
-            skip_registration: flag to skip adding the CompositeAlgorithm to 'Algorithm.instances' (automatic if name = None)
+            register: flag register a named CompositeAlgorithm to 'Algorithm.instances' (ignored if name = None)
         """
         if not (isinstance(algorithms, Sequence) and all(isinstance(alg, (Algorithm, CompositeAlgorithm)) for alg in algorithms)):
             raise TypeError("Should pass a list of algorithms or composites to CompositeAlgorithm.")
 
         self.algorithms: list[Algorithm] = []
 
-        if (name is not None) and (not skip_registration):
+        if (name is not None) and (register):
             if name in Algorithm.instances:
                 raise RuntimeError(f"Algorithm {name} has been defined multiple times.")
             Algorithm.instances[name] = self
