@@ -13,8 +13,6 @@ def calc_greenwald_fraction(average_electron_density: Unitfull, greenwald_densit
     Args:
         average_electron_density: [1e20 m^-3] :term:`glossary link<average_electron_density>`
         greenwald_density_limit: [1e20 m^-3] :term:`glossary link<greenwald_density_limit>`
-        major_radius: [m] :term:`glossary link<major_radius>`
-        plasma_current: [MA] :term:`glossary link<plasma_current>`
 
     Returns:
         :term:`greenwald_fraction` [~]
