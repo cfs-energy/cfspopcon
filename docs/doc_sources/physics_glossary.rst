@@ -531,24 +531,3 @@ Physics Glossary
   
   change_in_dilution
     Change in :term:`dilution` due to each species.
-
-  min_P_radiation
-    Minimum amount of radiated power. If the intrinsic radiated power is less than this, a core radiator will be injected to reach this level.
-
-  P_radiation_from_core_seeded_impurity
-    How much power (if any) is radiated from the core radiator.
-  
-  core_seeded_impurity_concentration
-    What is the concentration of the core radiator required to reach the required level of radiated power.
-  
-  maximum_P_LH_factor_for_P_SOL
-    If :term:`power_crossing_separatrix` is more than this factor times the LH threshold, the extra power will be radiated using a core radiator.
-  
-  change_in_zeff
-    Change in :term:`z_effective` due to each species.
-  
-  change_in_dilution
-    Change in :term:`dilution` due to each species.
-  greenwald_density_limit
-    The highest volume-averaged density which can be achieved before a density-limit disruption is triggered.
-  
