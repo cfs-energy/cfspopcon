@@ -47,6 +47,11 @@ def calc_zeff_and_dilution_due_to_impurities(
 
     z_effective = starting_zeff + change_in_zeff.sum(dim="dim_species")
     dilution = starting_dilution - change_in_dilution.sum(dim="dim_species")
+
+    # For strong seeding, the impurity content can reach levels where there are no electrons
+    # left for the main ions. The following line prevents the main ion density from reaching
+    # negative values.
+    dilution = dilution.where(dilution >= 0, 0.0)
     summed_impurity_density = impurities.sum(dim="dim_species") * average_electron_density
     average_ion_density = dilution * average_electron_density
 

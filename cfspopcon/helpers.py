@@ -92,10 +92,12 @@ def extend_impurities_array(
 
     if not isinstance(concentration, xr.DataArray):
         concentration = xr.DataArray(concentration)
-    concentration = concentration.expand_dims("dim_species").assign_coords(dim_species=[species])
 
     if array.ndim == 0:
-        return concentration
+        return concentration.expand_dims("dim_species").assign_coords(dim_species=[species])
+    elif species in array.dim_species:
+        array.loc[dict(dim_species=species)] = concentration
+        return array.sortby("dim_species")
     else:
-        other_species = array.sel(dim_species=[s for s in array.dim_species if s != species])
-        return xr.concat((other_species, concentration), dim="dim_species").sortby("dim_species")
+        array = xr.concat((array, concentration.expand_dims("dim_species").assign_coords(dim_species=[species])), dim="dim_species")
+        return array.sortby("dim_species")
