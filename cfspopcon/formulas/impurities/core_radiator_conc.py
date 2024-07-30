@@ -5,9 +5,9 @@ import xarray as xr
 
 from ... import named_options
 from ...algorithm_class import Algorithm
-from ...helpers import extend_impurity_concentration_array, make_impurity_concentration_array
 from ...unit_handling import Unitfull
 from .. import radiated_power
+from .impurity_array_helpers import extend_impurity_concentration_array, make_impurity_concentration_array
 
 
 @Algorithm.register_algorithm(return_keys=["min_P_radiation"])

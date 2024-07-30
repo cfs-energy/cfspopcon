@@ -7,10 +7,10 @@ import xarray as xr
 from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
 
 from ...algorithm_class import Algorithm
-from ...helpers import extend_impurity_concentration_array
 from ...named_options import AtomicSpecies
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
 from ..atomic_data import AtomicData
+from .impurity_array_helpers import extend_impurity_concentration_array
 
 
 @Algorithm.register_algorithm(
