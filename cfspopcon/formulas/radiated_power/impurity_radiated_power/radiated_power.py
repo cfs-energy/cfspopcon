@@ -17,7 +17,7 @@ def calc_impurity_radiated_power(
     rho: Unitfull,
     electron_temp_profile: Unitfull,
     electron_density_profile: Unitfull,
-    impurities: xr.DataArray,
+    impurity_concentration: xr.DataArray,
     plasma_volume: Unitfull,
     atomic_data: AtomicData,
 ) -> xr.DataArray:
@@ -28,7 +28,7 @@ def calc_impurity_radiated_power(
         rho: [~] :term:`glossary link<rho>`
         electron_temp_profile: [keV] :term:`glossary link<electron_temp_profile>`
         electron_density_profile: [1e19 m^-3] :term:`glossary link<electron_density_profile>`
-        impurities: [] :term:`glossary link<impurities>`
+        impurity_concentration: [] :term:`glossary link<impurity_concentration>`
         plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
         atomic_data: :term:`glossary link<atomic_data>`
 
@@ -39,8 +39,8 @@ def calc_impurity_radiated_power(
         rho=rho,
         electron_temp_profile=electron_temp_profile,
         electron_density_profile=electron_density_profile,
-        impurity_concentration=impurities,
-        impurity_species=impurities.dim_species,
+        impurity_concentration=impurity_concentration,
+        impurity_species=impurity_concentration.dim_species,
         plasma_volume=plasma_volume,
     )
     if radiated_power_method == RadiationMethod.PostJensen:

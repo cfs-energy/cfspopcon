@@ -8,6 +8,7 @@ from .core_radiator_conc import (
 )
 from .edge_radiator_conc import calc_edge_impurity_concentration
 from .impurity_charge_state import calc_impurity_charge_state
+from .set_up_impurity_concentration_array import set_up_impurity_concentration_array
 from .zeff_and_dilution_from_impurities import calc_zeff_and_dilution_due_to_impurities
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "calc_edge_impurity_concentration",
     "calc_impurity_charge_state",
     "calc_zeff_and_dilution_due_to_impurities",
+    "set_up_impurity_concentration_array",
 ]

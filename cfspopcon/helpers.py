@@ -20,10 +20,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return ProfileForm[val]
     elif key == "radiated_power_method":
         return RadiationMethod[val]
-    elif key == "impurity":
-        return AtomicSpecies[val]
-    elif key == "impurities":
-        return make_impurities_array(list(val.keys()), list(val.values()))
+    elif key in ["impurity_concentration", "intrinsic_impurity_concentration"]:
+        return make_impurity_concentration_array(list(val.keys()), list(val.values()))
     elif key in ["core_impurity_species", "edge_impurity_species"]:
         return AtomicSpecies[val]
     elif key == "lambda_q_scaling":
@@ -39,13 +37,13 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return val
 
 
-def make_impurities_array(
+def make_impurity_concentration_array(
     species_list: Union[list[Union[str, AtomicSpecies]], Union[str, AtomicSpecies]],
     concentrations_list: Union[list[Union[float, xr.DataArray]], Union[float, xr.DataArray]],
 ) -> xr.DataArray:
     """Make an xr.DataArray with impurity species and their corresponding concentrations.
 
-    This array should be used as the `impurities` variable.
+    This array should be used as the `impurity_concentration` variable.
     """
     # Convert DataArrays of species into plain lists. This is useful if you want to store AtomicSpecies objects in a dataset.
     if isinstance(species_list, (xr.DataArray)):
@@ -65,20 +63,20 @@ def make_impurities_array(
 
     array = xr.DataArray()
     for species, concentration in zip(species_list, concentrations_list):
-        array = extend_impurities_array(array, species, concentration)
+        array = extend_impurity_concentration_array(array, species, concentration)
 
     return array
 
 
-def make_impurities_array_from_kwargs(**kwargs: Any) -> xr.DataArray:
+def make_impurity_concentration_array_from_kwargs(**kwargs: Any) -> xr.DataArray:
     """Make an xr.DataArray with impurity species and their corresponding concentrations, using the format (species1=concentration1, ...)."""
-    return make_impurities_array(list(kwargs.keys()), list(kwargs.values()))
+    return make_impurity_concentration_array(list(kwargs.keys()), list(kwargs.values()))
 
 
-def extend_impurities_array(
+def extend_impurity_concentration_array(
     array: xr.DataArray, species: Union[str, AtomicSpecies], concentration: Union[float, xr.DataArray]
 ) -> xr.DataArray:
-    """Append a new element to the impurities array.
+    """Append a new element to the impurity_concentration array.
 
     This method automatically handles broadcasting.
 
@@ -96,6 +94,7 @@ def extend_impurities_array(
     if array.ndim == 0:
         return concentration.expand_dims("dim_species").assign_coords(dim_species=[species])
     elif species in array.dim_species:
+        array = array.broadcast_like(concentration).copy()
         array.loc[dict(dim_species=species)] = concentration
         return array.sortby("dim_species")
     else:

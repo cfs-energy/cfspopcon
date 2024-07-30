@@ -667,7 +667,22 @@
             "data": 0.5,
             "dims": []
         },
-        "impurities": {
+        "impurity_charge_state": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                2.0,
+                7.999462489512582,
+                17.893776835302685,
+                45.811693483863905,
+                58.38308823843501
+            ],
+            "dims": [
+                "dim_species"
+            ]
+        },
+        "impurity_concentration": {
             "attrs": {
                 "units": "dimensionless"
             },
@@ -677,21 +692,6 @@
                 0.01687905506268707,
                 0.0,
                 1.5e-05
-            ],
-            "dims": [
-                "dim_species"
-            ]
-        },
-        "impurity_charge_state": {
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": [
-                2.0,
-                7.999462489512582,
-                NaN,
-                45.811693483863905,
-                58.38308823843501
             ],
             "dims": [
                 "dim_species"
@@ -724,6 +724,21 @@
             },
             "data": 1.1444952177978316,
             "dims": []
+        },
+        "intrinsic_impurity_concentration": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": [
+                0.06,
+                0.0031,
+                NaN,
+                NaN,
+                1.5e-05
+            ],
+            "dims": [
+                "dim_species"
+            ]
         },
         "inverse_aspect_ratio": {
             "attrs": {

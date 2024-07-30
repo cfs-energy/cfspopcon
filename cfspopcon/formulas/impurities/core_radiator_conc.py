@@ -5,7 +5,7 @@ import xarray as xr
 
 from ... import named_options
 from ...algorithm_class import Algorithm
-from ...helpers import extend_impurities_array, make_impurities_array
+from ...helpers import extend_impurity_concentration_array, make_impurity_concentration_array
 from ...unit_handling import Unitfull
 from .. import radiated_power
 
@@ -67,12 +67,12 @@ def calc_P_radiation_from_core_seeded_impurity(P_radiation: Unitfull, min_P_radi
 
 @Algorithm.register_algorithm(
     return_keys=[
-        "impurities",
+        "impurity_concentration",
     ]
 )
 def calc_core_seeded_impurity_concentration(
     P_radiation_from_core_seeded_impurity: Unitfull,
-    impurities: Unitfull,
+    impurity_concentration: Unitfull,
     rho: Unitfull,
     electron_density_profile: Unitfull,
     electron_temp_profile: Unitfull,
@@ -81,12 +81,12 @@ def calc_core_seeded_impurity_concentration(
     radiated_power_scalar: Unitfull,
     core_impurity_species: named_options.AtomicSpecies,
     atomic_data: xr.DataArray,
-) -> tuple[Unitfull, ...]:
+) -> Unitfull:
     """Calculate the concentration of a core radiator required to increase the radiated power by a desired amount.
 
     Args:
         P_radiation_from_core_seeded_impurity: :term:`glossary link<P_radiation_from_core_seeded_impurity>`
-        impurities: :term:`glossary link<impurities>`
+        impurity_concentration: :term:`glossary link<impurity_concentration>`
         rho: :term:`glossary link<rho>`
         electron_density_profile: :term:`glossary link<electron_density_profile>`
         electron_temp_profile: :term:`glossary link<electron_temp_profile>`
@@ -97,7 +97,7 @@ def calc_core_seeded_impurity_concentration(
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
-        :term:`impurities`
+        :term:`impurity_concentration`
     """
     if radiated_power_method == named_options.RadiationMethod.Inherent:
         radiated_power_method_for_core_impurity = named_options.RadiationMethod.Radas
@@ -115,13 +115,15 @@ def calc_core_seeded_impurity_concentration(
 
     P_radiated_per_unit_concentration = radiated_power_scalar * radiated_power.impurity_radiated_power.calc_impurity_radiated_power(
         **kwargs,
-        impurities=make_impurities_array(core_impurity_species, 1.0),
+        impurity_concentration=make_impurity_concentration_array(core_impurity_species, 1.0),
     ).sum(dim="dim_species")
 
     core_seeded_impurity_concentration = xr.where(  # type:ignore[no-untyped-call]
         P_radiation_from_core_seeded_impurity > 0, P_radiation_from_core_seeded_impurity / P_radiated_per_unit_concentration, 0.0
     )
 
-    impurities = extend_impurities_array(impurities, core_impurity_species, core_seeded_impurity_concentration)
+    impurity_concentration = extend_impurity_concentration_array(
+        impurity_concentration, core_impurity_species, core_seeded_impurity_concentration
+    )
 
-    return impurities
+    return impurity_concentration

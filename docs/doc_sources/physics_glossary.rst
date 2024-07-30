@@ -136,6 +136,9 @@ Physics Glossary
 
   impurity_concentration
     Concentration of a non-fuel atomic species relative to the electron density :math:`c_Z = n_Z / n_e`.
+  
+  intrinsic_impurity_concentration
+    Concentration of :term:`intrinsic impurity` species, relative to the electron density :math:`c_Z = n_Z / n_e`.
 
   impurity_charge_state
     The mean charge state of a non-fuel species.
