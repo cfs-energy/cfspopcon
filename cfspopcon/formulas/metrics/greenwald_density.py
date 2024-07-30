@@ -44,6 +44,6 @@ def calc_average_electron_density_from_greenwald_fraction(greenwald_fraction: Un
         greenwald_density_limit: :term:`glossary link<greenwald_density_limit>`
 
     Returns:
-        :term:`average_electron_density` [1e20 m^-3]
+        :term:`average_electron_density` in same units as `greenwald_density_limit`
     """
     return greenwald_fraction * greenwald_density_limit
