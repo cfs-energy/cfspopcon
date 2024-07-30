@@ -24,7 +24,7 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return AtomicSpecies[val]
     elif key == "impurities":
         return make_impurities_array(list(val.keys()), list(val.values()))
-    elif key in ["core_radiator", "edge_impurity_species"]:
+    elif key in ["core_impurity_species", "edge_impurity_species"]:
         return AtomicSpecies[val]
     elif key == "lambda_q_scaling":
         return LambdaQScaling[val]

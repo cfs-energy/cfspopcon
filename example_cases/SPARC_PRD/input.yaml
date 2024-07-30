@@ -202,7 +202,7 @@ impurities:
   Helium: 6.0e-2
   Oxygen: 3.1e-3
 
-core_radiator: Xenon
+core_impurity_species: Xenon
 
 # Inputs for two-point-model
 # Ratio of separatrix to average density

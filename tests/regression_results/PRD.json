@@ -278,23 +278,16 @@
             "data": 1.0,
             "dims": []
         },
+        "core_impurity_species": {
+            "attrs": {},
+            "data": "Xenon",
+            "dims": []
+        },
         "core_radiated_power_fraction": {
             "attrs": {
                 "units": "dimensionless"
             },
             "data": 0.1871625858572634,
-            "dims": []
-        },
-        "core_radiator": {
-            "attrs": {},
-            "data": "Xenon",
-            "dims": []
-        },
-        "core_seeded_impurity_concentration": {
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.0,
             "dims": []
         },
         "current_relaxation_time": {

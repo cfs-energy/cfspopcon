@@ -152,11 +152,8 @@ Physics Glossary
   dilution
     Fuel-species concentration as a fraction of the electron density :math:`n_{DT}/n_e`.
 
-  core_radiator
+  core_impurity_species
     An :class:`~cfspopcon.named_options.AtomicSpecies` indicating which :term:`extrinsic<extrinsic impurity>` core radiator species should be injected into the confined region to enhance the core radiated power.
-
-  core_radiator_concentration
-    Concentration of the :term:`extrinsic<extrinsic impurity>` core radiator required to achieve the desired core radiated power fraction, relative to the electron density :math:`c_{core} = n_{core}/n_e`.
 
   mean_ion_charge_state
     Mean charge state of the ions (:math:`n_e / \sum_j n_j`)
