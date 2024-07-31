@@ -26,7 +26,7 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
     if invalid_units:
         msg = "The following units are not recognized:\n"
         msg += "\n".join([f"{key}: {units}" for key, units in invalid_units])
-        raise ValueError(msg)  # type:ignore[arg-type]
+        raise ValueError(msg)
 
 
 def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
