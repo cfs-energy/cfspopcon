@@ -30,7 +30,7 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
 
 
 def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
-    """Read in a units YAML ifile and add the units to the registered default units map.
+    """Read in a units YAML file and add the units to the registered default units map.
 
     Args:
         filepath: yaml file to read. If none, cfspopcon's default_units.yaml is read.
