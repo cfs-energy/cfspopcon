@@ -3,7 +3,8 @@
 from collections.abc import Iterable
 from importlib.resources import as_file, files
 from numbers import Number
-from typing import Any, Union, overload
+from pathlib import Path
+from typing import Any, Optional, Union, overload
 from warnings import warn
 
 import numpy as np
@@ -28,21 +29,58 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
         raise UndefinedUnitError(invalid_units)  # type:ignore[arg-type]
 
 
-def read_default_units() -> dict[str, str]:
-    """Read in the default_units.yaml file."""
-    with as_file(files("cfspopcon").joinpath("default_units.yaml")) as filepath:
-        with open(filepath) as f:
-            units_dictionary: dict[str, str] = yaml.safe_load(f)
+def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
+    """Read in a units YAML file and add the units to the registered default units map.
+
+    Args:
+        filepath: yaml file to read. If none, cfspopcon's default_units.yaml is read.
+
+    """
+    if filepath is None:
+        with as_file(files("cfspopcon").joinpath("default_units.yaml")) as fp:
+            with open(fp) as f:
+                units_dictionary: dict[str, str] = yaml.safe_load(f)
+    else:
+        units_dictionary = yaml.safe_load(filepath.read_text())
 
     check_units_are_valid(units_dictionary)
-    return units_dictionary
+
+    global _DEFAULT_UNITS  # noqa: PLW0603
+    _DEFAULT_UNITS |= units_dictionary
 
 
-DEFAULT_UNITS = read_default_units()
+# Module global state holding the registered default units mapping
+_DEFAULT_UNITS: dict[str, str] = {}
+read_default_units_from_file()
+
+
+def extend_default_units_map(units_dictionary: dict[str, str]) -> None:
+    """Extend the default units map with the given dictionary.
+
+    Args:
+        units_dictionary: dictionary of units to add to the default units map
+    """
+    check_units_are_valid(units_dictionary)
+    global _DEFAULT_UNITS  # noqa: PLW0603
+    _DEFAULT_UNITS |= units_dictionary
+
+
+def reset_default_units() -> None:
+    """Reset the default units to an empty dictionary."""
+    global _DEFAULT_UNITS  # noqa: PLW0603
+    _DEFAULT_UNITS = {}
 
 
 def default_unit(var: str) -> Union[str, None]:
     """Return cfspopcon's default unit for a given quantity.
+
+    The mapping of variable name to default unit is loaded upon module import.
+    By default this mapping will be initialized by the default_units.yaml file
+    in the cfspopcon package. To modify the default units mapping see, use any
+    of the following functions:
+    - `read_default_units_from_file`
+    - `extend_default_units_map`
+    - `reset_default_units`
 
     Args:
         var: Quantity name
@@ -50,7 +88,7 @@ def default_unit(var: str) -> Union[str, None]:
     Returns: Unit
     """
     try:
-        return DEFAULT_UNITS[var]
+        return _DEFAULT_UNITS[var]
     except KeyError:
         raise KeyError(
             f"No default unit defined for {var}. Please check configured default units in the unit_handling submodule."
@@ -62,7 +100,7 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
 
     Args:
         value: input value to convert to a float
-        key: name of field for looking up in DEFAULT_UNITS dictionary
+        key: name of variable which we are fetching the default units for
 
     Returns:
         magnitude of value in default units and as basic type
@@ -76,7 +114,7 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
         mag = magnitude_in_units(value, unit)
 
     except DimensionalityError as e:
-        print(f"Unit conversion failed for {key}. Could not convert '{value}' to '{DEFAULT_UNITS[key]}'")
+        print(f"Unit conversion failed for {key}. Could not convert '{value}' to '{default_unit(key)}'")
         raise e
 
     # single value arrays -> float
@@ -107,7 +145,7 @@ def set_default_units(value: Any, key: str) -> Any:
 
     Args:
         value: magnitude of input value to convert to a Quantity
-        key: name of field for looking up in DEFAULT_UNITS dictionary
+        key: name of variable which we are setting the default units for
 
     Returns:
         magnitude of value in default units
@@ -126,16 +164,17 @@ def set_default_units(value: Any, key: str) -> Any:
         return all(_is_number_not_bool(v) for v in value)
 
     # None is used to ignore class types
-    if DEFAULT_UNITS[key] is None:
+    unit = default_unit(key)
+    if unit is None:
         if _is_number_not_bool(value) or _is_iterable_of_number_not_bool(value):
             raise RuntimeError(
                 f"set_default_units for key {key} and value {value} of type {type(value)}: numeric types should carry units!"
             )
         return value
     elif isinstance(value, xr.DataArray):
-        return value.pint.quantify(DEFAULT_UNITS[key])
+        return value.pint.quantify(unit)
     else:
-        return Quantity(value, DEFAULT_UNITS[key])
+        return Quantity(value, unit)
 
 
 @overload
@@ -152,7 +191,7 @@ def convert_to_default_units(value: Quantity, key: str) -> Quantity: ...
 
 def convert_to_default_units(value: Union[float, Quantity, xr.DataArray], key: str) -> Union[float, Quantity, xr.DataArray]:
     """Convert an array or scalar to default units."""
-    unit = DEFAULT_UNITS[key]
+    unit = default_unit(key)
     if unit is None:
         return value
     elif isinstance(value, (xr.DataArray, Quantity)):
