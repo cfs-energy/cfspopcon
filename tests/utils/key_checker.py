@@ -106,24 +106,25 @@ class KeyChecker:
         extra_glossary_keys = (self.glossary_keys - self.variable_keys) - unlisted_args
         undocumented_args = (self.variable_keys - self.glossary_keys) - unused_variable_keys
 
+        linebreak = "\n"
         if len(unused_variable_keys):
             print(
-                f"\nThe following keys in the variables dictionary are not used by any algorithm and will be removed:\n{'\n'.join(list(unused_variable_keys))}\n"
+                f"{linebreak}The following keys in the variables dictionary are not used by any algorithm and will be removed:{linebreak}{linebreak.join(list(unused_variable_keys))}{linebreak}"
             )
 
         if len(unlisted_args):
             print(
-                f"\nThe following Algorithm input/output keys are not defined in the variables dictionary and will be added:\n{'\n'.join(list(unlisted_args))}\n"
+                f"{linebreak}The following Algorithm input/output keys are not defined in the variables dictionary and will be added:{linebreak}{linebreak.join(list(unlisted_args))}{linebreak}"
             )
 
         if len(extra_glossary_keys):
             print(
-                f"\nThe following keys in the glossary are not in the variables dictionary and will be removed:\n{'\n'.join(list(extra_glossary_keys))}\n"
+                f"{linebreak}The following keys in the glossary are not in the variables dictionary and will be removed:{linebreak}{linebreak.join(list(extra_glossary_keys))}{linebreak}"
             )
 
         if len(undocumented_args):
             print(
-                f"\nThe following keys in the variables dictionary are not defined in the glossary and will be added:\n{'\n'.join(list(undocumented_args))}\n"
+                f"{linebreak}The following keys in the variables dictionary are not defined in the glossary and will be added:{linebreak}{linebreak.join(list(undocumented_args))}{linebreak}"
             )
 
         if len(unused_variable_keys) or len(unlisted_args) or len(extra_glossary_keys) or len(undocumented_args):
@@ -149,9 +150,11 @@ class KeyChecker:
                     default_units = str(Quantity(1.0, default_units).units)
                 description = self.variables_dict[key]["description"]
                 if key not in self.glossary:
-                    print(f"Adding description for '{key}'.\nNew: '{description}'.\n")
+                    print(f"Adding description for '{key}'.{linebreak}New: '{description}'.{linebreak}")
                 elif not (description == self.glossary[key]):
-                    print(f"Description changing for '{key}'.\nFrom: '{self.glossary[key]}'\nTo: '{description}'.\n")
+                    print(
+                        f"Description changing for '{key}'.{linebreak}From: '{self.glossary[key]}'{linebreak}To: '{description}'.{linebreak}"
+                    )
                     success = False
             else:
                 default_units = None
