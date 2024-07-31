@@ -14,9 +14,6 @@ from pint import DimensionalityError, UndefinedUnitError
 
 from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
 
-# Module global stat holding the registered default units mapping
-_DEFAULT_UNITS: dict[str, str] = {}
-
 
 def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
     """Ensure that all units in units_dictionary are valid."""
@@ -50,6 +47,11 @@ def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
 
     global _DEFAULT_UNITS  # noqa: PLW0603
     _DEFAULT_UNITS |= units_dictionary
+
+
+# Module global state holding the registered default units mapping
+_DEFAULT_UNITS: dict[str, str] = {}
+read_default_units_from_file()
 
 
 def extend_default_units_map(units_dictionary: dict[str, str]) -> None:
