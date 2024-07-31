@@ -15,5 +15,5 @@ def test_check_units_are_valid():
 
     invalid_dict = dict(value4=ureg.n19, value="ducks", value2="chickens", value3=ureg.eV)
 
-    with pytest.raises(UndefinedUnitError):
+    with pytest.raises(ValueError, match="The following units are not recognized.*"):
         check_units_are_valid(invalid_dict)

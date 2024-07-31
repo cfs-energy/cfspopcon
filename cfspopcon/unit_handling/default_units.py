@@ -17,14 +17,16 @@ from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
 def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
     """Ensure that all units in units_dictionary are valid."""
     invalid_units = []
-    for units in units_dictionary.values():
+    for key, units in units_dictionary.items():
         try:
             Quantity(1.0, units)
         except UndefinedUnitError:  # noqa: PERF203
-            invalid_units.append(units)
+            invalid_units.append((key, units))
 
     if invalid_units:
-        raise UndefinedUnitError(invalid_units)  # type:ignore[arg-type]
+        msg = "The following units are not recognized:\n"
+        msg += "\n".join([f"{key}: {units}" for key, units in invalid_units])
+        raise ValueError(msg)  # type:ignore[arg-type]
 
 
 def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
