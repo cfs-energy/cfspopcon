@@ -53,6 +53,9 @@ def extend_impurity_concentration_array(
     This method automatically handles broadcasting.
 
     N.b. You can also 'extend' an empty array, constructed via xr.DataArray()
+
+    When writing this back into a xr.Dataset, make sure you use xr.merge instead of assignment!
+    See: https://github.com/cfs-energy/cfspopcon/pull/66#issuecomment-2256667631
     """
     if isinstance(species, xr.DataArray):
         species = species.item()
@@ -64,11 +67,21 @@ def extend_impurity_concentration_array(
         concentration = xr.DataArray(concentration)
 
     if array.ndim == 0:
+        # If the input array is empty, then just return the concentration instead of the input array
         return concentration.expand_dims("dim_species").assign_coords(dim_species=[species])
     elif species in array.dim_species:
+        # If the input array already has the species that we are writing, we need to carefully write these values
+        # into the array
+        # First, we make sure that the array is of the correct shape to write concentration in
         array = array.broadcast_like(concentration).copy()
+        # Then, we overwrite the values for the species that we are writing, using .loc instead of .sel since
+        # we can't assign values with .sel
         array.loc[dict(dim_species=species)] = concentration
+        # Finally, we sort by the species atomic number, to ensure consistent ordering of the species.
         return array.sortby("dim_species")
     else:
+        # If the input array doesn't have the species that we're writing, we can simply concatenate the
+        # concentration array in, along the 'dim_species' dimension.
         array = xr.concat((array, concentration.expand_dims("dim_species").assign_coords(dim_species=[species])), dim="dim_species")
+        # We again sort by the species atomic number, to ensure consistent ordering of the species.
         return array.sortby("dim_species")

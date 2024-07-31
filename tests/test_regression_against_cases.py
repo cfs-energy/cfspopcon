@@ -8,6 +8,7 @@ from regression_results.generate_regression_results import (
     ALL_CASE_PATHS,
 )
 from xarray.testing import assert_allclose
+import copy
 
 from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
@@ -61,13 +62,20 @@ def test_regression_against_case_with_repeated_update():
     dataset = xr.Dataset(input_parameters)
 
     first_run = algorithm.update_dataset(dataset)
-    second_run = algorithm.update_dataset(first_run)
+
+    # Make sure that first_run isn't being modified in-place when we re-run it.
+    first_run_copy = copy.deepcopy(first_run)
+    second_run = algorithm.update_dataset(first_run_copy)
 
     for variable in ["atomic_data"]:
         first_run = first_run.drop_vars(variable)
         second_run = second_run.drop_vars(variable)
 
+    # The ordering of the dimensions changes between the runs, and for some reason the automatic
+    # xarray broadcasting isn't handling this. Because of this, we manually ensure that the
+    # dimension ordering matches.
+    ordered_dims = [dim for dim in first_run.dims]
     assert_allclose(
-        first_run.transpose("dim_average_electron_density", "dim_average_electron_temp", "dim_species", "dim_rho"),
-        second_run.transpose("dim_average_electron_density", "dim_average_electron_temp", "dim_species", "dim_rho"),
+        first_run.transpose(*ordered_dims),
+        second_run.transpose(*ordered_dims),
     )
