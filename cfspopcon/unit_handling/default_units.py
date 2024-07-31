@@ -100,7 +100,7 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
 
     Args:
         value: input value to convert to a float
-        key: name of field for looking up default unit
+        key: name of variable which we are fetching the default units for
 
     Returns:
         magnitude of value in default units and as basic type
