@@ -145,7 +145,7 @@ def set_default_units(value: Any, key: str) -> Any:
 
     Args:
         value: magnitude of input value to convert to a Quantity
-        key: name of field for looking up in DEFAULT_UNITS dictionary
+        key: name of variable which we are setting the default units for
 
     Returns:
         magnitude of value in default units
