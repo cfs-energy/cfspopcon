@@ -33,13 +33,14 @@ def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
     """Read in a units YAML file and add the units to the registered default units map.
 
     Args:
-        filepath: yaml file to read. If none, cfspopcon's default_units.yaml is read.
+        filepath: yaml file to read. If none, cfspopcon's variables.yaml is read.
 
     """
     if filepath is None:
-        with as_file(files("cfspopcon").joinpath("default_units.yaml")) as fp:
+        with as_file(files("cfspopcon").joinpath("variables.yaml")) as fp:
             with open(fp) as f:
-                units_dictionary: dict[str, str] = yaml.safe_load(f)
+                variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(f)
+        units_dictionary = {key: value["default_units"] for key, value in variables_dictionary.items()}
     else:
         units_dictionary = yaml.safe_load(filepath.read_text())
 
@@ -75,7 +76,7 @@ def default_unit(var: str) -> Union[str, None]:
     """Return cfspopcon's default unit for a given quantity.
 
     The mapping of variable name to default unit is loaded upon module import.
-    By default this mapping will be initialized by the default_units.yaml file
+    By default this mapping will be initialized by the variables.yaml file
     in the cfspopcon package. To modify the default units mapping see, use any
     of the following functions:
     - `read_default_units_from_file`

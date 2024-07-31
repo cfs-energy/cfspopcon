@@ -19,7 +19,7 @@ def calc_SepOS_LH_transition(
     separatrix_electron_temp: Unitfull,
     major_radius: Unitfull,
     magnetic_field_on_axis: Unitfull,
-    ion_mass: Unitfull,
+    average_ion_mass: Unitfull,
     critical_alpha_MHD: Unitfull,
     alpha_t: Unitfull,
     poloidal_sound_larmor_radius: Unitfull,
@@ -36,7 +36,7 @@ def calc_SepOS_LH_transition(
         separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
         major_radius: :term:`glossary link<major_radius>`
         magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
-        ion_mass: :term:`glossary link<ion_mass>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         critical_alpha_MHD: :term:`glossary link<critical_alpha_MHD>`
         alpha_t: :term:`glossary link<alpha_t>`
         poloidal_sound_larmor_radius: :term:`glossary link<poloidal_sound_larmor_radius>`
@@ -45,7 +45,7 @@ def calc_SepOS_LH_transition(
         :term:`SepOS_LH_transition`
     """
     beta_e = calc_electron_beta(separatrix_electron_density, separatrix_electron_temp, magnetic_field_on_axis)
-    mu = calc_electron_to_ion_mass_ratio(ion_mass)
+    mu = calc_electron_to_ion_mass_ratio(average_ion_mass)
 
     electron_pressure_decay_length = calc_electron_pressure_decay_length_Eich2021H(
         alpha_t=alpha_t, poloidal_sound_larmor_radius=poloidal_sound_larmor_radius

@@ -31,3 +31,11 @@ repos:
         types: [python]
         files: '^cfspopcon/'
         exclude: ^cfspopcon/plotting
+-   repo: local
+    hooks:
+      - id: check_variables
+        name: Check variables
+        entry: poetry run python tests/utils/key_checker.py --run
+        language: system
+        pass_filenames: false
+        always_run: true

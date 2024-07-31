@@ -62,6 +62,13 @@
             "data": 1.64,
             "dims": []
         },
+        "average_ion_mass": {
+            "attrs": {
+                "units": "unified_atomic_mass_unit"
+            },
+            "data": 2.0,
+            "dims": []
+        },
         "critical_alpha_MHD": {
             "attrs": {
                 "units": "dimensionless"
@@ -109,13 +116,6 @@
                 "units": "meter ** 2 / second"
             },
             "data": 0.5,
-            "dims": []
-        },
-        "ion_mass": {
-            "attrs": {
-                "units": "unified_atomic_mass_unit"
-            },
-            "data": 2.0,
             "dims": []
         },
         "magnetic_field_on_axis": {

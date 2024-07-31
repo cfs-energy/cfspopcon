@@ -13,7 +13,7 @@ def calc_ohmic_power(inductive_plasma_current: Unitfull, loop_voltage: Unitfull)
         loop_voltage: [V] :term:`glossary link<loop_voltage>`
 
     Returns:
-        :term:`P_Ohmic` [MW]
+        :term:`P_ohmic` [MW]
     """
     return inductive_plasma_current * loop_voltage
 
@@ -35,29 +35,31 @@ def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
 
 
 @Algorithm.register_algorithm(return_keys=["trapped_particle_fraction"])
-def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, definition: int = 3) -> Unitfull:
+def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, resistivity_trapped_enhancement_method: int = 3) -> Unitfull:
     """Calculate the enhancement of the plasma resistivity due to trapped particles.
 
     Definition 1 is the denominator of eta_n (neoclassical resistivity) on p801 of Wesson :cite:`wesson_tokamaks_2011`
 
     Args:
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
-        definition: [~] choice of [1,2,3] to specify which definition to use
+        resistivity_trapped_enhancement_method: [~] :term:`glossary link<resistivity_trapped_enhancement_method>`
 
     Returns:
         :term:`trapped_particle_fraction` [~]
 
     Raises:
-        NotImplementedError: if definition doesn't match an implementation
+        NotImplementedError: if resistivity_trapped_enhancement_method doesn't match an implementation
     """
-    if definition == 1:
+    if resistivity_trapped_enhancement_method == 1:
         trapped_particle_fraction = 1 / ((1.0 - (inverse_aspect_ratio**0.5)) ** 2.0)  # pragma: nocover
-    elif definition == 2:
+    elif resistivity_trapped_enhancement_method == 2:
         trapped_particle_fraction = 2 / (1.0 - 1.31 * (inverse_aspect_ratio**0.5) + 0.46 * inverse_aspect_ratio)  # pragma: nocover
-    elif definition == 3:
+    elif resistivity_trapped_enhancement_method == 3:
         trapped_particle_fraction = 0.609 / (0.609 - 0.785 * (inverse_aspect_ratio**0.5) + 0.269 * inverse_aspect_ratio)
     else:
-        raise NotImplementedError(f"No implementation {definition} for calc_resistivity_trapped_enhancement.")  # pragma: nocover
+        raise NotImplementedError(
+            f"No implementation {resistivity_trapped_enhancement_method} for calc_resistivity_trapped_enhancement."
+        )  # pragma: nocover
 
     return trapped_particle_fraction
 

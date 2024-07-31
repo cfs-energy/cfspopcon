@@ -188,7 +188,7 @@ def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Uni
 
 def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
     if not set(vals.keys()) == set(units_mapping):
-        raise ValueError(f"Argument keys {vals.keys()} did not match units_mapping keys {units_mapping.keys()}")
+        raise ValueError(f"Incorrect input arguments: argument keys {vals.keys()} did not match units_mapping keys {units_mapping.keys()}")
 
     converted_vals = {}
 

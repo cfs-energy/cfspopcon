@@ -6,18 +6,20 @@ import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
 
+from ....algorithm_class import Algorithm
 from ....named_options import AtomicSpecies
 from ....unit_handling import Quantity, ureg, wraps_ufunc
 from ...geometry.volume_integral import integrate_profile_over_volume
 
 
+@Algorithm.register_algorithm(return_keys=["P_rad_impurity"])
 @wraps_ufunc(
     return_units=dict(radiated_power=ureg.MW),
     input_units=dict(
         rho=ureg.dimensionless,
         electron_temp_profile=ureg.keV,
         electron_density_profile=ureg.n19,
-        tau_i=ureg.s,
+        impurity_residence_time=ureg.s,
         impurity_concentration=ureg.dimensionless,
         impurity_species=None,
         plasma_volume=ureg.m**3,
@@ -28,7 +30,7 @@ def calc_impurity_radiated_power_mavrin_noncoronal(  # noqa: PLR0912
     rho: NDArray[float64],
     electron_temp_profile: NDArray[float64],
     electron_density_profile: NDArray[float64],
-    tau_i: Quantity,
+    impurity_residence_time: Quantity,
     impurity_concentration: float,
     impurity_species: AtomicSpecies,
     plasma_volume: float,
@@ -43,7 +45,7 @@ def calc_impurity_radiated_power_mavrin_noncoronal(  # noqa: PLR0912
         rho: [~] :term:`glossary link<rho>`
         electron_temp_profile: [keV] :term:`glossary link<electron_temp_profile>`
         electron_density_profile: [1e19 m^-3] :term:`glossary link<electron_density_profile>`
-        tau_i: [s] :term:`glossary link<tau_i>`
+        impurity_residence_time: [s] :term:`glossary link<impurity_residence_time>`
         impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
         impurity_species: [] :term:`glossary link<impurity_species>`
         plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
@@ -212,7 +214,7 @@ def calc_impurity_radiated_power_mavrin_noncoronal(  # noqa: PLR0912
     electron_temp_profile = np.minimum(electron_temp_profile, temperature_bin_borders[-1])
 
     # solve for radiated power
-    ne_tau_i_per_m3 = electron_density_profile * tau_i
+    ne_tau_i_per_m3 = electron_density_profile * impurity_residence_time
 
     X_vals = np.log10(electron_temp_profile)
     Y_vals = np.log10(ne_tau_i_per_m3 / 1e19)

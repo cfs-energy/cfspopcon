@@ -36,7 +36,7 @@ def solve_two_point_model(
     parallel_connection_length: Unitfull,
     separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
-    fuel_average_mass_number: Unitfull,
+    average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
     initial_target_electron_temp: Unitfull = 10.0 * ureg.eV,
@@ -57,7 +57,7 @@ def solve_two_point_model(
     target_electron_density_max_residual: float = 1e-2,
     target_temp_max_residual: float = 1e-2,
     # Return converged values even if not whole array is converged
-    raise_error_if_not_converged: bool = True,
+    two_point_model_error_nonconverged_error: bool = True,
     # Print information about the solve to terminal
     quiet: bool = True,
 ) -> tuple[Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray]]:
@@ -69,7 +69,7 @@ def solve_two_point_model(
         parallel_connection_length: [m]
         separatrix_electron_density: [m^-3]
         toroidal_flux_expansion: [~]
-        fuel_average_mass_number: [~]
+        average_ion_mass: [~]
         kappa_e0: electron heat conductivity constant [W / (eV^3.5 * m)]
         SOL_momentum_loss_function: which momentum loss function to use
         initial_target_electron_temp: starting guess for target electron temp [eV]
@@ -88,7 +88,7 @@ def solve_two_point_model(
         upstream_temp_max_residual: relative rate of change for convergence for upstream Te evolution
         target_electron_density_max_residual: relative rate of change for convergence for target ne evolution
         target_temp_max_residual: relative rate of change for convergence for target Te evolution
-        raise_error_if_not_converged: raise an error if not all point converge within max iterations (otherwise return NaN)
+        two_point_model_error_nonconverged_error: raise an error if not all point converge within max iterations (otherwise return NaN)
         quiet: if not True, print additional information about the iterative solve to terminal
     Returns:
         separatrix_electron_temp [eV], target_electron_density [m^-3], target_electron_temp [eV], target_electron_flux [m^-2 s^-1]
@@ -131,7 +131,7 @@ def solve_two_point_model(
         )
 
         f_basic_kwargs = dict(
-            fuel_average_mass_number=fuel_average_mass_number,
+            average_ion_mass=average_ion_mass,
             parallel_heat_flux_density=parallel_heat_flux_density,
             upstream_total_pressure=upstream_total_pressure,
             sheath_heat_transmission_factor=sheath_heat_transmission_factor,
@@ -180,7 +180,7 @@ def solve_two_point_model(
                 print(f"Converged in {iteration} iterations")
             break
     else:
-        if raise_error_if_not_converged:
+        if two_point_model_error_nonconverged_error:
             raise RuntimeError("Iterative solve did not converge.")
 
     target_electron_flux_basic = calc_target_electron_flux_basic(**f_basic_kwargs)

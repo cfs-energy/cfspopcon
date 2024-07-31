@@ -19,16 +19,16 @@ from .read_energy_confinement_scalings import ConfinementScaling
         areal_elongation=ureg.dimensionless,
         separatrix_elongation=ureg.dimensionless,
         inverse_aspect_ratio=ureg.dimensionless,
-        fuel_average_mass_number=ureg.amu,
+        average_ion_mass=ureg.amu,
         triangularity_psi95=ureg.dimensionless,
         separatrix_triangularity=ureg.dimensionless,
         plasma_stored_energy=ureg.MJ,
         q_star=ureg.dimensionless,
-        tau_e_scaling=None,
+        energy_confinement_scaling=None,
     ),
     output_core_dims=[(), ()],
 )
-def solve_tau_e_scaling_for_input_power(
+def solve_energy_confinement_scaling_for_input_power(
     confinement_time_scalar: float,
     plasma_current: float,
     magnetic_field_on_axis: float,
@@ -37,12 +37,12 @@ def solve_tau_e_scaling_for_input_power(
     areal_elongation: float,
     separatrix_elongation: float,
     inverse_aspect_ratio: float,
-    fuel_average_mass_number: float,
+    average_ion_mass: float,
     triangularity_psi95: float,
     separatrix_triangularity: float,
     plasma_stored_energy: float,
     q_star: float,
-    tau_e_scaling: str,
+    energy_confinement_scaling: str,
 ) -> tuple[float, float]:
     r"""Calculate energy confinement time and input power from a tau_E scaling.
 
@@ -106,17 +106,17 @@ def solve_tau_e_scaling_for_input_power(
         areal_elongation: [~] :term:`glossary link<areal_elongation>`
         separatrix_elongation: [~] :term:`glossary link<separatrix_elongation>`
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
-        fuel_average_mass_number: [amu] :term:`glossary link<fuel_average_mass_number>`
+        average_ion_mass: [amu] :term:`glossary link<average_ion_mass>`
         triangularity_psi95: [~] :term:`glossary link<triangularity_psi95>`
         separatrix_triangularity: [~] :term:`glossary link<separatrix_triangularity>`
         plasma_stored_energy: [MJ] :term:`glossary link<plasma_stored_energy>`
         q_star: [~] :term:`glossary link<q_star>`
-        tau_e_scaling: [] :term:`glossary link<tau_e_scaling>`
+        energy_confinement_scaling: [] :term:`glossary link<energy_confinement_scaling>`
 
     Returns:
         :term:`energy_confinement_time` [s], :term:`P_in` [MW]
     """
-    scaling = ConfinementScaling.instances[tau_e_scaling]
+    scaling = ConfinementScaling.instances[energy_confinement_scaling]
 
     gamma = (
         confinement_time_scalar
@@ -128,7 +128,7 @@ def solve_tau_e_scaling_for_input_power(
         * areal_elongation**scaling.areal_elongation_alpha
         * separatrix_elongation**scaling.separatrix_elongation_alpha
         * inverse_aspect_ratio**scaling.inverse_aspect_ratio_alpha
-        * fuel_average_mass_number**scaling.mass_ratio_alpha
+        * average_ion_mass**scaling.mass_ratio_alpha
         * (1.0 + np.mean([triangularity_psi95, separatrix_triangularity])) ** scaling.triangularity_alpha
         * q_star**scaling.qstar_alpha
     )

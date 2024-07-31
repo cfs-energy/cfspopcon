@@ -62,7 +62,7 @@ def calc_alpha_t(
     separatrix_electron_temp: Unitfull,
     cylindrical_safety_factor: Unitfull,
     major_radius: Unitfull,
-    ion_mass: Unitfull,
+    average_ion_mass: Unitfull,
     z_effective: Unitfull,
     mean_ion_charge_state: Unitfull,
     ion_to_electron_temp_ratio: float = 1.0,
@@ -78,7 +78,7 @@ def calc_alpha_t(
         separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
         cylindrical_safety_factor: :term:`glossary link<cylindrical_safety_factor>`
         major_radius: :term:`glossary link<major_radius>`
-        ion_mass: :term:`glossary link<ion_mass>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         z_effective: :term:`glossary link<z_effective>`
         mean_ion_charge_state: :term:`glossary link<mean_ion_charge_state>`
         ion_to_electron_temp_ratio: :term:`glossary link<ion_to_electron_temp_ratio>`
@@ -87,7 +87,7 @@ def calc_alpha_t(
         :term:`alpha_t`
     """
     coulomb_log = calc_coulomb_logarithm(electron_density=separatrix_electron_density, electron_temp=separatrix_electron_temp)
-    ion_sound_speed = np.sqrt(mean_ion_charge_state * separatrix_electron_temp / ion_mass)
+    ion_sound_speed = np.sqrt(mean_ion_charge_state * separatrix_electron_temp / average_ion_mass)
     nu_ei = calc_electron_ion_collision_freq(
         electron_density=separatrix_electron_density,
         electron_temp=separatrix_electron_temp,
@@ -99,7 +99,7 @@ def calc_alpha_t(
         1.02
         * nu_ei
         / ion_sound_speed
-        * (1.0 * ureg.electron_mass / ion_mass)
+        * (1.0 * ureg.electron_mass / average_ion_mass)
         * cylindrical_safety_factor**2
         * major_radius
         * (1.0 + ion_to_electron_temp_ratio / mean_ion_charge_state)
@@ -114,7 +114,7 @@ def calc_edge_collisionality(
     separatrix_electron_temp: Unitfull,
     cylindrical_safety_factor: Unitfull,
     major_radius: Unitfull,
-    ion_mass: Unitfull,
+    average_ion_mass: Unitfull,
     z_effective: Unitfull,
     mean_ion_charge_state: Unitfull,
     ion_to_electron_temp_ratio: float = 1.0,
@@ -128,7 +128,7 @@ def calc_edge_collisionality(
         separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
         cylindrical_safety_factor: :term:`glossary link<cylindrical_safety_factor>`
         major_radius: :term:`glossary link<major_radius>`
-        ion_mass: :term:`glossary link<ion_mass>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         z_effective: :term:`glossary link<z_effective>`
         mean_ion_charge_state: :term:`glossary link<mean_ion_charge_state>`
         ion_to_electron_temp_ratio: :term:`glossary link<ion_to_electron_temp_ratio>`
@@ -141,7 +141,7 @@ def calc_edge_collisionality(
         separatrix_electron_temp=separatrix_electron_temp,
         cylindrical_safety_factor=cylindrical_safety_factor,
         major_radius=major_radius,
-        ion_mass=ion_mass,
+        average_ion_mass=average_ion_mass,
         z_effective=z_effective,
         mean_ion_charge_state=mean_ion_charge_state,
         ion_to_electron_temp_ratio=ion_to_electron_temp_ratio,

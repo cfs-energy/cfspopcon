@@ -14,7 +14,7 @@ from ...unit_handling import ureg, wraps_ufunc
         minor_radius=ureg.m,
         major_radius=ureg.m,
         surface_area=ureg.m**2,
-        fuel_average_mass_number=ureg.amu,
+        average_ion_mass=ureg.amu,
         average_electron_density=ureg.n19,
         confinement_power_scaling=None,
         confinement_threshold_scalar=ureg.dimensionless,
@@ -26,7 +26,7 @@ def calc_LH_transition_threshold_power(
     minor_radius: float,
     major_radius: float,
     surface_area: float,
-    fuel_average_mass_number: float,
+    average_ion_mass: float,
     average_electron_density: float,
     confinement_power_scaling: ConfinementPowerScaling = ConfinementPowerScaling.H_mode_Martin,
     confinement_threshold_scalar: float = 1.0,
@@ -42,7 +42,7 @@ def calc_LH_transition_threshold_power(
         minor_radius: [m] :term:`glossary link<minor_radius>`
         major_radius: [m] :term:`glossary link<major_radius>`
         surface_area: [m^2] :term:`glossary link<surface_area>`
-        fuel_average_mass_number: [amu] :term:`glossary link<fuel_average_mass_number>`
+        average_ion_mass: [amu] :term:`glossary link<average_ion_mass>`
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         confinement_power_scaling: [~] :term:`glossary link<confinement_power_scaling>`
         confinement_threshold_scalar: [~] :term:`glossary link<confinement_threshold_scalar>`
@@ -55,7 +55,7 @@ def calc_LH_transition_threshold_power(
         _DEUTERIUM_MASS_NUMBER = 2.0
 
         return float(0.0488 * ((electron_density / 10.0) ** 0.717) * (magnetic_field_on_axis**0.803) * (surface_area**0.941)) * (
-            _DEUTERIUM_MASS_NUMBER / fuel_average_mass_number
+            _DEUTERIUM_MASS_NUMBER / average_ion_mass
         )
 
     if confinement_power_scaling == ConfinementPowerScaling.H_mode_Martin:
@@ -78,7 +78,9 @@ def calc_LH_transition_threshold_power(
 
 
 calc_ratio_P_LH = Algorithm.from_single_function(
-    func=lambda P_sol, P_LH_thresh: P_sol / P_LH_thresh, return_keys=["ratio_of_P_SOL_to_P_LH"], name="calc_ratio_P_LH"
+    func=lambda power_crossing_separatrix, P_LH_thresh: power_crossing_separatrix / P_LH_thresh,
+    return_keys=["ratio_of_P_SOL_to_P_LH"],
+    name="calc_ratio_P_LH",
 )
 
 
@@ -161,5 +163,7 @@ def calc_LI_transition_threshold_power(
 
 
 calc_ratio_P_LI = Algorithm.from_single_function(
-    func=lambda P_sol, P_LI_thresh: P_sol / P_LI_thresh, return_keys=["ratio_of_P_SOL_to_P_LI"], name="calc_ratio_P_LI"
+    func=lambda power_crossing_separatrix, P_LI_thresh: power_crossing_separatrix / P_LI_thresh,
+    return_keys=["ratio_of_P_SOL_to_P_LI"],
+    name="calc_ratio_P_LI",
 )

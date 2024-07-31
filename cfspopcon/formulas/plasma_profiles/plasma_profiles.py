@@ -1,6 +1,6 @@
 """Estimate 1D plasma profiles of density and temperature."""
 
-from typing import Optional
+from typing import Any
 
 import numpy as np
 from numpy import float64
@@ -76,7 +76,9 @@ def calc_peaked_profiles(
 
     # Calculate the total fusion power by estimating density and temperature profiles and
     # using this to calculate fusion power profiles.
-    kwargs = dict(
+    (rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(
+        density_profile_form=density_profile_form,
+        temp_profile_form=temp_profile_form,
         average_electron_density=average_electron_density,
         average_electron_temp=average_electron_temp,
         average_ion_temp=average_ion_temp,
@@ -86,10 +88,6 @@ def calc_peaked_profiles(
         dilution=dilution,
         normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length,
     )
-
-    (rho, electron_density_profile, fuel_ion_density_profile, _, _) = calc_1D_plasma_profiles(density_profile_form, **kwargs)
-
-    (rho, _, _, electron_temp_profile, ion_temp_profile) = calc_1D_plasma_profiles(temp_profile_form, **kwargs)
 
     return (
         effective_collisionality,
@@ -119,7 +117,8 @@ def calc_peaked_profiles(
         ion_temp_profile=ureg.keV,
     ),
     input_units=dict(
-        profile_form=None,
+        density_profile_form=None,
+        temp_profile_form=None,
         average_electron_density=ureg.n19,
         average_electron_temp=ureg.keV,
         average_ion_temp=ureg.keV,
@@ -128,12 +127,13 @@ def calc_peaked_profiles(
         temperature_peaking=ureg.dimensionless,
         dilution=ureg.dimensionless,
         normalized_inverse_temp_scale_length=ureg.dimensionless,
-        npoints=None,
+        n_points_for_confined_region_profiles=None,
     ),
     output_core_dims=[("dim_rho",), ("dim_rho",), ("dim_rho",), ("dim_rho",), ("dim_rho",)],
 )
 def calc_1D_plasma_profiles(
-    profile_form: ProfileForm,
+    density_profile_form: ProfileForm,
+    temp_profile_form: ProfileForm,
     average_electron_density: float,
     average_electron_temp: float,
     average_ion_temp: float,
@@ -141,13 +141,14 @@ def calc_1D_plasma_profiles(
     ion_density_peaking: float,
     temperature_peaking: float,
     dilution: float,
-    normalized_inverse_temp_scale_length: Optional[float] = None,
-    npoints: int = 50,
+    normalized_inverse_temp_scale_length: float,
+    n_points_for_confined_region_profiles: int = 50,
 ) -> tuple[NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64], NDArray[float64]]:
     """Estimate density and temperature profiles.
 
     Args:
-        profile_form: select between analytic fit or profiles from Pablo Rodriguez-Fernandez
+        density_profile_form: :term:`<glossary link<density_profile_form>`
+        temp_profile_form: :term:`<glossary link<temp_profile_form>`
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
@@ -156,45 +157,48 @@ def calc_1D_plasma_profiles(
         temperature_peaking: [~] :term:`glossary link<temperature_peaking>`
         dilution: dilution of main ions [~]
         normalized_inverse_temp_scale_length: [~] :term:`glossary link<normalized_inverse_temp_scale_length>`
-        npoints: number of points to return in profile
+        n_points_for_confined_region_profiles: number of points to return in profile
 
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
-
-    Raises:
-        ValueError: if profile_form == prf and normalized_inverse_temp_scale_length is not set
     """
-    if profile_form == ProfileForm.analytic:
-        rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = calc_analytic_profiles(
-            average_electron_density,
-            average_electron_temp,
-            average_ion_temp,
-            electron_density_peaking,
-            ion_density_peaking,
-            temperature_peaking,
-            dilution,
-            npoints=npoints,
-        )
+    kwargs: dict[str, Any] = dict(
+        average_electron_density=average_electron_density,
+        average_electron_temp=average_electron_temp,
+        average_ion_temp=average_ion_temp,
+        electron_density_peaking=electron_density_peaking,
+        ion_density_peaking=ion_density_peaking,
+        temperature_peaking=temperature_peaking,
+        dilution=dilution,
+        npoints=n_points_for_confined_region_profiles,
+    )
 
-    elif profile_form == ProfileForm.prf:
-        if normalized_inverse_temp_scale_length is None:
-            raise ValueError("normalized_inverse_temp_scale_length must be set if using profile_form = prf")
+    electron_density_profiles, fuel_ion_density_profiles, electron_temp_profiles, ion_temp_profiles = dict(), dict(), dict(), dict()
+    (
+        rho_1,
+        electron_density_profiles[ProfileForm.analytic],
+        fuel_ion_density_profiles[ProfileForm.analytic],
+        electron_temp_profiles[ProfileForm.analytic],
+        ion_temp_profiles[ProfileForm.analytic],
+    ) = calc_analytic_profiles(**kwargs)
 
-        rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = calc_prf_profiles(
-            average_electron_density,
-            average_electron_temp,
-            average_ion_temp,
-            electron_density_peaking,
-            ion_density_peaking,
-            temperature_peaking,
-            dilution,
-            normalized_inverse_temp_scale_length,
-            npoints=npoints,
-        )
-    else:
-        raise NotImplementedError(f"No implementation for ProfileForm = {profile_form} (type = {type(profile_form)})")
+    (
+        rho_2,
+        electron_density_profiles[ProfileForm.prf],
+        fuel_ion_density_profiles[ProfileForm.prf],
+        electron_temp_profiles[ProfileForm.prf],
+        ion_temp_profiles[ProfileForm.prf],
+    ) = calc_prf_profiles(**kwargs, normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length)
 
-    return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
+    assert np.allclose(rho_1, rho_2)
+
+    return (
+        rho_1,
+        electron_density_profiles[density_profile_form],
+        fuel_ion_density_profiles[density_profile_form],
+        electron_temp_profiles[temp_profile_form],
+        ion_temp_profiles[temp_profile_form],
+    )
 
 
 def calc_analytic_profiles(

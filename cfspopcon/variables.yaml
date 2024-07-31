@@ -1,0 +1,1845 @@
+alpha_t:
+  default_units: dimensionless
+  description:
+  - Turbulence characterization parameter used by the separatrix operational space.
+  set_by:
+  - calc_alpha_t
+  used_by:
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_power_crossing_separatrix_in_ion_channel
+  - calc_power_crossing_separatrix_in_electron_channel
+areal_elongation:
+  default_units: dimensionless
+  description:
+  - Elongation of the confined region computed using the poloidal area inside the
+    last-closed-flux-surface :math:`\kappa_A = S_{pol} / (\pi a^2)`.
+  set_by:
+  - calc_areal_elongation_from_elongation_at_psi95
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_plasma_volume
+  - calc_plasma_surface_area
+  - calc_plasma_poloidal_circumference
+  - calc_elongation_at_psi95_from_areal_elongation
+  - calc_separatrix_elongation_from_areal_elongation
+  - calc_external_inductance
+  - calc_vertical_field_mutual_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+  - calc_current_relaxation_time
+  - calc_loop_voltage
+  - calc_f_shaping_for_qstar
+atomic_data:
+  default_units: null
+  description:
+  - Dictionary mapping :class:`~cfspopcon.named_options.AtomicSpecies` to datasets
+    giving coronal and non-coronal :math:`L_z` radiated power factors and :math:`\langle
+    Z \rangle` mean charge state curves from `radas <https://github.com/cfs-energy/radas>`_.
+  set_by:
+  - read_atomic_data
+  used_by:
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+  - calc_edge_impurity_concentration
+  - calc_impurity_charge_state
+  - calc_zeff_and_dilution_due_to_impurities
+average_electron_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - Volume-averaged electron density in the confined region :math:`\bar n_e`.
+  set_by:
+  - calc_average_electron_density_from_greenwald_fraction
+  used_by:
+  - calc_plasma_stored_energy
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_impurity_charge_state
+  - calc_zeff_and_dilution_due_to_impurities
+  - calc_normalised_collisionality
+  - calc_greenwald_fraction
+  - calc_PBpRnSq
+  - calc_beta_toroidal
+  - calc_beta_poloidal
+  - calc_average_total_pressure
+  - calc_ion_density_peaking
+  - calc_electron_density_peaking
+  - calc_effective_collisionality
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  - calc_separatrix_electron_density
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - calc_LH_transition_threshold_power
+  - calc_LI_transition_threshold_power
+average_electron_temp:
+  default_units: kiloelectron_volt
+  description:
+  - Volume-averaged electron temperature in the confined region :math:`\bar T_e`.
+  set_by: []
+  used_by:
+  - calc_plasma_stored_energy
+  - calc_impurity_charge_state
+  - calc_zeff_and_dilution_due_to_impurities
+  - calc_normalised_collisionality
+  - calc_Spitzer_loop_resistivity
+  - calc_current_relaxation_time
+  - calc_beta_toroidal
+  - calc_beta_poloidal
+  - calc_average_ion_temp_from_temperature_ratio
+  - calc_average_total_pressure
+  - calc_effective_collisionality
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  - calc_temperature_peaking
+average_ion_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - Volume-averaged ion density in the confined region :math:`\bar n_i`.
+  set_by:
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by:
+  - calc_plasma_stored_energy
+average_ion_mass:
+  default_units: unified_atomic_mass_unit
+  description:
+  - Average mass of fuel ions, with the average weighted by the relative concentration
+    of each species.
+  set_by:
+  - calc_average_ion_mass
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - calc_rho_star
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+  - calc_poloidal_sound_larmor_radius
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_LH_transition_threshold_power
+average_ion_temp:
+  default_units: kiloelectron_volt
+  description:
+  - Volume-averaged ion temperature in the confined region :math:`\bar T_i`.
+  set_by:
+  - calc_average_ion_temp_from_temperature_ratio
+  used_by:
+  - calc_plasma_stored_energy
+  - calc_normalised_collisionality
+  - calc_rho_star
+  - calc_beta_toroidal
+  - calc_beta_poloidal
+  - calc_average_total_pressure
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  - calc_temperature_peaking
+average_total_pressure:
+  default_units: pascal
+  description:
+  - Sum of electron and ion pressures.
+  set_by:
+  - calc_average_total_pressure
+  used_by:
+  - calc_lambda_q
+B_pol_out_mid:
+  default_units: tesla
+  description:
+  - Poloidal magnetic field at outboard midplane separatrix
+  set_by:
+  - calc_B_pol_omp
+  used_by:
+  - calc_fieldline_pitch_at_omp
+  - calc_lambda_q
+  - calc_power_crossing_separatrix_in_electron_channel
+B_t_out_mid:
+  default_units: tesla
+  description:
+  - Toroidal magnetic field at outboard midplane separatrix
+  set_by:
+  - calc_B_tor_omp
+  used_by:
+  - calc_fieldline_pitch_at_omp
+  - calc_power_crossing_separatrix_in_electron_channel
+beta_poloidal:
+  default_units: dimensionless
+  description:
+  - Ratio of plasma pressure to magnetic pressure provided by the poloidal magnetic
+    field.
+  set_by:
+  - calc_beta_poloidal
+  used_by:
+  - calc_bootstrap_fraction
+  - calc_external_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+  - calc_beta_total
+beta_toroidal:
+  default_units: dimensionless
+  description:
+  - Ratio of plasma pressure to magnetic pressure provided by the toroidal magnetic
+    field.
+  set_by:
+  - calc_beta_toroidal
+  used_by:
+  - calc_beta_total
+  - calc_ion_density_peaking
+  - calc_electron_density_peaking
+  - calc_peaked_profiles
+beta_total:
+  default_units: dimensionless
+  description:
+  - Ratio of plasma pressure to magnetic pressure provided by the total magnetic field.
+  set_by:
+  - calc_beta_total
+  used_by:
+  - calc_beta_normalized
+bootstrap_fraction:
+  default_units: dimensionless
+  description:
+  - Fraction of the plasma current due to the bootstrap current.
+  set_by:
+  - calc_bootstrap_fraction
+  used_by:
+  - calc_inductive_plasma_current
+breakdown_flux_consumption:
+  default_units: weber
+  description:
+  - From a point model estimate given by :cite:`Sugihara`, this expression gives the
+    required flux for ionization.
+  set_by:
+  - calc_breakdown_flux_consumption
+  used_by: []
+change_in_dilution:
+  default_units: dimensionless
+  description:
+  - Change in the fuel-ion dilution, resolved per impurity species.
+  set_by:
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by: []
+change_in_zeff:
+  default_units: dimensionless
+  description:
+  - Change in the effective charge, resolved per impurity species.
+  set_by:
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by: []
+confinement_power_scaling:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.ConfinementPowerScaling` indicating which confinement
+    mode power-threshold scaling to use.
+  set_by: []
+  used_by:
+  - calc_LH_transition_threshold_power
+  - calc_LI_transition_threshold_power
+confinement_threshold_scalar:
+  default_units: dimensionless
+  description:
+  - Scalar value applied to the confinement threshold (:math:`P_{LH}` or :math:`P_{LI}`),
+    used to study the effect of increasing or decreasing the threshold.
+  set_by: []
+  used_by:
+  - calc_LH_transition_threshold_power
+  - calc_LI_transition_threshold_power
+confinement_time_scalar:
+  default_units: dimensionless
+  description:
+  - Usually denoted :math:`H`, scalar applied to the energy confinement time calculated
+    from a scaling such that :math:`\tau_e = H \tau_{e,scaling}`.
+  set_by: []
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+core_impurity_species:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.AtomicSpecies` indicating which species should
+    be used as the core radiator
+  set_by: []
+  used_by:
+  - calc_core_seeded_impurity_concentration
+core_radiated_power_fraction:
+  default_units: dimensionless
+  description:
+  - Fraction of input power radiated from the confined region before it reaches the
+    separatrix.
+  set_by:
+  - calc_f_rad_core
+  used_by: []
+critical_alpha_MHD:
+  default_units: dimensionless
+  description:
+  - Critical value of :math:`\alpha_{MHD}` used in the separatrix operational space.
+  set_by:
+  - calc_critical_alpha_MHD
+  used_by:
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+current_relaxation_time:
+  default_units: second
+  description:
+  - Time constant for the radial current diffusion.
+  set_by:
+  - calc_current_relaxation_time
+  used_by: []
+cylindrical_safety_factor:
+  default_units: dimensionless
+  description:
+  - Analytical approximation of safety factor at :math:`\rho=0.95` (confusingly, still
+    has some shaping corrections despite being called the 'cylindrical' safety factor).
+  set_by:
+  - calc_cylindrical_edge_safety_factor
+  used_by:
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - calc_internal_inductivity
+  - calc_SepOS_ideal_MHD_limit
+  - calc_power_crossing_separatrix_in_electron_channel
+density_profile_form:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed
+    profile shape we should use for the density profiles.
+  set_by: []
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+dilution:
+  default_units: dimensionless
+  description:
+  - Fuel-species concentration as a fraction of the electron density :math:`n_{DT}/n_e`.
+  set_by:
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by:
+  - calc_ion_density_peaking
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+edge_collisionality:
+  default_units: dimensionless
+  description:
+  - Collisionality at the separatrix.
+  set_by:
+  - calc_edge_collisionality
+  used_by: []
+edge_impurity_concentration:
+  default_units: dimensionless
+  description:
+  - Concentration of the edge radiator (impurity density relative to the electron
+    density) in the edge.
+  set_by:
+  - calc_edge_impurity_concentration
+  used_by: []
+edge_impurity_concentration_in_core:
+  default_units: dimensionless
+  description:
+  - Concentration of the edge-radiator impurity in the core, after applying a compression/enrichment
+    factor.
+  set_by:
+  - calc_edge_impurity_concentration
+  used_by: []
+edge_impurity_enrichment:
+  default_units: dimensionless
+  description:
+  - Ratio of concentration of the edge radiator in the core to in the edge, :math:`f_e
+    = n_{edge}/n_{core}`.
+  set_by: []
+  used_by:
+  - calc_edge_impurity_concentration
+edge_impurity_species:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.AtomicSpecies` indicating which species should
+    be injected into the plasma to increase the power radiated from the confined region.
+  set_by: []
+  used_by:
+  - calc_edge_impurity_concentration
+effective_collisionality:
+  default_units: dimensionless
+  description:
+  - Estimate of collisionality used for computing the expected density peaking.
+  set_by:
+  - calc_effective_collisionality
+  - calc_peaked_profiles
+  used_by:
+  - calc_ion_density_peaking
+  - calc_electron_density_peaking
+ejima_coefficient:
+  default_units: dimensionless
+  description:
+  - Empirical linear scaling factor of the product of major radius and plasma current
+    at flattop correlated with resistive flux at start of flattop :math:`C_E`.
+  set_by: []
+  used_by:
+  - calc_resistive_flux
+electron_density_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak ion density to the volume-averaged electron density.
+  set_by:
+  - calc_electron_density_peaking
+  - calc_peaked_profiles
+  used_by:
+  - calc_bootstrap_fraction
+  - calc_1D_plasma_profiles
+electron_density_peaking_offset:
+  default_units: dimensionless
+  description:
+  - Scalar offset of the electron density peaking relative to the density peaking
+    scaling.
+  set_by: []
+  used_by:
+  - calc_electron_density_peaking
+  - calc_peaked_profiles
+electron_density_profile:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - A 1D profile of the electron density as a function of :math:`\rho_{pol}`.
+  set_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  used_by:
+  - calc_bremsstrahlung_radiation
+  - calc_P_rad_hydrogen_bremsstrahlung
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+electron_temp_profile:
+  default_units: kiloelectron_volt
+  description:
+  - A 1D profile of the electron temperature as a function of :math:`\rho_{pol}`.
+  set_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  used_by:
+  - calc_bremsstrahlung_radiation
+  - calc_P_rad_hydrogen_bremsstrahlung
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+elongation_psi95:
+  default_units: dimensionless
+  description:
+  - Usually denoted :math:`\kappa_{95}`, the elongation at the :math:`\psi_N=0.95`
+    surface.
+  set_by:
+  - calc_elongation_at_psi95_from_areal_elongation
+  used_by:
+  - calc_areal_elongation_from_elongation_at_psi95
+  - calc_cylindrical_edge_safety_factor
+  - calc_critical_alpha_MHD
+  - calc_poloidal_sound_larmor_radius
+elongation_ratio_areal_to_psi95:
+  default_units: dimensionless
+  description:
+  - Ratio of areal elongation to elongation at the :math:`\psi_N=0.95` surface, :math:`\kappa_{A}/\kappa_{95}`.
+  set_by: []
+  used_by:
+  - calc_areal_elongation_from_elongation_at_psi95
+  - calc_elongation_at_psi95_from_areal_elongation
+elongation_ratio_sep_to_areal:
+  default_units: dimensionless
+  description:
+  - Ratio of separatrix elongation to areal elongation :math:`\kappa_{sep}/\kappa_A`.
+  set_by: []
+  used_by:
+  - calc_separatrix_elongation_from_areal_elongation
+energy_confinement_scaling:
+  default_units: null
+  description:
+  - Which :math:`\tau_e` energy confinement scaling should be used. Should match a
+    confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
+  set_by: []
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+energy_confinement_time:
+  default_units: second
+  description:
+  - A characteristic time which gives the rate at which the plasma loses energy. In
+    steady-state, :math:`\tau_e=W_p / P_in`.
+  set_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  used_by:
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_triple_product
+external_flux:
+  default_units: weber
+  description:
+  - The flux from the time integration of the voltage due to the external inductance
+    of the plasma. The general formula is the time integration of :math:`- L_e\frac{dI_p}{dt}
+    - Ip\frac{dL_e}{dt}`
+  - Note, time-independent POPCON makes the simplification that :math:`L_e` is constant
+    over the ramp-up.
+  set_by:
+  - calc_external_flux
+  used_by:
+  - calc_flux_needed_from_solenoid_over_rampup
+external_inductance:
+  default_units: henry
+  description:
+  - The self-inductance associated with the LCFS of the plasma.
+  set_by:
+  - calc_external_inductance
+  used_by:
+  - calc_external_flux
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+f_shaping:
+  default_units: dimensionless
+  description:
+  - Shaping factor used to compute :math:`q_*`.
+  set_by:
+  - calc_f_shaping_for_qstar
+  used_by:
+  - calc_plasma_current_from_qstar
+  - calc_q_star_from_plasma_current
+fieldline_pitch_at_omp:
+  default_units: dimensionless
+  description:
+  - The magnetic field pitch :math:`B_{tot} / B_{pol}` at the 'upstream' end of a
+    flux tube in the scrape-off-layer, used to convert from poloidal to parallel heat
+    flux density.
+  set_by:
+  - calc_fieldline_pitch_at_omp
+  used_by:
+  - calc_parallel_heat_flux_density
+flux_needed_from_CS_over_rampup:
+  default_units: weber
+  description:
+  - The amount of flux needed from the CS over ramp up.
+  set_by:
+  - calc_flux_needed_from_solenoid_over_rampup
+  used_by:
+  - calc_max_flattop_duration
+fraction_of_external_power_coupled:
+  default_units: dimensionless
+  description:
+  - 'Fraction of supplied external heating absorbed by the plasma: :math:`f_{coupled}=P_{external}
+    / P_{launched}`.'
+  set_by: []
+  used_by:
+  - calc_fusion_gain
+fraction_of_P_SOL_to_divertor:
+  default_units: dimensionless
+  description:
+  - fraction of the total power going towards the most-loaded divertor target.
+  set_by: []
+  used_by:
+  - calc_parallel_heat_flux_density
+  - calc_power_crossing_separatrix_in_electron_channel
+fuel_ion_density_profile:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - A 1D profile of the fuel ion density as a function of :math:`\rho_{pol}`.
+  set_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  used_by:
+  - calc_fusion_power
+fusion_reaction:
+  default_units: null
+  description:
+  - A `str` indicating which fusion reaction should be used, should match a class
+    name in `cfspopcon.formulas.fusion_reaction.fusion_data`
+  set_by: []
+  used_by:
+  - calc_average_ion_mass
+  - calc_fusion_power
+  - calc_neutron_flux_to_walls
+fusion_triple_product:
+  default_units: _1e20_per_cubic_metre * kiloelectron_volt * second
+  description:
+  - The product of the energy confinement time, the core ion temperature and core
+    ion density, used as a metric for fusion performance.
+  set_by:
+  - calc_triple_product
+  used_by: []
+greenwald_density_limit:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - The highest volume-averaged density which can be achieved before a density-limit
+    disruption is triggered.
+  set_by:
+  - calc_greenwald_density_limit
+  used_by:
+  - calc_greenwald_fraction
+  - calc_average_electron_density_from_greenwald_fraction
+greenwald_fraction:
+  default_units: dimensionless
+  description:
+  - Ratio of the average electron density to the Greenwald density limit :math:`f_{G}=\bar
+    n_e / n_G`.
+  set_by:
+  - calc_greenwald_fraction
+  used_by:
+  - calc_average_electron_density_from_greenwald_fraction
+heavier_fuel_species_fraction:
+  default_units: dimensionless
+  description:
+  - Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this
+    is :math:`f_T = n_T/(n_T+n_D)`.
+  set_by: []
+  used_by:
+  - calc_average_ion_mass
+  - calc_fusion_power
+  - calc_neutron_flux_to_walls
+impurity_charge_state:
+  default_units: dimensionless
+  description:
+  - The mean charge state of a non-fuel species.
+  set_by:
+  - calc_impurity_charge_state
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by: []
+impurity_concentration:
+  default_units: dimensionless
+  description:
+  - Concentration of each impurity species, relative to the electron density.
+  set_by:
+  - calc_core_seeded_impurity_concentration
+  - calc_edge_impurity_concentration
+  - set_up_impurity_concentration_array
+  used_by:
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+  - calc_edge_impurity_concentration
+  - calc_impurity_charge_state
+  - calc_zeff_and_dilution_due_to_impurities
+impurity_residence_time:
+  default_units: second
+  description:
+  - The average time an impurity ion stays in the scrape-off-layer before it recycles
+    on the wall.
+  set_by: []
+  used_by:
+  - calc_impurity_radiated_power_mavrin_noncoronal
+impurity_species:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.AtomicSpecies` indicating which impurity to
+    use for a calculation.
+  set_by: []
+  used_by:
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+inductive_plasma_current:
+  default_units: ampere
+  description:
+  - Plasma current driven by the central solenoid (i.e. excluding the contribution
+    of the bootstrap current).
+  set_by:
+  - calc_inductive_plasma_current
+  used_by:
+  - calc_ohmic_power
+  - calc_loop_voltage
+internal_flux:
+  default_units: weber
+  description:
+  - The flux from the time integration of the voltage due to the internal inductance
+    of the plasma. The general formula is the time integration of :math:`- L_i\frac{dI_p}{dt}
+    - \frac{Ip}{2}\frac{dL_i}{dt}`
+  - Note, time-independent POPCON makes the simplification that :math:`L_i` is constant
+    over the ramp-up.
+  set_by:
+  - calc_internal_flux
+  used_by:
+  - calc_flux_needed_from_solenoid_over_rampup
+internal_inductance:
+  default_units: henry
+  description:
+  - The self-inductance of the plasma from the center to the plasma edge.
+  set_by:
+  - calc_internal_inductance_for_cylindrical
+  - calc_internal_inductance_for_noncylindrical
+  used_by:
+  - calc_internal_flux
+internal_inductivity:
+  default_units: dimensionless
+  description:
+  - Also known as normalized internal inductance, for a general geometry, is :math:`\frac{\langle
+    B^2_{\theta} \rangle _V}{\langle B_{\theta}(r=LCFS) \rangle}` but is approximated
+    in POPCON for a cylindrical plasma.
+  set_by:
+  - calc_internal_inductivity
+  used_by:
+  - calc_internal_inductance_for_cylindrical
+  - calc_internal_inductance_for_noncylindrical
+  - calc_external_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+intrinsic_impurity_concentration:
+  default_units: dimensionless
+  description:
+  - Concentration of each intrinsic impurity species, relative to the electron density.
+  set_by: []
+  used_by:
+  - set_up_impurity_concentration_array
+inverse_aspect_ratio:
+  default_units: dimensionless
+  description:
+  - Ratio of minor to major radius :math:`\epsilon= a / R_0`.
+  set_by:
+  - calc_inverse_aspect_ratio
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_plasma_volume
+  - calc_plasma_surface_area
+  - calc_minor_radius_from_inverse_aspect_ratio
+  - calc_normalised_collisionality
+  - calc_bootstrap_fraction
+  - calc_external_inductance
+  - calc_vertical_field_mutual_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+  - calc_resistivity_trapped_enhancement
+  - calc_current_relaxation_time
+  - calc_f_shaping_for_qstar
+  - calc_plasma_current_from_qstar
+  - calc_q_star_from_plasma_current
+  - calc_lambda_q
+invmu_0_dLedR:
+  default_units: dimensionless
+  description:
+  - :math:`\frac{1}{\mu_0}\frac{\partial L_e}{\partial R}` (eq.21 in :cite:`Barr_2018`)
+    which is a part of the hoop force and therefore appears in the :term:`vertical_magnetic_field_equation`
+    which counteracts the outward toroidal forces.
+  set_by:
+  - calc_invmu_0_dLedR
+  used_by:
+  - calc_vertical_magnetic_field
+ion_density_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak ion density to the volume-averaged ion density.
+  set_by:
+  - calc_ion_density_peaking
+  - calc_peaked_profiles
+  used_by:
+  - calc_bootstrap_fraction
+  - calc_1D_plasma_profiles
+ion_density_peaking_offset:
+  default_units: dimensionless
+  description:
+  - Scalar offset of the ion density peaking relative to the density peaking scaling.
+  set_by: []
+  used_by:
+  - calc_ion_density_peaking
+  - calc_peaked_profiles
+ion_heat_diffusivity:
+  default_units: meter ** 2 / second
+  description:
+  - A heat diffusion constant which gives a heat flux corresponding to an ion temperature
+    gradient.
+  set_by: []
+  used_by:
+  - calc_power_crossing_separatrix_in_ion_channel
+ion_temp_profile:
+  default_units: kiloelectron_volt
+  description:
+  - A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
+  set_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  used_by:
+  - calc_fusion_power
+  - calc_neutron_flux_to_walls
+ion_to_electron_temp_ratio:
+  default_units: dimensionless
+  description:
+  - Ratio of electron and ion temperatures, :math:`T_i/T_e`.
+  set_by: []
+  used_by:
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - calc_average_ion_temp_from_temperature_ratio
+  - calc_SepOS_ideal_MHD_limit
+kappa_e0:
+  default_units: watt / electron_volt ** 3.5 / meter
+  description:
+  - Electron heat conductivity constant, such that :math:`q_{e,\parallel,cond}=\kappa_{e0}T_{e}^{5/2}\nabla_\parallel
+    T_e`.
+  set_by: []
+  used_by:
+  - calc_edge_impurity_concentration
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+lambda_q:
+  default_units: millimeter
+  description:
+  - The near-scrape-off-layer heat-flux-density decay length.
+  set_by:
+  - calc_lambda_q
+  used_by:
+  - calc_parallel_heat_flux_density
+  - calc_q_perp
+lambda_q_factor:
+  default_units: dimensionless
+  description:
+  - A scaling factor :math:`C` which can be used to increase or decrease :math:`\lambda_q=C
+    \lambda_{q,scaling}`.
+  set_by: []
+  used_by:
+  - calc_lambda_q
+lambda_q_scaling:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.LambdaQScaling` indicating which scaling to
+    use for calculating :term:`lambda_q`.
+  set_by: []
+  used_by:
+  - calc_lambda_q
+lengyel_overestimation_factor:
+  default_units: dimensionless
+  description:
+  - A constant calibration factor applied to the impurity concentration calculated
+    by the Lengyel model such that its value approximately matches the value calculated
+    by higher fidelity modelling such as SOLPS.
+  set_by: []
+  used_by:
+  - calc_edge_impurity_concentration
+loop_voltage:
+  default_units: volt
+  description:
+  - inductive loop voltage
+  set_by:
+  - calc_loop_voltage
+  used_by:
+  - calc_max_flattop_duration
+  - calc_ohmic_power
+magnetic_field_on_axis:
+  default_units: tesla
+  description:
+  - Magnetic field at the geometric magnetic axis :math:`B_0 = BR / R0`.
+  set_by: []
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_PB_over_R
+  - calc_PBpRnSq
+  - calc_rho_star
+  - calc_plasma_current_from_qstar
+  - calc_q_star_from_plasma_current
+  - calc_cylindrical_edge_safety_factor
+  - calc_beta_toroidal
+  - calc_beta_normalized
+  - calc_troyon_limit
+  - calc_B_tor_omp
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_LH_transition_threshold_power
+  - calc_LI_transition_threshold_power
+major_radius:
+  default_units: meter
+  description:
+  - The major radius of the geometric magnetic axis.
+  set_by: []
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_plasma_volume
+  - calc_plasma_surface_area
+  - calc_minor_radius_from_inverse_aspect_ratio
+  - calc_inverse_aspect_ratio
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_normalised_collisionality
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - calc_PB_over_R
+  - calc_PBpRnSq
+  - calc_resistive_flux
+  - calc_poloidal_field_flux
+  - calc_breakdown_flux_consumption
+  - calc_internal_inductance_for_cylindrical
+  - calc_external_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+  - calc_current_relaxation_time
+  - calc_loop_voltage
+  - calc_plasma_current_from_qstar
+  - calc_q_star_from_plasma_current
+  - calc_cylindrical_edge_safety_factor
+  - calc_effective_collisionality
+  - calc_peaked_profiles
+  - calc_B_tor_omp
+  - calc_parallel_heat_flux_density
+  - calc_q_perp
+  - calc_lambda_q
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_power_crossing_separatrix_in_electron_channel
+  - calc_LH_transition_threshold_power
+max_flattop_duration:
+  default_units: second
+  description:
+  - Given the loop voltage at flattop, and how much flux from the CS has been consumed
+    over the ramp-up, this defines how long your flattop can be.
+  set_by:
+  - calc_max_flattop_duration
+  used_by: []
+maximum_P_LH_factor_for_P_SOL:
+  default_units: dimensionless
+  description:
+  - If P_SOL is larger than this factor times the P_LH threshold, core impurities
+    will be seeded to reduce P_SOL to th
+  set_by: []
+  used_by:
+  - calc_min_P_radiation_from_LH_factor
+mean_ion_charge_state:
+  default_units: dimensionless
+  description:
+  - Mean charge state of the ions (:math:`n_e / \sum_j n_j`)
+  set_by: []
+  used_by:
+  - calc_alpha_t
+  - calc_edge_collisionality
+min_P_radiation:
+  default_units: megawatt
+  description:
+  - The minimum amount of power which must be radiated from the confined region. If
+    power radiated by the intrinsic impurities
+  - is less than this, a core radiator will be injected until this level is reached.
+  set_by:
+  - calc_min_P_radiation_from_fraction
+  - calc_min_P_radiation_from_LH_factor
+  used_by:
+  - calc_P_radiation_from_core_seeded_impurity
+minimum_core_radiated_fraction:
+  default_units: dimensionless
+  description:
+  - Minimum fraction of :math:`P_{in}` which should be radiated from the confined
+    region, below which we will inject an additional core radiator to increase the
+    radiated power up to this value.
+  set_by: []
+  used_by:
+  - calc_min_P_radiation_from_fraction
+minor_radius:
+  default_units: meter
+  description:
+  - Horizontal minor radius of the plasma :math:`(R_{max,LCFS}-R_{min,LCFS})/2`
+  set_by:
+  - calc_minor_radius_from_inverse_aspect_ratio
+  used_by:
+  - calc_plasma_poloidal_circumference
+  - calc_inverse_aspect_ratio
+  - calc_vertical_minor_radius_from_elongation_and_minor_radius
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_greenwald_density_limit
+  - calc_rho_star
+  - calc_loop_voltage
+  - calc_cylindrical_edge_safety_factor
+  - calc_beta_poloidal
+  - calc_beta_normalized
+  - calc_troyon_limit
+  - calc_B_pol_omp
+  - calc_B_tor_omp
+  - calc_parallel_heat_flux_density
+  - calc_q_perp
+  - calc_poloidal_sound_larmor_radius
+  - calc_power_crossing_separatrix_in_electron_channel
+  - calc_LH_transition_threshold_power
+n_points_for_confined_region_profiles:
+  default_units: null
+  description:
+  - The number of points to use for the confined region profiles.
+  set_by: []
+  used_by:
+  - calc_1D_plasma_profiles
+neoclassical_loop_resistivity:
+  default_units: meter * ohm
+  description:
+  - Plasma loop neoclassical resistivity.
+  set_by:
+  - calc_neoclassical_loop_resistivity
+  used_by:
+  - calc_loop_voltage
+nesep_over_nebar:
+  default_units: dimensionless
+  description:
+  - Ratio of the separatrix electron density to the volume-averaged electron density
+    :math:`n_{e,sep} / \bar n_e`.
+  set_by: []
+  used_by:
+  - calc_separatrix_electron_density
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+neutron_power_flux_to_walls:
+  default_units: megawatt / meter ** 2
+  description:
+  - Neutron power per unit area to the wall.
+  set_by:
+  - calc_neutron_flux_to_walls
+  used_by: []
+neutron_rate:
+  default_units: 1 / second
+  description:
+  - Number of neutrons produced per second.
+  set_by:
+  - calc_neutron_flux_to_walls
+  used_by: []
+normalized_beta:
+  default_units: meter * percent * tesla / megaampere
+  description:
+  - Ratio of plasma pressure to magnetic pressure provided by the total magnetic field,
+    normalized to :math:`\beta_{max} = I_MA / a B_0` (Troyon limit).
+  set_by:
+  - calc_beta_normalized
+  used_by: []
+normalized_inverse_temp_scale_length:
+  default_units: dimensionless
+  description:
+  - Inverse normalized electron temperature gradient scale length :math:`a / ( T_e
+    / \nabla T_e )`, which defines the shape of the :class:`~cfspopcon.named_options.ProfileForm.prf`
+    profiles.
+  set_by: []
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+nu_star:
+  default_units: dimensionless
+  description:
+  - The normalized collisionality.
+  set_by:
+  - calc_normalised_collisionality
+  used_by: []
+P_alpha:
+  default_units: megawatt
+  description:
+  - Fusion power released as alpha particles integrated over the plasma volume.
+  set_by:
+  - calc_fusion_power
+  used_by:
+  - calc_fusion_gain
+P_auxillary:
+  default_units: megawatt
+  description:
+  - The auxillary heating power (i.e. the external heating power not provided by ohmic
+    heating).
+  set_by:
+  - calc_auxillary_power
+  used_by: []
+P_external:
+  default_units: megawatt
+  description:
+  - External heating absorbed by the plasma (ohmic plus auxillary) integrated over
+    the plasma volume.
+  set_by:
+  - calc_fusion_gain
+  used_by:
+  - calc_auxillary_power
+P_fusion:
+  default_units: megawatt
+  description:
+  - Total power generated by fusion integrated over the plasma volume. For DT fusion,
+    this is the sum of the power going to the alpha particles and to the neutrons.
+  set_by:
+  - calc_fusion_power
+  used_by:
+  - calc_fusion_gain
+P_in:
+  default_units: megawatt
+  description:
+  - Total input power to the plasma. Sum of ohmic, auxillary and alpha power.
+  set_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  used_by:
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_fusion_gain
+  - calc_f_rad_core
+  - require_P_rad_less_than_P_in
+  - calc_min_P_radiation_from_fraction
+  - calc_min_P_radiation_from_LH_factor
+  - calc_power_crossing_separatrix
+P_launched:
+  default_units: megawatt
+  description:
+  - "External heating supplied to the plasma (entering the volume, but not necessarily\
+    \ absorbed \u2014 ohmic plus auxillary) integrated over the plasma volume."
+  set_by:
+  - calc_fusion_gain
+  used_by: []
+P_LH_thresh:
+  default_units: megawatt
+  description:
+  - Power required to cross the L-H transition.
+  set_by:
+  - calc_LH_transition_threshold_power
+  used_by:
+  - calc_min_P_radiation_from_LH_factor
+  - calc_ratio_P_LH
+P_LI_thresh:
+  default_units: megawatt
+  description:
+  - Power required to cross the L-I transition.
+  set_by:
+  - calc_LI_transition_threshold_power
+  used_by:
+  - calc_ratio_P_LI
+P_neutron:
+  default_units: megawatt
+  description:
+  - Fusion power released as neutrons integrated over the plasma volume.
+  set_by:
+  - calc_fusion_power
+  used_by:
+  - calc_neutron_flux_to_walls
+P_ohmic:
+  default_units: megawatt
+  description:
+  - Power deposited in the plasma due to resistive ohmic heating.
+  set_by:
+  - calc_ohmic_power
+  used_by:
+  - calc_auxillary_power
+P_rad_bremsstrahlung:
+  default_units: megawatt
+  description:
+  - Power radiated due to Bremmsstrahlung from all species.
+  set_by:
+  - calc_bremsstrahlung_radiation
+  used_by: []
+P_rad_hydrogen_bremsstrahlung:
+  default_units: megawatt
+  description:
+  - Power radiated due to Bremmsstrahlung from hydrogen.
+  set_by:
+  - calc_P_rad_hydrogen_bremsstrahlung
+  used_by: []
+P_rad_impurity:
+  default_units: megawatt
+  description:
+  - Power radiated by impurities in the plasma.
+  set_by:
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  used_by: []
+P_rad_synchrotron:
+  default_units: megawatt
+  description:
+  - Power radiated due to synchrotron radiation.
+  set_by:
+  - calc_synchrotron_radiation
+  used_by: []
+P_radiation:
+  default_units: megawatt
+  description:
+  - Power radiated from the confined region due to Bremmsstrahlung, synchrotron and
+    impurity excitation-relaxation processes.
+  set_by:
+  - require_P_rad_less_than_P_in
+  - calc_intrinsic_radiated_power_from_core
+  - calc_P_radiation_from_core_seeded_impurity
+  used_by:
+  - calc_f_rad_core
+  - require_P_rad_less_than_P_in
+  - calc_P_radiation_from_core_seeded_impurity
+  - calc_power_crossing_separatrix
+P_radiation_from_core_seeded_impurity:
+  default_units: megawatt
+  description:
+  - The power radiated by the core radiator.
+  set_by:
+  - calc_P_radiation_from_core_seeded_impurity
+  used_by:
+  - calc_core_seeded_impurity_concentration
+parallel_connection_length:
+  default_units: meter
+  description:
+  - Parallel length (along a field-line) of a scrape-off-layer flux tube, from an
+    'upstream' position (usually the outboard midplane) to the divertor target.
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+PB_over_R:
+  default_units: megawatt * tesla / meter
+  description:
+  - :math:`P_{SOL}B_0/R`, a metric used to estimate how challenging heat exhaust will
+    be.
+  set_by:
+  - calc_PB_over_R
+  used_by: []
+PBpRnSq:
+  default_units: megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter
+  description:
+  - :math:`P_{SOL}B_{pol}/(R n_{sep}^2)`, a metric used to estimate how challenging
+    heat exhaust will be. This metric is approximately :math:`q_\parallel/n_{e,sep}^2`,
+    which in the Lengyel model gives the impurity concentration required for detachment.
+  set_by:
+  - calc_PBpRnSq
+  used_by: []
+peak_electron_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - Peak electron density
+  set_by:
+  - calc_electron_density_peaking
+  - calc_peaked_profiles
+  used_by:
+  - calc_peak_pressure
+peak_electron_temp:
+  default_units: kiloelectron_volt
+  description:
+  - Peak electron temperature
+  set_by:
+  - calc_peaked_profiles
+  - calc_temperature_peaking
+  used_by:
+  - calc_peak_pressure
+peak_fuel_ion_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - Peak fuel ion density (i.e. product of fuel dilution, ion peaking factor and average
+    electron density).
+  set_by:
+  - calc_ion_density_peaking
+  - calc_peaked_profiles
+  used_by:
+  - calc_triple_product
+  - calc_peak_pressure
+peak_ion_temp:
+  default_units: kiloelectron_volt
+  description:
+  - Peak ion temperature
+  set_by:
+  - calc_peaked_profiles
+  - calc_temperature_peaking
+  used_by:
+  - calc_triple_product
+  - calc_peak_pressure
+peak_pressure:
+  default_units: pascal
+  description:
+  - Peak total pressure in the core.
+  set_by:
+  - calc_peak_pressure
+  used_by: []
+plasma_current:
+  default_units: ampere
+  description:
+  - Current carried by the plasma :math:`I_p`.
+  set_by:
+  - calc_plasma_current_from_qstar
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_greenwald_density_limit
+  - calc_inductive_plasma_current
+  - calc_internal_flux
+  - calc_external_flux
+  - calc_resistive_flux
+  - calc_vertical_magnetic_field
+  - calc_q_star_from_plasma_current
+  - calc_cylindrical_edge_safety_factor
+  - calc_beta_poloidal
+  - calc_beta_normalized
+  - calc_troyon_limit
+  - calc_B_pol_omp
+  - calc_poloidal_sound_larmor_radius
+  - calc_LH_transition_threshold_power
+  - calc_LI_transition_threshold_power
+plasma_stored_energy:
+  default_units: megajoule
+  description:
+  - Thermal energy in the plasma.
+  set_by:
+  - calc_plasma_stored_energy
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+plasma_volume:
+  default_units: meter ** 3
+  description:
+  - Plasma volume inside the last-closed-flux-surface.
+  set_by:
+  - calc_plasma_volume
+  used_by:
+  - calc_plasma_stored_energy
+  - calc_fusion_power
+  - calc_bremsstrahlung_radiation
+  - calc_P_rad_hydrogen_bremsstrahlung
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+  - calc_internal_inductance_for_noncylindrical
+poloidal_circumference:
+  default_units: meter
+  description:
+  - Plasma poloidal circumference of the LCFS.
+  set_by:
+  - calc_plasma_poloidal_circumference
+  used_by:
+  - calc_internal_inductance_for_noncylindrical
+poloidal_field_flux:
+  default_units: weber
+  description:
+  - The surface flux contribution from the vertical magnetic field required for radial
+    force balance (which arises from the poloidal field coils).
+  set_by:
+  - calc_poloidal_field_flux
+  used_by:
+  - calc_flux_needed_from_solenoid_over_rampup
+poloidal_sound_larmor_radius:
+  default_units: millimeter
+  description:
+  - The sound Larmor radius using the poloidal magnetic field.
+  set_by:
+  - calc_poloidal_sound_larmor_radius
+  used_by:
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_power_crossing_separatrix_in_ion_channel
+  - calc_power_crossing_separatrix_in_electron_channel
+power_crossing_separatrix:
+  default_units: megawatt
+  description:
+  - Power crossing the separatrix and entering the scrape-off-layer.
+  set_by:
+  - calc_power_crossing_separatrix
+  used_by:
+  - calc_PB_over_R
+  - calc_PBpRnSq
+  - calc_parallel_heat_flux_density
+  - calc_q_perp
+  - calc_lambda_q
+  - calc_ratio_P_LH
+  - calc_ratio_P_LI
+Q:
+  default_units: dimensionless
+  description:
+  - Fusion power thermal gain factor.
+  set_by:
+  - calc_fusion_gain
+  used_by: []
+q_parallel:
+  default_units: gigawatt / meter ** 2
+  description:
+  - The parallel heat flux density entering a scrape-off-layer flux tube.
+  set_by:
+  - calc_parallel_heat_flux_density
+  used_by:
+  - calc_edge_impurity_concentration
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+q_perp:
+  default_units: megawatt / meter ** 2
+  description:
+  - The poloidal heat flux density entering a scrape-off-layer flux tube.
+  set_by:
+  - calc_q_perp
+  used_by: []
+q_star:
+  default_units: dimensionless
+  description:
+  - Analytical approximation of safety factor at :math:`\rho=0.95`.
+  set_by:
+  - calc_q_star_from_plasma_current
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_normalised_collisionality
+  - calc_PBpRnSq
+  - calc_bootstrap_fraction
+  - calc_plasma_current_from_qstar
+radas_dir:
+  default_units: null
+  description:
+  - A path to the `radas <https://github.com/cfs-energy/radas>`_ working directory.
+  set_by: []
+  used_by:
+  - read_atomic_data
+radiated_power_method:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.RadiationMethod` indicating how we should calculate
+    the power radiated from the confined region.
+  set_by: []
+  used_by:
+  - calc_impurity_radiated_power
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+radiated_power_scalar:
+  default_units: dimensionless
+  description:
+  - An enhancement factor :math:`C` to modify the radiated power :math:`P_{rad} =
+    C P_{rad,calculated}`.
+  set_by: []
+  used_by:
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+ratio_of_P_SOL_to_P_LH:
+  default_units: dimensionless
+  description:
+  - The ratio of the power crossing the separatrix to the LH transition threshold
+    power.
+  set_by:
+  - calc_ratio_P_LH
+  used_by: []
+ratio_of_P_SOL_to_P_LI:
+  default_units: dimensionless
+  description:
+  - The ratio of the power crossing the separatrix to the LI transition threshold
+    power.
+  set_by:
+  - calc_ratio_P_LI
+  used_by: []
+reference_electron_density:
+  default_units: 1 / meter ** 3
+  description:
+  - A constant upstream electron density used when evaluating the :math:`L_Z` impurity
+    radiation curve (due to the reasonably weak dependence of :math:`L_Z` on :math:`n_e`,
+    this approximation shouldn't be too harmful).
+  set_by: []
+  used_by:
+  - calc_edge_impurity_concentration
+reference_ne_tau:
+  default_units: second / meter ** 3
+  description:
+  - A constant :math:`n_e\tau` (upstream electron density times impurity residence
+    time) used when evaluating the :math:`L_Z` impurity radiation curve.
+  set_by: []
+  used_by:
+  - calc_edge_impurity_concentration
+resistive_flux:
+  default_units: weber
+  description:
+  - Usually this is the magnetic flux induced by the resistance of the plasma. However,
+    given that POPCON calculates this with the empirical :math:`C_E`, it may also
+    hold information about flux induced coupling with the wall. :math:`\psi_{res}
+    = C_E\mu_0R_0I_p`.
+  set_by:
+  - calc_resistive_flux
+  used_by:
+  - calc_flux_needed_from_solenoid_over_rampup
+resistivity_trapped_enhancement_method:
+  default_units: null
+  description:
+  - A flag to indicate which method should be used when calculating the enhancement
+    of resistivity due to trapped particles.
+  set_by: []
+  used_by:
+  - calc_resistivity_trapped_enhancement
+rho:
+  default_units: dimensionless
+  description:
+  - The square-root of the normalized poloidal flux :math:`\rho_{pol}=\sqrt{\psi_N}`,
+    used as a flux surface label.
+  set_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  used_by:
+  - calc_fusion_power
+  - calc_bremsstrahlung_radiation
+  - calc_P_rad_hydrogen_bremsstrahlung
+  - calc_impurity_radiated_power_mavrin_coronal
+  - calc_impurity_radiated_power_mavrin_noncoronal
+  - calc_impurity_radiated_power_post_and_jensen
+  - calc_impurity_radiated_power_radas
+  - calc_impurity_radiated_power
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_core_seeded_impurity_concentration
+rho_star:
+  default_units: dimensionless
+  description:
+  - The ratio of the sound Larmor radius to the major radius for the average ion temperature.
+  set_by:
+  - calc_rho_star
+  used_by: []
+safety_factor_on_axis:
+  default_units: dimensionless
+  description:
+  - On-axis safety factor
+  set_by: []
+  used_by:
+  - calc_internal_inductivity
+separatrix_electron_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - The electron density at the 'upstream' end of a scrape-off-layer flux-tube (usually
+    at the outboard midplane).
+  set_by:
+  - calc_separatrix_electron_density
+  used_by:
+  - calc_edge_impurity_concentration
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - two_point_model_fixed_tet
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_power_crossing_separatrix_in_ion_channel
+separatrix_electron_temp:
+  default_units: electron_volt
+  description:
+  - The electron temperature at the 'upstream' end of a scrape-off-layer flux-tube
+    (usually at the outboard midplane).
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+  used_by:
+  - calc_edge_impurity_concentration
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - calc_poloidal_sound_larmor_radius
+  - calc_SepOS_L_mode_density_limit
+  - calc_SepOS_LH_transition
+  - calc_SepOS_ideal_MHD_limit
+  - calc_power_crossing_separatrix_in_ion_channel
+  - calc_power_crossing_separatrix_in_electron_channel
+separatrix_elongation:
+  default_units: dimensionless
+  description:
+  - Elongation of the last-closed-flux-surface :math:`(Z_{max,LCFS} - Z_{min,LCFS})
+    / (R_{max,LCFS} - R_{min,LCFS})`.
+  set_by:
+  - calc_separatrix_elongation_from_areal_elongation
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_vertical_minor_radius_from_elongation_and_minor_radius
+  - calc_synchrotron_radiation
+  - calc_intrinsic_radiated_power_from_core
+separatrix_triangularity:
+  default_units: dimensionless
+  description:
+  - Separatrix triangularity (average of upper and lower triangularity).
+  set_by:
+  - calc_separatrix_triangularity_from_triangularity95
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+SepOS_density_limit:
+  default_units: dimensionless
+  description:
+  - Less than 1 if an L-mode is below the density limit, according to the separatrix
+    operational space.
+  set_by:
+  - calc_SepOS_L_mode_density_limit
+  used_by: []
+SepOS_LH_transition:
+  default_units: dimensionless
+  description:
+  - Less than 1 if in L-mode and greater than 1 if in H-mode, according to the separatrix
+    operational space.
+  set_by:
+  - calc_SepOS_LH_transition
+  used_by: []
+SepOS_MHD_limit:
+  default_units: dimensionless
+  description:
+  - Less than 1 if below the ideal MHD limit, according to the separatrix operational
+    space.
+  set_by:
+  - calc_SepOS_ideal_MHD_limit
+  used_by: []
+SOC_LOC_ratio:
+  default_units: dimensionless
+  description:
+  - Ratio of the energy confinement time from the chosen saturated ohmic confinement
+    (SOC) scaling and the chosen linear ohmic confinement (LOC) scaling.
+  set_by:
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  used_by: []
+SOL_momentum_loss_function:
+  default_units: null
+  description:
+  - Fraction of momentum entering a scrape-off-layer flux tube which is lost before
+    reaching the divertor target.
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+SOL_power_loss_fraction:
+  default_units: dimensionless
+  description:
+  - Fraction of power entering a scrape-off-layer flux tube which is lost (radiated
+    or cross-field transported) before reaching the divertor target.
+  set_by:
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+  used_by:
+  - calc_edge_impurity_concentration
+  - two_point_model_fixed_fpow
+spitzer_resistivity:
+  default_units: meter * ohm
+  description:
+  - Plasma loop collisional resistivity.
+  set_by:
+  - calc_Spitzer_loop_resistivity
+  used_by:
+  - calc_neoclassical_loop_resistivity
+summed_impurity_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - Density of non-fuel ions.
+  set_by:
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by:
+  - calc_plasma_stored_energy
+surface_area:
+  default_units: meter ** 2
+  description:
+  - Area of the last-closed-flux-surface, i.e. the surface defined by toroidally revolving
+    the poloidal last-closed-flux-surface.
+  set_by:
+  - calc_plasma_surface_area
+  used_by:
+  - calc_neutron_flux_to_walls
+  - calc_power_crossing_separatrix_in_ion_channel
+  - calc_LH_transition_threshold_power
+  - calc_LI_transition_threshold_power
+surface_inductance_coefficients:
+  default_units: null
+  description:
+  - The set of coefficients from Hirshman :cite:`hirshman` or Barr's :cite:`Barr_2018`
+    paper on external flux which are used to fit analytic expressions, dependent on
+    plasma geometry, to the external inductance and vertical field mutual inductance
+    of the plasma.
+  set_by: []
+  used_by:
+  - calc_external_inductance
+  - calc_vertical_field_mutual_inductance
+  - calc_invmu_0_dLedR
+  - calc_vertical_magnetic_field
+sustainment_power_in_electron_channel:
+  default_units: megawatt
+  description:
+  - The power in the electron channel required to maintain the electron temperature
+    at the separatrix.
+  set_by:
+  - calc_power_crossing_separatrix_in_electron_channel
+  used_by: []
+sustainment_power_in_ion_channel:
+  default_units: megawatt
+  description:
+  - The power in the ion channel required to maintain the ion temperature gradient
+    at the separatrix.
+  set_by:
+  - calc_power_crossing_separatrix_in_ion_channel
+  used_by: []
+target_electron_density:
+  default_units: _1e19_per_cubic_metre
+  description:
+  - The electron density at the divertor target.
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+  used_by: []
+target_electron_flux:
+  default_units: 1 / meter ** 2 / second
+  description:
+  - The rate of electrons per unit area reaching the divertor target.
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+  used_by: []
+target_electron_temp:
+  default_units: electron_volt
+  description:
+  - The electron temperature at the divertor target.
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  used_by:
+  - calc_edge_impurity_concentration
+  - two_point_model_fixed_tet
+  - calc_power_crossing_separatrix_in_electron_channel
+target_q_parallel:
+  default_units: gigawatt / meter ** 2
+  description:
+  - The parallel heat flux density at the divertor target.
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_tet
+  used_by:
+  - two_point_model_fixed_qpart
+temp_profile_form:
+  default_units: null
+  description:
+  - A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed
+    profile shape we should use for the temperature profiles.
+  set_by: []
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+temp_scale_length_ratio:
+  default_units: dimensionless
+  description:
+  - The ratio of the electron and ion temperature scale lengths at the separatrix
+    :math:`T_i / T_e * \lambda_{T_e} / \lambda_{T_i} = L_{T_e} / L_{T_i}`.
+  set_by: []
+  used_by:
+  - calc_power_crossing_separatrix_in_ion_channel
+temperature_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak (electron or ion) temperature to the volume-averaged temperature.
+  set_by: []
+  used_by:
+  - calc_bootstrap_fraction
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+  - calc_temperature_peaking
+toroidal_flux_expansion:
+  default_units: dimensionless
+  description:
+  - Ratio of the divertor target major radius to the 'upstream' (usually outboard
+    midplane) major radius for the two point model :math:`R_{target} / R_{upstream}`.
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+total_flux_available_from_CS:
+  default_units: weber
+  description:
+  - The amount of flux available from the central solenoid over the entire pulse.
+  set_by: []
+  used_by:
+  - calc_max_flattop_duration
+trapped_particle_fraction:
+  default_units: dimensionless
+  description:
+  - Global average of the fraction of trapped electrons used in the calculation of
+    global plasma resistivity.
+  set_by:
+  - calc_resistivity_trapped_enhancement
+  used_by:
+  - calc_neoclassical_loop_resistivity
+triangularity_psi95:
+  default_units: dimensionless
+  description:
+  - Usually denoted :math:`\delta_{95}`, average of upper and lower triangularity
+    at the :math:`\psi_N=0.95` surface.
+  set_by: []
+  used_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - switch_to_linearised_ohmic_confinement_below_threshold
+  - calc_separatrix_triangularity_from_triangularity95
+  - calc_f_shaping_for_qstar
+  - calc_cylindrical_edge_safety_factor
+  - calc_critical_alpha_MHD
+  - calc_poloidal_sound_larmor_radius
+triangularity_ratio_sep_to_psi95:
+  default_units: dimensionless
+  description:
+  - Ratio of separatrix triangularity to triangularity at the :math:`psi_N=0.95` surface
+    :math:`\delta_{sep}/\delta_{95}.`
+  set_by: []
+  used_by:
+  - calc_separatrix_triangularity_from_triangularity95
+troyon_max_beta:
+  default_units: percent
+  description:
+  - The Troyon beta limit.
+  set_by:
+  - calc_troyon_limit
+  used_by: []
+two_point_model_error_nonconverged_error:
+  default_units: null
+  description:
+  - Indicates whether the two-point-model should raise an error or return NaN if its
+    iterative solver does not converge.
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+vertical_field_mutual_inductance:
+  default_units: dimensionless
+  description:
+  - This unitless mutual-inductance quantity provides the coupling between the plasma
+    surface and the vertical magnetic field.
+  set_by:
+  - calc_vertical_field_mutual_inductance
+  used_by:
+  - calc_poloidal_field_flux
+vertical_magnetic_field:
+  default_units: tesla
+  description:
+  - Vertical magnetic field derived from the necessary force to balance the hoop force
+    :math:`B_V`
+  set_by:
+  - calc_vertical_magnetic_field
+  used_by:
+  - calc_poloidal_field_flux
+vertical_magnetic_field_equation:
+  default_units: null
+  description:
+  - Which vertical magnetic field equation to select from :cite:`mit&taka`, :cite:`Barr_2018`,
+    :cite:`Jean`, :cite:`MFEF`
+  set_by: []
+  used_by:
+  - calc_vertical_magnetic_field
+vertical_minor_radius:
+  default_units: meter
+  description:
+  - Vertical minor radius of the plasma :math:`(Z_{max,LCFS}-Z_{min,LCFS})/2`
+  set_by:
+  - calc_vertical_minor_radius_from_elongation_and_minor_radius
+  used_by: []
+z_effective:
+  default_units: dimensionless
+  description:
+  - The "effective charge" of the ions, defined as :math:`\sum_j Z_j^2 n_j / n_e`.
+  set_by:
+  - calc_zeff_and_dilution_due_to_impurities
+  used_by:
+  - calc_bremsstrahlung_radiation
+  - calc_intrinsic_radiated_power_from_core
+  - calc_normalised_collisionality
+  - calc_alpha_t
+  - calc_edge_collisionality
+  - calc_bootstrap_fraction
+  - calc_neoclassical_loop_resistivity
+  - calc_current_relaxation_time
+  - calc_effective_collisionality
+  - calc_peaked_profiles
+  - calc_power_crossing_separatrix_in_electron_channel

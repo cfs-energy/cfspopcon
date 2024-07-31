@@ -1,0 +1,214 @@
+"""A simple tool to ensure consistency between the algorithms, default units and the physics glossary, with a CLI."""
+
+import re
+from importlib.resources import as_file, files
+from pathlib import Path
+
+import click
+import yaml
+from sys import exit
+
+from cfspopcon import Algorithm
+from cfspopcon.unit_handling import Quantity
+
+
+class KeyChecker:
+    """A class for comparing the keys in algorithms, default units and the physics glossary."""
+
+    def __init__(self) -> None:
+        """Read in the keys from the algorithms, default units and the physics glossary."""
+        self.glossary, self.glossary_keys = self.read_physics_glossary()
+        self.algorithm_keys = self.read_algorithm_keys()
+        self.variables_dict, self.variable_keys = self.read_variables_dict()
+
+    def read_physics_glossary(self) -> tuple[dict[str, list[str]], set[str]]:
+        """Read the physics glossary file."""
+        with as_file(files("cfspopcon").parents[0] / "docs" / "doc_sources" / "physics_glossary.rst") as filepath:  # type:ignore[attr-defined]
+            glossary_text = Path(filepath).read_text().splitlines()
+
+        # Find the length of the header
+        header_line = 0
+        for i, line in enumerate(glossary_text):
+            if ":sorted:" in line:
+                header_line = i
+                break
+        if header_line == 0:
+            raise RuntimeError("Header not found")
+        self._glossary_header = glossary_text[: header_line + 1]
+
+        # Define patterns for identifying blank lines, keys and descriptions.
+        pattern_for_key = re.compile(r"^\s{2}[^\s]")
+        pattern_for_description = re.compile(r"\s{4}[^\s]")
+        pattern_for_blank = re.compile(r"^\s*$")
+
+        # Store the results in a dictionary
+        glossary: dict[str, list[str]] = dict()
+
+        # Iterate over the glossary, ignoring the header lines
+        keys: list[str] = []
+        description: list[str] = []
+        for line in glossary_text[header_line + 1 :]:
+            line_is_blank = pattern_for_blank.match(line)
+            line_is_key = pattern_for_key.match(line)
+            line_is_description = pattern_for_description.match(line)
+
+            if not (line_is_key or line_is_description):
+                # Blank lines indicate new entry
+                assert line_is_blank, f"Line didn't match format for key or description, and wasn't blank. Line was: '{line}'"
+
+                if keys or description:
+                    if len(keys) > 1:
+                        raise RuntimeError(f"Multiple keys for entry: ({keys}). This must be fixed before proceeding.")
+                    if len(keys) == 0:
+                        raise RuntimeError(f"No key for description '{description}'.")
+                    glossary[keys[0]] = description
+
+                keys = []
+                description = []
+
+            if line_is_key:
+                keys.append(line.strip())
+
+            if line_is_description:
+                description.append(line.strip())
+
+        if keys or description:
+            if len(keys) > 1:
+                raise RuntimeError(f"Multiple keys for entry: ({keys}). This must be fixed before proceeding.")
+            glossary[keys[0]] = description
+
+        return glossary, set(glossary.keys())
+
+    def read_algorithm_keys(self) -> set[str]:
+        """Read the algorithm keys."""
+        algorithm_keys: set[str] = set()
+        for alg in Algorithm.instances.values():
+            algorithm_keys.update(alg.input_keys)
+            algorithm_keys.update(alg.return_keys)
+
+        return algorithm_keys
+
+    def read_variables_dict(self) -> set[str]:
+        """Read the variables dictionary file."""
+        with as_file(files("cfspopcon").joinpath("variables.yaml")) as filepath:
+            with open(filepath) as f:
+                variables_dict = yaml.safe_load(f)
+
+        return variables_dict, set(variables_dict.keys())
+
+    def run(self, apply_changes: bool = True) -> None:
+        """Check the files and, if apply_changes = True, modify the files in place."""
+        success = True
+
+        unused_variable_keys = self.variable_keys - self.algorithm_keys
+        unlisted_args = self.algorithm_keys - self.variable_keys
+
+        extra_glossary_keys = (self.glossary_keys - self.variable_keys) - unlisted_args
+        undocumented_args = (self.variable_keys - self.glossary_keys) - unused_variable_keys
+
+        if len(unused_variable_keys):
+            print(
+                f"\nThe following keys in the variables dictionary are not used by any algorithm and will be removed:\n{'\n'.join(list(unused_variable_keys))}\n"
+            )
+
+        if len(unlisted_args):
+            print(
+                f"\nThe following Algorithm input/output keys are not defined in the variables dictionary and will be added:\n{'\n'.join(list(unlisted_args))}\n"
+            )
+
+        if len(extra_glossary_keys):
+            print(
+                f"\nThe following keys in the glossary are not in the variables dictionary and will be removed:\n{'\n'.join(list(extra_glossary_keys))}\n"
+            )
+
+        if len(undocumented_args):
+            print(
+                f"\nThe following keys in the variables dictionary are not defined in the glossary and will be added:\n{'\n'.join(list(undocumented_args))}\n"
+            )
+
+        if len(unused_variable_keys) or len(unlisted_args) or len(extra_glossary_keys) or len(undocumented_args):
+            success = False
+
+        if not apply_changes:
+            exit(0) if success else exit(1)
+
+        new_variables_dict = dict()
+        for key in sorted((self.variable_keys - unused_variable_keys) | unlisted_args, key=str.lower):
+            used_by = []
+            set_by = []
+
+            for alg in Algorithm.instances.values():
+                if key in alg.input_keys:
+                    used_by.append(alg._name)
+                if key in alg.return_keys:
+                    set_by.append(alg._name)
+
+            if key in self.variables_dict:
+                default_units = self.variables_dict[key]["default_units"]
+                if default_units is not None:
+                    default_units = str(Quantity(1.0, default_units).units)
+                description = self.variables_dict[key]["description"]
+                if key not in self.glossary:
+                    print(f"Adding description for '{key}'.\nNew: '{description}'.\n")
+                elif not (description == self.glossary[key]):
+                    print(f"Description changing for '{key}'.\nFrom: '{self.glossary[key]}'\nTo: '{description}'.\n")
+                    success = False
+            else:
+                default_units = None
+                description = ["UNKNOWN. Please add a description and default units for this variable."]
+
+            new_variables_dict[key] = dict(
+                default_units=default_units,
+                description=description,
+                set_by=set_by,
+                used_by=used_by,
+            )
+
+        with as_file(files("cfspopcon").joinpath("variables.yaml")) as filepath:
+            with open(filepath, "w") as f:
+                yaml.safe_dump(new_variables_dict, f, sort_keys=False)
+
+        unknown_entries = False
+        for entry in new_variables_dict.values():
+            for description_line in entry["description"]:
+                if "UNKNOWN" in description_line:
+                    unknown_entries = True
+
+        if unknown_entries:
+            print("Description has 'UNKNOWN' variables.yaml. Skipping glossary update.")
+            success = False
+        else:
+            glossary_text = [
+                ".. _physics_glossary:",
+                "..",
+                "  Automatically generated by KeyChecker based on variables.yaml. Do not edit this file by hand!" "",
+                "",
+                "Physics Glossary",
+                "==================",
+                "",
+                ".. glossary::",
+                "  :sorted:",
+            ]
+            for key in new_variables_dict.keys():
+                description = new_variables_dict[key]["description"]
+                glossary_text += [""]
+                glossary_text += [f"  {key}"]
+                for line in description:
+                    glossary_text += [f"    {line}"]
+
+                with as_file(files("cfspopcon").parents[0] / "docs" / "doc_sources" / "physics_glossary.rst") as filepath:  # type:ignore[attr-defined]
+                    filepath.write_text("\n".join(glossary_text))
+
+        exit(0) if success else exit(1)
+
+
+@click.command()
+@click.option("--run", is_flag=True, help="Modifies the checked files in-place.")
+def check_variables_cli(run: bool) -> None:
+    """Check whether the Algorithm keys, the default_units file and the physics_glossary file are consistent."""
+    key_checker = KeyChecker()
+    key_checker.run(apply_changes=run)
+
+
+if __name__ == "__main__":
+    check_variables_cli()

@@ -19,7 +19,7 @@ def calc_density_peaking(effective_collisionality: Unitfull, beta_toroidal: Unit
         nu_noffset: scalar offset added to peaking factor [~]
 
     Returns:
-        :term:`nu_n` [~]
+        nu_n [~]
     """
     nu_n = (1.347 - 0.117 * np.log(effective_collisionality) - 4.03 * beta_toroidal) + nu_noffset
     if isinstance(nu_n, xr.DataArray):

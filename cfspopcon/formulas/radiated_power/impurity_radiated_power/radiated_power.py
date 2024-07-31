@@ -3,6 +3,7 @@
 import numpy as np
 import xarray as xr
 
+from ....algorithm_class import Algorithm
 from ....named_options import RadiationMethod
 from ....unit_handling import Unitfull, ureg
 from ...atomic_data import AtomicData
@@ -12,6 +13,7 @@ from .post_and_jensen import calc_impurity_radiated_power_post_and_jensen
 from .radas import calc_impurity_radiated_power_radas
 
 
+@Algorithm.register_algorithm(return_keys=["P_rad_impurity"])
 def calc_impurity_radiated_power(
     radiated_power_method: RadiationMethod,
     rho: Unitfull,
@@ -48,7 +50,7 @@ def calc_impurity_radiated_power(
     elif radiated_power_method == RadiationMethod.MavrinCoronal:
         P_rad_impurity = calc_impurity_radiated_power_mavrin_coronal(**P_rad_kwargs)
     elif radiated_power_method == RadiationMethod.MavrinNoncoronal:
-        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(**P_rad_kwargs, tau_i=np.inf * ureg.s)
+        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(**P_rad_kwargs, impurity_residence_time=np.inf * ureg.s)
     elif radiated_power_method == RadiationMethod.Radas:
         P_rad_impurity = calc_impurity_radiated_power_radas(**P_rad_kwargs, atomic_data=atomic_data)
     else:
