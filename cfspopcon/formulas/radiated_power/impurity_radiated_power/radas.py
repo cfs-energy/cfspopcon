@@ -6,8 +6,8 @@ from numpy.typing import NDArray
 
 from ....named_options import AtomicSpecies
 from ....unit_handling import ureg, wraps_ufunc
+from ...atomic_data import AtomicData
 from ...geometry.volume_integral import integrate_profile_over_volume
-from ...read_atomic_data import AtomicData
 
 
 @wraps_ufunc(

@@ -54,17 +54,13 @@ Scrape Off Layer
 --------------------
 .. automodule:: cfspopcon.formulas.scrape_off_layer
 
-Seeded Radiators
---------------------
-.. automodule:: cfspopcon.formulas.seeded_radiators
-
-Z_eff & Dilution from Impurities
----------------------------------
-.. automodule:: cfspopcon.formulas.zeff_and_dilution
+Impurity seeding, dilution and Z-effective
+-------------------------------------------
+.. automodule:: cfspopcon.formulas.impurities
 
 Atomic Data
 ---------------------------------
-.. automodule:: cfspopcon.formulas.read_atomic_data
+.. automodule:: cfspopcon.formulas.atomic_data
 
 Algorithms
 =====================

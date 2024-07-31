@@ -1,10 +1,36 @@
 """Calculate the mean charge state of an impurity for given plasma conditions."""
 
 import numpy as np
+import xarray as xr
 
+from ...algorithm_class import Algorithm
 from ...named_options import AtomicSpecies
-from ...unit_handling import ureg, wraps_ufunc
-from ..read_atomic_data import AtomicData
+from ...unit_handling import Unitfull, ureg, wraps_ufunc
+from ..atomic_data import AtomicData
+
+
+@Algorithm.register_algorithm(return_keys=["impurity_charge_state"])
+def calc_impurity_charge_state(
+    average_electron_density: Unitfull,
+    average_electron_temp: Unitfull,
+    impurity_concentration: xr.DataArray,
+    atomic_data: xr.DataArray,
+) -> Unitfull:
+    """Calculate the impurity charge state for each species in impurity_concentration.
+
+    Args:
+        average_electron_density: :term:`glossary link<average_electron_density>`
+        average_electron_temp: :term:`glossary link<average_electron_temp>`
+        impurity_concentration: :term:`glossary link<impurity_concentration>`
+        atomic_data: :term:`glossary link<atomic_data>`
+
+    Returns:
+        :term:`impurity_charge_state`
+    """
+    if isinstance(atomic_data, xr.DataArray):
+        atomic_data = atomic_data.item()
+
+    return _calc_impurity_charge_state(average_electron_density, average_electron_temp, impurity_concentration.dim_species, atomic_data)
 
 
 @wraps_ufunc(
@@ -17,7 +43,7 @@ from ..read_atomic_data import AtomicData
     ),
     pass_as_kwargs=("atomic_data",),
 )
-def calc_impurity_charge_state(
+def _calc_impurity_charge_state(
     average_electron_density: float,
     average_electron_temp: float,
     impurity_species: AtomicSpecies,

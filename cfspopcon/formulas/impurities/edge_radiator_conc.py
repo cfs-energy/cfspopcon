@@ -7,17 +7,17 @@ import xarray as xr
 from scipy.interpolate import InterpolatedUnivariateSpline  # type:ignore[import-untyped]
 
 from ...algorithm_class import Algorithm
-from ...helpers import extend_impurities_array
 from ...named_options import AtomicSpecies
 from ...unit_handling import Unitfull, convert_units, magnitude, ureg, wraps_ufunc
-from ..read_atomic_data import AtomicData
+from ..atomic_data import AtomicData
+from .impurity_array_helpers import extend_impurity_concentration_array
 
 
 @Algorithm.register_algorithm(
     return_keys=[
         "edge_impurity_concentration",
         "edge_impurity_concentration_in_core",
-        "impurities",
+        "impurity_concentration",
     ]
 )
 def calc_edge_impurity_concentration(
@@ -30,7 +30,7 @@ def calc_edge_impurity_concentration(
     kappa_e0: Unitfull,
     lengyel_overestimation_factor: Unitfull,
     edge_impurity_enrichment: Unitfull,
-    impurities: xr.DataArray,
+    impurity_concentration: xr.DataArray,
     atomic_data: xr.DataArray,
     reference_electron_density: Unitfull = 1.0 * ureg.n20,
     reference_ne_tau: Unitfull = 1.0 * ureg.n20 * ureg.ms,
@@ -47,7 +47,7 @@ def calc_edge_impurity_concentration(
         separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
         separatrix_electron_density: :term:`glossary link<separatrix_electron_density>`
         kappa_e0: :term:`glossary link<kappa_e0>`
-        impurities: :term:`glossary link<impurities>`
+        impurity_concentration: :term:`glossary link<impurity_concentration>`
         lengyel_overestimation_factor: :term:`glossary link<lengyel_overestimation_factor>`
         edge_impurity_enrichment: :term:`glossary link<edge_impurity_enrichment>`
         atomic_data: :term:`glossary link<atomic_data>`
@@ -62,7 +62,7 @@ def calc_edge_impurity_concentration(
         reference_ne_tau=reference_ne_tau,
     )
 
-    edge_impurity_concentration = calc_required_edge_impurity_concentration(
+    edge_impurity_concentration = calc_edge_impurity_concentration_from_lengyel(
         L_int_integrator=L_int_integrator,
         q_parallel=q_parallel,
         SOL_power_loss_fraction=SOL_power_loss_fraction,
@@ -74,9 +74,11 @@ def calc_edge_impurity_concentration(
     )
 
     edge_impurity_concentration_in_core = edge_impurity_concentration / edge_impurity_enrichment
-    impurities = extend_impurities_array(impurities, edge_impurity_species, edge_impurity_concentration_in_core)
+    impurity_concentration = extend_impurity_concentration_array(
+        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core
+    )
 
-    return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurities)
+    return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurity_concentration)
 
 
 def build_L_int_integrator(
@@ -126,7 +128,7 @@ def build_L_int_integrator(
     return L_int_integrator
 
 
-def calc_required_edge_impurity_concentration(
+def calc_edge_impurity_concentration_from_lengyel(
     L_int_integrator: Callable[[Unitfull, Unitfull], Unitfull],
     q_parallel: Unitfull,
     SOL_power_loss_fraction: Unitfull,

@@ -23,7 +23,7 @@ def calc_instrinsic_radiated_power_from_core(
     separatrix_elongation: Unitfull,
     radiated_power_method: named_options.RadiationMethod,
     radiated_power_scalar: Unitfull,
-    impurities: xr.DataArray,
+    impurity_concentration: xr.DataArray,
     atomic_data: xr.DataArray,
 ) -> Unitfull:
     """Calculate the power radiated from the confined region due to the fuel and impurity species.
@@ -40,7 +40,7 @@ def calc_instrinsic_radiated_power_from_core(
         separatrix_elongation: :term:`glossary link<separatrix_elongation>`
         radiated_power_method: :term:`glossary link<radiated_power_method>`
         radiated_power_scalar: :term:`glossary link<radiated_power_scalar>`
-        impurities: :term:`glossary link<impurities>`
+        impurity_concentration: :term:`glossary link<impurity_concentration>`
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
@@ -71,7 +71,7 @@ def calc_instrinsic_radiated_power_from_core(
             rho=rho,
             electron_temp_profile=electron_temp_profile,
             electron_density_profile=electron_density_profile,
-            impurities=impurities,
+            impurity_concentration=impurity_concentration,
             plasma_volume=plasma_volume,
             atomic_data=atomic_data.item(),
         )

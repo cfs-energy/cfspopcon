@@ -30,9 +30,7 @@ Physics Glossary
   P_radiation
     Power radiated from the confined region due to Bremmsstrahlung, synchrotron and impurity excitation-relaxation processes.
 
-  P_radiated_by_core_radiator
-    Power radiated from the confined region due to the injection of an :term:`extrinsic<extrinsic impurity>` core radiator.
-
+  seed impurity
   extrinsic impurity
     An impurity which has intentionally been injected into the plasma to enhance radiative power dissipation.
 
@@ -138,6 +136,9 @@ Physics Glossary
 
   impurity_concentration
     Concentration of a non-fuel atomic species relative to the electron density :math:`c_Z = n_Z / n_e`.
+  
+  intrinsic_impurity_concentration
+    Concentration of :term:`intrinsic impurity` species, relative to the electron density :math:`c_Z = n_Z / n_e`.
 
   impurity_charge_state
     The mean charge state of a non-fuel species.
@@ -154,14 +155,8 @@ Physics Glossary
   dilution
     Fuel-species concentration as a fraction of the electron density :math:`n_{DT}/n_e`.
 
-  core_radiator
+  core_impurity_species
     An :class:`~cfspopcon.named_options.AtomicSpecies` indicating which :term:`extrinsic<extrinsic impurity>` core radiator species should be injected into the confined region to enhance the core radiated power.
-
-  core_radiator_charge_state
-    Charge state of the :term:`extrinsic<extrinsic impurity>` core radiator.
-
-  core_radiator_concentration
-    Concentration of the :term:`extrinsic<extrinsic impurity>` core radiator required to achieve the desired core radiated power fraction, relative to the electron density :math:`c_{core} = n_{core}/n_e`.
 
   mean_ion_charge_state
     Mean charge state of the ions (:math:`n_e / \sum_j n_j`)
@@ -332,12 +327,6 @@ Physics Glossary
 
   radiated_power_scalar
     An enhancement factor :math:`C` to modify the radiated power :math:`P_{rad} = C P_{rad,calculated}`.
-
-  zeff_change_from_core_rad
-    Change in :term:`z_effective` due to the injection of a core radiator.
-
-  dilution_change_from_core_rad
-    Change in :term:`dilution` due to the injection of a core radiator.
 
   fuel_ion_density_profile
     A 1D profile of the fuel ion density as a function of :math:`\rho_{pol}`.
@@ -525,3 +514,20 @@ Physics Glossary
   greenwald_density_limit
     The highest volume-averaged density which can be achieved before a density-limit disruption is triggered.
   
+  min_P_radiation
+    Minimum amount of radiated power. If the intrinsic radiated power is less than this, a core radiator will be injected to reach this level.
+
+  P_radiation_from_core_seeded_impurity
+    How much power (if any) is radiated from the core radiator.
+  
+  core_seeded_impurity_concentration
+    What is the concentration of the core radiator required to reach the required level of radiated power.
+  
+  maximum_P_LH_factor_for_P_SOL
+    If :term:`power_crossing_separatrix` is more than this factor times the LH threshold, the extra power will be radiated using a core radiator.
+  
+  change_in_zeff
+    Change in :term:`z_effective` due to each species.
+  
+  change_in_dilution
+    Change in :term:`dilution` due to each species.

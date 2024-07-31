@@ -4,6 +4,7 @@ algorithms:
   # and temperature, which defines a stored energy stored_energy. From this,
   # we can compute P_in from stored_energy and a tau_e scaling.
   - read_atomic_data
+  - set_up_impurity_concentration_array
   - calc_separatrix_elongation_from_areal_elongation
   - calc_separatrix_triangularity_from_triangularity95
   - calc_minor_radius_from_inverse_aspect_ratio
@@ -36,9 +37,12 @@ algorithms:
   # increase the power radiated from the core. This increases
   # the fuel dilution and Zeff (computed), as well as degrading
   # core confinement (not yet computed).
-  - calc_extrinsic_core_radiator
+  - calc_min_P_radiation_from_fraction
+  - calc_P_radiation_from_core_seeded_impurity
+  - calc_core_seeded_impurity_concentration
   # We then recompute the profiles with the dilution due to the
   # core radiator and recompute the profiles.
+  - calc_zeff_and_dilution_due_to_impurities
   - calc_peaked_profiles
   # Calculate the fusion power and gain.
   - calc_fusion_power
@@ -88,6 +92,7 @@ algorithms:
   - calc_separatrix_electron_density
   - two_point_model_fixed_tet
   - calc_edge_impurity_concentration
+  - calc_impurity_charge_state
   # Finally, we calculate several parameters which aren't used in other
   # calculations, but which are useful for characterizing operational
   # points. These can be used later when masking inaccessible operational
@@ -193,13 +198,13 @@ radiated_power_scalar: 1.0
 minimum_core_radiated_fraction: 0.0
 radas_dir: "WORKING_DIR/radas_dir"
 
-impurities:
+intrinsic_impurity_concentration:
   # Impurity concentration relative to electron density.
   Tungsten: 1.5e-5
   Helium: 6.0e-2
   Oxygen: 3.1e-3
 
-core_radiator: Xenon
+core_impurity_species: Xenon
 
 # Inputs for two-point-model
 # Ratio of separatrix to average density
