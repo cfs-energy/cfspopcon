@@ -73,6 +73,10 @@ markers = [
     "cli: marks tests as testing the command-line-interface (deselect with '-m \"not cli\"')",
     "regression: marks tests as checking the regression result (deselect with '-m \"not regression\"')",
 ]
+filterwarnings = [
+  "error",
+  "ignore:numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject"
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

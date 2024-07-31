@@ -5,7 +5,6 @@ from importlib.resources import as_file, files
 from numbers import Number
 from pathlib import Path
 from typing import Any, Optional, Union, overload
-from warnings import warn
 
 import numpy as np
 import xarray as xr
@@ -22,11 +21,12 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
         try:
             Quantity(1.0, units)
         except UndefinedUnitError:  # noqa: PERF203
-            warn(f"Undefined units '{units}' for '{key}", stacklevel=3)
-            invalid_units.append(units)
+            invalid_units.append((key, units))
 
     if invalid_units:
-        raise UndefinedUnitError(invalid_units)  # type:ignore[arg-type]
+        msg = "The following units are not recognized:\n"
+        msg += "\n".join([f"{key}: {units}" for key, units in invalid_units])
+        raise ValueError(msg)
 
 
 def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
