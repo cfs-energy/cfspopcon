@@ -8,7 +8,6 @@ def test_read_default_units():
     read_default_units_from_file()
 
 
-@pytest.mark.filterwarnings("ignore:Undefined units")
 def test_check_units_are_valid():
     valid_dict = dict(value="metres", value2="kg", value3=ureg.eV, value4=ureg.n19)
 

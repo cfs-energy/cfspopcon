@@ -5,7 +5,6 @@ from importlib.resources import as_file, files
 from numbers import Number
 from pathlib import Path
 from typing import Any, Optional, Union, overload
-from warnings import warn
 
 import numpy as np
 import xarray as xr
@@ -18,11 +17,10 @@ from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
 def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
     """Ensure that all units in units_dictionary are valid."""
     invalid_units = []
-    for key, units in units_dictionary.items():
+    for units in units_dictionary.values():
         try:
             Quantity(1.0, units)
         except UndefinedUnitError:  # noqa: PERF203
-            warn(f"Undefined units '{units}' for '{key}", stacklevel=3)
             invalid_units.append(units)
 
     if invalid_units:
