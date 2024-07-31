@@ -2,6 +2,7 @@
 # Run this script from the repository directory.
 """CLI for cfspopcon."""
 
+import warnings
 from pathlib import Path
 
 import click
@@ -11,13 +12,15 @@ import xarray as xr
 from cfspopcon import file_io
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.plotting import make_plot, read_plot_style
+from cfspopcon.unit_handling import UnitStrippedWarning
 
 
 @click.command()
 @click.argument("case", type=click.Path(exists=True))
 @click.option("--dict", "-d", "kwargs", type=(str, str), multiple=True, help="Command-line arguments, takes precedence over config.")
 @click.option("--show", is_flag=True, help="Display an interactive figure of the result.")
-def run_popcon_cli(case: str, show: bool, kwargs: tuple[tuple[str, str]]) -> None:
+@click.option("--debug", is_flag=True, help="Enable the ipdb exception catcher. (Development helper)", hidden=True)
+def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, str]]) -> None:
     """Run POPCON from the command line.
 
     This function uses "Click" to develop the command line interface. You can execute it using
@@ -25,7 +28,19 @@ def run_popcon_cli(case: str, show: bool, kwargs: tuple[tuple[str, str]]) -> Non
     """
     cli_args: dict[str, str] = dict(kwargs)
 
-    run_popcon(case, show, cli_args)
+    if debug:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", category=UnitStrippedWarning)
+            try:
+                # if ipdb is installed we use it to catch exceptions during development
+                from ipdb import launch_ipdb_on_exception  # type:ignore[import-untyped]
+
+                with launch_ipdb_on_exception():
+                    run_popcon(case, show, cli_args)
+            except ModuleNotFoundError:
+                run_popcon(case, show, cli_args)
+    else:
+        run_popcon(case, show, cli_args)
 
 
 @click.command()
