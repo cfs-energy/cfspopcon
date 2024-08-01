@@ -127,7 +127,7 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
         From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
         """
 
-        __repr__ = staticmethod(lambda x: f"{x:#.10g}")
+        __repr__ = staticmethod(lambda x: f"{x:#.10g}")  # type:ignore[assignment,unused-ignore]
 
     json.encoder.c_make_encoder = None  # type:ignore[attr-defined]
     json.encoder.float = RoundingFloat  # type:ignore[attr-defined]
