@@ -38,8 +38,8 @@ class VariableConsistencyChecker:
         self._glossary_header = glossary_text[: header_line + 1]
 
         # Define patterns for identifying blank lines, keys and descriptions.
-        pattern_for_key = re.compile(r"^\s{2}[^\s]")
-        pattern_for_description = re.compile(r"\s{4}[^\s]")
+        pattern_for_key = re.compile(r"^\s{2}\S+\s*$")
+        pattern_for_description = re.compile(r"^\s{4}\S.+")
         pattern_for_blank = re.compile(r"^\s*$")
 
         # Store the results in a dictionary
