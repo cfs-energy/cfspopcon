@@ -3,8 +3,7 @@
 from collections.abc import Iterable
 from importlib.resources import as_file, files
 from numbers import Number
-from pathlib import Path
-from typing import Any, Optional, Union, overload
+from typing import Any, Union, overload
 
 import numpy as np
 import xarray as xr
@@ -29,20 +28,12 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
         raise ValueError(msg)
 
 
-def read_default_units_from_file(filepath: Optional[Path] = None) -> None:
-    """Read in a units YAML file and add the units to the registered default units map.
-
-    Args:
-        filepath: yaml file to read. If none, cfspopcon's variables.yaml is read.
-
-    """
-    if filepath is None:
-        with as_file(files("cfspopcon").joinpath("variables.yaml")) as fp:
-            with open(fp) as f:
-                variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(f)
-        units_dictionary = {key: value["default_units"] for key, value in variables_dictionary.items()}
-    else:
-        units_dictionary = yaml.safe_load(filepath.read_text())
+def read_default_units_from_file() -> None:
+    """Read in a units YAML file and add the units to the registered default units map."""
+    with as_file(files("cfspopcon").joinpath("variables.yaml")) as fp:
+        with open(fp) as f:
+            variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(f)
+    units_dictionary = {key: value["default_units"] for key, value in variables_dictionary.items()}
 
     check_units_are_valid(units_dictionary)
 
