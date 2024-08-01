@@ -1,6 +1,5 @@
 """Tools to generate and interface with regression results for testing."""
 
-from importlib.resources import as_file, files
 from pathlib import Path
 
 import click

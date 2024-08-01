@@ -3,10 +3,11 @@
 import re
 from importlib.resources import as_file, files
 from pathlib import Path
+from sys import exit
+from typing import Any
 
 import click
 import yaml
-from sys import exit
 
 from cfspopcon import Algorithm
 from cfspopcon.unit_handling import Quantity
@@ -47,6 +48,15 @@ class VariableConsistencyChecker:
         # Iterate over the glossary, ignoring the header lines
         keys: list[str] = []
         description: list[str] = []
+
+        def check_and_add_to_glossary(keys: list[str], description: list[str]) -> None:
+            if keys or description:
+                if len(keys) > 1:
+                    raise RuntimeError(f"Multiple keys for entry: ({keys}). This must be fixed before proceeding.")
+                if len(keys) == 0:
+                    raise RuntimeError(f"No key for description '{description}'.")
+                glossary[keys[0]] = description
+
         for line in glossary_text[header_line + 1 :]:
             line_is_blank = pattern_for_blank.match(line)
             line_is_key = pattern_for_key.match(line)
@@ -56,12 +66,7 @@ class VariableConsistencyChecker:
                 # Blank lines indicate new entry
                 assert line_is_blank, f"Line didn't match format for key or description, and wasn't blank. Line was: '{line}'"
 
-                if keys or description:
-                    if len(keys) > 1:
-                        raise RuntimeError(f"Multiple keys for entry: ({keys}). This must be fixed before proceeding.")
-                    if len(keys) == 0:
-                        raise RuntimeError(f"No key for description '{description}'.")
-                    glossary[keys[0]] = description
+                check_and_add_to_glossary(keys, description)
 
                 keys = []
                 description = []
@@ -72,10 +77,7 @@ class VariableConsistencyChecker:
             if line_is_description:
                 description.append(line.strip())
 
-        if keys or description:
-            if len(keys) > 1:
-                raise RuntimeError(f"Multiple keys for entry: ({keys}). This must be fixed before proceeding.")
-            glossary[keys[0]] = description
+        check_and_add_to_glossary(keys, description)
 
         return glossary, set(glossary.keys())
 
@@ -88,7 +90,7 @@ class VariableConsistencyChecker:
 
         return algorithm_keys
 
-    def read_variables_dict(self) -> set[str]:
+    def read_variables_dict(self) -> tuple[dict[str, dict[str, Any]], set[str]]:
         """Read the variables dictionary file."""
         with as_file(files("cfspopcon").joinpath("variables.yaml")) as filepath:
             with open(filepath) as f:
@@ -96,7 +98,7 @@ class VariableConsistencyChecker:
 
         return variables_dict, set(variables_dict.keys())
 
-    def run(self, apply_changes: bool = True) -> None:
+    def run(self, apply_changes: bool = True) -> None: # noqa: PLR0912, PLR0915
         """Check the files and, if apply_changes = True, modify the files in place."""
         success = True
 
@@ -133,16 +135,19 @@ class VariableConsistencyChecker:
         if not apply_changes:
             exit(0) if success else exit(1)
 
-        new_variables_dict = dict()
-        for key in sorted((self.variable_keys - unused_variable_keys) | unlisted_args, key=str.lower):
-            used_by = []
-            set_by = []
+        all_keys = sorted((self.variable_keys - unused_variable_keys) | unlisted_args, key=str.lower)
+        algs_using_variable: dict[str, list[str]] = {key: [] for key in all_keys}
+        algs_setting_variable: dict[str, list[str]] = {key: [] for key in all_keys}
+        for alg in Algorithm.instances.values():
+            for key in alg.input_keys:
+                algs_using_variable[key].append(alg._name) #type:ignore[arg-type]
+            for key in alg.return_keys:
+                algs_setting_variable[key].append(alg._name) #type:ignore[arg-type]
 
-            for alg in Algorithm.instances.values():
-                if key in alg.input_keys:
-                    used_by.append(alg._name)
-                if key in alg.return_keys:
-                    set_by.append(alg._name)
+        new_variables_dict = dict()
+        for key in all_keys:
+            used_by = algs_using_variable[key]
+            set_by = algs_setting_variable[key]
 
             if key in self.variables_dict:
                 default_units = self.variables_dict[key]["default_units"]
