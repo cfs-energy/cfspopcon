@@ -98,7 +98,7 @@ class VariableConsistencyChecker:
 
         return variables_dict, set(variables_dict.keys())
 
-    def run(self, apply_changes: bool = True) -> None: # noqa: PLR0912, PLR0915
+    def run(self, apply_changes: bool = True) -> None:  # noqa: PLR0912, PLR0915
         """Check the files and, if apply_changes = True, modify the files in place."""
         success = True
 
@@ -140,9 +140,9 @@ class VariableConsistencyChecker:
         algs_setting_variable: dict[str, list[str]] = {key: [] for key in all_keys}
         for alg in Algorithm.instances.values():
             for key in alg.input_keys:
-                algs_using_variable[key].append(alg._name) #type:ignore[arg-type]
+                algs_using_variable[key].append(alg._name)  # type:ignore[arg-type]
             for key in alg.return_keys:
-                algs_setting_variable[key].append(alg._name) #type:ignore[arg-type]
+                algs_setting_variable[key].append(alg._name)  # type:ignore[arg-type]
 
         new_variables_dict = dict()
         for key in all_keys:
