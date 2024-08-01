@@ -121,5 +121,16 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    class RoundingFloat(float):
+        """A formatter to control how floats are written to JSON.
+
+        From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
+        """
+
+        __repr__ = staticmethod(lambda x: f"{x:#.10g}")
+
+    json.encoder.c_make_encoder = None  # type:ignore[attr-defined]
+    json.encoder.float = RoundingFloat  # type:ignore[attr-defined]
+
     with open(output_dir / f"{point_key}.json", "w") as file:
         json.dump(point.to_dict(), file, indent=4, sort_keys=True)
