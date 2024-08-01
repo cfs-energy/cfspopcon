@@ -35,7 +35,7 @@ repos:
     hooks:
       - id: check_variables
         name: Check variables
-        entry: poetry run python tests/utils/key_checker.py --run
+        entry: poetry run python tests/utils/variable_consistency_checker.py --run
         language: system
         pass_filenames: false
         always_run: true
