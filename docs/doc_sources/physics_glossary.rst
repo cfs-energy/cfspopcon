@@ -137,6 +137,9 @@ Physics Glossary
   energy_confinement_scaling
     Which :math:`\tau_e` energy confinement scaling should be used. Should match a confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
 
+  energy_confinement_scaling_for_L_mode
+    Which :math:`\tau_e` energy confinement scaling should be used if :math:`P_{SOL} < P_{LH}`. Should match an L-mode confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
+
   energy_confinement_time
     A characteristic time which gives the rate at which the plasma loses energy. In steady-state, :math:`\tau_e=W_p / P_in`.
 

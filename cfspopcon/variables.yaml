@@ -20,6 +20,7 @@ areal_elongation:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_plasma_volume
   - calc_plasma_surface_area
   - calc_plasma_poloidal_circumference
@@ -58,6 +59,7 @@ average_electron_density:
   - calc_plasma_stored_energy
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_impurity_charge_state
   - calc_zeff_and_dilution_due_to_impurities
   - calc_normalised_collisionality
@@ -114,6 +116,7 @@ average_ion_mass:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_alpha_t
   - calc_edge_collisionality
   - calc_rho_star
@@ -257,6 +260,7 @@ confinement_time_scalar:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
 core_impurity_species:
   default_units: null
   description:
@@ -469,6 +473,14 @@ energy_confinement_scaling:
   set_by: []
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+energy_confinement_scaling_for_L_mode:
+  default_units: null
+  description:
+  - Which :math:`\tau_e` energy confinement scaling should be used if :math:`P_{SOL}
+    < P_{LH}`. Should match an L-mode confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
+  set_by: []
+  used_by:
+  - switch_to_L_mode_confinement_below_threshold
 energy_confinement_time:
   default_units: second
   description:
@@ -477,8 +489,10 @@ energy_confinement_time:
   set_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   used_by:
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_triple_product
 external_flux:
   default_units: weber
@@ -708,6 +722,7 @@ inverse_aspect_ratio:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_plasma_volume
   - calc_plasma_surface_area
   - calc_minor_radius_from_inverse_aspect_ratio
@@ -841,6 +856,7 @@ magnetic_field_on_axis:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
   - calc_PB_over_R
@@ -866,6 +882,7 @@ major_radius:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_plasma_volume
   - calc_plasma_surface_area
   - calc_minor_radius_from_inverse_aspect_ratio
@@ -1075,8 +1092,10 @@ P_in:
   set_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   used_by:
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_fusion_gain
   - calc_f_rad_core
   - require_P_rad_less_than_P_in
@@ -1260,6 +1279,7 @@ plasma_current:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_greenwald_density_limit
   - calc_inductive_plasma_current
   - calc_internal_flux
@@ -1284,6 +1304,7 @@ plasma_stored_energy:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
 plasma_volume:
   default_units: meter ** 3
   description:
@@ -1380,6 +1401,7 @@ q_star:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_normalised_collisionality
   - calc_PBpRnSq
   - calc_bootstrap_fraction
@@ -1417,7 +1439,8 @@ ratio_of_P_SOL_to_P_LH:
     power.
   set_by:
   - calc_ratio_P_LH
-  used_by: []
+  used_by:
+  - switch_to_L_mode_confinement_below_threshold
 ratio_of_P_SOL_to_P_LI:
   default_units: dimensionless
   description:
@@ -1541,6 +1564,7 @@ separatrix_elongation:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
@@ -1553,6 +1577,7 @@ separatrix_triangularity:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
 SepOS_density_limit:
   default_units: dimensionless
   description:
@@ -1763,6 +1788,7 @@ triangularity_psi95:
   used_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
+  - switch_to_L_mode_confinement_below_threshold
   - calc_separatrix_triangularity_from_triangularity95
   - calc_f_shaping_for_qstar
   - calc_cylindrical_edge_safety_factor
