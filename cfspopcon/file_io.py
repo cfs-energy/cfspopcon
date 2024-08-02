@@ -1,8 +1,14 @@
 """Functions for saving results to file and loading those files."""
 
 import json
+import sys
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Any, Literal
+
+if sys.version_info >= (3, 11, 0):
+    from typing import Self  # type:ignore[attr-defined,unused-ignore]
+else:
+    from typing_extensions import Self  # type:ignore[attr-defined,unused-ignore]
 
 import numpy as np
 import xarray as xr
