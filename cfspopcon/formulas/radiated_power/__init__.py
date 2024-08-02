@@ -12,7 +12,7 @@ from .impurity_radiated_power import (
     calc_impurity_radiated_power_post_and_jensen,
     calc_impurity_radiated_power_radas,
 )
-from .instrinsic_radiated_power_from_core import calc_instrinsic_radiated_power_from_core
+from .intrinsic_radiated_power_from_core import calc_intrinsic_radiated_power_from_core
 from .synchrotron import calc_synchrotron_radiation
 
 __all__ = [
@@ -25,6 +25,6 @@ __all__ = [
     "calc_impurity_radiated_power_mavrin_noncoronal",
     "calc_impurity_radiated_power_post_and_jensen",
     "calc_impurity_radiated_power_radas",
-    "calc_instrinsic_radiated_power_from_core",
+    "calc_intrinsic_radiated_power_from_core",
     "calc_synchrotron_radiation",
 ]

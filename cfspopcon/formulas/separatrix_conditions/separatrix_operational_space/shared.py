@@ -53,12 +53,12 @@ def calc_electron_beta(electron_density: Unitfull, electron_temp: Unitfull, magn
     return 2.0 * ureg.mu_0 * electron_density * electron_temp / magnetic_field_strength**2
 
 
-def calc_electron_to_ion_mass_ratio(ion_mass: Unitfull) -> Unitfull:
+def calc_electron_to_ion_mass_ratio(average_ion_mass: Unitfull) -> Unitfull:
     """Calculate the electron-to-ion mass ratio.
 
     Row 3, table 2 from :cite:`Eich_2021`
     """
-    return Quantity(1, ureg.electron_mass) / ion_mass
+    return Quantity(1, ureg.electron_mass) / average_ion_mass
 
 
 def calc_curvature_drive(perpendicular_decay_length: Unitfull, major_radius: Unitfull) -> Unitfull:
@@ -96,7 +96,7 @@ def calc_poloidal_sound_larmor_radius(
     triangularity_psi95: Unitfull,
     plasma_current: Unitfull,
     separatrix_electron_temp: Unitfull,
-    ion_mass: Unitfull,
+    average_ion_mass: Unitfull,
 ) -> Unitfull:
     """Calculate the poloidally-averaged sound Larmor radius (rho_s_pol).
 
@@ -108,7 +108,7 @@ def calc_poloidal_sound_larmor_radius(
         triangularity_psi95: :term:`glossary link<triangularity_psi95>`
         plasma_current: :term:`glossary link<plasma_current>`
         separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
-        ion_mass: :term:`glossary link<ion_mass>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
 
     Returns:
         :term:`poloidal_sound_larmor_radius`
@@ -118,7 +118,7 @@ def calc_poloidal_sound_larmor_radius(
     return calc_larmor_radius(
         species_temperature=separatrix_electron_temp,
         magnetic_field_strength=B_pol_avg,
-        species_mass=ion_mass,
+        species_mass=average_ion_mass,
     )
 
 

@@ -30,7 +30,7 @@ def _calc_beta_general(
         magnetic_field: magnetic field generating magnetic pressure [T]
 
     Returns:
-         beta (toroidal or poloidal) [~]
+        beta (toroidal or poloidal) [~]
     """
     mu_0 = Quantity(1, "mu_0")
     # to make the result dimensionless
@@ -103,7 +103,7 @@ def calc_beta_poloidal(
     return _calc_beta_general(average_electron_density, average_electron_temp, average_ion_temp, magnetic_field=B_pol)
 
 
-@Algorithm.register_algorithm(return_keys=["beta"])
+@Algorithm.register_algorithm(return_keys=["beta_total"])
 def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitfull:
     """Calculate the total beta from the toroidal and poloidal betas.
 
@@ -114,19 +114,21 @@ def calc_beta_total(beta_toroidal: Unitfull, beta_poloidal: Unitfull) -> Unitful
         beta_poloidal: [~] :term:`glossary link<beta_poloidal>`
 
     Returns:
-         :term:`beta` [~]
+         :term:`beta_total` [~]
     """
     return 1.0 / (1.0 / beta_toroidal + 1.0 / beta_poloidal)
 
 
 @Algorithm.register_algorithm(return_keys=["normalized_beta"])
-def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull) -> Unitfull:
+def calc_beta_normalized(
+    beta_total: Unitfull, minor_radius: Unitfull, magnetic_field_on_axis: Unitfull, plasma_current: Unitfull
+) -> Unitfull:
     """Normalize beta to stability (Troyon) parameters.
 
     See section 6.18 in Wesson :cite:`wesson_tokamaks_2011`.
 
     Args:
-        beta: plasma pressure normalized against toroidal B-on-axis [%]
+        beta_total: [~] :term:`glossary link<beta_total>`
         minor_radius: [m] :term:`glossary link<minor_radius>`
         magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
         plasma_current: [MA] :term:`glossary link<plasma_current>`
@@ -136,9 +138,9 @@ def calc_beta_normalized(beta: Unitfull, minor_radius: Unitfull, magnetic_field_
     """
     normalisation = plasma_current / (minor_radius * magnetic_field_on_axis)
 
-    beta_N = beta / normalisation
+    normalized_beta = beta_total / normalisation
 
-    return beta_N
+    return normalized_beta
 
 
 @Algorithm.register_algorithm(return_keys=["troyon_max_beta"])

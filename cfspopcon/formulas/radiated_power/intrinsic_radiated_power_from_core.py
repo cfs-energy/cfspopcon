@@ -11,7 +11,7 @@ from .synchrotron import calc_synchrotron_radiation
 
 
 @Algorithm.register_algorithm(return_keys=["P_radiation"])
-def calc_instrinsic_radiated_power_from_core(
+def calc_intrinsic_radiated_power_from_core(
     rho: Unitfull,
     electron_density_profile: Unitfull,
     electron_temp_profile: Unitfull,

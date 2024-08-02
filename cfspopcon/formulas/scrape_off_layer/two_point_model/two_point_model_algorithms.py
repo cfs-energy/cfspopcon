@@ -27,10 +27,10 @@ def two_point_model_fixed_fpow(
     average_electron_density: Unitfull,
     nesep_over_nebar: Unitfull,
     toroidal_flux_expansion: Unitfull,
-    fuel_average_mass_number: Unitfull,
+    average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
-    raise_error_if_not_converged: bool = False,
+    two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed power loss fraction in the SOL.
 
@@ -41,10 +41,10 @@ def two_point_model_fixed_fpow(
         average_electron_density: :term:`glossary link<average_electron_density>`
         nesep_over_nebar: :term:`glossary link<nesep_over_nebar>`
         toroidal_flux_expansion: :term:`glossary link<toroidal_flux_expansion>`
-        fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
-        raise_error_if_not_converged: Raise an error if solve does not converge
+        two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
         :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
@@ -60,10 +60,10 @@ def two_point_model_fixed_fpow(
         parallel_connection_length=parallel_connection_length,
         separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
-        fuel_average_mass_number=fuel_average_mass_number,
+        average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
-        raise_error_if_not_converged=raise_error_if_not_converged,
+        two_point_model_error_nonconverged_error=two_point_model_error_nonconverged_error,
     )
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
@@ -87,10 +87,10 @@ def two_point_model_fixed_qpart(
     average_electron_density: Unitfull,
     nesep_over_nebar: Unitfull,
     toroidal_flux_expansion: Unitfull,
-    fuel_average_mass_number: Unitfull,
+    average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
-    raise_error_if_not_converged: bool = False,
+    two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed parallel heat flux density reaching the target.
 
@@ -101,10 +101,10 @@ def two_point_model_fixed_qpart(
         average_electron_density: :term:`glossary link<average_electron_density>`
         nesep_over_nebar: :term:`glossary link<nesep_over_nebar>`
         toroidal_flux_expansion: :term:`glossary link<toroidal_flux_expansion>`
-        fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
-        raise_error_if_not_converged: Raise an error if solve does not converge
+        two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
         :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`,
@@ -123,10 +123,10 @@ def two_point_model_fixed_qpart(
         parallel_connection_length=parallel_connection_length,
         separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
-        fuel_average_mass_number=fuel_average_mass_number,
+        average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
-        raise_error_if_not_converged=raise_error_if_not_converged,
+        two_point_model_error_nonconverged_error=two_point_model_error_nonconverged_error,
     )
 
     return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
@@ -147,7 +147,7 @@ def two_point_model_fixed_tet(
     parallel_connection_length: Unitfull,
     separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
-    fuel_average_mass_number: Unitfull,
+    average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
 ) -> tuple[Unitfull, ...]:
@@ -160,7 +160,7 @@ def two_point_model_fixed_tet(
         average_electron_density: :term:`glossary link<average_electron_density>`
         separatrix_electron_density: :term:`glossary link<separatrix_electron_density>`
         toroidal_flux_expansion: :term:`glossary link<toroidal_flux_expansion>`
-        fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
 
@@ -178,7 +178,7 @@ def two_point_model_fixed_tet(
         parallel_connection_length=parallel_connection_length,
         separatrix_electron_density=separatrix_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
-        fuel_average_mass_number=fuel_average_mass_number,
+        average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
     )

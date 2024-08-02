@@ -54,17 +54,17 @@ class DTFusionBoschHale(FusionReaction):
 
         return sigmav
 
-    def calc_average_fuel_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
+    def calc_average_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
         """Calculate the average mass of the fuel ions.
 
         Args:
             heavier_fuel_species_fraction: n_heavier / (n_heavier + n_lighter) number fraction.
 
         Returns:
-            :term:`fuel_average_mass_number` [amu]
+            :term:`average_ion_mass` [amu]
         """
-        average_fuel_ion_mass = 2.0 * (1 - heavier_fuel_species_fraction) + 3.0 * heavier_fuel_species_fraction
-        return average_fuel_ion_mass * ureg.amu
+        average_ion_mass = 2.0 * (1 - heavier_fuel_species_fraction) + 3.0 * heavier_fuel_species_fraction
+        return average_ion_mass * ureg.amu
 
     def calc_energy_per_reaction(self) -> Unitfull:
         """Returns the total energy per reaction."""
@@ -191,11 +191,11 @@ class DDFusionBoschHale(FusionReaction):
         else:
             return sigmav_combined, sigmav_DD_to_pT, sigmav_DD_to_nHe3
 
-    def calc_average_fuel_ion_mass(self) -> Unitfull:
+    def calc_average_ion_mass(self) -> Unitfull:
         """Returns the average mass of the fuel ions.
 
         Returns:
-            :term:`fuel_average_mass_number` [amu]
+            :term:`average_ion_mass` [amu]
         """
         return 2.0 * ureg.amu
 
@@ -367,14 +367,14 @@ class DHe3Fusion(FusionReaction):
 
         return float(sigmav)
 
-    def calc_average_fuel_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
+    def calc_average_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
         """Calculate the average mass of the fuel ions.
 
         Args:
             heavier_fuel_species_fraction: n_heavier / (n_heavier + n_lighter) number fraction.
 
         Returns:
-            :term:`fuel_average_mass_number` [amu]
+            :term:`average_ion_mass` [amu]
         """
         average_fuel_ion_mass = 2.0 * (1 - heavier_fuel_species_fraction) + 3.0 * heavier_fuel_species_fraction
         return average_fuel_ion_mass * ureg.amu
@@ -492,14 +492,14 @@ class pB11Fusion(FusionReaction):
 
         return float(sigmav)
 
-    def calc_average_fuel_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
+    def calc_average_ion_mass(self, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
         """Calculate the average mass of the fuel ions.
 
         Args:
             heavier_fuel_species_fraction: n_heavier / (n_heavier + n_lighter) number fraction.
 
         Returns:
-            :term:`fuel_average_mass_number` [amu]
+            :term:`average_ion_mass` [amu]
         """
         average_fuel_ion_mass = 1.0 * (1 - heavier_fuel_species_fraction) + 11.0 * heavier_fuel_species_fraction
         return average_fuel_ion_mass * ureg.amu

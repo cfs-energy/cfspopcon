@@ -17,7 +17,6 @@ classifiers = [
 "License :: OSI Approved :: MIT License",
 ]
 
-
 [tool.poetry.scripts]
 popcon = 'cfspopcon.cli:run_popcon_cli'
 popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'

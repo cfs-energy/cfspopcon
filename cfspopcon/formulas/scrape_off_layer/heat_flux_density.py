@@ -56,7 +56,7 @@ def calc_fieldline_pitch_at_omp(B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull) 
 
 @Algorithm.register_algorithm(return_keys=["q_parallel"])
 def calc_parallel_heat_flux_density(
-    P_sol: Unitfull,
+    power_crossing_separatrix: Unitfull,
     fraction_of_P_SOL_to_divertor: Unitfull,
     major_radius: Unitfull,
     minor_radius: Unitfull,
@@ -73,7 +73,7 @@ def calc_parallel_heat_flux_density(
     5. We project this poloidal heat flux density into a parallel heat flux density by dividing by the field-line pitch
 
     Args:
-      P_sol: [MW] :term:`glossary link<P_sol>`
+      power_crossing_separatrix: [MW] :term:`glossary link<power_crossing_separatrix>`
       fraction_of_P_SOL_to_divertor: :term:`glossary link <fraction_of_P_SOL_to_divertor>`
       major_radius: [m] :term:`glossary link <major_radius>`
       minor_radius: [m] :term:`glossary link <minor_radius>`
@@ -84,15 +84,20 @@ def calc_parallel_heat_flux_density(
       q_parallel [GW/m^2]
     """
     upstream_major_radius = major_radius + minor_radius
-    return P_sol * fraction_of_P_SOL_to_divertor / (2.0 * np.pi * upstream_major_radius * lambda_q) * fieldline_pitch_at_omp
+    return (
+        power_crossing_separatrix
+        * fraction_of_P_SOL_to_divertor
+        / (2.0 * np.pi * upstream_major_radius * lambda_q)
+        * fieldline_pitch_at_omp
+    )
 
 
 @Algorithm.register_algorithm(return_keys=["q_perp"])
-def calc_q_perp(P_sol: Unitfull, major_radius: Unitfull, minor_radius: Unitfull, lambda_q: Unitfull) -> Unitfull:
+def calc_q_perp(power_crossing_separatrix: Unitfull, major_radius: Unitfull, minor_radius: Unitfull, lambda_q: Unitfull) -> Unitfull:
     """Calculate the perpendicular heat flux at the outboard midplane.
 
     Args:
-      P_sol: [MW] :term:`glossary link<P_sol>`
+      power_crossing_separatrix: [MW] :term:`glossary link<power_crossing_separatrix>`
       major_radius: [m] :term:`glossary link <major_radius>`
       minor_radius: [m] :term:`glossary link <minor_radius>`
       lambda_q: [mm] :term:`glossary link<lambda_q>`
@@ -100,4 +105,4 @@ def calc_q_perp(P_sol: Unitfull, major_radius: Unitfull, minor_radius: Unitfull,
     Returns:
       q_perp [MW/m^2]
     """
-    return P_sol / (2.0 * np.pi * (major_radius + minor_radius) * lambda_q)
+    return power_crossing_separatrix / (2.0 * np.pi * (major_radius + minor_radius) * lambda_q)

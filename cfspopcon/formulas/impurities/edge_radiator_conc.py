@@ -53,7 +53,7 @@ def calc_edge_impurity_concentration(
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
-        :term:`edge_impurity_concentration`
+        :term:`edge_impurity_concentration`, :term:`edge_impurity_concentration_in_core`, :term:`impurity_concentration`
     """
     L_int_integrator = build_L_int_integrator(
         atomic_data=atomic_data.item(),

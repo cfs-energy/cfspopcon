@@ -11,7 +11,7 @@ from ...unit_handling import ureg, wraps_ufunc
     input_units=dict(
         lambda_q_scaling=None,
         average_total_pressure=ureg.atm,
-        P_sol=ureg.megawatt,
+        power_crossing_separatrix=ureg.megawatt,
         major_radius=ureg.meter,
         B_pol_out_mid=ureg.tesla,
         inverse_aspect_ratio=ureg.dimensionless,
@@ -21,7 +21,7 @@ from ...unit_handling import ureg, wraps_ufunc
 def calc_lambda_q(
     lambda_q_scaling: LambdaQScaling,
     average_total_pressure: float,
-    P_sol: float,
+    power_crossing_separatrix: float,
     major_radius: float,
     B_pol_out_mid: float,
     inverse_aspect_ratio: float,
@@ -32,7 +32,7 @@ def calc_lambda_q(
     Args:
         lambda_q_scaling: :term:`glossary link<lambda_q_scaling>`
         average_total_pressure: [atm] :term:`glossary link <average_total_pressure>`
-        P_sol: [MW] :term:`glossary link<P_sol>`
+        power_crossing_separatrix: [MW] :term:`glossary link<power_crossing_separatrix>`
         major_radius: [m] :term:`glossary link<major_radius>`
         B_pol_out_mid: [T] :term:`glossary link<B_pol_out_mid>`
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
@@ -47,7 +47,9 @@ def calc_lambda_q(
         return lambda_q_factor * float(calc_lambda_q_with_eich_regression_14.unitless_func(B_pol_out_mid))
     elif lambda_q_scaling == LambdaQScaling.EichRegression15:
         return lambda_q_factor * float(
-            calc_lambda_q_with_eich_regression_15.unitless_func(P_sol, major_radius, B_pol_out_mid, inverse_aspect_ratio)
+            calc_lambda_q_with_eich_regression_15.unitless_func(
+                power_crossing_separatrix, major_radius, B_pol_out_mid, inverse_aspect_ratio
+            )
         )
     else:
         raise NotImplementedError(f"No implementation for lambda_q scaling {lambda_q_scaling}")
@@ -77,19 +79,21 @@ def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float) -> float:
 @wraps_ufunc(
     return_units=dict(lambda_q=ureg.millimeter),
     input_units=dict(
-        P_sol=ureg.megawatt,
+        power_crossing_separatrix=ureg.megawatt,
         major_radius=ureg.meter,
         B_pol_out_mid=ureg.tesla,
         inverse_aspect_ratio=ureg.dimensionless,
     ),
 )
-def calc_lambda_q_with_eich_regression_15(P_sol: float, major_radius: float, B_pol_out_mid: float, inverse_aspect_ratio: float) -> float:
+def calc_lambda_q_with_eich_regression_15(
+    power_crossing_separatrix: float, major_radius: float, B_pol_out_mid: float, inverse_aspect_ratio: float
+) -> float:
     """Return lambda_q according to Eich regression 15.
 
     #15 in Table 3 in :cite:`eich_scaling_2013`
     """
     lambda_q = 1.35 * major_radius**0.04 * B_pol_out_mid**-0.92 * inverse_aspect_ratio**0.42
-    if P_sol > 0:
-        return float(lambda_q * P_sol**-0.02)
+    if power_crossing_separatrix > 0:
+        return float(lambda_q * power_crossing_separatrix**-0.02)
     else:
         return float(lambda_q)

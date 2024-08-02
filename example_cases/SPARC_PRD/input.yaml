@@ -13,12 +13,12 @@ algorithms:
   - calc_plasma_surface_area
   - calc_f_shaping_for_qstar
   - calc_q_star_from_plasma_current
-  - calc_average_fuel_ion_mass
+  - calc_average_ion_mass
   - calc_average_ion_temp_from_temperature_ratio
   - calc_zeff_and_dilution_due_to_impurities
   - calc_plasma_stored_energy
   - read_confinement_scalings
-  - solve_tau_e_scaling_for_input_power
+  - solve_energy_confinement_scaling_for_input_power
   # Once we have P_in (=P_loss in steady-state), we want to split
   # it into components. For this, we need to estimate 1D plasma
   # profiles in the confined region.
@@ -30,7 +30,7 @@ algorithms:
   - calc_peaked_profiles
   # Once we have the profiles, we can then estimate the power
   # radiated from the confined region.
-  - calc_instrinsic_radiated_power_from_core
+  - calc_intrinsic_radiated_power_from_core
   - require_P_rad_less_than_P_in
   # To control the power crossing the separatrix, we can inject
   # a core radiator (high-Z species like Xenon) to intentionally
@@ -191,7 +191,7 @@ confinement_threshold_scalar: 1.0
 # Confinement enhancement factor
 confinement_time_scalar: 1.0
 # Name of the tau_e scaling used
-tau_e_scaling: ITER98y2
+energy_confinement_scaling: ITER98y2
 
 radiated_power_method: Radas
 radiated_power_scalar: 1.0

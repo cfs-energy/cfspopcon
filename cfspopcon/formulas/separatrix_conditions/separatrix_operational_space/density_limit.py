@@ -18,7 +18,7 @@ def calc_SepOS_L_mode_density_limit(
     separatrix_electron_temp: Unitfull,
     major_radius: Unitfull,
     magnetic_field_on_axis: Unitfull,
-    ion_mass: Unitfull,
+    average_ion_mass: Unitfull,
     critical_alpha_MHD: Unitfull,
     alpha_t: Unitfull,
 ) -> Unitfull:
@@ -34,7 +34,7 @@ def calc_SepOS_L_mode_density_limit(
         separatrix_electron_temp: :term:`glossary link<separatrix_electron_temp>`
         major_radius: :term:`glossary link<major_radius>`
         magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
-        ion_mass: :term:`glossary link<ion_mass>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         critical_alpha_MHD: :term:`glossary link<critical_alpha_MHD>`
         alpha_t: :term:`glossary link<alpha_t>`
 
@@ -47,7 +47,7 @@ def calc_SepOS_L_mode_density_limit(
     beta_e = calc_electron_beta(
         electron_density=separatrix_electron_density, electron_temp=separatrix_electron_temp, magnetic_field_strength=magnetic_field_on_axis
     )
-    mu = calc_electron_to_ion_mass_ratio(ion_mass=ion_mass)
+    mu = calc_electron_to_ion_mass_ratio(average_ion_mass=average_ion_mass)
 
     k_EM = calc_electromagnetic_wavenumber(beta_e=beta_e, mu=mu)
     k_RBM = calc_resistive_ballooning_wavenumber(critical_alpha_MHD=critical_alpha_MHD, alpha_t=alpha_t, omega_B=omega_B)

@@ -4,7 +4,7 @@ import xarray as xr
 
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull
-from .solve_for_input_power import solve_tau_e_scaling_for_input_power
+from .solve_for_input_power import solve_energy_confinement_scaling_for_input_power
 
 
 @Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in", "SOC_LOC_ratio"])
@@ -20,7 +20,7 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
     areal_elongation: Unitfull,
     separatrix_elongation: Unitfull,
     inverse_aspect_ratio: Unitfull,
-    fuel_average_mass_number: Unitfull,
+    average_ion_mass: Unitfull,
     triangularity_psi95: Unitfull,
     separatrix_triangularity: Unitfull,
     q_star: Unitfull,
@@ -39,7 +39,7 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
         areal_elongation: :term:`glossary link<areal_elongation>`
         separatrix_elongation: :term:`glossary link<separatrix_elongation>`
         inverse_aspect_ratio: :term:`glossary link<inverse_aspect_ratio>`
-        fuel_average_mass_number: :term:`glossary link<fuel_average_mass_number>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
         triangularity_psi95: :term:`glossary link<triangularity_psi95>`
         separatrix_triangularity: :term:`glossary link<separatrix_triangularity>`
         q_star: :term:`glossary link<q_star>`
@@ -47,7 +47,7 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
     Returns:
         :term:`energy_confinement_time`, :term:`P_in`, :term:`SOC_LOC_ratio`
     """
-    tau_e_LOC, P_in_LOC = solve_tau_e_scaling_for_input_power(
+    tau_e_LOC, P_in_LOC = solve_energy_confinement_scaling_for_input_power(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,
@@ -56,12 +56,12 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
         areal_elongation=areal_elongation,
         separatrix_elongation=separatrix_elongation,
         inverse_aspect_ratio=inverse_aspect_ratio,
-        fuel_average_mass_number=fuel_average_mass_number,
+        average_ion_mass=average_ion_mass,
         triangularity_psi95=triangularity_psi95,
         separatrix_triangularity=separatrix_triangularity,
         plasma_stored_energy=plasma_stored_energy,
         q_star=q_star,
-        tau_e_scaling="LOC",
+        energy_confinement_scaling="LOC",
     )
 
     # Use Linearized Ohmic Confinement if it gives worse energy confinement.

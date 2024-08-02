@@ -20,7 +20,7 @@ def calc_target_electron_temp(
 
 
 def calc_target_electron_temp_basic(
-    fuel_average_mass_number: Union[Quantity, xr.DataArray],
+    average_ion_mass: Union[Quantity, xr.DataArray],
     parallel_heat_flux_density: Union[Quantity, xr.DataArray],
     upstream_total_pressure: Union[Quantity, xr.DataArray],
     sheath_heat_transmission_factor: Union[float, xr.DataArray],
@@ -30,7 +30,7 @@ def calc_target_electron_temp_basic(
     From equation 24, :cite:`stangeby_2018`.
 
     Args:
-        fuel_average_mass_number: [amu]
+        average_ion_mass: [amu]
         parallel_heat_flux_density: [GW/m^2]
         upstream_total_pressure: [atm]
         sheath_heat_transmission_factor: [~]
@@ -38,9 +38,7 @@ def calc_target_electron_temp_basic(
     Returns:
         target_electron_temp_basic [eV]
     """
-    return (8.0 * fuel_average_mass_number / sheath_heat_transmission_factor**2) * (
-        parallel_heat_flux_density**2 / upstream_total_pressure**2
-    )
+    return (8.0 * average_ion_mass / sheath_heat_transmission_factor**2) * (parallel_heat_flux_density**2 / upstream_total_pressure**2)
 
 
 def calc_f_vol_loss_target_electron_temp(

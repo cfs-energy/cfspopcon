@@ -61,7 +61,7 @@ def minor_radius():
 
 
 @pytest.fixture()
-def ion_mass():
+def average_ion_mass():
     """Ion mass in amu."""
     return Quantity(2.0, ureg.amu)
 
@@ -125,7 +125,7 @@ def alpha_t(
     separatrix_electron_density,
     separatrix_electron_temp,
     major_radius,
-    ion_mass,
+    average_ion_mass,
     z_effective,
     mean_ion_charge,
     ion_to_electron_temp_ratio,
@@ -136,7 +136,7 @@ def alpha_t(
         separatrix_electron_temp=separatrix_electron_temp,
         cylindrical_safety_factor=cylindrical_safety_factor,
         major_radius=major_radius,
-        ion_mass=ion_mass,
+        average_ion_mass=average_ion_mass,
         z_effective=z_effective,
         mean_ion_charge_state=mean_ion_charge,
         ion_to_electron_temp_ratio=ion_to_electron_temp_ratio,
@@ -169,7 +169,7 @@ def poloidal_sound_larmor_radius(
     triangularity_psi95,
     plasma_current,
     separatrix_electron_temp,
-    ion_mass,
+    average_ion_mass,
 ):
     return sepos.calc_poloidal_sound_larmor_radius(
         minor_radius=minor_radius,
@@ -177,7 +177,7 @@ def poloidal_sound_larmor_radius(
         triangularity_psi95=triangularity_psi95,
         plasma_current=plasma_current,
         separatrix_electron_temp=separatrix_electron_temp,
-        ion_mass=ion_mass,
+        average_ion_mass=average_ion_mass,
     )
 
 
@@ -187,7 +187,7 @@ def L_mode_density_limit_condition(
     separatrix_electron_temp,
     major_radius,
     magnetic_field_on_axis,
-    ion_mass,
+    average_ion_mass,
     critical_alpha_MHD,
     alpha_t,
 ):
@@ -196,7 +196,7 @@ def L_mode_density_limit_condition(
         separatrix_electron_temp=separatrix_electron_temp,
         major_radius=major_radius,
         magnetic_field_on_axis=magnetic_field_on_axis,
-        ion_mass=ion_mass,
+        average_ion_mass=average_ion_mass,
         critical_alpha_MHD=critical_alpha_MHD,
         alpha_t=alpha_t,
     )
@@ -216,7 +216,7 @@ def LH_transition_condition(
     separatrix_electron_temp,
     major_radius,
     magnetic_field_on_axis,
-    ion_mass,
+    average_ion_mass,
     critical_alpha_MHD,
     alpha_t,
     poloidal_sound_larmor_radius,
@@ -226,7 +226,7 @@ def LH_transition_condition(
         separatrix_electron_temp=separatrix_electron_temp,
         major_radius=major_radius,
         magnetic_field_on_axis=magnetic_field_on_axis,
-        ion_mass=ion_mass,
+        average_ion_mass=average_ion_mass,
         critical_alpha_MHD=critical_alpha_MHD,
         alpha_t=alpha_t,
         poloidal_sound_larmor_radius=poloidal_sound_larmor_radius,

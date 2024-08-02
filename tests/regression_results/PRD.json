@@ -131,13 +131,6 @@
             "data": 0.0,
             "dims": []
         },
-        "P_sol": {
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 25.574170517921907,
-            "dims": []
-        },
         "Q": {
             "attrs": {
                 "units": "dimensionless"
@@ -185,6 +178,13 @@
             "data": 21.35814799897336,
             "dims": []
         },
+        "average_ion_mass": {
+            "attrs": {
+                "units": "unified_atomic_mass_unit"
+            },
+            "data": 2.5,
+            "dims": []
+        },
         "average_ion_temp": {
             "attrs": {
                 "units": "kiloelectron_volt"
@@ -199,13 +199,6 @@
             "data": 732028.9793275861,
             "dims": []
         },
-        "beta": {
-            "attrs": {
-                "units": "dimensionless"
-            },
-            "data": 0.011632527455851185,
-            "dims": []
-        },
         "beta_poloidal": {
             "attrs": {
                 "units": "dimensionless"
@@ -218,6 +211,13 @@
                 "units": "dimensionless"
             },
             "data": 0.012360853882996833,
+            "dims": []
+        },
+        "beta_total": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.011632527455851185,
             "dims": []
         },
         "bootstrap_fraction": {
@@ -511,6 +511,11 @@
             "data": 1.125,
             "dims": []
         },
+        "energy_confinement_scaling": {
+            "attrs": {},
+            "data": "ITER98y2",
+            "dims": []
+        },
         "energy_confinement_time": {
             "attrs": {
                 "units": "second"
@@ -565,13 +570,6 @@
                 "units": "dimensionless"
             },
             "data": 0.9,
-            "dims": []
-        },
-        "fuel_average_mass_number": {
-            "attrs": {
-                "units": "unified_atomic_mass_unit"
-            },
-            "data": 2.5,
             "dims": []
         },
         "fuel_ion_density_profile": {
@@ -1036,6 +1034,13 @@
             "data": 12.663930174827374,
             "dims": []
         },
+        "power_crossing_separatrix": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 25.574170517921907,
+            "dims": []
+        },
         "q_parallel": {
             "attrs": {
                 "units": "gigawatt / meter ** 2"
@@ -1237,11 +1242,6 @@
                 "units": "gigawatt / meter ** 2"
             },
             "data": 0.4128534409629226,
-            "dims": []
-        },
-        "tau_e_scaling": {
-            "attrs": {},
-            "data": "ITER98y2",
             "dims": []
         },
         "temp_profile_form": {

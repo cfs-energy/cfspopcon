@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pytest
 import xarray as xr
-from regression_results.generate_regression_results import (
+
+from utils.regression_results import (
     CASES_DIR,
     ALL_CASE_NAMES,
     ALL_CASE_PATHS,

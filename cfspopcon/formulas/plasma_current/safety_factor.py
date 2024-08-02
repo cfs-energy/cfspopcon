@@ -1,4 +1,4 @@
-"""Routines relating the plasma current to an analytical estimate of the 95% safety factor qstar."""
+"""Routines relating the plasma current to an analytical estimate of the 95% safety factor q_star."""
 
 import numpy as np
 
@@ -87,10 +87,12 @@ def calc_q_star_from_plasma_current(
         f_shaping: [~] :term:`glossary link<f_shaping>`
 
     Returns:
-        :term:`qstar` [~]
+        :term:`q_star` [~]
     """
-    qstar: float = 5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
-    return qstar
+    q_star: float = (
+        5.0 * (inverse_aspect_ratio * major_radius) ** 2.0 * magnetic_field_on_axis / (plasma_current * major_radius) * f_shaping
+    )
+    return q_star
 
 
 @Algorithm.register_algorithm(return_keys=["cylindrical_safety_factor"])

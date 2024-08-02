@@ -31,7 +31,7 @@ def solve_target_first_two_point_model(
     parallel_connection_length: Unitfull,
     separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
-    fuel_average_mass_number: Unitfull,
+    average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
     sheath_heat_transmission_factor: Unitfull = 7.5 * ureg.dimensionless,
@@ -51,7 +51,7 @@ def solve_target_first_two_point_model(
         parallel_connection_length: [m]
         separatrix_electron_density: [m^-3]
         toroidal_flux_expansion: [~]
-        fuel_average_mass_number: [~]
+        average_ion_mass: [~]
         kappa_e0: electron heat conductivity constant [W / (eV^3.5 * m)]
         SOL_momentum_loss_function: which momentum loss function to use
         sheath_heat_transmission_factor: [~]
@@ -85,7 +85,7 @@ def solve_target_first_two_point_model(
     )
 
     f_basic_kwargs = dict(
-        fuel_average_mass_number=fuel_average_mass_number,
+        average_ion_mass=average_ion_mass,
         parallel_heat_flux_density=parallel_heat_flux_density,
         upstream_total_pressure=upstream_total_pressure,
         sheath_heat_transmission_factor=sheath_heat_transmission_factor,
