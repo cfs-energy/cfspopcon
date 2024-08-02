@@ -1,8 +1,14 @@
 """Functions for saving results to file and loading those files."""
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Literal
+
+if sys.version_info >= (3, 11, 0):
+    from typing import Self  # type:ignore[attr-defined,unused-ignore]
+else:
+    from typing_extensions import Self  # type:ignore[attr-defined,unused-ignore]
 
 import numpy as np
 import xarray as xr
@@ -91,6 +97,38 @@ def read_dataset_from_netcdf(filepath: Path) -> xr.Dataset:
     return dataset
 
 
+# These following lines are needed to modify the representation of floats
+# in the JSON file. This is needed, because otherwise small errors in the
+# floats lead to a large, meaningless diff of the reference JSON files.
+
+
+class _RoundingFloat(float):
+    """A modified version of the 'float' built-in, with a modified __repr__.
+
+    This is needed because `iterencode` directly uses `float.__repr__` in `floatstr`.
+
+    From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
+    """
+
+    __repr__ = staticmethod(lambda x: f"{x:#.10g}")  # type:ignore[assignment,unused-ignore]
+
+
+class _ModifyJSONFloatRepr:
+    """A ContextManager to locally modify the representation of floats."""
+
+    def __enter__(self) -> Self:
+        """Change the float representation to fixed precision on entry."""
+        self.c_make_encoder = json.encoder.c_make_encoder  # type:ignore[attr-defined]
+        json.encoder.c_make_encoder = None  # type:ignore[attr-defined]
+        json.encoder.float = _RoundingFloat  # type:ignore[attr-defined]
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        """Change the float representation back to the default."""
+        json.encoder.c_make_encoder = self.c_make_encoder  # type:ignore[attr-defined]
+        json.encoder.float = float  # type:ignore[attr-defined]
+
+
 def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path) -> None:
     """Write the analysis values at the named points to a json file."""
     mask = build_mask_from_dict(dataset, point_params)
@@ -121,5 +159,6 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(output_dir / f"{point_key}.json", "w") as file:
-        json.dump(point.to_dict(), file, indent=4, sort_keys=True)
+    with _ModifyJSONFloatRepr():
+        with open(output_dir / f"{point_key}.json", "w") as file:
+            json.dump(point.to_dict(), file, indent=4, sort_keys=True)
