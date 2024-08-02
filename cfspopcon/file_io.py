@@ -102,7 +102,7 @@ def read_dataset_from_netcdf(filepath: Path) -> xr.Dataset:
 # floats lead to a large, meaningless diff of the reference JSON files.
 
 
-class RoundingFloat(float):
+class _RoundingFloat(float):
     """A modified version of the 'float' built-in, with a modified __repr__.
 
     This is needed because `iterencode` directly uses `float.__repr__` in `floatstr`.
@@ -113,14 +113,14 @@ class RoundingFloat(float):
     __repr__ = staticmethod(lambda x: f"{x:#.10g}")  # type:ignore[assignment,unused-ignore]
 
 
-class ModifyJSONFloatRepr:
+class _ModifyJSONFloatRepr:
     """A ContextManager to locally modify the representation of floats."""
 
     def __enter__(self) -> Self:
         """Change the float representation to fixed precision on entry."""
         self.c_make_encoder = json.encoder.c_make_encoder  # type:ignore[attr-defined]
         json.encoder.c_make_encoder = None  # type:ignore[attr-defined]
-        json.encoder.float = RoundingFloat  # type:ignore[attr-defined]
+        json.encoder.float = _RoundingFloat  # type:ignore[attr-defined]
         return self
 
     def __exit__(self, *args: Any) -> None:
@@ -159,6 +159,6 @@ def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict,
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    with ModifyJSONFloatRepr():
+    with _ModifyJSONFloatRepr():
         with open(output_dir / f"{point_key}.json", "w") as file:
             json.dump(point.to_dict(), file, indent=4, sort_keys=True)
