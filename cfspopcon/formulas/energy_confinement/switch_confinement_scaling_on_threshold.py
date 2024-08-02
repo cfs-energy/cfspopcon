@@ -72,4 +72,69 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
     return (energy_confinement_time, P_in, SOC_LOC_ratio)
 
 
-# TODO implement switch to L-mode below PLH
+@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
+def switch_to_L_mode_confinement_below_threshold(
+    plasma_stored_energy: Unitfull,
+    energy_confinement_time: Unitfull,
+    P_in: Unitfull,
+    average_electron_density: Unitfull,
+    confinement_time_scalar: Unitfull,
+    plasma_current: Unitfull,
+    magnetic_field_on_axis: Unitfull,
+    major_radius: Unitfull,
+    areal_elongation: Unitfull,
+    separatrix_elongation: Unitfull,
+    inverse_aspect_ratio: Unitfull,
+    average_ion_mass: Unitfull,
+    triangularity_psi95: Unitfull,
+    separatrix_triangularity: Unitfull,
+    q_star: Unitfull,
+    ratio_of_P_SOL_to_P_LH: Unitfull,
+    energy_confinement_scaling_for_L_mode: Unitfull,
+) -> tuple[Unitfull, ...]:
+    """Switch to the L-mode scaling if Psol < PLH.
+
+    Args:
+        plasma_stored_energy: :term:`glossary link<plasma_stored_energy>`
+        energy_confinement_time: :term:`glossary link<energy_confinement_time>`
+        P_in: :term:`glossary link<P_in>`
+        average_electron_density: :term:`glossary link<average_electron_density>`
+        confinement_time_scalar: :term:`glossary link<confinement_time_scalar>`
+        plasma_current: :term:`glossary link<plasma_current>`
+        magnetic_field_on_axis: :term:`glossary link<magnetic_field_on_axis>`
+        major_radius: :term:`glossary link<major_radius>`
+        areal_elongation: :term:`glossary link<areal_elongation>`
+        separatrix_elongation: :term:`glossary link<separatrix_elongation>`
+        inverse_aspect_ratio: :term:`glossary link<inverse_aspect_ratio>`
+        average_ion_mass: :term:`glossary link<average_ion_mass>`
+        triangularity_psi95: :term:`glossary link<triangularity_psi95>`
+        separatrix_triangularity: :term:`glossary link<separatrix_triangularity>`
+        q_star: :term:`glossary link<q_star>`
+        ratio_of_P_SOL_to_P_LH: :term:`glossary link<ratio_of_P_SOL_to_P_LH>`
+        energy_confinement_scaling_for_L_mode: :term:`glossary link<energy_confinement_scaling_for_L_mode>`
+
+    Returns:
+        :term:`energy_confinement_time`, :term:`P_in`
+    """
+    tau_e_L_mode, P_in_L_mode = solve_energy_confinement_scaling_for_input_power(
+        confinement_time_scalar=confinement_time_scalar,
+        plasma_current=plasma_current,
+        magnetic_field_on_axis=magnetic_field_on_axis,
+        average_electron_density=average_electron_density,
+        major_radius=major_radius,
+        areal_elongation=areal_elongation,
+        separatrix_elongation=separatrix_elongation,
+        inverse_aspect_ratio=inverse_aspect_ratio,
+        average_ion_mass=average_ion_mass,
+        triangularity_psi95=triangularity_psi95,
+        separatrix_triangularity=separatrix_triangularity,
+        plasma_stored_energy=plasma_stored_energy,
+        q_star=q_star,
+        energy_confinement_scaling=energy_confinement_scaling_for_L_mode,
+    )
+
+    # Use L-mode confinement if Psol < PLH
+    energy_confinement_time = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, tau_e_L_mode, energy_confinement_time)  # type:ignore[no-untyped-call]
+    P_in = xr.where(ratio_of_P_SOL_to_P_LH < 1.0, P_in_L_mode, P_in)  # type:ignore[no-untyped-call]
+
+    return energy_confinement_time, P_in
