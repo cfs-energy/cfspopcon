@@ -302,8 +302,11 @@ Physics Glossary
   P_alpha
     Fusion power released as alpha particles integrated over the plasma volume.
 
-  P_auxillary
-    The auxillary heating power (i.e. the external heating power not provided by ohmic heating).
+  P_auxillary_absorbed
+    Auxillary heating absorbed by the plasma integrated over the plasma volume.
+
+  P_auxillary_launched
+    External heating supplied to the plasma (entering the volume, but not necessarily absorbed by the plasma) integrated over the plasma volume.
 
   P_external
     External heating absorbed by the plasma (ohmic plus auxillary) integrated over the plasma volume.
@@ -313,9 +316,6 @@ Physics Glossary
 
   P_in
     Total input power to the plasma. Sum of ohmic, auxillary and alpha power.
-
-  P_launched
-    External heating supplied to the plasma (entering the volume, but not necessarily absorbed — ohmic plus auxillary) integrated over the plasma volume.
 
   P_LH_thresh
     Power required to cross the L-H transition.
