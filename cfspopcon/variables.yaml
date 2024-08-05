@@ -550,7 +550,7 @@ fraction_of_external_power_coupled:
     / P_{launched}`.'
   set_by: []
   used_by:
-  - calc_fusion_gain
+  - calc_auxillary_power
 fraction_of_P_SOL_to_divertor:
   default_units: dimensionless
   description:
@@ -1058,24 +1058,31 @@ P_alpha:
   set_by:
   - calc_fusion_power
   used_by:
-  - calc_fusion_gain
-P_auxillary:
+  - calc_auxillary_power
+P_auxillary_absorbed:
   default_units: megawatt
   description:
-  - The auxillary heating power (i.e. the external heating power not provided by ohmic
-    heating).
+  - Auxillary heating absorbed by the plasma integrated over the plasma volume.
   set_by:
   - calc_auxillary_power
   used_by: []
+P_auxillary_launched:
+  default_units: megawatt
+  description:
+  - External heating supplied to the plasma (entering the volume, but not necessarily
+    absorbed by the plasma) integrated over the plasma volume.
+  set_by:
+  - calc_auxillary_power
+  used_by:
+  - calc_fusion_gain
 P_external:
   default_units: megawatt
   description:
   - External heating absorbed by the plasma (ohmic plus auxillary) integrated over
     the plasma volume.
   set_by:
-  - calc_fusion_gain
-  used_by:
   - calc_auxillary_power
+  used_by: []
 P_fusion:
   default_units: megawatt
   description:
@@ -1094,22 +1101,14 @@ P_in:
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   used_by:
+  - calc_auxillary_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
-  - calc_fusion_gain
   - calc_f_rad_core
   - require_P_rad_less_than_P_in
   - calc_min_P_radiation_from_fraction
   - calc_min_P_radiation_from_LH_factor
   - calc_power_crossing_separatrix
-P_launched:
-  default_units: megawatt
-  description:
-  - "External heating supplied to the plasma (entering the volume, but not necessarily\
-    \ absorbed \u2014 ohmic plus auxillary) integrated over the plasma volume."
-  set_by:
-  - calc_fusion_gain
-  used_by: []
 P_LH_thresh:
   default_units: megawatt
   description:
@@ -1143,6 +1142,7 @@ P_ohmic:
   - calc_ohmic_power
   used_by:
   - calc_auxillary_power
+  - calc_fusion_gain
 P_rad_bremsstrahlung:
   default_units: megawatt
   description:

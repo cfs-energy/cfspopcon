@@ -68,11 +68,18 @@
             "data": 22.55867182,
             "dims": []
         },
-        "P_auxillary": {
+        "P_auxillary_absorbed": {
             "attrs": {
                 "units": "megawatt"
             },
             "data": 7.702542635,
+            "dims": []
+        },
+        "P_auxillary_launched": {
+            "attrs": {
+                "units": "megawatt"
+            },
+            "data": 8.558380706,
             "dims": []
         },
         "P_external": {
@@ -94,13 +101,6 @@
                 "units": "megawatt"
             },
             "data": 31.46283632,
-            "dims": []
-        },
-        "P_launched": {
-            "attrs": {
-                "units": "megawatt"
-            },
-            "data": 9.893516117,
             "dims": []
         },
         "P_neutron": {
@@ -135,7 +135,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 11.40073537,
+            "data": 11.55669358,
             "dims": []
         },
         "SOL_momentum_loss_function": {
