@@ -235,6 +235,9 @@ Physics Glossary
   kappa_e0
     Electron heat conductivity constant, such that :math:`q_{e,\parallel,cond}=\kappa_{e0}T_{e}^{5/2}\nabla_\parallel T_e`.
 
+  kappa_ez
+    finite z correction factor to the electron heat conductivity.  per :cite:`Goldston_2017`
+
   lambda_q
     The near-scrape-off-layer heat-flux-density decay length.
 
@@ -283,6 +286,9 @@ Physics Glossary
 
   nesep_over_nebar
     Ratio of the separatrix electron density to the volume-averaged electron density :math:`n_{e,sep} / \bar n_e`.
+
+  neutral_flux_density_factor
+    Conversion factor from neutral pressure at duct to neutral recycling flux at the target.  From :cite:`Kallenbach_2018`
 
   neutron_power_flux_to_walls
     Neutron power per unit area to the wall.
@@ -419,6 +425,9 @@ Physics Glossary
   ratio_of_P_SOL_to_P_LI
     The ratio of the power crossing the separatrix to the LI transition threshold power.
 
+  reattachment_time
+    Time duration for detachment front to reach the target in response to a transient.  Per :cite:`Henderson_2023`
+
   reference_electron_density
     A constant upstream electron density used when evaluating the :math:`L_Z` impurity radiation curve (due to the reasonably weak dependence of :math:`L_Z` on :math:`n_e`, this approximation shouldn't be too harmful).
 
@@ -449,6 +458,9 @@ Physics Glossary
   separatrix_elongation
     Elongation of the last-closed-flux-surface :math:`(Z_{max,LCFS} - Z_{min,LCFS}) / (R_{max,LCFS} - R_{min,LCFS})`.
 
+  separatrix_power_transient
+    Transient increase to power crossing the separatrix.  Per :cite:`Henderson_2023`
+
   separatrix_triangularity
     Separatrix triangularity (average of upper and lower triangularity).
 
@@ -460,6 +472,9 @@ Physics Glossary
 
   SepOS_MHD_limit
     Less than 1 if below the ideal MHD limit, according to the separatrix operational space.
+
+  sheath_heat_transmission_factor
+    Sheath heat transmission coefficient
 
   SOC_LOC_ratio
     Ratio of the energy confinement time from the chosen saturated ohmic confinement (SOC) scaling and the chosen linear ohmic confinement (LOC) scaling.
@@ -488,6 +503,9 @@ Physics Glossary
   sustainment_power_in_ion_channel
     The power in the ion channel required to maintain the ion temperature gradient at the separatrix.
 
+  target_angle_of_incidence
+    Angle of incidence between magnetic field vector and surface normal vector at target.
+
   target_electron_density
     The electron density at the divertor target.
 
@@ -496,6 +514,12 @@ Physics Glossary
 
   target_electron_temp
     The electron temperature at the divertor target.
+
+  target_gaussian_spreading
+    Gaussian spreading coefficient, S, representing diffusive transport between x-point and target
+
+  target_neutral_pressure
+    Neutral pressure at the divertor target.
 
   target_q_parallel
     The parallel heat flux density at the divertor target.
