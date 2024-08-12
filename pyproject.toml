@@ -35,7 +35,7 @@ xarray = "^2024"
 pint-xarray = "^0.4"
 click = "^8.1.0"
 netcdf4 = "^1.7"
-radas = ">=2024.7.1"
+radas = ">=2024.8.0"
 contourpy = "^1.2.1"
 
 [tool.poetry.group.dev.dependencies]
