@@ -1190,6 +1190,13 @@
             "data": 0.5400000000,
             "dims": []
         },
+        "sheath_heat_transmission_factor": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 7.500000000,
+            "dims": []
+        },
         "spitzer_resistivity": {
             "attrs": {
                 "units": "meter * ohm"
