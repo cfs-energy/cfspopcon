@@ -3,7 +3,7 @@
 import numpy as np
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import Unitfull, ureg
+from ...unit_handling import Unitfull, ureg, convert_units
 from .two_point_model.momentum_loss_functions import calc_SOL_momentum_loss_fraction
 
 
@@ -50,7 +50,7 @@ def calc_neutral_pressure_kallenbach(
     SOL_momentum_loss_fraction = calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp)
     lq_int = lambda_q + 1.64 * target_gaussian_spreading
     b = lq_int / lambda_q
-    q_eV = q_parallel.pint.to("eV s**-1 m**-2")
+    q_eV = convert_units(q_parallel, "eV s**-1 m**-2")
 
     term1 = 3.0 / 2.0 * np.sqrt(1 - SOL_power_loss_fraction) / (1 - SOL_momentum_loss_fraction)
     term2 = np.sqrt(average_ion_mass / 2.0)

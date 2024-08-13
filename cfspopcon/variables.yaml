@@ -1600,7 +1600,7 @@ separatrix_elongation:
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
 separatrix_power_transient:
-  default_units: null
+  default_units: megawatt
   description:
   - Transient increase to power crossing the separatrix.  Per :cite:`Henderson_2023`
   set_by: []
