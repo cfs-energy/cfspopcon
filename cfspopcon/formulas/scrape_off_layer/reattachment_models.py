@@ -45,7 +45,7 @@ def calc_neutral_pressure_kallenbach(
         q_parallel: [GW/m²] :term:`glossary link<q_parallel>`
 
     Returns:
-        target_neutral_pressure: [Pa] :term:`glossary link<target_neutral_pressure>`
+        :term:`target_neutral_pressure` [Pa]
     """
     SOL_momentum_loss_fraction = calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp)
     lq_int = lambda_q + 1.64 * target_gaussian_spreading
