@@ -8,7 +8,6 @@ from cfspopcon.unit_handling import magnitude_in_units as umag
 from cfspopcon import formulas
 
 
-
 @pytest.fixture()
 def magnetic_field_on_axis():
     """Toroidal field on-axis in Tesla."""
@@ -71,82 +70,103 @@ def ion_to_electron_temp_ratio():
 def target_electron_temp():
     return Quantity(10.0, ureg.eV)
 
+
 @pytest.fixture()
 def target_electron_density():
     return Quantity(152.1067012, ureg.n19)
+
 
 @pytest.fixture()
 def fraction_of_P_SOL_to_divertor():
     return 1.0
 
+
 @pytest.fixture()
 def ion_heat_diffusivity():
     return 0.5
+
 
 @pytest.fixture()
 def separatrix_electron_density():
     return Quantity(10, ureg.n19)
 
+
 @pytest.fixture()
 def power_crossing_separatrix():
     return Quantity(29.0, ureg.MW)
+
 
 @pytest.fixture()
 def lambda_q():
     return Quantity(0.3, ureg.mm)
 
+
 @pytest.fixture()
 def target_gaussian_spreading():
     return Quantity(0.15, ureg.mm)
+
 
 @pytest.fixture()
 def B_pol_out_mid():
     return Quantity(2.5, ureg.T)
 
+
 @pytest.fixture()
 def fieldline_pitch_at_omp():
     return 3.92
+
 
 @pytest.fixture()
 def parallel_connection_length():
     return Quantity(13.4, ureg.m)
 
+
 @pytest.fixture()
 def toroidal_flux_expansion():
     return 2.0
+
 
 @pytest.fixture()
 def kappa_e0():
     return Quantity(2400, "watt / electron_volt ** 3.5 / meter")
 
+
 @pytest.fixture()
 def SOL_momentum_loss_function():
     from cfspopcon.named_options import MomentumLossFunction
+
     return MomentumLossFunction.KotovReiter
+
 
 @pytest.fixture()
 def target_angle_of_incidence():
     return Quantity(2.0, ureg.degree)
 
+
 @pytest.fixture()
 def kappa_ez():
     return 4
+
 
 @pytest.fixture()
 def sheath_heat_transmission_factor():
     return 7
 
+
 @pytest.fixture()
 def neutral_flux_density_factor():
     return Quantity(1.5, "1 / meter ** 2 / pascal / second")
+
 
 @pytest.fixture()
 def separatrix_power_transient():
     return Quantity(5.0, ureg.MW)
 
+
 @pytest.fixture()
 def SOL_power_loss_fraction():
     return 0.9597046482
+
 
 @pytest.fixture()
 def cylindrical_safety_factor(
@@ -166,6 +186,7 @@ def cylindrical_safety_factor(
         plasma_current=plasma_current,
     )
 
+
 @pytest.fixture()
 def q_parallel(
     power_crossing_separatrix,
@@ -175,7 +196,6 @@ def q_parallel(
     lambda_q,
     fieldline_pitch_at_omp,
 ):
-
     return formulas.scrape_off_layer.heat_flux_density.calc_parallel_heat_flux_density(
         power_crossing_separatrix=power_crossing_separatrix,
         fraction_of_P_SOL_to_divertor=fraction_of_P_SOL_to_divertor,
@@ -184,6 +204,7 @@ def q_parallel(
         lambda_q=lambda_q,
         fieldline_pitch_at_omp=fieldline_pitch_at_omp,
     )
+
 
 @pytest.fixture()
 def two_point_model_fixed_tet(
@@ -208,6 +229,7 @@ def two_point_model_fixed_tet(
         SOL_momentum_loss_function=SOL_momentum_loss_function,
         sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
+
 
 @pytest.fixture()
 def target_neutral_pressure(
@@ -264,5 +286,3 @@ def test_calc_reattachment_time_henderson(
     assert np.isclose(reattachment_time, 0.81782812)
 
     return
-
-    
