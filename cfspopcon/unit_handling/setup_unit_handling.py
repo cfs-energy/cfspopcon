@@ -62,6 +62,18 @@ def convert_units(array: Union[xr.DataArray, pint.Quantity], units: Any) -> Unio
 
     if isinstance(array, xr.DataArray):
         if not hasattr(array.pint, "units") or array.pint.units is None:
+            if hasattr(array, "units"):
+                # If we've already called pint.dequantify() on an array, it will have the units stored as the
+                # .units attribute. In this case, we perform the unit conversion manually.
+                conversion_factor = dimensionless_magnitude(Quantity(1.0, units) / Quantity(1.0, array.units))
+                array = array * conversion_factor
+                array["units"] = str(units)
+                return array
+            else:
+                # If we pass in an array with no unit information whatsoever, assume that it is dimensionless.
+                array = array.pint.quantify(ureg.dimensionless)
+
+        if not hasattr(array.pint, "units") or array.pint.units is None:
             array = array.pint.quantify(ureg.dimensionless)
 
         return array.pint.to(units)  # type: ignore[no-any-return]
