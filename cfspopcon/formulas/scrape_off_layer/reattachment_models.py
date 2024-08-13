@@ -58,7 +58,7 @@ def calc_neutral_pressure_kallenbach(
     term4 = (q_eV) ** (3.0 / 14.0)
     term5 = b * sheath_heat_transmission_factor * np.sin(np.radians(target_angle_of_incidence)) / (neutral_flux_density_factor * 10**23)
 
-    p0 = (separatrix_electron_density * 1 / term1 * 1 / term2 * 1 / term3 * 1 / term4) ** 2 * term5
+    p0 = (separatrix_electron_density / term1  / term2  / term3  / term4) ** 2 * term5
 
     return p0
 
