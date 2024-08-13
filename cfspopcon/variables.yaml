@@ -1643,7 +1643,7 @@ SepOS_MHD_limit:
 sheath_heat_transmission_factor:
   default_units: dimensionless
   description:
-  - Sheath heat transmission coefficient
+  - Sheath heat transmission coefficient per equation 2.89 in :cite:`Stangeby_2000`
   set_by: []
   used_by:
   - two_point_model_fixed_fpow
@@ -1742,7 +1742,7 @@ target_angle_of_incidence:
   default_units: degree
   description:
   - Angle of incidence between magnetic field vector and surface normal vector at
-    target.
+    divertor target.
   set_by: []
   used_by:
   - calc_neutral_pressure_kallenbach
@@ -1781,7 +1781,7 @@ target_gaussian_spreading:
   default_units: millimeter
   description:
   - Gaussian spreading coefficient, S, representing diffusive transport between x-point
-    and target
+    and divertor target
   set_by: []
   used_by:
   - calc_neutral_pressure_kallenbach

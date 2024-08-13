@@ -474,7 +474,7 @@ Physics Glossary
     Less than 1 if below the ideal MHD limit, according to the separatrix operational space.
 
   sheath_heat_transmission_factor
-    Sheath heat transmission coefficient
+    Sheath heat transmission coefficient per equation 2.89 in :cite:`Stangeby_2000`
 
   SOC_LOC_ratio
     Ratio of the energy confinement time from the chosen saturated ohmic confinement (SOC) scaling and the chosen linear ohmic confinement (LOC) scaling.

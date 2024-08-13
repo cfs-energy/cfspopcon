@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.unit_handling import Quantity, ureg, get_units
+from cfspopcon.named_options import MomentumLossFunction
+from cfspopcon.unit_handling import Quantity, ureg, get_units, convert_units
 from cfspopcon.unit_handling import dimensionless_magnitude as dmag
 from cfspopcon.unit_handling import magnitude_in_units as umag
 from cfspopcon import formulas
@@ -128,13 +129,11 @@ def toroidal_flux_expansion():
 
 @pytest.fixture()
 def kappa_e0():
-    return Quantity(2400.0, ureg.watt / ureg.electron_volt ** 3.5 / ureg.meter)
+    return Quantity(2400.0, ureg.watt / ureg.electron_volt**3.5 / ureg.meter)
 
 
 @pytest.fixture()
 def SOL_momentum_loss_function():
-    from cfspopcon.named_options import MomentumLossFunction
-
     return MomentumLossFunction.KotovReiter
 
 
@@ -155,7 +154,7 @@ def sheath_heat_transmission_factor():
 
 @pytest.fixture()
 def neutral_flux_density_factor():
-    return Quantity(1.5, ureg.meter ** -2 / ureg.pascal / ureg.second)
+    return Quantity(1.5, ureg.meter**-2 / ureg.pascal / ureg.second)
 
 
 @pytest.fixture()

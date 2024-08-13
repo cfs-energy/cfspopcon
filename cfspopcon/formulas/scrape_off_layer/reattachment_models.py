@@ -3,7 +3,7 @@
 import numpy as np
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import Unitfull, convert_units, ureg
+from ...unit_handling import Unitfull, ureg
 from .two_point_model.momentum_loss_functions import calc_SOL_momentum_loss_fraction
 
 
@@ -84,14 +84,14 @@ def calc_reattachment_time_henderson(
     Returns:
         :term:`reattachment_time` [s]
     """
-    term1 = target_neutral_pressure / (2.0 * ureg("Pa"))
-    term2 = target_electron_density / (30.0 * ureg("n19"))
+    term1 = target_neutral_pressure / (2.0 * ureg.Pa)
+    term2 = target_electron_density / (30.0 * ureg.n19)
     # calculate ionization volume using AUG volume (0.4 m^3) and AUG major radius (1.65m)
-    ionization_volume = major_radius / (1.65 * ureg("m")) * (0.4 * ureg("m**3"))
-    term3 = ionization_volume / (0.4 * ureg("m**3"))
-    term4 = parallel_connection_length / (12.0 * ureg("m"))
-    term5 = 2.0 * ureg("MW") / separatrix_power_transient
+    ionization_volume = major_radius / (1.65 * ureg.m) * (0.4 * ureg.m**3)
+    term3 = ionization_volume / (0.4 * ureg.m**3)
+    term4 = parallel_connection_length / (12.0 * ureg.m)
+    term5 = 2.0 * ureg.MW / separatrix_power_transient
 
-    reattachment_time = 0.09 * ureg("s") * term1 * term2 * term3 * term4 * term5
+    reattachment_time = 0.09 * ureg.s * term1 * term2 * term3 * term4 * term5
 
     return reattachment_time
