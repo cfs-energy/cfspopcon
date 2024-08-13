@@ -50,12 +50,11 @@ def calc_neutral_pressure_kallenbach(
     SOL_momentum_loss_fraction = calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp)
     lq_int = lambda_q + 1.64 * target_gaussian_spreading
     b = lq_int / lambda_q
-    q_eV = convert_units(q_parallel, "eV s**-1 m**-2")
 
     term1 = 3.0 / 2.0 * np.sqrt(1 - SOL_power_loss_fraction) / (1 - SOL_momentum_loss_fraction)
     term2 = np.sqrt(average_ion_mass / 2.0)
     term3 = ((2 * kappa_e0 * kappa_ez) / (7 * parallel_connection_length)) ** (2.0 / 7.0)
-    term4 = (q_eV) ** (3.0 / 14.0)
+    term4 = (q_parallel) ** (3.0 / 14.0)
     term5 = b * sheath_heat_transmission_factor * np.sin(np.radians(target_angle_of_incidence)) / (neutral_flux_density_factor * 10**23)
 
     p0 = (separatrix_electron_density / term1 / term2 / term3 / term4) ** 2 * term5

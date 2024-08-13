@@ -128,7 +128,7 @@ def toroidal_flux_expansion():
 
 @pytest.fixture()
 def kappa_e0():
-    return Quantity(2400, "watt / electron_volt ** 3.5 / meter")
+    return Quantity(2400.0, ureg.watt / ureg.electron_volt ** 3.5 / ureg.meter)
 
 
 @pytest.fixture()
@@ -145,17 +145,17 @@ def target_angle_of_incidence():
 
 @pytest.fixture()
 def kappa_ez():
-    return 4
+    return 4.0
 
 
 @pytest.fixture()
 def sheath_heat_transmission_factor():
-    return 7
+    return 7.0
 
 
 @pytest.fixture()
 def neutral_flux_density_factor():
-    return Quantity(1.5, "1 / meter ** 2 / pascal / second")
+    return Quantity(1.5, ureg.meter ** -2 / ureg.pascal / ureg.second)
 
 
 @pytest.fixture()
@@ -177,7 +177,7 @@ def cylindrical_safety_factor(
     elongation_psi95,
     triangularity_psi95,
 ):
-    return formulas.plasma_current.safety_factor.calc_cylindrical_edge_safety_factor(
+    q_cyl = formulas.plasma_current.safety_factor.calc_cylindrical_edge_safety_factor(
         major_radius=major_radius,
         minor_radius=minor_radius,
         elongation_psi95=elongation_psi95,
@@ -185,6 +185,7 @@ def cylindrical_safety_factor(
         magnetic_field_on_axis=magnetic_field_on_axis,
         plasma_current=plasma_current,
     )
+    return convert_units(q_cyl, ureg.dimensionless)
 
 
 @pytest.fixture()
@@ -196,7 +197,7 @@ def q_parallel(
     lambda_q,
     fieldline_pitch_at_omp,
 ):
-    return formulas.scrape_off_layer.heat_flux_density.calc_parallel_heat_flux_density(
+    q_par = formulas.scrape_off_layer.heat_flux_density.calc_parallel_heat_flux_density(
         power_crossing_separatrix=power_crossing_separatrix,
         fraction_of_P_SOL_to_divertor=fraction_of_P_SOL_to_divertor,
         major_radius=major_radius,
@@ -204,6 +205,7 @@ def q_parallel(
         lambda_q=lambda_q,
         fieldline_pitch_at_omp=fieldline_pitch_at_omp,
     )
+    return convert_units(q_par, ureg.W / ureg.m**2)
 
 
 @pytest.fixture()
@@ -218,7 +220,7 @@ def two_point_model_fixed_tet(
     SOL_momentum_loss_function,
     sheath_heat_transmission_factor,
 ):
-    return formulas.scrape_off_layer.two_point_model_fixed_tet(
+    Te_tar = formulas.scrape_off_layer.two_point_model_fixed_tet(
         target_electron_temp=target_electron_temp,
         q_parallel=q_parallel,
         parallel_connection_length=parallel_connection_length,
@@ -229,6 +231,7 @@ def two_point_model_fixed_tet(
         SOL_momentum_loss_function=SOL_momentum_loss_function,
         sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
+    return convert_units(Te_tar, ureg.eV)
 
 
 @pytest.fixture()
@@ -248,7 +251,7 @@ def target_neutral_pressure(
     target_electron_temp,
     q_parallel,
 ):
-    return formulas.scrape_off_layer.calc_neutral_pressure_kallenbach(
+    p0 = formulas.scrape_off_layer.calc_neutral_pressure_kallenbach(
         average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         kappa_ez=kappa_ez,
@@ -264,6 +267,8 @@ def target_neutral_pressure(
         target_electron_temp=target_electron_temp,
         q_parallel=q_parallel,
     )
+
+    return convert_units(p0, ureg.Pa)
 
 
 def test_calc_reattachment_time_henderson(
@@ -281,8 +286,6 @@ def test_calc_reattachment_time_henderson(
         separatrix_power_transient=separatrix_power_transient,
     )
 
-    reattachment_time = reattachment_time.item().to_base_units().magnitude
-
-    assert np.isclose(reattachment_time, 0.81782812)
+    assert np.isclose(umag(reattachment_time, ureg.s), 0.81782812)
 
     return

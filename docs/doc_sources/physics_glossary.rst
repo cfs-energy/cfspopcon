@@ -504,7 +504,7 @@ Physics Glossary
     The power in the ion channel required to maintain the ion temperature gradient at the separatrix.
 
   target_angle_of_incidence
-    Angle of incidence between magnetic field vector and surface normal vector at target.
+    Angle of incidence between magnetic field vector and surface normal vector at divertor target.
 
   target_electron_density
     The electron density at the divertor target.
@@ -516,7 +516,7 @@ Physics Glossary
     The electron temperature at the divertor target.
 
   target_gaussian_spreading
-    Gaussian spreading coefficient, S, representing diffusive transport between x-point and target
+    Gaussian spreading coefficient, S, representing diffusive transport between x-point and divertor target
 
   target_neutral_pressure
     Neutral pressure at the divertor target.
