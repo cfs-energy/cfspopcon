@@ -83,7 +83,7 @@ def calc_reattachment_time_henderson(
       separatrix_power_transient: [MW] :term:`glossary link<separatrix_power_transient>`
 
     Returns:
-      reattachment_time: [s] :term:`glossary link<>`
+        :term:`reattachment_time` [s]
     """
     term1 = target_neutral_pressure / (2.0 * ureg("Pa"))
     term2 = target_electron_density / (30.0 * ureg("n19"))
