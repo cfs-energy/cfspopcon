@@ -232,6 +232,12 @@ Physics Glossary
   ion_to_electron_temp_ratio
     Ratio of electron and ion temperatures, :math:`T_i/T_e`.
 
+  ionization_volume
+    Volume available above the target for ionization
+
+  ionization_volume_density_factor
+    factor that relates the target density to an averaged density across the ionization volume
+
   kappa_e0
     Electron heat conductivity constant, such that :math:`q_{e,\parallel,cond}=\kappa_{e0}T_{e}^{5/2}\nabla_\parallel T_e`.
 
@@ -419,6 +425,12 @@ Physics Glossary
   radiated_power_scalar
     An enhancement factor :math:`C` to modify the radiated power :math:`P_{rad} = C P_{rad,calculated}`.
 
+  ratio_of_divertor_to_duct_pressure
+    ratio between divertor neutral pressure and pressure at duct location
+
+  ratio_of_molecular_to_ion_mass
+    Ratio between neutral molecule mass and ion mass
+
   ratio_of_P_SOL_to_P_LH
     The ratio of the power crossing the separatrix to the LH transition threshold power.
 
@@ -565,6 +577,9 @@ Physics Glossary
 
   vertical_minor_radius
     Vertical minor radius of the plasma :math:`(Z_{max,LCFS}-Z_{min,LCFS})/2`
+
+  wall_temperature
+    Temperature of neutral gas at the wall
 
   z_effective
     The "effective charge" of the ions, defined as :math:`\sum_j Z_j^2 n_j / n_e`.

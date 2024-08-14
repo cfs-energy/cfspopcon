@@ -124,6 +124,7 @@ average_ion_mass:
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
   - calc_neutral_pressure_kallenbach
+  - calc_neutral_flux_density_factor
   - calc_poloidal_sound_larmor_radius
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
@@ -795,6 +796,22 @@ ion_to_electron_temp_ratio:
   - calc_edge_collisionality
   - calc_average_ion_temp_from_temperature_ratio
   - calc_SepOS_ideal_MHD_limit
+ionization_volume:
+  default_units: meter ** 3
+  description:
+  - Volume available above the target for ionization
+  set_by:
+  - calc_ionization_volume_from_AUG
+  used_by:
+  - calc_reattachment_time_henderson
+ionization_volume_density_factor:
+  default_units: dimensionless
+  description:
+  - factor that relates the target density to an averaged density across the ionization
+    volume
+  set_by: []
+  used_by:
+  - calc_reattachment_time_henderson
 kappa_e0:
   default_units: watt / electron_volt ** 3.5 / meter
   description:
@@ -922,7 +939,7 @@ major_radius:
   - calc_parallel_heat_flux_density
   - calc_q_perp
   - calc_lambda_q
-  - calc_reattachment_time_henderson
+  - calc_ionization_volume_from_AUG
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
@@ -1028,7 +1045,8 @@ neutral_flux_density_factor:
   description:
   - Conversion factor from neutral pressure at duct to neutral recycling flux at the
     target.  From :cite:`Kallenbach_2018`
-  set_by: []
+  set_by:
+  - calc_neutral_flux_density_factor
   used_by:
   - calc_neutral_pressure_kallenbach
 neutron_power_flux_to_walls:
@@ -1454,6 +1472,20 @@ radiated_power_scalar:
   used_by:
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
+ratio_of_divertor_to_duct_pressure:
+  default_units: dimensionless
+  description:
+  - ratio between divertor neutral pressure and pressure at duct location
+  set_by: []
+  used_by:
+  - calc_reattachment_time_henderson
+ratio_of_molecular_to_ion_mass:
+  default_units: dimensionless
+  description:
+  - Ratio between neutral molecule mass and ion mass
+  set_by: []
+  used_by:
+  - calc_neutral_flux_density_factor
 ratio_of_P_SOL_to_P_LH:
   default_units: dimensionless
   description:
@@ -1927,6 +1959,13 @@ vertical_minor_radius:
   set_by:
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
   used_by: []
+wall_temperature:
+  default_units: kelvin
+  description:
+  - Temperature of neutral gas at the wall
+  set_by: []
+  used_by:
+  - calc_neutral_flux_density_factor
 z_effective:
   default_units: dimensionless
   description:

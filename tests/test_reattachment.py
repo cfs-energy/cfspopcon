@@ -12,59 +12,43 @@ from cfspopcon import formulas
 @pytest.fixture()
 def magnetic_field_on_axis():
     """Toroidal field on-axis in Tesla."""
-    return Quantity(2.5, ureg.T)
+    return Quantity(12.2, ureg.T)
 
 
 @pytest.fixture()
 def major_radius():
     """Major radius in metres."""
-    return Quantity(1.65, ureg.m)
+    return Quantity(1.85, ureg.m)
 
 
 @pytest.fixture()
 def minor_radius():
     """Minor radius in metres."""
-    return Quantity(0.49, ureg.m)
+    return Quantity(0.55, ureg.m)
 
 
 @pytest.fixture()
 def average_ion_mass():
     """Ion mass in amu."""
-    return Quantity(2.0, ureg.amu)
+    return Quantity(2.515, ureg.amu)
 
 
 @pytest.fixture()
 def plasma_current():
     """Plasma current in A."""
-    return Quantity(0.8e6, ureg.A)
+    return Quantity(8.7e6, ureg.A)
 
 
 @pytest.fixture()
 def elongation_psi95():
     """Elongation (kappa) at the psiN = 0.95 flux surface."""
-    return 1.6
-
-
-@pytest.fixture()
-def elongation_ratio_areal_to_psi95():
-    return 1.025
+    return 1.68
 
 
 @pytest.fixture()
 def triangularity_psi95():
     """Triangularity (delta) at the psiN = 0.95 flux surface."""
     return 0.3
-
-
-@pytest.fixture()
-def z_effective():
-    """Effective ion charge."""
-    return 1.25
-
-
-@pytest.fixture()
-def ion_to_electron_temp_ratio():
-    return 0.95
 
 
 @pytest.fixture()
@@ -80,11 +64,6 @@ def target_electron_density():
 @pytest.fixture()
 def fraction_of_P_SOL_to_divertor():
     return 1.0
-
-
-@pytest.fixture()
-def ion_heat_diffusivity():
-    return 0.5
 
 
 @pytest.fixture()
@@ -105,11 +84,6 @@ def lambda_q():
 @pytest.fixture()
 def target_gaussian_spreading():
     return Quantity(0.15, ureg.mm)
-
-
-@pytest.fixture()
-def B_pol_out_mid():
-    return Quantity(2.5, ureg.T)
 
 
 @pytest.fixture()
@@ -149,12 +123,7 @@ def kappa_ez():
 
 @pytest.fixture()
 def sheath_heat_transmission_factor():
-    return 7.0
-
-
-@pytest.fixture()
-def neutral_flux_density_factor():
-    return Quantity(1.5, ureg.meter**-2 / ureg.pascal / ureg.second)
+    return 7.5
 
 
 @pytest.fixture()
@@ -165,6 +134,26 @@ def separatrix_power_transient():
 @pytest.fixture()
 def SOL_power_loss_fraction():
     return 0.9597046482
+
+
+@pytest.fixture()
+def ionization_volume_density_factor():
+    return 1.0
+
+
+@pytest.fixture()
+def ratio_of_divertor_to_duct_pressure():
+    return 1.0
+
+
+@pytest.fixture()
+def ratio_of_molecular_to_ion_mass():
+    return 2.0
+
+
+@pytest.fixture()
+def wall_temperature():
+    return Quantity(300.0, ureg.K)
 
 
 @pytest.fixture()
@@ -234,6 +223,20 @@ def two_point_model_fixed_tet(
 
 
 @pytest.fixture()
+def neutral_flux_density_factor(
+    average_ion_mass,
+    ratio_of_molecular_to_ion_mass,
+    wall_temperature,
+):
+    factor = formulas.scrape_off_layer.calc_neutral_flux_density_factor(
+        average_ion_mass=average_ion_mass,
+        ratio_of_molecular_to_ion_mass=ratio_of_molecular_to_ion_mass,
+        wall_temperature=wall_temperature,
+    )
+    return factor
+
+
+@pytest.fixture()
 def target_neutral_pressure(
     average_ion_mass,
     kappa_e0,
@@ -270,21 +273,32 @@ def target_neutral_pressure(
     return convert_units(p0, ureg.Pa)
 
 
+@pytest.fixture()
+def ionization_volume(
+    major_radius,
+):
+    ionization_volume = formulas.scrape_off_layer.calc_ionization_volume_from_AUG(major_radius=major_radius)
+    return ionization_volume
+
+
 def test_calc_reattachment_time_henderson(
     target_neutral_pressure,
     target_electron_density,
-    major_radius,
     parallel_connection_length,
     separatrix_power_transient,
+    ionization_volume_density_factor,
+    ratio_of_divertor_to_duct_pressure,
+    ionization_volume,
 ):
     reattachment_time = formulas.scrape_off_layer.calc_reattachment_time_henderson(
         target_neutral_pressure=target_neutral_pressure,
         target_electron_density=target_electron_density,
-        major_radius=major_radius,
         parallel_connection_length=parallel_connection_length,
         separatrix_power_transient=separatrix_power_transient,
+        ionization_volume_density_factor=ionization_volume_density_factor,
+        ratio_of_divertor_to_duct_pressure=ratio_of_divertor_to_duct_pressure,
+        ionization_volume=ionization_volume,
     )
-
-    assert np.isclose(umag(reattachment_time, ureg.s), 0.81782812)
+    assert np.isclose(umag(reattachment_time, ureg.s), 0.90742101)
 
     return
