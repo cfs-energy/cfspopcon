@@ -157,6 +157,30 @@ def wall_temperature():
 
 
 @pytest.fixture()
+def areal_elongation():
+    return 1.75
+
+
+@pytest.fixture()
+def inverse_aspect_ratio():
+    return 0.3081
+
+
+@pytest.fixture()
+def plasma_volume(
+    major_radius,
+    areal_elongation,
+    inverse_aspect_ratio,
+):
+    v = formulas.geometry.calc_plasma_volume(
+        major_radius=major_radius,
+        areal_elongation=areal_elongation,
+        inverse_aspect_ratio=inverse_aspect_ratio,
+    )
+    return v
+
+
+@pytest.fixture()
 def cylindrical_safety_factor(
     magnetic_field_on_axis,
     major_radius,
@@ -252,8 +276,9 @@ def target_neutral_pressure(
     separatrix_electron_density,
     target_electron_temp,
     q_parallel,
+    ratio_of_divertor_to_duct_pressure,
 ):
-    p0 = formulas.scrape_off_layer.calc_neutral_pressure_kallenbach(
+    p_div, p_duct = formulas.scrape_off_layer.calc_neutral_pressure_kallenbach(
         average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         kappa_ez=kappa_ez,
@@ -268,16 +293,17 @@ def target_neutral_pressure(
         separatrix_electron_density=separatrix_electron_density,
         target_electron_temp=target_electron_temp,
         q_parallel=q_parallel,
+        ratio_of_divertor_to_duct_pressure=ratio_of_divertor_to_duct_pressure,
     )
 
-    return convert_units(p0, ureg.Pa)
+    return convert_units(p_div, ureg.Pa)
 
 
 @pytest.fixture()
 def ionization_volume(
-    major_radius,
+    plasma_volume,
 ):
-    ionization_volume = formulas.scrape_off_layer.calc_ionization_volume_from_AUG(major_radius=major_radius)
+    ionization_volume = formulas.scrape_off_layer.calc_ionization_volume_from_AUG(plasma_volume=plasma_volume)
     return ionization_volume
 
 
@@ -287,7 +313,6 @@ def test_calc_reattachment_time_henderson(
     parallel_connection_length,
     separatrix_power_transient,
     ionization_volume_density_factor,
-    ratio_of_divertor_to_duct_pressure,
     ionization_volume,
 ):
     reattachment_time = formulas.scrape_off_layer.calc_reattachment_time_henderson(
@@ -296,9 +321,8 @@ def test_calc_reattachment_time_henderson(
         parallel_connection_length=parallel_connection_length,
         separatrix_power_transient=separatrix_power_transient,
         ionization_volume_density_factor=ionization_volume_density_factor,
-        ratio_of_divertor_to_duct_pressure=ratio_of_divertor_to_duct_pressure,
         ionization_volume=ionization_volume,
     )
-    assert np.isclose(umag(reattachment_time, ureg.s), 0.90742101)
+    assert np.isclose(umag(reattachment_time, ureg.s), 1.23233809)
 
     return

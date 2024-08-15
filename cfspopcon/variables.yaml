@@ -939,7 +939,6 @@ major_radius:
   - calc_parallel_heat_flux_density
   - calc_q_perp
   - calc_lambda_q
-  - calc_ionization_volume_from_AUG
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
@@ -1364,6 +1363,7 @@ plasma_volume:
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
   - calc_internal_inductance_for_noncylindrical
+  - calc_ionization_volume_from_AUG
 poloidal_circumference:
   default_units: meter
   description:
@@ -1406,6 +1406,13 @@ power_crossing_separatrix:
   - calc_lambda_q
   - calc_ratio_P_LH
   - calc_ratio_P_LI
+pumping_duct_neutral_pressure:
+  default_units: pascal
+  description:
+  - Neutral pressure at the baratron position in pumping duct.
+  set_by:
+  - calc_neutral_pressure_kallenbach
+  used_by: []
 Q:
   default_units: dimensionless
   description:
@@ -1475,10 +1482,10 @@ radiated_power_scalar:
 ratio_of_divertor_to_duct_pressure:
   default_units: dimensionless
   description:
-  - ratio between divertor neutral pressure and pressure at duct location
+  - ratio between divertor neutral pressure and pressure at pumping duct
   set_by: []
   used_by:
-  - calc_reattachment_time_henderson
+  - calc_neutral_pressure_kallenbach
 ratio_of_molecular_to_ion_mass:
   default_units: dimensionless
   description:

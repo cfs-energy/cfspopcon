@@ -404,6 +404,9 @@ Physics Glossary
   power_crossing_separatrix
     Power crossing the separatrix and entering the scrape-off-layer.
 
+  pumping_duct_neutral_pressure
+    Neutral pressure at the baratron position in pumping duct.
+
   Q
     Fusion power thermal gain factor.
 
@@ -426,7 +429,7 @@ Physics Glossary
     An enhancement factor :math:`C` to modify the radiated power :math:`P_{rad} = C P_{rad,calculated}`.
 
   ratio_of_divertor_to_duct_pressure
-    ratio between divertor neutral pressure and pressure at duct location
+    ratio between divertor neutral pressure and pressure at pumping duct
 
   ratio_of_molecular_to_ion_mass
     Ratio between neutral molecule mass and ion mass

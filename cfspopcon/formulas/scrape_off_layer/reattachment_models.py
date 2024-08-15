@@ -7,7 +7,7 @@ from ...unit_handling import Unitfull, convert_units, magnitude_in_units, ureg
 from .two_point_model.momentum_loss_functions import calc_SOL_momentum_loss_fraction
 
 
-@Algorithm.register_algorithm(return_keys=["target_neutral_pressure"])
+@Algorithm.register_algorithm(return_keys=["target_neutral_pressure", "pumping_duct_neutral_pressure"])
 def calc_neutral_pressure_kallenbach(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
@@ -23,6 +23,7 @@ def calc_neutral_pressure_kallenbach(
     separatrix_electron_density: Unitfull,
     target_electron_temp: Unitfull,
     q_parallel: Unitfull,
+    ratio_of_divertor_to_duct_pressure: Unitfull,
 ) -> Unitfull:
     """Calculates target neutral pressure, p0, as a function of upstream separatrix density and some other variables.
 
@@ -43,6 +44,7 @@ def calc_neutral_pressure_kallenbach(
         separatrix_electron_density: [1e19 m^-3] :term:`glossary link<separatrix_electron_density>`
         target_electron_temp: [eV] :term:`glossary link<target_electron_temp>`
         q_parallel: [GW/m²] :term:`glossary link<q_parallel>`
+        ratio_of_divertor_to_duct_pressure: [~] :term:`glossary link<ratio_of_divertor_to_duct_pressure>`
 
     Returns:
         :term:`target_neutral_pressure` [Pa]
@@ -62,9 +64,10 @@ def calc_neutral_pressure_kallenbach(
         / (neutral_flux_density_factor)
     )
 
-    p0 = (separatrix_electron_density / term1 / term2 / term3 / term4) ** 2 * term5
+    p_div = (separatrix_electron_density / term1 / term2 / term3 / term4) ** 2 * term5
+    p_duct = p_div / ratio_of_divertor_to_duct_pressure
 
-    return p0
+    return p_div, p_duct
 
 
 @Algorithm.register_algorithm(return_keys=["reattachment_time"])
@@ -74,7 +77,6 @@ def calc_reattachment_time_henderson(
     parallel_connection_length: Unitfull,
     separatrix_power_transient: Unitfull,
     ionization_volume_density_factor: Unitfull,
-    ratio_of_divertor_to_duct_pressure: Unitfull,
     ionization_volume: Unitfull,
 ) -> Unitfull:
     """Calculates the reattachment time for a detachment front to move to e^-5 * original front location from the target.
@@ -87,7 +89,6 @@ def calc_reattachment_time_henderson(
       parallel_connection_length: [m] :term:`glossary link<parallel_connection_length>`
       separatrix_power_transient: [MW] :term:`glossary link<separatrix_power_transient>`
       ionization_volume_density_factor: [~] :term:`glossary link<ionization_volume_density_factor>`
-      ratio_of_divertor_to_duct_pressure: [~] :term:`glossary link<ratio_of_divertor_to_duct_pressure>`
       ionization_volume: [m**3] :term:`glossary link<ionization_volume>`
 
     Returns:
@@ -100,27 +101,26 @@ def calc_reattachment_time_henderson(
     term4 = parallel_connection_length / (12.0 * ureg.m)
     term5 = (2.0 * ureg.MW) / separatrix_power_transient
 
-    reattachment_time = 0.09 * ureg.s * term1 * term2 * term3 * term4 * term5 / ratio_of_divertor_to_duct_pressure
-
+    reattachment_time = 0.09 * ureg.s * term1 * term2 * term3 * term4 * term5
     return reattachment_time
 
 
 @Algorithm.register_algorithm(return_keys=["ionization_volume"])
 def calc_ionization_volume_from_AUG(
-    major_radius: Unitfull,
+    plasma_volume: Unitfull,
 ) -> Unitfull:
     """Calculates ionization volume using major radius and AUG ionization volume.
 
-    AUG ionization volume per :cite:`henderson2024comparison`
+    AUG ionization volume per :cite:`henderson2024comparison` page 8 RH column
 
     Args:
-      major_radius: [m] :term:`glossary link<major_radius>`
+      plasma_volume: [m**3] :term:`glossary link<plasma_volume>`
 
     Returns:
       :term:`ionization_volume` [m**3]
     """
-    # calculate ionization volume using AUG volume (0.4 m^3) and AUG major radius (1.65m)
-    ionization_volume = major_radius / (1.65 * ureg.m) * (0.4 * ureg.m**3)
+    # calculate ionization volume using ratio of plasma_volume to AUG plasma volume (13.0 m^3)
+    ionization_volume = plasma_volume / (13.0 * ureg.m**3) * (0.4 * ureg.m**3)
     return ionization_volume
 
 
