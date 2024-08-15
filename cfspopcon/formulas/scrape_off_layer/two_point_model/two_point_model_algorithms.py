@@ -30,6 +30,7 @@ def two_point_model_fixed_fpow(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    sheath_heat_transmission_factor: Unitfull,
     two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed power loss fraction in the SOL.
@@ -44,6 +45,7 @@ def two_point_model_fixed_fpow(
         average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
+        sheath_heat_transmission_factor: :term:`glossary link<sheath_heat_transmission_factor>`
         two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
@@ -64,6 +66,7 @@ def two_point_model_fixed_fpow(
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
         two_point_model_error_nonconverged_error=two_point_model_error_nonconverged_error,
+        sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
@@ -90,6 +93,7 @@ def two_point_model_fixed_qpart(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    sheath_heat_transmission_factor: Unitfull,
     two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed parallel heat flux density reaching the target.
@@ -104,6 +108,7 @@ def two_point_model_fixed_qpart(
         average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
+        sheath_heat_transmission_factor: :term:`glossary link<sheath_heat_transmission_factor>`
         two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
@@ -127,6 +132,7 @@ def two_point_model_fixed_qpart(
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
         two_point_model_error_nonconverged_error=two_point_model_error_nonconverged_error,
+        sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
 
     return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
@@ -150,6 +156,7 @@ def two_point_model_fixed_tet(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    sheath_heat_transmission_factor: Unitfull,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed sheath entrance temperature.
 
@@ -163,6 +170,7 @@ def two_point_model_fixed_tet(
         average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
+        sheath_heat_transmission_factor: :term:`glossary link<sheath_heat_transmission_factor>`
 
     Returns:
         :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`SOL_power_loss_fraction`, :term:`target_electron_flux`, :term:`target_q_parallel`,
@@ -181,6 +189,7 @@ def two_point_model_fixed_tet(
         average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
+        sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)

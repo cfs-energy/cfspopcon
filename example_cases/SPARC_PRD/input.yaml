@@ -225,6 +225,8 @@ fraction_of_P_SOL_to_divertor: 0.6
 kappa_e0: 2600.0
 # Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
 target_electron_temp: 25.0
+# Sheath energy transmission factor
+sheath_heat_transmission_factor: 7.5
 
 # Which species should be injected to cool the scrape-off-layer?
 edge_impurity_species: Argon

@@ -73,9 +73,9 @@ average_electron_density:
   - calc_effective_collisionality
   - calc_peaked_profiles
   - calc_1D_plasma_profiles
-  - calc_separatrix_electron_density
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
+  - calc_separatrix_electron_density
   - calc_LH_transition_threshold_power
   - calc_LI_transition_threshold_power
 average_electron_temp:
@@ -123,6 +123,8 @@ average_ion_mass:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
+  - calc_neutral_flux_density_factor
   - calc_poloidal_sound_larmor_radius
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
@@ -794,6 +796,22 @@ ion_to_electron_temp_ratio:
   - calc_edge_collisionality
   - calc_average_ion_temp_from_temperature_ratio
   - calc_SepOS_ideal_MHD_limit
+ionization_volume:
+  default_units: meter ** 3
+  description:
+  - Volume available above the target for ionization
+  set_by:
+  - calc_ionization_volume_from_AUG
+  used_by:
+  - calc_reattachment_time_henderson
+ionization_volume_density_factor:
+  default_units: dimensionless
+  description:
+  - factor that relates the target density to an averaged density across the ionization
+    volume
+  set_by: []
+  used_by:
+  - calc_reattachment_time_henderson
 kappa_e0:
   default_units: watt / electron_volt ** 3.5 / meter
   description:
@@ -805,6 +823,14 @@ kappa_e0:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
+kappa_ez:
+  default_units: dimensionless
+  description:
+  - finite z correction factor to the electron heat conductivity.  per :cite:`Goldston_2017`
+  set_by: []
+  used_by:
+  - calc_neutral_pressure_kallenbach
 lambda_q:
   default_units: millimeter
   description:
@@ -814,6 +840,7 @@ lambda_q:
   used_by:
   - calc_parallel_heat_flux_density
   - calc_q_perp
+  - calc_neutral_pressure_kallenbach
 lambda_q_factor:
   default_units: dimensionless
   description:
@@ -1009,9 +1036,18 @@ nesep_over_nebar:
     :math:`n_{e,sep} / \bar n_e`.
   set_by: []
   used_by:
-  - calc_separatrix_electron_density
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
+  - calc_separatrix_electron_density
+neutral_flux_density_factor:
+  default_units: 1 / meter ** 2 / pascal / second
+  description:
+  - Conversion factor from neutral pressure at duct to neutral recycling flux at the
+    target.  From :cite:`Kallenbach_2018`
+  set_by:
+  - calc_neutral_flux_density_factor
+  used_by:
+  - calc_neutral_pressure_kallenbach
 neutron_power_flux_to_walls:
   default_units: megawatt / meter ** 2
   description:
@@ -1207,6 +1243,8 @@ parallel_connection_length:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
+  - calc_reattachment_time_henderson
 PB_over_R:
   default_units: megawatt * tesla / meter
   description:
@@ -1325,6 +1363,7 @@ plasma_volume:
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
   - calc_internal_inductance_for_noncylindrical
+  - calc_ionization_volume_from_AUG
 poloidal_circumference:
   default_units: meter
   description:
@@ -1367,6 +1406,13 @@ power_crossing_separatrix:
   - calc_lambda_q
   - calc_ratio_P_LH
   - calc_ratio_P_LI
+pumping_duct_neutral_pressure:
+  default_units: pascal
+  description:
+  - Neutral pressure at the baratron position in pumping duct.
+  set_by:
+  - calc_neutral_pressure_kallenbach
+  used_by: []
 Q:
   default_units: dimensionless
   description:
@@ -1385,6 +1431,7 @@ q_parallel:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
 q_perp:
   default_units: megawatt / meter ** 2
   description:
@@ -1432,6 +1479,20 @@ radiated_power_scalar:
   used_by:
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
+ratio_of_divertor_to_duct_pressure:
+  default_units: dimensionless
+  description:
+  - ratio between divertor neutral pressure and pressure at pumping duct
+  set_by: []
+  used_by:
+  - calc_neutral_pressure_kallenbach
+ratio_of_molecular_to_ion_mass:
+  default_units: dimensionless
+  description:
+  - Ratio between neutral molecule mass and ion mass
+  set_by: []
+  used_by:
+  - calc_neutral_flux_density_factor
 ratio_of_P_SOL_to_P_LH:
   default_units: dimensionless
   description:
@@ -1448,6 +1509,14 @@ ratio_of_P_SOL_to_P_LI:
     power.
   set_by:
   - calc_ratio_P_LI
+  used_by: []
+reattachment_time:
+  default_units: second
+  description:
+  - Time duration for detachment front to reach the target in response to a transient.  Per
+    :cite:`Henderson_2023`
+  set_by:
+  - calc_reattachment_time_henderson
   used_by: []
 reference_electron_density:
   default_units: 1 / meter ** 3
@@ -1531,6 +1600,7 @@ separatrix_electron_density:
   - calc_alpha_t
   - calc_edge_collisionality
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
@@ -1568,6 +1638,13 @@ separatrix_elongation:
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
+separatrix_power_transient:
+  default_units: megawatt
+  description:
+  - Transient increase to power crossing the separatrix.  Per :cite:`Henderson_2023`
+  set_by: []
+  used_by:
+  - calc_reattachment_time_henderson
 separatrix_triangularity:
   default_units: dimensionless
   description:
@@ -1602,6 +1679,16 @@ SepOS_MHD_limit:
   set_by:
   - calc_SepOS_ideal_MHD_limit
   used_by: []
+sheath_heat_transmission_factor:
+  default_units: dimensionless
+  description:
+  - Sheath heat transmission coefficient per equation 2.89 in :cite:`Stangeby_2000`
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
 SOC_LOC_ratio:
   default_units: dimensionless
   description:
@@ -1620,6 +1707,7 @@ SOL_momentum_loss_function:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
 SOL_power_loss_fraction:
   default_units: dimensionless
   description:
@@ -1631,6 +1719,7 @@ SOL_power_loss_fraction:
   used_by:
   - calc_edge_impurity_concentration
   - two_point_model_fixed_fpow
+  - calc_neutral_pressure_kallenbach
 spitzer_resistivity:
   default_units: meter * ohm
   description:
@@ -1688,6 +1777,14 @@ sustainment_power_in_ion_channel:
   set_by:
   - calc_power_crossing_separatrix_in_ion_channel
   used_by: []
+target_angle_of_incidence:
+  default_units: degree
+  description:
+  - Angle of incidence between magnetic field vector and surface normal vector at
+    divertor target.
+  set_by: []
+  used_by:
+  - calc_neutral_pressure_kallenbach
 target_electron_density:
   default_units: _1e19_per_cubic_metre
   description:
@@ -1696,7 +1793,8 @@ target_electron_density:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
-  used_by: []
+  used_by:
+  - calc_reattachment_time_henderson
 target_electron_flux:
   default_units: 1 / meter ** 2 / second
   description:
@@ -1716,7 +1814,24 @@ target_electron_temp:
   used_by:
   - calc_edge_impurity_concentration
   - two_point_model_fixed_tet
+  - calc_neutral_pressure_kallenbach
   - calc_power_crossing_separatrix_in_electron_channel
+target_gaussian_spreading:
+  default_units: millimeter
+  description:
+  - Gaussian spreading coefficient, S, representing diffusive transport between x-point
+    and divertor target
+  set_by: []
+  used_by:
+  - calc_neutral_pressure_kallenbach
+target_neutral_pressure:
+  default_units: pascal
+  description:
+  - Neutral pressure at the divertor target.
+  set_by:
+  - calc_neutral_pressure_kallenbach
+  used_by:
+  - calc_reattachment_time_henderson
 target_q_parallel:
   default_units: gigawatt / meter ** 2
   description:
@@ -1851,6 +1966,13 @@ vertical_minor_radius:
   set_by:
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
   used_by: []
+wall_temperature:
+  default_units: kelvin
+  description:
+  - Temperature of neutral gas at the wall
+  set_by: []
+  used_by:
+  - calc_neutral_flux_density_factor
 z_effective:
   default_units: dimensionless
   description:
