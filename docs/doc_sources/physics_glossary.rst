@@ -494,6 +494,9 @@ Physics Glossary
   SOC_LOC_ratio
     Ratio of the energy confinement time from the chosen saturated ohmic confinement (SOC) scaling and the chosen linear ohmic confinement (LOC) scaling.
 
+  SOL_conduction_fraction
+    Fraction of power carried by heat conduction in the scrape-off-layer.
+
   SOL_momentum_loss_function
     Fraction of momentum entering a scrape-off-layer flux tube which is lost before reaching the divertor target.
 

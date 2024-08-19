@@ -9,6 +9,7 @@ from .reattachment_models import (
     calc_reattachment_time_henderson,
 )
 from .separatrix_density import calc_separatrix_electron_density
+from .separatrix_electron_temp import calc_separatrix_electron_temp
 from .two_point_model import (
     solve_target_first_two_point_model,
     solve_two_point_model,
@@ -25,6 +26,7 @@ __all__ = [
     "two_point_model_fixed_tet",
     "calc_lambda_q",
     "calc_separatrix_electron_density",
+    "calc_separatrix_electron_temp",
     "calc_B_pol_omp",
     "calc_B_tor_omp",
     "calc_fieldline_pitch_at_omp",

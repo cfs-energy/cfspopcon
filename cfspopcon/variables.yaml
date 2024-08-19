@@ -820,6 +820,7 @@ kappa_e0:
   set_by: []
   used_by:
   - calc_edge_impurity_concentration
+  - calc_separatrix_electron_temp
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
@@ -1240,6 +1241,7 @@ parallel_connection_length:
     'upstream' position (usually the outboard midplane) to the divertor target.
   set_by: []
   used_by:
+  - calc_separatrix_electron_temp
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
@@ -1428,6 +1430,7 @@ q_parallel:
   - calc_parallel_heat_flux_density
   used_by:
   - calc_edge_impurity_concentration
+  - calc_separatrix_electron_temp
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
@@ -1611,6 +1614,7 @@ separatrix_electron_temp:
   - The electron temperature at the 'upstream' end of a scrape-off-layer flux-tube
     (usually at the outboard midplane).
   set_by:
+  - calc_separatrix_electron_temp
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - two_point_model_fixed_tet
@@ -1697,6 +1701,13 @@ SOC_LOC_ratio:
   set_by:
   - switch_to_linearised_ohmic_confinement_below_threshold
   used_by: []
+SOL_conduction_fraction:
+  default_units: dimensionless
+  description:
+  - Fraction of power carried by heat conduction in the scrape-off-layer.
+  set_by: []
+  used_by:
+  - calc_separatrix_electron_temp
 SOL_momentum_loss_function:
   default_units: null
   description:
@@ -1813,6 +1824,7 @@ target_electron_temp:
   - two_point_model_fixed_qpart
   used_by:
   - calc_edge_impurity_concentration
+  - calc_separatrix_electron_temp
   - two_point_model_fixed_tet
   - calc_neutral_pressure_kallenbach
   - calc_power_crossing_separatrix_in_electron_channel

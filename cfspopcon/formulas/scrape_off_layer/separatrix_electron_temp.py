@@ -4,12 +4,14 @@ from typing import Union
 
 import xarray as xr
 
+from ...algorithm_class import Algorithm
 from ...unit_handling import Quantity
 
 
+@Algorithm.register_algorithm(return_keys=["separatrix_electron_temp"])
 def calc_separatrix_electron_temp(
     target_electron_temp: Union[Quantity, xr.DataArray],
-    parallel_heat_flux_density: Union[Quantity, xr.DataArray],
+    q_parallel: Union[Quantity, xr.DataArray],
     parallel_connection_length: Union[Quantity, xr.DataArray],
     kappa_e0: Union[Quantity, xr.DataArray],
     SOL_conduction_fraction: Union[float, xr.DataArray] = 1.0,
@@ -19,15 +21,13 @@ def calc_separatrix_electron_temp(
     Equation 38 from :cite:`stangeby_2018`, keeping the dependence on target_electron_temp.
 
     Args:
-        target_electron_temp: [eV]
-        parallel_heat_flux_density: [GW/m^2]
-        parallel_connection_length: [m]
-        kappa_e0: [W / (eV**3.5 m)]
-        SOL_conduction_fraction: [eV]
+        target_electron_temp: [eV] :term:`glossary link<target_electron_temp>`
+        q_parallel: [GW/m^2] :term:`glossary link<q_parallel>`
+        parallel_connection_length: [m] :term:`glossary link<parallel_connection_length>`
+        kappa_e0: [W / (eV**3.5 m)] :term:`glossary link<kappa_e0>`
+        SOL_conduction_fraction: [eV] :term:`glossary link<SOL_conduction_fraction>`
 
     Returns:
         separatrix_electron_temp [eV]
     """
-    return (
-        target_electron_temp**3.5 + 3.5 * (SOL_conduction_fraction * parallel_heat_flux_density * parallel_connection_length / kappa_e0)
-    ) ** (2.0 / 7.0)
+    return (target_electron_temp**3.5 + 3.5 * (SOL_conduction_fraction * q_parallel * parallel_connection_length / kappa_e0)) ** (2.0 / 7.0)
