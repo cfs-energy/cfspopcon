@@ -31,10 +31,14 @@ def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray:
         pass
 
     if val.dtype == object:
-        if val.size == 1:
-            val = val.item().name
-        else:
-            val = xr.DataArray([v.name for v in val.values])
+        try:
+            if val.size == 1:
+                val = val.item().name
+            else:
+                val = xr.DataArray([v.name for v in val.values])
+        except AttributeError:
+            print(f"Cannot handle {key}. Dropping variable.")
+            return "UNHANDLED"
 
     return val
 
