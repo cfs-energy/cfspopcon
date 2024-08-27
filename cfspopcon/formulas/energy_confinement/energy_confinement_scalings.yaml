@@ -314,3 +314,33 @@ H_DS03:
     triangularity_alpha: 0.0
     qstar_alpha: 0.0
 
+H_NTD3D24:
+  metadata:
+    reference: "Simultaneous access to high normalized density, current, pressure, and confinement in strongly-shaped diverted negative triangularity plasmas, C. Paz-Soldan et. al (2024) Nuclear Fusion, 64"
+    notes: ""
+    regime: "Neg-D"
+  params:
+    constant: 0.0562
+    mass_ratio_alpha: 0.19
+    field_on_axis_alpha: 0.108
+    plasma_current_alpha: 1.024
+    input_power_alpha: -0.907
+    major_radius_alpha: 1.97
+    triangularity_alpha: 0.0
+    inverse_aspect_ratio_alpha: 0.58
+    areal_elongation_alpha: 0.78
+    separatrix_elongation_alpha: 0.0
+    average_density_alpha: 0.508
+    qstar_alpha: 0.0
+    C: 0.0562
+    a_A: 0.19
+    a_B: 0.108
+    a_I: 1.024
+    a_P: -0.907
+    a_R: 1.97
+    a_d: 0.0
+    a_e: 0.58
+    a_ka: 0.78
+    a_ks: 0.0
+    a_n: 0.508
+    a_q: 0.0
