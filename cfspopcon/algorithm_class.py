@@ -137,6 +137,8 @@ class Algorithm:
         skip_registration: bool = False,
     ) -> Algorithm:
         """Build an Algorithm which wraps a single function."""
+        if not isinstance(return_keys, list):
+            return_keys = [return_keys]
 
         @wraps(func)
         def wrapped_function(**kwargs: Any) -> dict:
