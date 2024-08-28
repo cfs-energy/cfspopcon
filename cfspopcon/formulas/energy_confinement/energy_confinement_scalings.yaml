@@ -332,15 +332,3 @@ H_NTD3D24:
     separatrix_elongation_alpha: 0.0
     average_density_alpha: 0.508
     qstar_alpha: 0.0
-    C: 0.0562
-    a_A: 0.19
-    a_B: 0.108
-    a_I: 1.024
-    a_P: -0.907
-    a_R: 1.97
-    a_d: 0.0
-    a_e: 0.58
-    a_ka: 0.78
-    a_ks: 0.0
-    a_n: 0.508
-    a_q: 0.0
