@@ -312,6 +312,12 @@ class CompositeAlgorithm:
         self._name = name
         self.__doc__ = self._make_docstring()
 
+    @classmethod
+    def from_list(cls, keys: list[str]) -> CompositeAlgorithm:
+        """Build a CompositeAlgorithm from a list of Algorithm names."""
+        algorithms = [Algorithm.get_algorithm(key) for key in keys]
+        return CompositeAlgorithm(algorithms=algorithms)
+
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
         components = f"[{', '.join(alg._name for alg in self.algorithms)}]"
