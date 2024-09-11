@@ -27,7 +27,7 @@ from .target_electron_temp import calc_f_other_target_electron_temp, calc_target
 
 def solve_target_first_two_point_model(
     target_electron_temp: Unitfull,
-    parallel_heat_flux_density: Unitfull,
+    q_parallel: Unitfull,
     parallel_connection_length: Unitfull,
     separatrix_electron_density: Unitfull,
     toroidal_flux_expansion: Unitfull,
@@ -47,7 +47,7 @@ def solve_target_first_two_point_model(
 
     Args:
         target_electron_temp: [eV]
-        parallel_heat_flux_density: [GW/m^2]
+        q_parallel: [GW/m^2]
         parallel_connection_length: [m]
         separatrix_electron_density: [m^-3]
         toroidal_flux_expansion: [~]
@@ -70,7 +70,7 @@ def solve_target_first_two_point_model(
 
     separatrix_electron_temp = calc_separatrix_electron_temp(
         target_electron_temp=target_electron_temp,
-        parallel_heat_flux_density=parallel_heat_flux_density,
+        q_parallel=q_parallel,
         parallel_connection_length=parallel_connection_length,
         SOL_conduction_fraction=SOL_conduction_fraction,
         kappa_e0=kappa_e0,
@@ -86,7 +86,7 @@ def solve_target_first_two_point_model(
 
     f_basic_kwargs = dict(
         average_ion_mass=average_ion_mass,
-        parallel_heat_flux_density=parallel_heat_flux_density,
+        q_parallel=q_parallel,
         upstream_total_pressure=upstream_total_pressure,
         sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
