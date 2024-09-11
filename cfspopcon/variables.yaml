@@ -552,7 +552,7 @@ fraction_of_external_power_coupled:
     / P_{launched}`.'
   set_by: []
   used_by:
-  - calc_auxillary_power
+  - calc_auxiliary_power
 fraction_of_P_SOL_to_divertor:
   default_units: dimensionless
   description:
@@ -1095,30 +1095,30 @@ P_alpha:
   set_by:
   - calc_fusion_power
   used_by:
-  - calc_auxillary_power
-P_auxillary_absorbed:
+  - calc_auxiliary_power
+P_auxiliary_absorbed:
   default_units: megawatt
   description:
-  - Auxillary heating absorbed by the plasma integrated over the plasma volume.
+  - auxiliary heating absorbed by the plasma integrated over the plasma volume.
   set_by:
-  - calc_auxillary_power
+  - calc_auxiliary_power
   used_by: []
-P_auxillary_launched:
+P_auxiliary_launched:
   default_units: megawatt
   description:
   - External heating supplied to the plasma (entering the volume, but not necessarily
     absorbed by the plasma) integrated over the plasma volume.
   set_by:
-  - calc_auxillary_power
+  - calc_auxiliary_power
   used_by:
   - calc_fusion_gain
 P_external:
   default_units: megawatt
   description:
-  - External heating absorbed by the plasma (ohmic plus auxillary) integrated over
+  - External heating absorbed by the plasma (ohmic plus auxiliary) integrated over
     the plasma volume.
   set_by:
-  - calc_auxillary_power
+  - calc_auxiliary_power
   used_by: []
 P_fusion:
   default_units: megawatt
@@ -1132,13 +1132,13 @@ P_fusion:
 P_in:
   default_units: megawatt
   description:
-  - Total input power to the plasma. Sum of ohmic, auxillary and alpha power.
+  - Total input power to the plasma. Sum of ohmic, auxiliary and alpha power.
   set_by:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   used_by:
-  - calc_auxillary_power
+  - calc_auxiliary_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_f_rad_core
@@ -1178,7 +1178,7 @@ P_ohmic:
   set_by:
   - calc_ohmic_power
   used_by:
-  - calc_auxillary_power
+  - calc_auxiliary_power
   - calc_fusion_gain
 P_rad_bremsstrahlung:
   default_units: megawatt

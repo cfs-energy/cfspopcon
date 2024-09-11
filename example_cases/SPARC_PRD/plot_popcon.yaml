@@ -18,7 +18,7 @@ fill:
   where:
       Q:
         min: 1.0
-      P_auxillary_launched:
+      P_auxiliary_launched:
         min: 0.0
         max: 25.0
         units: MW
@@ -53,7 +53,7 @@ contour:
     levels: [1.0]
     format: "1.2g"
 
-  P_auxillary_launched:
+  P_auxiliary_launched:
     label: "$P_{aux,launched}$"
     levels: [1.0, 5.0, 10.0, 25.0, 50.0]
     color: "tab:gray"

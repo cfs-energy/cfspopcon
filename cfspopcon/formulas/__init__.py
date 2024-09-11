@@ -2,7 +2,7 @@
 
 from . import (
     atomic_data,
-    auxillary_power,
+    auxiliary_power,
     energy_confinement,
     fusion_power,
     geometry,
@@ -26,7 +26,7 @@ __all__ = [
     "radiated_power",
     "scrape_off_layer",
     "plasma_pressure",
-    "auxillary_power",
+    "auxiliary_power",
     "separatrix_conditions",
     "impurities",
     "atomic_data",

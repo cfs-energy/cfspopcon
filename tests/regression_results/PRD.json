@@ -68,14 +68,14 @@
             "data": 22.55867182,
             "dims": []
         },
-        "P_auxillary_absorbed": {
+        "P_auxiliary_absorbed": {
             "attrs": {
                 "units": "megawatt"
             },
             "data": 7.702542635,
             "dims": []
         },
-        "P_auxillary_launched": {
+        "P_auxiliary_launched": {
             "attrs": {
                 "units": "megawatt"
             },
@@ -320,14 +320,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.08439527531,
+            "data": 0.08439528049,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.01687905506,
+            "data": 0.01687905610,
             "dims": []
         },
         "edge_impurity_enrichment": {
@@ -687,7 +687,7 @@
             "data": [
                 0.06000000000,
                 0.003100000000,
-                0.01687905506,
+                0.01687905610,
                 0.000000000,
                 1.500000000e-05
             ],
