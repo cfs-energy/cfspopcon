@@ -21,23 +21,23 @@ class RadiationMethod(Enum):
 
 
 class AtomicSpecies(Enum):
-    """Enum of possible atomic species.
+    """Enum of possible atomic species."""
 
-    The enum value represents the species atomic number (Z).
-    """
-
-    Hydrogen = 1
-    Helium = 2
-    Lithium = 3
-    Beryllium = 4
-    Carbon = 6
-    Nitrogen = 7
-    Oxygen = 8
-    Neon = 10
-    Argon = 18
-    Krypton = 36
-    Xenon = 54
-    Tungsten = 74
+    Hydrogen = auto()
+    Deuterium = auto()
+    Tritium = auto()
+    Helium = auto()
+    Lithium = auto()
+    Beryllium = auto()
+    Boron = auto()
+    Carbon = auto()
+    Nitrogen = auto()
+    Oxygen = auto()
+    Neon = auto()
+    Argon = auto()
+    Krypton = auto()
+    Xenon = auto()
+    Tungsten = auto()
 
     def __lt__(self, other: "AtomicSpecies") -> bool:
         """Implements '<' to allow sorting."""
