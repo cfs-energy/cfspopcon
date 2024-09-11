@@ -5,7 +5,7 @@ show_dpi: 150
 
 new_coords:
   x:
-    dimension: P_auxillary_launched
+    dimension: P_auxiliary_launched
     label: "$P_{RF}$ [$MW$]"
     units: MW
     max: 25.0
@@ -19,7 +19,7 @@ fill:
   where:
       Q:
         min: 1.0
-      P_auxillary_launched:
+      P_auxiliary_launched:
         min: 0.0
         max: 25.0
         units: MW
@@ -51,7 +51,7 @@ contour:
     levels: [1.0]
     format: "1.2g"
 
-  P_auxillary_launched:
+  P_auxiliary_launched:
     label: "$P_{aux}$"
     levels: [1.0, 5.0, 10.0, 25.0, 50.0]
     color: "tab:gray"

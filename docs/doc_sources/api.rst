@@ -10,9 +10,9 @@ Configuration Enums
 Formulas
 ========================
 
-Auxillary Power
+auxiliary Power
 ----------------
-.. automodule:: cfspopcon.formulas.auxillary_power
+.. automodule:: cfspopcon.formulas.auxiliary_power
 
 Energy Confinement
 ----------------------

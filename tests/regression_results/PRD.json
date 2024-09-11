@@ -68,14 +68,14 @@
             "data": 22.55867182,
             "dims": []
         },
-        "P_auxillary_absorbed": {
+        "P_auxiliary_absorbed": {
             "attrs": {
                 "units": "megawatt"
             },
             "data": 7.702542635,
             "dims": []
         },
-        "P_auxillary_launched": {
+        "P_auxiliary_launched": {
             "attrs": {
                 "units": "megawatt"
             },

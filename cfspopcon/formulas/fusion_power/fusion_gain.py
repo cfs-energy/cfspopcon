@@ -5,7 +5,7 @@ from ...unit_handling import Unitfull, ureg
 
 
 @Algorithm.register_algorithm(return_keys=["Q"])
-def calc_fusion_gain(P_fusion: Unitfull, P_ohmic: Unitfull, P_auxillary_launched: Unitfull) -> Unitfull:
+def calc_fusion_gain(P_fusion: Unitfull, P_ohmic: Unitfull, P_auxiliary_launched: Unitfull) -> Unitfull:
     """Calculate the fusion gain, using the launched power in the denominator.
 
     This is the thermal gain using the launched power.
@@ -17,12 +17,12 @@ def calc_fusion_gain(P_fusion: Unitfull, P_ohmic: Unitfull, P_auxillary_launched
     Args:
         P_fusion: [MW] :term:`glossary link<P_fusion>`
         P_ohmic: [MW] :term:`glossary link<P_ohmic>`
-        P_auxillary_launched: [MW] :term:`glossary link<P_auxillary_launched>`
+        P_auxiliary_launched: [MW] :term:`glossary link<P_auxiliary_launched>`
 
     Returns:
         :term:`Q` [~]
     """
-    Q = P_fusion / (P_ohmic + P_auxillary_launched).clip(min=1.0 * ureg.W)
+    Q = P_fusion / (P_ohmic + P_auxiliary_launched).clip(min=1.0 * ureg.W)
 
     return Q
 

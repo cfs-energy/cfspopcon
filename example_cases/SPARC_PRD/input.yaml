@@ -45,7 +45,7 @@ algorithms:
   - calc_zeff_and_dilution_due_to_impurities
   - calc_peaked_profiles
   # We compute the ohmic heating power from the inductive current and
-  # loop voltage, and then set P_auxillary_absorbed = P_in - P_ohmic
+  # loop voltage, and then set P_auxiliary_absorbed = P_in - P_ohmic
   - calc_bootstrap_fraction
   - calc_inductive_plasma_current
   - calc_Spitzer_loop_resistivity
@@ -56,7 +56,7 @@ algorithms:
   # Calculate the fusion power and gain.
   - calc_fusion_power
   - calc_neutron_flux_to_walls
-  - calc_auxillary_power
+  - calc_auxiliary_power
   - calc_fusion_gain
   # We compute the inductances and then flux to get the max_flux_for_flattop
   - calc_elongation_at_psi95_from_areal_elongation
@@ -130,7 +130,7 @@ points:
   PRD:
     maximize: Q
     where:
-      P_auxillary_launched:
+      P_auxiliary_launched:
         min: 0.0
         max: 25.0
         units: MW
