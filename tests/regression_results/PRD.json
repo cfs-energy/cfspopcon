@@ -65,35 +65,35 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 23.15215641,
+            "data": 23.15670789,
             "dims": []
         },
         "P_auxiliary_absorbed": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 7.109058038,
+            "data": 7.104506562,
             "dims": []
         },
         "P_auxiliary_launched": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 7.898953375,
+            "data": 7.893896180,
             "dims": []
         },
         "P_external": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 8.310679908,
+            "data": 8.306128433,
             "dims": []
         },
         "P_fusion": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 115.7607821,
+            "data": 115.7835394,
             "dims": []
         },
         "P_in": {
@@ -107,7 +107,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 92.60862566,
+            "data": 92.62683156,
             "dims": []
         },
         "P_ohmic": {
@@ -135,7 +135,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 12.72016097,
+            "data": 12.72973555,
             "dims": []
         },
         "SOL_momentum_loss_function": {
@@ -933,14 +933,14 @@
             "attrs": {
                 "units": "megawatt / meter ** 2"
             },
-            "data": 1.667534492,
+            "data": 1.667862312,
             "dims": []
         },
         "neutron_rate": {
             "attrs": {
                 "units": "1 / second"
             },
-            "data": 4.105238476e+19,
+            "data": 4.106045524e+19,
             "dims": []
         },
         "normalized_beta": {

@@ -34,7 +34,7 @@ class DTFusionBoschHale(FusionReaction):
     def calc_rate_coefficient(ion_temp: float) -> float:
         r"""Calculate :math:`\\langle \\sigma v \rangle` for a given ion temperature.
 
-        Cross-section from :cite:`bosch_improved_1992`
+        Cross-section from :cite:`bosch_improved_1992`, equation 12, using coefficients from table VII, page 625 (first column is DT reaction)
 
         Args:
             ion_temp: [keV]
@@ -42,7 +42,7 @@ class DTFusionBoschHale(FusionReaction):
         Returns:
             :math:`\\langle \\sigma v \rangle` [cm^3/s]
         """
-        C = [0.0, 1.173e-9, 1.514e-2, 7.519e-2, 4.606e-3, 1.35e-2, -1.068e-4, 1.366e-5]
+        C = [0.0, 1.17302e-9, 1.51361e-2, 7.51886e-2, 4.60643e-3, 1.35000e-2, -1.06750e-4, 1.36600e-5]
         B_G = 34.3827
         mr_c2 = 1124656
 
