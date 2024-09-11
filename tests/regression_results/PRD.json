@@ -65,35 +65,35 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 22.55867182,
+            "data": 23.15670789,
             "dims": []
         },
         "P_auxiliary_absorbed": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 7.702542635,
+            "data": 7.104506562,
             "dims": []
         },
         "P_auxiliary_launched": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 8.558380706,
+            "data": 7.893896180,
             "dims": []
         },
         "P_external": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 8.904164506,
+            "data": 8.306128433,
             "dims": []
         },
         "P_fusion": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 112.7933591,
+            "data": 115.7835394,
             "dims": []
         },
         "P_in": {
@@ -107,7 +107,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 90.23468727,
+            "data": 92.62683156,
             "dims": []
         },
         "P_ohmic": {
@@ -135,7 +135,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 11.55669358,
+            "data": 12.72973555,
             "dims": []
         },
         "SOL_momentum_loss_function": {
@@ -320,14 +320,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.08439528049,
+            "data": 0.08439527661,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.01687905610,
+            "data": 0.01687905532,
             "dims": []
         },
         "edge_impurity_enrichment": {
@@ -634,7 +634,7 @@
         },
         "fusion_reaction": {
             "attrs": {},
-            "data": "DTFusionHively",
+            "data": "DTFusionBoschHale",
             "dims": []
         },
         "fusion_triple_product": {
@@ -687,7 +687,7 @@
             "data": [
                 0.06000000000,
                 0.003100000000,
-                0.01687905610,
+                0.01687905532,
                 0.000000000,
                 1.500000000e-05
             ],
@@ -933,14 +933,14 @@
             "attrs": {
                 "units": "megawatt / meter ** 2"
             },
-            "data": 1.624788752,
+            "data": 1.667862312,
             "dims": []
         },
         "neutron_rate": {
             "attrs": {
                 "units": "1 / second"
             },
-            "data": 4.000004399e+19,
+            "data": 4.106045524e+19,
             "dims": []
         },
         "normalized_beta": {
