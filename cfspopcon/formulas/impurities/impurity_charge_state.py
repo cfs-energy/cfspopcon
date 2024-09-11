@@ -68,24 +68,8 @@ def _calc_impurity_charge_state(
     interpolator = atomic_data.coronal_Z_interpolators[impurity_species]
     interpolated_values = np.power(10, interpolator((np.log10(average_electron_temp), np.log10(average_electron_density))))
 
-    atomic_number = {
-        AtomicSpecies.Hydrogen: 1,
-        AtomicSpecies.Deuterium: 1,
-        AtomicSpecies.Tritium: 1,
-        AtomicSpecies.Helium: 2,
-        AtomicSpecies.Lithium: 3,
-        AtomicSpecies.Beryllium: 4,
-        AtomicSpecies.Boron: 5,
-        AtomicSpecies.Carbon: 6,
-        AtomicSpecies.Nitrogen: 7,
-        AtomicSpecies.Oxygen: 8,
-        AtomicSpecies.Neon: 10,
-        AtomicSpecies.Argon: 18,
-        AtomicSpecies.Krypton: 36,
-        AtomicSpecies.Xenon: 54,
-        AtomicSpecies.Tungsten: 74,
-    }
+    atomic_number = atomic_data.datasets[impurity_species].atomic_number
 
-    interpolated_values = np.minimum(interpolated_values, atomic_number[impurity_species])
+    interpolated_values = np.minimum(interpolated_values, atomic_number)
     interpolated_values = np.maximum(interpolated_values, 0)
     return interpolated_values  # type:ignore[no-any-return]
