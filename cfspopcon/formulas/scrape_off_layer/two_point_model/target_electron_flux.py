@@ -21,7 +21,7 @@ def calc_target_electron_flux(
 
 def calc_target_electron_flux_basic(
     average_ion_mass: Union[Quantity, xr.DataArray],
-    parallel_heat_flux_density: Union[Quantity, xr.DataArray],
+    q_parallel: Union[Quantity, xr.DataArray],
     upstream_total_pressure: Union[Quantity, xr.DataArray],
     sheath_heat_transmission_factor: Union[float, xr.DataArray],
 ) -> Union[Quantity, xr.DataArray]:
@@ -31,14 +31,14 @@ def calc_target_electron_flux_basic(
 
     Args:
         average_ion_mass: [amu]
-        parallel_heat_flux_density: [GW/m^2]
+        q_parallel: [GW/m^2]
         upstream_total_pressure: [atm]
         sheath_heat_transmission_factor: [~]
 
     Returns:
         target_electron_flux_basic [m^-2 s^-1]
     """
-    return sheath_heat_transmission_factor / (8.0 * average_ion_mass) * upstream_total_pressure**2 / parallel_heat_flux_density
+    return sheath_heat_transmission_factor / (8.0 * average_ion_mass) * upstream_total_pressure**2 / q_parallel
 
 
 def calc_f_vol_loss_target_electron_flux(

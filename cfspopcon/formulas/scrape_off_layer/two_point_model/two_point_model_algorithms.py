@@ -58,7 +58,7 @@ def two_point_model_fixed_fpow(
         target_electron_flux,
     ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
-        parallel_heat_flux_density=q_parallel,
+        q_parallel=q_parallel,
         parallel_connection_length=parallel_connection_length,
         separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
@@ -124,7 +124,7 @@ def two_point_model_fixed_qpart(
         target_electron_flux,
     ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
-        parallel_heat_flux_density=q_parallel,
+        q_parallel=q_parallel,
         parallel_connection_length=parallel_connection_length,
         separatrix_electron_density=nesep_over_nebar * average_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
@@ -182,7 +182,7 @@ def two_point_model_fixed_tet(
         target_electron_flux,
     ) = solve_target_first_two_point_model(
         target_electron_temp=target_electron_temp,
-        parallel_heat_flux_density=q_parallel,
+        q_parallel=q_parallel,
         parallel_connection_length=parallel_connection_length,
         separatrix_electron_density=separatrix_electron_density,
         toroidal_flux_expansion=toroidal_flux_expansion,
