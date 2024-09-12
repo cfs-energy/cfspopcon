@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cfspopcon"
-version = "7.0.0"
+version = "7.0.1"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"
