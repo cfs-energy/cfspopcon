@@ -12,6 +12,7 @@ from .fusion_data import (
     pB11Fusion,
 )
 from .fusion_gain import calc_fusion_gain, calc_triple_product
+from .fusion_power_reduction import require_P_fusion_less_than_P_fusion_limit
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "calc_triple_product",
     "calc_fusion_power",
     "calc_neutron_flux_to_walls",
+    "require_P_fusion_less_than_P_fusion_limit",
 ]
