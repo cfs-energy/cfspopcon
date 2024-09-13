@@ -26,8 +26,8 @@ Ret = TypeVar("Ret")
 
 # Define custom units for density as n_19 or n_20 (used in several formulas)
 # Format is "canonical_name = definition = unit_symbol = alias1 = alias2" where unit_symbol and aliases are optional
-ureg.define("n19 = 1e19 m^-3 = 1e19 m^-3")
-ureg.define("n20 = 1e20 m^-3 = 1e20 m^-3")
+ureg.define("n19 = 1e19 m^-3 = n19 = 1e19 m^-3")
+ureg.define("n20 = 1e20 m^-3 = n20 = 1e20 m^-3")
 
 # Needed for serialization/deserialization
 pint.set_application_registry(ureg)  # type:ignore[no-untyped-call]
