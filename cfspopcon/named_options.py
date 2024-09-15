@@ -67,6 +67,14 @@ class LambdaQScaling(Enum):
     EichRegression15 = auto()
 
 
+class ParallelConductionModel(Enum):
+    """Method for SOL parallel heat conduction."""
+
+    Spitzer = auto()
+    FluxLimiter = auto()
+    KineticCorrectionScalings = auto()
+
+
 class ConfinementPowerScaling(Enum):
     """Options for which confinement threshold power scaling to use."""
 

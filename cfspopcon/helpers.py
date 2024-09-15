@@ -8,6 +8,7 @@ from .named_options import (
     ConfinementPowerScaling,
     LambdaQScaling,
     MomentumLossFunction,
+    ParallelConductionModel,
     ProfileForm,
     RadiationMethod,
 )
@@ -31,6 +32,8 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
         return RadiationMethod[val]
     elif key == "confinement_power_scaling":
         return ConfinementPowerScaling[val]
+    elif key == "parallel_conduction_model":
+        return ParallelConductionModel[val]
     else:
         # If the key doesn't match, don't convert the value
         return val

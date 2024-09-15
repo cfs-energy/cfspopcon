@@ -90,7 +90,7 @@ algorithms:
   - calc_parallel_heat_flux_density
   - calc_q_perp
   - calc_separatrix_electron_density
-  - two_point_model_fixed_tet
+  - two_point_model_fixed_fpow
   - calc_edge_impurity_concentration
   - calc_impurity_charge_state
   # Finally, we calculate several parameters which aren't used in other
@@ -145,6 +145,10 @@ points:
 plots:
   "POPCON for SPARC PRD": CASE_DIR/plot_popcon.yaml
   "SPARC PRD $(n_e, P_{aux})$": CASE_DIR/plot_remapped.yaml
+  "r$\nu_{SOL}$": CASE_DIR/plot_SOL_collisionality.yaml
+  "fke": CASE_DIR/plot_SOL_fke.yaml
+  "$T_{e,u}$": CASE_DIR/plot_SOL_Tu.yaml
+  "$T_{e,t}$": CASE_DIR/plot_SOL_Tt.yaml
 
 # Major radius in metres
 major_radius: 1.85
@@ -214,7 +218,7 @@ toroidal_flux_expansion: 0.6974
 # Length along field-line from upstream (outboard midplane) to target in m
 parallel_connection_length: 30.0
 # Lambda_q scaling (matching a LambdaQScaling in named_options)
-lambda_q_scaling: EichRegression15
+lambda_q_scaling: Brunner
 # Scaling factor for lambda_q relative to selected scaling
 lambda_q_factor: 1.0
 # Function used to calculate the momentum loss as a function of target Te in the SOL (matching a MomentumLossFunction in named_options)
@@ -223,11 +227,15 @@ SOL_momentum_loss_function: KotovReiter
 fraction_of_P_SOL_to_divertor: 0.6
 # Electron thermal conductivity in W / (eV**3.5 m)
 kappa_e0: 2600.0
-# Calculate P_rad_SOL such that the target electron temperature in eV reaches this value (for FixedTargetElectronTemp)
-target_electron_temp: 25.0
+# Set P_rad_SOL at fixed fraction of P_SOL (for FixedSOLPowerFraction)
+SOL_power_loss_fraction: 0.9
 # Sheath energy transmission factor
 sheath_heat_transmission_factor: 7.5
-
+# Method for SOL parallel heat conduction. Options: Spitzer (default), KineticCorrectionScalings (D. Power et al), FluxLimiter ("SOLPS-like")
+# Note: this can only be used for two_point_model_fixed_fpow and two_point_model_fixed_qpart two-point-model methods. two_point_model_fixed_tet defaults to Spitzer.
+parallel_conduction_model: FluxLimiter
+# Flux limiter alpha factor (for FluxLimiter conduction option)
+flux_limit_factor_alpha: 0.15
 
 # Which species should be injected to cool the scrape-off-layer?
 edge_impurity_species: Argon

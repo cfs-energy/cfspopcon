@@ -309,6 +309,14 @@ cylindrical_safety_factor:
   - calc_internal_inductivity
   - calc_SepOS_ideal_MHD_limit
   - calc_power_crossing_separatrix_in_electron_channel
+delta_electron_sheath_factor:
+  default_units: dimensionless
+  description:
+  - Increase in electron sheath transmission factor from kinetic effects
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  used_by: []
 density_profile_form:
   default_units: null
   description:
@@ -537,6 +545,15 @@ fieldline_pitch_at_omp:
   - calc_fieldline_pitch_at_omp
   used_by:
   - calc_parallel_heat_flux_density
+flux_limit_factor_alpha:
+  default_units: dimensionless
+  description:
+  - mutliplication factor on the "free-streaming-flux" quantity used by the flux limited
+    conductivity
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
 flux_needed_from_CS_over_rampup:
   default_units: weber
   description:
@@ -817,7 +834,9 @@ kappa_e0:
   description:
   - Electron heat conductivity constant, such that :math:`q_{e,\parallel,cond}=\kappa_{e0}T_{e}^{5/2}\nabla_\parallel
     T_e`.
-  set_by: []
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
   used_by:
   - calc_edge_impurity_concentration
   - calc_separatrix_electron_temp
@@ -1234,6 +1253,15 @@ P_radiation_from_core_seeded_impurity:
   - calc_P_radiation_from_core_seeded_impurity
   used_by:
   - calc_core_seeded_impurity_concentration
+parallel_conduction_model:
+  default_units: null
+  description:
+  - Which model for the parallel heat flux conduction to use in the two point model
+    calculation
+  set_by: []
+  used_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
 parallel_connection_length:
   default_units: meter
   description:
@@ -1687,7 +1715,9 @@ sheath_heat_transmission_factor:
   default_units: dimensionless
   description:
   - Sheath heat transmission coefficient per equation 2.89 in :cite:`Stangeby_2000`
-  set_by: []
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
   used_by:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
@@ -1731,6 +1761,14 @@ SOL_power_loss_fraction:
   - calc_edge_impurity_concentration
   - two_point_model_fixed_fpow
   - calc_neutral_pressure_kallenbach
+Spitzer_conduction_reduction_factor:
+  default_units: dimensionless
+  description:
+  - Multiplication factor on kappa_e0 to account for kinetic effects on reduced conduction
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  used_by: []
 spitzer_resistivity:
   default_units: meter * ohm
   description:
@@ -1945,6 +1983,14 @@ two_point_model_error_nonconverged_error:
   used_by:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
+upstream_SOL_collisionality:
+  default_units: dimensionless
+  description:
+  - SOL collisionality calculated from the upstream quantities from two-point model
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  used_by: []
 vertical_field_mutual_inductance:
   default_units: dimensionless
   description:
