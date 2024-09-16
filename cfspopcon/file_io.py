@@ -23,7 +23,7 @@ ignored_keys = [
 ]
 
 
-def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray:
+def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray | str:
     """Strip units and Enum values from a variable so that it can be stored in a NetCDF file."""
     try:
         val = convert_to_default_units(val, key).pint.dequantify()

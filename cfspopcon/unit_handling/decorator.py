@@ -80,14 +80,16 @@ def wraps_ufunc(  # noqa: PLR0915
     else:
         input_core_dims = len(pass_as_positional_args) * [()]
 
-    def _wraps_ufunc(func: FunctionType) -> FunctionType: # noqa: PLR0915
+    def _wraps_ufunc(func: FunctionType) -> FunctionType:  # noqa: PLR0915
         func_signature = signature(func)
         func_parameters = func_signature.parameters
 
         if not list(input_units.keys()) == list(func_parameters.keys()):
             message = f"input_units for {func.__name__} did not match the function inputs (n.b. order matters!)"
             message += "\ni: input_unit, func_param"
-            for i, (input_unit, func_param) in enumerate(itertools.zip_longest(list(input_units.keys()), list(func_parameters.keys()), fillvalue="MISSING")):
+            for i, (input_unit, func_param) in enumerate(
+                itertools.zip_longest(list(input_units.keys()), list(func_parameters.keys()), fillvalue="MISSING")
+            ):
                 message += f"\n{i}: {input_unit}, {func_param}"
 
             raise ValueError(message)
