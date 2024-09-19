@@ -137,6 +137,8 @@ class Algorithm:
         skip_registration: bool = False,
     ) -> Algorithm:
         """Build an Algorithm which wraps a single function."""
+        if not isinstance(return_keys, list):
+            return_keys = [return_keys]
 
         @wraps(func)
         def wrapped_function(**kwargs: Any) -> dict:
@@ -309,6 +311,12 @@ class CompositeAlgorithm:
         )
         self._name = name
         self.__doc__ = self._make_docstring()
+
+    @classmethod
+    def from_list(cls, keys: list[str]) -> CompositeAlgorithm:
+        """Build a CompositeAlgorithm from a list of Algorithm names."""
+        algorithms = [Algorithm.get_algorithm(key) for key in keys]
+        return CompositeAlgorithm(algorithms=algorithms)
 
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""

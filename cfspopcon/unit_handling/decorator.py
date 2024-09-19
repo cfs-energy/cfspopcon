@@ -1,6 +1,7 @@
 """Defines the wraps_ufunc decorator used to perform unit conversions and dimension handling."""
 
 import functools
+import itertools
 import warnings
 from collections.abc import Callable, Mapping, Sequence, Set
 from inspect import Parameter, Signature, signature
@@ -79,14 +80,21 @@ def wraps_ufunc(  # noqa: PLR0915
     else:
         input_core_dims = len(pass_as_positional_args) * [()]
 
-    def _wraps_ufunc(func: FunctionType) -> FunctionType:
+    def _wraps_ufunc(func: FunctionType) -> FunctionType:  # noqa: PLR0915
         func_signature = signature(func)
         func_parameters = func_signature.parameters
 
         if not list(input_units.keys()) == list(func_parameters.keys()):
-            raise ValueError(
-                f"Keys for input_units {input_units.keys()} did not match func_parameters {func_parameters.keys()} (n.b. order matters!)"
-            )
+            message = f"Keys for input_units for {func.__name__} did not match the declared function inputs (n.b. order matters!)"
+            message += "\ni: input_key, func_param"
+            for i, (input_key, func_param) in enumerate(
+                itertools.zip_longest(list(input_units.keys()), list(func_parameters.keys()), fillvalue="MISSING")
+            ):
+                message += f"\n{i}: {input_key}, {func_param}"
+                if not input_key == func_param:
+                    message += " DOES NOT MATCH"
+
+            raise ValueError(message)
 
         default_values = {key: val.default for key, val in func_parameters.items() if val.default is not Parameter.empty}
 
@@ -187,8 +195,14 @@ def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Uni
 
 
 def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
-    if not set(vals.keys()) == set(units_mapping):
-        raise ValueError(f"Incorrect input arguments: argument keys {vals.keys()} did not match units_mapping keys {units_mapping.keys()}")
+    vals_set, units_set = set(vals.keys()), set(units_mapping)
+    if not vals_set == units_set:
+        message = "Incorrect input arguments."
+        if vals_set - units_set:
+            message += f"\nUnused arguments given for: {vals_set - units_set}"
+        if units_set - vals_set:
+            message += f"\nMissing arguments for: {units_set - vals_set}"
+        raise ValueError(message)
 
     converted_vals = {}
 
@@ -215,11 +229,20 @@ def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Uni
 
 
 def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
+    if isinstance(vals, xr.DataArray) and vals.ndim == 0:
+        # Calling wraps_ufunc with scalar values and multiple returns results in
+        # a xr.DataArray with a single tuple element.
+        vals = vals.item()
+
     if not isinstance(vals, tuple):
         vals = (vals,)
 
     if not len(vals) == len(units_mapping):
-        raise ValueError(f"Number of returned values ({len(vals)}) did not match length of units_mapping ({len(units_mapping)})")
+        message = f"Number of returned values ({len(vals)}) did not match length of units_mapping ({len(units_mapping)})"
+        message += "\ni: return_key, returned_value"
+        for i, (return_key, return_param) in enumerate(itertools.zip_longest(list(units_mapping.keys()), vals, fillvalue="MISSING")):
+            message += f"\n{i}: {return_key}, {return_param}"
+        raise ValueError(message)
     vals = dict(zip(units_mapping.keys(), vals))
 
     converted_vals = {}

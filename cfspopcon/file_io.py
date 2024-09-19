@@ -2,8 +2,9 @@
 
 import json
 import sys
+import warnings
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Union
 
 if sys.version_info >= (3, 11, 0):
     from typing import Self  # type:ignore[attr-defined,unused-ignore]
@@ -23,7 +24,7 @@ ignored_keys = [
 ]
 
 
-def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray:
+def sanitize_variable(val: xr.DataArray, key: str) -> Union[xr.DataArray, str]:
     """Strip units and Enum values from a variable so that it can be stored in a NetCDF file."""
     try:
         val = convert_to_default_units(val, key).pint.dequantify()
@@ -31,10 +32,14 @@ def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray:
         pass
 
     if val.dtype == object:
-        if val.size == 1:
-            val = val.item().name
-        else:
-            val = xr.DataArray([v.name for v in val.values])
+        try:
+            if val.size == 1:
+                val = val.item().name
+            else:
+                val = xr.DataArray([v.name for v in val.values])
+        except AttributeError:
+            warnings.warn(f"Cannot handle {key}. Dropping variable.", stacklevel=3)
+            return "UNHANDLED"
 
     return val
 
