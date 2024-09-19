@@ -37,7 +37,7 @@ def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray | str:
             else:
                 val = xr.DataArray([v.name for v in val.values])
         except AttributeError:
-            print(f"Cannot handle {key}. Dropping variable.")
+            warnings.warn(f"Cannot handle {key}. Dropping variable.")
             return "UNHANDLED"
 
     return val
