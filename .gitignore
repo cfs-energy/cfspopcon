@@ -142,3 +142,6 @@ popcon_algorithms.yaml
 
 # Have an untracked folder for rough working
 untracked/
+# Have a cases folder for personal cases which shouldn't be added
+# to the index
+cases/*

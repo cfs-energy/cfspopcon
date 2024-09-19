@@ -41,6 +41,16 @@ linkcheck_ignore = [
     r"https://doi.org/10.13182/FST43-67",
     r"https://www.tandfonline.com/doi/full/10.13182/FST43-67",
     r"https://www-internal.psfc.mit.edu/research/alcator/data/fst_cmod.pdf",
+    # these links in the time_independent_inductances_and_fluxes notebook are on private servers that are sometimes down
+    r"https://fire.pppl.gov/iaea06_ftp7_5_matsukawa.pdf",
+    r"https://escholarship.org/content/qt78k0v04v/qt78k0v04v_noSplash_c44c701847deffab65024dd9ceff9c59.pdf?t=p15pc5",
+    r"https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084",
+    r"https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084",
+    r"https://fire.pppl.gov/Snowmass_BP/FIRE.pdf",
+    r"https://www.ipp.mpg.de/16208/einfuehrung",
+    r"https://www.ipp.mpg.de/16701/jet",
+    r"https://iopscience.iop.org/article/10.1088/1009-0630/13/1/01",
+    r"https://www-internal.psfc.mit.edu/research/alcator/data/fst_cmod.pdf",
 ]
 linkcheck_retries = 5
 linkcheck_timeout = 120

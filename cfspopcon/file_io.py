@@ -24,8 +24,13 @@ ignored_keys = [
 ]
 
 
-def sanitize_variable(val: xr.DataArray, key: str) -> Union[xr.DataArray, str]:
-    """Strip units and Enum values from a variable so that it can be stored in a NetCDF file."""
+def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> Union[xr.DataArray, str]:
+    """Strip units and Enum values from a variable so that it can be stored in a NetCDF file.
+
+    If you set coord=True and you pass in a scalar val, val is wrapped in a length-1 array to
+    circumvent an xarray issue regarding single-value coordinates.
+    See https://github.com/pydata/xarray/issues/1709.
+    """
     try:
         val = convert_to_default_units(val, key).pint.dequantify()
     except KeyError:
@@ -34,9 +39,12 @@ def sanitize_variable(val: xr.DataArray, key: str) -> Union[xr.DataArray, str]:
     if val.dtype == object:
         try:
             if val.size == 1:
-                val = val.item().name
+                if not coord:
+                    val = val.item().name
+                else:
+                    val = xr.DataArray([val.item().name])
             else:
-                val = xr.DataArray([v.name for v in val.values])
+                val = xr.DataArray([v.name for v in val.values], dims=val.dims)
         except AttributeError:
             warnings.warn(f"Cannot handle {key}. Dropping variable.", stacklevel=3)
             return "UNHANDLED"
@@ -62,7 +70,7 @@ def write_dataset_to_netcdf(
 
     for key in serialized_dataset.coords:  # type:ignore[assignment]
         assert isinstance(key, str)
-        serialized_dataset[key] = sanitize_variable(dataset[key], key)
+        serialized_dataset[key] = sanitize_variable(dataset[key], key, coord=True)
 
     serialized_dataset.to_netcdf(filepath, engine=netcdf_writer)
 

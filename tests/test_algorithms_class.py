@@ -270,3 +270,13 @@ def test_get_algorithm():
     for key in Algorithm.algorithms():
         alg = Algorithm.get_algorithm(key)
         assert alg._name in [f"run_{key}", key, "<lambda>"]
+
+
+def test_blank_algorithm():
+    test_ds = xr.Dataset(data_vars=dict(a=xr.DataArray([1, 2, 3])))
+
+    algorithm = Algorithm.empty()
+
+    updated_ds = algorithm.update_dataset(test_ds)
+
+    xr.testing.assert_allclose(test_ds, updated_ds)

@@ -1,12 +1,10 @@
 import numpy as np
 import pytest
-import xarray as xr
 
-from cfspopcon.named_options import MomentumLossFunction
-from cfspopcon.unit_handling import Quantity, ureg, get_units, convert_units
-from cfspopcon.unit_handling import dimensionless_magnitude as dmag
-from cfspopcon.unit_handling import magnitude_in_units as umag
 from cfspopcon import formulas
+from cfspopcon.named_options import MomentumLossFunction
+from cfspopcon.unit_handling import Quantity, convert_units, ureg
+from cfspopcon.unit_handling import magnitude_in_units as umag
 
 
 @pytest.fixture()
@@ -324,5 +322,3 @@ def test_calc_reattachment_time_henderson(
         ionization_volume=ionization_volume,
     )
     assert np.isclose(umag(reattachment_time, ureg.s), 1.23233809)
-
-    return

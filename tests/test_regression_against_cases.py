@@ -1,15 +1,14 @@
+import copy
 from pathlib import Path
 
 import pytest
 import xarray as xr
-
 from utils.regression_results import (
-    CASES_DIR,
     ALL_CASE_NAMES,
     ALL_CASE_PATHS,
+    CASES_DIR,
 )
 from xarray.testing import assert_allclose
-import copy
 
 from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case

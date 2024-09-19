@@ -1,6 +1,7 @@
-from cfspopcon.algorithm_class import Algorithm
-import cfspopcon
 from importlib import import_module
+
+import cfspopcon
+from cfspopcon.algorithm_class import Algorithm
 
 
 def import_all_submodules(importable, module, prefix):

@@ -1,17 +1,17 @@
+import numpy as np
 import pytest
 import xarray as xr
-import numpy as np
 
 from cfspopcon import named_options
-from cfspopcon.helpers import (
-    convert_named_options,
-)
-from cfspopcon.named_options import AtomicSpecies
 from cfspopcon.formulas.impurities.impurity_array_helpers import (
     extend_impurity_concentration_array,
     make_impurity_concentration_array,
     make_impurity_concentration_array_from_kwargs,
 )
+from cfspopcon.helpers import (
+    convert_named_options,
+)
+from cfspopcon.named_options import AtomicSpecies
 
 
 def test_convert_named_options():
