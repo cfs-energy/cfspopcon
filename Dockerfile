@@ -13,22 +13,19 @@
 # https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-scipy-notebook
 # 
 # N.b. for mybinder.org, we need to pin to a specific tag
-FROM jupyter/scipy-notebook:848a82674792
+FROM jupyter/minimal-notebook:python-3.11
 
-# 2. Install a fortran compiler into this image, so that we
-# can compile the radas headers
-RUN conda install -c conda-forge gfortran==13.2.0 -y
-# 3. Install poetry, which is what we use to build cfspopcon
+# 2. Install poetry, which is what we use to build cfspopcon
 RUN pip install poetry==1.8.2
 
-# 4. Copy in the files from the local directory
+# 3. Copy in the files from the local directory
 COPY --chown=$NB_USER:$NB_GID . ./
 
-# 5. Tell poetry to install in the global python environment,
+# 4. Tell poetry to install in the global python environment,
 # so we don't have to worry about custom kernels or venvs.
 RUN poetry config virtualenvs.create false
-# 6. Install cfspopcon in the global python environment.
+# 5. Install cfspopcon in the global python environment.
 RUN poetry install --without dev
 
-# 7. Run radas to get the atomic data files
+# 6. Run radas to get the atomic data files
 RUN poetry run radas
