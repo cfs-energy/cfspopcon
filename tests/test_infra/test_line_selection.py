@@ -1,8 +1,8 @@
 import numpy as np
 import xarray as xr
-from cfspopcon.unit_handling import ureg, Quantity, magnitude, convert_units
 
-from cfspopcon.shaping_and_selection.line_selection import interpolate_onto_line, find_coords_of_contour
+from cfspopcon.shaping_and_selection.line_selection import find_coords_of_contour, interpolate_onto_line
+from cfspopcon.unit_handling import Quantity, convert_units, magnitude, ureg
 
 
 def test_extract_values_along_contour():

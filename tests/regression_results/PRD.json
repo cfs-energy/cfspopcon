@@ -21,7 +21,7 @@
                 "Tungsten"
             ],
             "dims": [
-                "dim_0"
+                "dim_species"
             ]
         }
     },
@@ -1333,7 +1333,6 @@
         }
     },
     "dims": {
-        "dim_0": 5,
         "dim_rho": 50,
         "dim_species": 5
     }

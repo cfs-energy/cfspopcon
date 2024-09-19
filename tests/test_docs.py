@@ -1,6 +1,7 @@
-import pytest
 import subprocess
 import warnings
+
+import pytest
 
 pytest.importorskip("sphinx")
 from importlib.resources import files
@@ -8,7 +9,7 @@ from importlib.resources import files
 
 @pytest.mark.docs
 def test_docs():
-    "Test the Sphinx documentation."
+    """Test the Sphinx documentation."""
     popcon_directory = files("cfspopcon")
 
     doctest_output = subprocess.run(

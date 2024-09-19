@@ -19,6 +19,7 @@ classifiers = [
 
 [tool.poetry.scripts]
 popcon = 'cfspopcon.cli:run_popcon_cli'
+cfspopcon = 'cfspopcon.cli:run_popcon_cli'
 popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'
 
 [tool.poetry.dependencies]

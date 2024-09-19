@@ -174,6 +174,16 @@ class Algorithm:
 
         return function_wrapper
 
+    @classmethod
+    def empty(cls) -> Algorithm:
+        """Makes a 'do nothing' algorithm, in case you don't want to use the algorithm functionality."""
+
+        def do_nothing() -> dict[str, Any]:
+            result_dict: dict[str, Any] = {}
+            return result_dict
+
+        return cls(do_nothing, return_keys=[], name="empty", skip_registration=True)
+
     def validate_inputs(
         self, configuration: Union[dict, xr.Dataset], quiet: bool = False, raise_error_on_missing_inputs: bool = False
     ) -> bool:

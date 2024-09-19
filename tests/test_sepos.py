@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.unit_handling import Quantity, ureg, get_units
+from cfspopcon import formulas
+from cfspopcon.formulas.separatrix_conditions import separatrix_operational_space as sepos
+from cfspopcon.unit_handling import Quantity, get_units, ureg
 from cfspopcon.unit_handling import dimensionless_magnitude as dmag
 from cfspopcon.unit_handling import magnitude_in_units as umag
-from cfspopcon.formulas.separatrix_conditions import separatrix_operational_space as sepos
-from cfspopcon import formulas
 
 
 @pytest.fixture(params=[True, False], ids=["density_scalar", "density_vector"])

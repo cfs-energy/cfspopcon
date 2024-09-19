@@ -1,6 +1,7 @@
 import pytest
-from cfspopcon.unit_handling import ureg, UndefinedUnitError
-from cfspopcon.unit_handling.default_units import read_default_units_from_file, check_units_are_valid
+
+from cfspopcon.unit_handling import ureg
+from cfspopcon.unit_handling.default_units import check_units_are_valid, read_default_units_from_file
 
 
 def test_read_default_units():

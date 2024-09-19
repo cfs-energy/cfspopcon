@@ -13,7 +13,7 @@ from .unit_handling import set_default_units
 
 
 def read_case(
-    case: Union[str, Path], kwargs: Optional[dict[str, str]] = None
+    case: Union[str, Path, dict[str, Any]], kwargs: Optional[dict[str, str]] = None
 ) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
     """Read a yaml file corresponding to a given case.
 
@@ -24,33 +24,45 @@ def read_case(
     """
     if kwargs is None:
         kwargs = dict()
-    if Path(case).exists():
+
+    if isinstance(case, dict):
+        repr_d = case
+        case_dir = Path(".").absolute()
+
+    elif Path(case).exists():
         case = Path(case)
         if case.is_dir():
-            input_file = case / "input.yaml"
+            case_dir = case
+            input_file = case_dir / "input.yaml"
         else:
+            case_dir = case.parent
             input_file = case
+
+        with open(input_file) as file:
+            repr_d = yaml.load(file, Loader=yaml.FullLoader)
+
     else:
         raise FileNotFoundError(f"Could not find {case}.")
 
-    with open(input_file) as file:
-        repr_d: dict[str, Any] = yaml.load(file, Loader=yaml.FullLoader)
-
     repr_d.update(kwargs)
 
-    algorithms = repr_d.pop("algorithms")
-    algorithm_list = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
+    algorithms = repr_d.pop("algorithms", dict())
+    algorithm_list: list[Union[Algorithm, CompositeAlgorithm]] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
 
-    # why doesn't mypy deduce the below without hint?
-    algorithm: Union[Algorithm, CompositeAlgorithm] = CompositeAlgorithm(algorithm_list) if len(algorithm_list) > 1 else algorithm_list[0]
+    if len(algorithm_list) > 1:
+        algorithm = CompositeAlgorithm(algorithm_list)
+    elif len(algorithm_list) == 1:
+        algorithm = algorithm_list[0]  # type:ignore[assignment]
+    elif len(algorithm_list) == 0:
+        algorithm = Algorithm.empty()  # type:ignore[assignment]
 
     points = repr_d.pop("points", dict())
     plots = repr_d.pop("plots", dict())
 
     process_grid_values(repr_d)
     process_named_options(repr_d)
-    process_paths(repr_d, input_file)
-    process_paths(plots, input_file)
+    process_paths(repr_d, case_dir)
+    process_paths(plots, case_dir)
     process_units(repr_d)
 
     return repr_d, algorithm, points, plots
@@ -58,7 +70,7 @@ def read_case(
 
 def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
     """Process the grid of values to run POPCON over."""
-    grid_values = repr_d.pop("grid")
+    grid_values = repr_d.pop("grid", dict())
     for key, grid_spec in grid_values.items():
         grid_spacing = grid_spec.get("spacing", "linear")
 
@@ -81,7 +93,7 @@ def process_named_options(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def
             repr_d[key] = convert_named_options(key=key, val=val)
 
 
-def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-untyped-def]
+def process_paths(repr_d: dict[str, Any], case_dir: Path):  # type:ignore[no-untyped-def]
     """Process path tags, up to a maximum of one tag per input variable.
 
     Allowed tags are:
@@ -89,7 +101,7 @@ def process_paths(repr_d: dict[str, Any], input_file: Path):  # type:ignore[no-u
     * WORKING_DIR: the current working directory that the script is being run from
     """
     path_mappings = dict(
-        CASE_DIR=input_file.parent,
+        CASE_DIR=case_dir,
         WORKING_DIR=Path("."),
     )
     if repr_d is None:
