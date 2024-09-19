@@ -57,7 +57,6 @@ class MomentumLossFunction(Enum):
     Moulton = auto()
     PerezH = auto()
     PerezL = auto()
-    Kallenbach = auto()
 
 
 class LambdaQScaling(Enum):
