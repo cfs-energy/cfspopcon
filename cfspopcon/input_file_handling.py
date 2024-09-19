@@ -49,7 +49,7 @@ def process_input_dictionary(
     """Convert an input dictionary into an processed dictionary, a CompositeAlgorithm and dictionaries defining points and plots.
 
     Several processing steps are applied, including;
-        * The `algorithms` entry is converted into a `cfspopcon.CompositeAlgorithm` which we'll talk about later. This basically gives the list of operations that we want to perform on the input data.
+        * The `algorithms` entry is converted into a `cfspopcon.CompositeAlgorithm`. This basically gives the list of operations that we want to perform on the input data.
         * The `points` entry is stored in a separate dictionary. This gives a set of key-value pairs of 'optimal' points (for instance, giving the point with the maximum fusion power gain).
         * The `grids` entry is converted into an `xr.DataArray` storing a `np.linspace` or `np.logspace` of values which we scan over. We usually scan over `average_electron_density` and `average_electron_temp`, but there's nothing preventing you from scanning over other numerical input variables or having more than 2 dimensions which you scan over (n.b. this can get expensive!).
         * Each input variable is checked to see if its name matches one of the enumerators in `cfspopcon.named_options`. These are used to store switch values, such as `cfspopcon.named_options.ReactionType.DT` which indicates that we're interested in the DT fusion reaction.
