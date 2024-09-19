@@ -54,6 +54,9 @@ def process_input_dictionary(
         * The `grids` entry is converted into an `xr.DataArray` storing a `np.linspace` or `np.logspace` of values which we scan over. We usually scan over `average_electron_density` and `average_electron_temp`, but there's nothing preventing you from scanning over other numerical input variables or having more than 2 dimensions which you scan over (n.b. this can get expensive!).
         * Each input variable is checked to see if its name matches one of the enumerators in `cfspopcon.named_options`. These are used to store switch values, such as `cfspopcon.named_options.ReactionType.DT` which indicates that we're interested in the DT fusion reaction.
         * Each input variable is converted into its default units. Default units are retrieved via the `cfspopcon.unit_handling.default_unit` function. This will set, for instance, the `average_electron_temp` values to have units of `keV`.
+    Args:
+        repr_d: Dictionary to process
+        case_dir: Relative paths specified in repr_d are interpreted as relative to this directory
     """
     algorithms = repr_d.pop("algorithms", dict())
     algorithm_list: list[Union[Algorithm, CompositeAlgorithm]] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
