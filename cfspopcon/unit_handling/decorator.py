@@ -85,12 +85,14 @@ def wraps_ufunc(  # noqa: PLR0915
         func_parameters = func_signature.parameters
 
         if not list(input_units.keys()) == list(func_parameters.keys()):
-            message = f"input_units for {func.__name__} did not match the function inputs (n.b. order matters!)"
-            message += "\ni: input_unit, func_param"
-            for i, (input_unit, func_param) in enumerate(
+            message = f"Keys for input_units for {func.__name__} did not match the declared function inputs (n.b. order matters!)"
+            message += "\ni: input_key, func_param"
+            for i, (input_key, func_param) in enumerate(
                 itertools.zip_longest(list(input_units.keys()), list(func_parameters.keys()), fillvalue="MISSING")
             ):
-                message += f"\n{i}: {input_unit}, {func_param}"
+                message += f"\n{i}: {input_key}, {func_param}"
+                if not input_key == func_param:
+                    message += " DOES NOT MATCH"
 
             raise ValueError(message)
 
@@ -237,8 +239,9 @@ def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str,
 
     if not len(vals) == len(units_mapping):
         message = f"Number of returned values ({len(vals)}) did not match length of units_mapping ({len(units_mapping)})"
-        for i, return_val in enumerate(vals):
-            message += f"\n{i}: {return_val}"
+        message += "\ni: return_key, returned_value"
+        for i, (return_key, return_param) in enumerate(itertools.zip_longest(list(units_mapping.keys()), vals, fillvalue="MISSING")):
+            message += f"\n{i}: {return_key}, {return_param}"
         raise ValueError(message)
     vals = dict(zip(units_mapping.keys(), vals))
 
