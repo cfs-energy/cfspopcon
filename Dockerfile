@@ -13,7 +13,7 @@
 # https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-scipy-notebook
 # 
 # N.b. for mybinder.org, we need to pin to a specific tag
-FROM jupyter/scipy-notebook:x86_64-python-3.11.6
+FROM jupyter/minimal-notebook:python-3.11
 
 # 2. Install poetry, which is what we use to build cfspopcon
 RUN pip install poetry==1.8.2
