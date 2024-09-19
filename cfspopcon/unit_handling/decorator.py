@@ -227,7 +227,6 @@ def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Uni
 
 
 def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
-
     if isinstance(vals, xr.DataArray) and vals.ndim == 0:
         # Calling wraps_ufunc with scalar values and multiple returns results in
         # a xr.DataArray with a single tuple element.

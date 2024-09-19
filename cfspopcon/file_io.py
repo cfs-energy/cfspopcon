@@ -2,6 +2,7 @@
 
 import json
 import sys
+import warnings
 from pathlib import Path
 from typing import Any, Literal
 
@@ -37,7 +38,7 @@ def sanitize_variable(val: xr.DataArray, key: str) -> xr.DataArray | str:
             else:
                 val = xr.DataArray([v.name for v in val.values])
         except AttributeError:
-            warnings.warn(f"Cannot handle {key}. Dropping variable.")
+            warnings.warn(f"Cannot handle {key}. Dropping variable.", stacklevel=3)
             return "UNHANDLED"
 
     return val
