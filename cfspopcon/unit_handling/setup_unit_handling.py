@@ -25,9 +25,9 @@ Params = ParamSpec("Params")
 Ret = TypeVar("Ret")
 
 # Define custom units for density as n_19 or n_20 (used in several formulas)
+# Format is "canonical_name = definition = unit_symbol = alias1 = alias2" where unit_symbol and aliases are optional
 ureg.define("_1e19_per_cubic_metre = 1e19 m^-3 = 1e19 m^-3 = n19")
-ureg.define("_1e20_per_cubic_metre = 1e20 m^-3 = 1e10 m^-3 = n20")
-ureg.define("percent = 0.01")
+ureg.define("_1e20_per_cubic_metre = 1e20 m^-3 = 1e20 m^-3 = n20")
 
 # Needed for serialization/deserialization
 pint.set_application_registry(ureg)  # type:ignore[no-untyped-call]

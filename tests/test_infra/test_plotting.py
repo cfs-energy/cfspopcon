@@ -38,4 +38,4 @@ def test_label_contour(z):
 def test_units_to_string():
     assert plotting.units_to_string(ureg.dimensionless) == ""
     assert plotting.units_to_string(ureg.m) == "[m]"
-    assert plotting.units_to_string(ureg.percent) == "[percent]"
+    assert plotting.units_to_string(ureg.percent) == "[%]"
