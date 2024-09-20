@@ -4,16 +4,16 @@ from typing import Union
 
 import xarray as xr
 
-from ....unit_handling import Quantity
+from ....unit_handling import Unitfull
 
 
 def calc_upstream_total_pressure(
-    separatrix_electron_density: Union[Quantity, xr.DataArray],
-    separatrix_electron_temp: Union[Quantity, xr.DataArray],
+    separatrix_electron_density: Unitfull,
+    separatrix_electron_temp: Unitfull,
     upstream_ratio_of_ion_to_electron_temp: Union[float, xr.DataArray],
     upstream_ratio_of_electron_to_ion_density: Union[float, xr.DataArray],
     upstream_mach_number: Union[float, xr.DataArray] = 0.0,
-) -> Union[Quantity, xr.DataArray]:
+) -> Unitfull:
     """Calculate the upstream total pressure (including the ion temperature contribution).
 
     Same as calc_total_pressure, but with a default value upstream_mach_number=0.0.
@@ -38,12 +38,12 @@ def calc_upstream_total_pressure(
 
 
 def calc_total_pressure(
-    electron_density: Union[Quantity, xr.DataArray],
-    electron_temp: Union[Quantity, xr.DataArray],
+    electron_density: Unitfull,
+    electron_temp: Unitfull,
     ratio_of_ion_to_electron_temp: Union[float, xr.DataArray],
     ratio_of_electron_to_ion_density: Union[float, xr.DataArray],
     mach_number: Union[float, xr.DataArray],
-) -> Union[Quantity, xr.DataArray]:
+) -> Unitfull:
     """Calculate the total pressure (including ion temperature contribution).
 
     From equation 20, :cite:`stangeby_2018`.

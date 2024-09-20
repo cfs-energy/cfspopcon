@@ -17,7 +17,7 @@ new_coords:
     units: n20
 
 fill:
-  variable: upstream_SOL_collisionality
+  variable: separatrix_SOL_collisionality
   #units: dimensionless
   where:
       P_auxiliary_launched:

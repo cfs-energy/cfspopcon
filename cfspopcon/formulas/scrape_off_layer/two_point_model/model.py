@@ -6,16 +6,12 @@ import numpy as np
 import xarray as xr
 
 from ....named_options import MomentumLossFunction, ParallelConductionModel
-from ....unit_handling import Quantity, Unitfull, ureg
+from ....unit_handling import Unitfull, ureg
 from ..separatrix_electron_temp import calc_separatrix_electron_temp
+from .kinetic_corrections import calc_solkit_kinetic_corrections, calc_Spitzer_conduction_reduction_factor_fluxlim
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
-from .parallel_conduction import (
-    calc_Spitzer_conduction_reduction_factor_fluxlim,
-    calc_Spitzer_conduction_reduction_factor_scaling,
-    calc_delta_electron_sheath_factor,
-)
 from .separatrix_pressure import calc_upstream_total_pressure
-from .upstream_SOL_collisionality import calc_upstream_SOL_collisionality
+from .separatrix_SOL_collisionality import calc_separatrix_SOL_collisionality
 from .target_electron_density import (
     calc_f_other_target_electron_density,
     calc_f_vol_loss_target_electron_density,
@@ -71,15 +67,15 @@ def solve_two_point_model(
     # Print information about the solve to terminal
     quiet: bool = True,
 ) -> tuple[
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
 ]:
     """Calculate the upstream and target electron temperature and target electron density according to the extended two-point-model.
 
@@ -104,7 +100,7 @@ def solve_two_point_model(
         upstream_mach_number: [~]
         delta_electron_sheath_factor: Increase in electron sheath transmission factor from kinetic effects
         Spitzer_conduction_reduction_factor: multiplication factor on kappa_e0 to account for kinetic effects on reduced conduction
-        flux_limit_factor_alpha: mutliplication factor on the "free-streaming-flux" quantity used by the flux limited conductivity
+        flux_limit_factor_alpha: multiplication factor on the "free-streaming-flux" quantity used by the flux limited conductivity
         max_iterations: how many iterations to try before returning NaN
         upstream_temp_relaxation: step-size for upstream Te evolution
         target_electron_density_relaxation: step-size for target ne evolution
@@ -129,31 +125,24 @@ def solve_two_point_model(
 
     iteration = 0
     target_electron_temp = initial_target_electron_temp
-    separatrix_electron_temp = 100
+    separatrix_electron_temp = 0 * ureg.eV
+    SOL_momentum_loss_fraction = 0.0
 
     while iteration < max_iterations:
         iteration += 1
 
-        if parallel_conduction_model == ParallelConductionModel.KineticCorrectionScalings:
-            if iteration != 1:
-                upstream_SOL_collisionality = calc_upstream_SOL_collisionality(
-                    separatrix_electron_density=separatrix_electron_density,
-                    separatrix_electron_temp=separatrix_electron_temp,
-                    parallel_connection_length=parallel_connection_length,
+        if iteration != 1:
+            if parallel_conduction_model == ParallelConductionModel.KineticCorrectionScalings:
+                separatrix_SOL_collisionality, Spitzer_conduction_reduction_factor, delta_electron_sheath_factor = (
+                    calc_solkit_kinetic_corrections(
+                        separatrix_electron_density=separatrix_electron_density,
+                        target_electron_temp=target_electron_temp,
+                        separatrix_electron_temp=separatrix_electron_temp,
+                        parallel_connection_length=parallel_connection_length,
+                        SOL_momentum_loss_fraction=SOL_momentum_loss_fraction,
+                    )
                 )
-
-                Spitzer_conduction_reduction_factor = calc_Spitzer_conduction_reduction_factor_scaling(
-                    upstream_SOL_collisionality=upstream_SOL_collisionality,
-                )
-
-                delta_electron_sheath_factor = calc_delta_electron_sheath_factor(
-                    separatrix_electron_temp=separatrix_electron_temp,
-                    target_electron_temp=target_electron_temp,
-                    SOL_momentum_loss_fraction=calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp),
-                )
-
-        if parallel_conduction_model == ParallelConductionModel.FluxLimiter:
-            if iteration != 1:
+            if parallel_conduction_model == ParallelConductionModel.FluxLimiter:
                 Spitzer_conduction_reduction_factor = calc_Spitzer_conduction_reduction_factor_fluxlim(
                     separatrix_electron_density=separatrix_electron_density,
                     separatrix_electron_temp=separatrix_electron_temp,
@@ -247,7 +236,7 @@ def solve_two_point_model(
         f_other_target_electron_flux=f_other_target_electron_flux,
     )
 
-    upstream_SOL_collisionality = calc_upstream_SOL_collisionality(
+    separatrix_SOL_collisionality = calc_separatrix_SOL_collisionality(
         separatrix_electron_density=separatrix_electron_density,
         separatrix_electron_temp=separatrix_electron_temp,
         parallel_connection_length=parallel_connection_length,
@@ -273,7 +262,7 @@ def solve_two_point_model(
     kappa_e0 = xr.where(mask, kappa_e0, np.nan)  # type:ignore[no-untyped-call]
     sheath_heat_transmission_factor = xr.where(mask, sheath_heat_transmission_factor, np.nan)  # type:ignore[no-untyped-call]
     Spitzer_conduction_reduction_factor = xr.where(mask, Spitzer_conduction_reduction_factor, np.nan)  # type:ignore[no-untyped-call]
-    upstream_SOL_collisionality = xr.where(mask, upstream_SOL_collisionality, np.nan)  # type:ignore[no-untyped-call]
+    separatrix_SOL_collisionality = xr.where(mask, separatrix_SOL_collisionality, np.nan)  # type:ignore[no-untyped-call]
     delta_electron_sheath_factor = xr.where(mask, delta_electron_sheath_factor, np.nan)  # type:ignore[no-untyped-call]
 
     return (
@@ -284,6 +273,6 @@ def solve_two_point_model(
         kappa_e0,
         sheath_heat_transmission_factor,
         Spitzer_conduction_reduction_factor,
-        upstream_SOL_collisionality,
+        separatrix_SOL_collisionality,
         delta_electron_sheath_factor,
     )

@@ -5,17 +5,17 @@ from typing import Union
 import xarray as xr
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import Quantity
+from ...unit_handling import Unitfull
 
 
 @Algorithm.register_algorithm(return_keys=["separatrix_electron_temp"])
 def calc_separatrix_electron_temp(
-    target_electron_temp: Union[Quantity, xr.DataArray],
-    q_parallel: Union[Quantity, xr.DataArray],
-    parallel_connection_length: Union[Quantity, xr.DataArray],
-    kappa_e0: Union[Quantity, xr.DataArray],
+    target_electron_temp: Unitfull,
+    q_parallel: Unitfull,
+    parallel_connection_length: Unitfull,
+    kappa_e0: Unitfull,
     SOL_conduction_fraction: Union[float, xr.DataArray] = 1.0,
-) -> Union[Quantity, xr.DataArray]:
+) -> Unitfull:
     """Calculate the upstream electron temperature assuming Spitzer-Harm heat conductivity.
 
     Equation 38 from :cite:`stangeby_2018`, keeping the dependence on target_electron_temp.

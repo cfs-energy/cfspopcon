@@ -548,7 +548,7 @@ fieldline_pitch_at_omp:
 flux_limit_factor_alpha:
   default_units: dimensionless
   description:
-  - mutliplication factor on the "free-streaming-flux" quantity used by the flux limited
+  - multiplication factor on the "free-streaming-flux" quantity used by the flux limited
     conductivity
   set_by: []
   used_by:
@@ -1677,6 +1677,14 @@ separatrix_power_transient:
   set_by: []
   used_by:
   - calc_reattachment_time_henderson
+separatrix_SOL_collisionality:
+  default_units: dimensionless
+  description:
+  - SOL collisionality calculated from the upstream quantities from two-point model
+  set_by:
+  - two_point_model_fixed_fpow
+  - two_point_model_fixed_qpart
+  used_by: []
 separatrix_triangularity:
   default_units: dimensionless
   description:
@@ -1983,14 +1991,6 @@ two_point_model_error_nonconverged_error:
   used_by:
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
-upstream_SOL_collisionality:
-  default_units: dimensionless
-  description:
-  - SOL collisionality calculated from the upstream quantities from two-point model
-  set_by:
-  - two_point_model_fixed_fpow
-  - two_point_model_fixed_qpart
-  used_by: []
 vertical_field_mutual_inductance:
   default_units: dimensionless
   description:

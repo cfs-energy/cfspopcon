@@ -11,7 +11,7 @@ from typing import Any, Optional, Union
 import xarray as xr
 from pint import Unit, UnitStrippedWarning
 
-from .setup_unit_handling import Quantity, convert_units, magnitude, ureg
+from .setup_unit_handling import Quantity, Unitfull, convert_units, magnitude, ureg
 
 FunctionType = Callable[..., Any]
 
@@ -281,7 +281,7 @@ def _make_new_sig(
         if unit is None:
             new_parameters.append(param)
         else:
-            new_parameters.append(param.replace(annotation=Union[Quantity, xr.DataArray]))
+            new_parameters.append(param.replace(annotation=Unitfull))
 
     # update return annotation
     units_list = list(return_units.values())
