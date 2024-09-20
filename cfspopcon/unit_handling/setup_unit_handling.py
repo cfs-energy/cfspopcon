@@ -20,6 +20,7 @@ ureg = pint_xarray.setup_registry(
 
 Quantity = ureg.Quantity
 Unit = ureg.Unit
+Unitfull = Union[Quantity, xr.DataArray]
 
 Params = ParamSpec("Params")
 Ret = TypeVar("Ret")

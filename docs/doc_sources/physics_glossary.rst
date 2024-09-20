@@ -86,6 +86,9 @@ Physics Glossary
   cylindrical_safety_factor
     Analytical approximation of safety factor at :math:`\rho=0.95` (confusingly, still has some shaping corrections despite being called the 'cylindrical' safety factor).
 
+  delta_electron_sheath_factor
+    Increase in electron sheath transmission factor from kinetic effects
+
   density_profile_form
     A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use for the density profiles.
 
@@ -155,6 +158,9 @@ Physics Glossary
 
   fieldline_pitch_at_omp
     The magnetic field pitch :math:`B_{tot} / B_{pol}` at the 'upstream' end of a flux tube in the scrape-off-layer, used to convert from poloidal to parallel heat flux density.
+
+  flux_limit_factor_alpha
+    mutliplication factor on the "free-streaming-flux" quantity used by the flux limited conductivity
 
   flux_needed_from_CS_over_rampup
     The amount of flux needed from the CS over ramp up.
@@ -359,6 +365,9 @@ Physics Glossary
   P_radiation_from_core_seeded_impurity
     The power radiated by the core radiator.
 
+  parallel_conduction_model
+    Which model for the parallel heat flux conduction to use in the two point model calculation
+
   parallel_connection_length
     Parallel length (along a field-line) of a scrape-off-layer flux tube, from an 'upstream' position (usually the outboard midplane) to the divertor target.
 
@@ -503,6 +512,9 @@ Physics Glossary
   SOL_power_loss_fraction
     Fraction of power entering a scrape-off-layer flux tube which is lost (radiated or cross-field transported) before reaching the divertor target.
 
+  Spitzer_conduction_reduction_factor
+    Multiplication factor on kappa_e0 to account for kinetic effects on reduced conduction
+
   spitzer_resistivity
     Plasma loop collisional resistivity.
 
@@ -571,6 +583,9 @@ Physics Glossary
 
   two_point_model_error_nonconverged_error
     Indicates whether the two-point-model should raise an error or return NaN if its iterative solver does not converge.
+
+  upstream_SOL_collisionality
+    SOL collisionality calculated from the upstream quantities from two-point model
 
   vertical_field_mutual_inductance
     This unitless mutual-inductance quantity provides the coupling between the plasma surface and the vertical magnetic field.

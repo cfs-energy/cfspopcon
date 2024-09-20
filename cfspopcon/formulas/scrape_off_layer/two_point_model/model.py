@@ -6,16 +6,15 @@ import numpy as np
 import xarray as xr
 
 from ....named_options import MomentumLossFunction, ParallelConductionModel
-from ....unit_handling import Quantity, Unitfull, ureg
+from ....unit_handling import Unitfull, ureg
 from ..separatrix_electron_temp import calc_separatrix_electron_temp
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
 from .parallel_conduction import (
+    calc_delta_electron_sheath_factor,
     calc_Spitzer_conduction_reduction_factor_fluxlim,
     calc_Spitzer_conduction_reduction_factor_scaling,
-    calc_delta_electron_sheath_factor,
 )
 from .separatrix_pressure import calc_upstream_total_pressure
-from .upstream_SOL_collisionality import calc_upstream_SOL_collisionality
 from .target_electron_density import (
     calc_f_other_target_electron_density,
     calc_f_vol_loss_target_electron_density,
@@ -34,6 +33,7 @@ from .target_electron_temp import (
     calc_target_electron_temp,
     calc_target_electron_temp_basic,
 )
+from .upstream_SOL_collisionality import calc_upstream_SOL_collisionality
 
 
 def solve_two_point_model(
@@ -71,15 +71,15 @@ def solve_two_point_model(
     # Print information about the solve to terminal
     quiet: bool = True,
 ) -> tuple[
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
-    Union[Quantity, xr.DataArray],
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
+    Unitfull,
 ]:
     """Calculate the upstream and target electron temperature and target electron density according to the extended two-point-model.
 

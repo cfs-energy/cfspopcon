@@ -4,14 +4,14 @@ from typing import Union
 
 import xarray as xr
 
-from ....unit_handling import Quantity
+from ....unit_handling import Unitfull
 
 
 def calc_target_electron_density(
-    target_electron_density_basic: Union[Quantity, xr.DataArray],
+    target_electron_density_basic: Unitfull,
     f_vol_loss_target_electron_density: Union[float, xr.DataArray],
     f_other_target_electron_density: Union[float, xr.DataArray],
-) -> Union[Quantity, xr.DataArray]:
+) -> Unitfull:
     """Calculate the target electron density, correcting for volume-losses and other effects.
 
     Components are calculated using the other functions in this file.
@@ -20,11 +20,11 @@ def calc_target_electron_density(
 
 
 def calc_target_electron_density_basic(
-    average_ion_mass: Union[Quantity, xr.DataArray],
-    q_parallel: Union[Quantity, xr.DataArray],
-    upstream_total_pressure: Union[Quantity, xr.DataArray],
+    average_ion_mass: Unitfull,
+    q_parallel: Unitfull,
+    upstream_total_pressure: Unitfull,
     sheath_heat_transmission_factor: Union[float, xr.DataArray],
-) -> Union[Quantity, xr.DataArray]:
+) -> Unitfull:
     """Calculate the electron density at the target according to the basic two-point-model.
 
     From equation 24, :cite:`stangeby_2018`.

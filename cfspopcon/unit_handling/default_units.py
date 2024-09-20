@@ -10,7 +10,7 @@ import xarray as xr
 import yaml
 from pint import DimensionalityError, UndefinedUnitError
 
-from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
+from .setup_unit_handling import Quantity, Unitfull, convert_units, magnitude_in_units
 
 
 def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
@@ -87,7 +87,7 @@ def default_unit(var: str) -> Union[str, None]:
         ) from None
 
 
-def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -> Union[float, list[float], Any]:
+def magnitude_in_default_units(value: Unitfull, key: str) -> Union[float, list[float], Any]:
     """Convert values to default units and then return the magnitude.
 
     Args:

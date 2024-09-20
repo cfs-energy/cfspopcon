@@ -1,10 +1,8 @@
 """Routine to calculate the upstream SOL collisionality."""
 
-from typing import Union
 
-import xarray as xr
 
-from ....unit_handling import Quantity, ureg, wraps_ufunc
+from ....unit_handling import Unitfull, ureg, wraps_ufunc
 
 
 @wraps_ufunc(
@@ -12,10 +10,10 @@ from ....unit_handling import Quantity, ureg, wraps_ufunc
     input_units=dict(separatrix_electron_density=ureg.m**-3, separatrix_electron_temp=ureg.eV, parallel_connection_length=ureg.m),
 )
 def calc_upstream_SOL_collisionality(
-    separatrix_electron_density: Union[Quantity, xr.DataArray],
-    separatrix_electron_temp: Union[Quantity, xr.DataArray],
-    parallel_connection_length: Union[Quantity, xr.DataArray],
-) -> Union[Quantity, xr.DataArray]:
+    separatrix_electron_density: Unitfull,
+    separatrix_electron_temp: Unitfull,
+    parallel_connection_length: Unitfull,
+) -> Unitfull:
     """Calculate the upstream SOL collisionality.
 
     Equation XX

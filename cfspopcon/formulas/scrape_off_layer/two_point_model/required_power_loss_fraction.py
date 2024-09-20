@@ -5,14 +5,14 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
-from ....unit_handling import Quantity
+from ....unit_handling import Unitfull
 
 
 def calc_required_SOL_power_loss_fraction(
-    target_electron_temp_basic: Union[Quantity, xr.DataArray],
+    target_electron_temp_basic: Unitfull,
     f_other_target_electron_temp: Union[float, xr.DataArray],
-    SOL_momentum_loss_fraction: Union[Quantity, xr.DataArray],
-    required_target_electron_temp: Union[Quantity, xr.DataArray],
+    SOL_momentum_loss_fraction: Unitfull,
+    required_target_electron_temp: Unitfull,
 ) -> Union[float, xr.DataArray]:
     """Calculate the SOL radiated power fraction required to reach a desired target electron temperature.
 
