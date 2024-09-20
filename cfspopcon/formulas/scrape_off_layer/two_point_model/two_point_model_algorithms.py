@@ -5,8 +5,8 @@ from typing import Union
 import xarray as xr
 
 from ....algorithm_class import Algorithm
-from ....named_options import MomentumLossFunction
-from ....unit_handling import Unitfull
+from ....named_options import MomentumLossFunction, ParallelConductionModel
+from ....unit_handling import Unitfull, ureg
 from .model import solve_two_point_model
 from .target_first_model import solve_target_first_two_point_model
 
@@ -18,6 +18,11 @@ from .target_first_model import solve_target_first_two_point_model
         "target_electron_temp",
         "target_electron_flux",
         "target_q_parallel",
+        "kappa_e0",
+        "sheath_heat_transmission_factor",
+        "Spitzer_conduction_reduction_factor",
+        "upstream_SOL_collisionality",
+        "delta_electron_sheath_factor",
     ]
 )
 def two_point_model_fixed_fpow(
@@ -30,7 +35,9 @@ def two_point_model_fixed_fpow(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    parallel_conduction_model: Union[ParallelConductionModel, xr.DataArray],
     sheath_heat_transmission_factor: Unitfull,
+    flux_limit_factor_alpha: Unitfull = 0.15 * ureg.dimensionless,
     two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed power loss fraction in the SOL.
@@ -45,17 +52,24 @@ def two_point_model_fixed_fpow(
         average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
+        parallel_conduction_model :term:`glossary link<parallel_conduction_model>`
+        flux_limit_factor_alpha: term:`glossary link<flux_limit_factor_alpha>`
         sheath_heat_transmission_factor: :term:`glossary link<sheath_heat_transmission_factor>`
         two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
-        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`, :term:`kappa_e0', :term:'sheath_heat_transmission_factor', :term:`Spitzer_conduction_reduction_factor', :term:`upstream_SOL_collisionality', :term:`delta_electron_sheath_factor',
     """
     (
         separatrix_electron_temp,
         target_electron_density,
         target_electron_temp,
         target_electron_flux,
+        kappa_e0,
+        sheath_heat_transmission_factor,
+        Spitzer_conduction_reduction_factor,
+        upstream_SOL_collisionality,
+        delta_electron_sheath_factor,
     ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         q_parallel=q_parallel,
@@ -65,13 +79,26 @@ def two_point_model_fixed_fpow(
         average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
+        parallel_conduction_model=parallel_conduction_model,
+        flux_limit_factor_alpha=flux_limit_factor_alpha,
         two_point_model_error_nonconverged_error=two_point_model_error_nonconverged_error,
         sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
 
     target_q_parallel = q_parallel * (1.0 - SOL_power_loss_fraction)
 
-    return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
+    return (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+        target_q_parallel,
+        kappa_e0,
+        sheath_heat_transmission_factor,
+        Spitzer_conduction_reduction_factor,
+        upstream_SOL_collisionality,
+        delta_electron_sheath_factor,
+    )
 
 
 @Algorithm.register_algorithm(
@@ -81,6 +108,11 @@ def two_point_model_fixed_fpow(
         "target_electron_temp",
         "target_electron_flux",
         "SOL_power_loss_fraction",
+        "kappa_e0",
+        "sheath_heat_transmission_factor",
+        "Spitzer_conduction_reduction_factor",
+        "upstream_SOL_collisionality",
+        "delta_electron_sheath_factor",
     ]
 )
 def two_point_model_fixed_qpart(
@@ -93,7 +125,9 @@ def two_point_model_fixed_qpart(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
     SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    parallel_conduction_model: Union[ParallelConductionModel, xr.DataArray],
     sheath_heat_transmission_factor: Unitfull,
+    flux_limit_factor_alpha: Unitfull = 0.15 * ureg.dimensionless,
     two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed parallel heat flux density reaching the target.
@@ -108,11 +142,13 @@ def two_point_model_fixed_qpart(
         average_ion_mass: :term:`glossary link<average_ion_mass>`
         kappa_e0: :term:`glossary link<kappa_e0>`
         SOL_momentum_loss_function: :term:`glossary link<SOL_momentum_loss_function>`
+        parallel_conduction_model :term:`glossary link<parallel_conduction_model>`
+        flux_limit_factor_alpha: term:`glossary link<flux_limit_factor_alpha>`
         sheath_heat_transmission_factor: :term:`glossary link<sheath_heat_transmission_factor>`
         two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
-        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`,
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`, :term:`kappa_e0', :term:'sheath_heat_transmission_factor', :term:`Spitzer_conduction_reduction_factor', :term:`upstream_SOL_collisionality', :term:`delta_electron_sheath_factor',
 
     """
     SOL_power_loss_fraction = (1.0 - target_q_parallel / q_parallel).clip(min=0.0, max=1.0)
@@ -122,6 +158,11 @@ def two_point_model_fixed_qpart(
         target_electron_density,
         target_electron_temp,
         target_electron_flux,
+        kappa_e0,
+        sheath_heat_transmission_factor,
+        Spitzer_conduction_reduction_factor,
+        upstream_SOL_collisionality,
+        delta_electron_sheath_factor,
     ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
         q_parallel=q_parallel,
@@ -131,11 +172,24 @@ def two_point_model_fixed_qpart(
         average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         SOL_momentum_loss_function=SOL_momentum_loss_function,
+        parallel_conduction_model=parallel_conduction_model,
+        flux_limit_factor_alpha=flux_limit_factor_alpha,
         two_point_model_error_nonconverged_error=two_point_model_error_nonconverged_error,
         sheath_heat_transmission_factor=sheath_heat_transmission_factor,
     )
 
-    return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
+    return (
+        separatrix_electron_temp,
+        target_electron_density,
+        target_electron_temp,
+        target_electron_flux,
+        SOL_power_loss_fraction,
+        kappa_e0,
+        sheath_heat_transmission_factor,
+        Spitzer_conduction_reduction_factor,
+        upstream_SOL_collisionality,
+        delta_electron_sheath_factor,
+    )
 
 
 @Algorithm.register_algorithm(

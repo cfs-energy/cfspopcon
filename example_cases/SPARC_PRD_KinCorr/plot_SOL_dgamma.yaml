@@ -1,0 +1,42 @@
+type: popcon
+
+figsize: [6, 4]
+show_dpi: 150
+
+
+new_coords:
+  x:
+    dimension: P_auxiliary_launched
+    label: "$P_{RF}$ [$MW$]"
+    min: 0.0
+    max: 25.0
+    units: MW
+  y:
+    dimension: average_electron_density
+    label: "$<n_e>$ [$10^{20} m^{-3}$]"
+    units: n20
+
+fill:
+  variable: delta_electron_sheath_factor
+  where:
+      P_auxiliary_launched:
+        min: 0.0
+        max: 25.0
+        units: MW
+      greenwald_fraction:
+        max: 0.9
+      ratio_of_P_SOL_to_P_LH:
+        min: 1.0
+
+
+points:
+  PRD:
+    label: "PRD"
+    marker: "x"
+    color: "red"
+    size: 50.0
+
+# Suggested colors are "tab:red", "tab:blue", "tab:orange", "tab:green", "tab:purple",
+# "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan"
+
+  
