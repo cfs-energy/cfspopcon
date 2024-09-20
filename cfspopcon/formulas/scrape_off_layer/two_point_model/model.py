@@ -129,7 +129,7 @@ def solve_two_point_model(
 
     iteration = 0
     target_electron_temp = initial_target_electron_temp
-    separatrix_electron_temp = 100
+    separatrix_electron_temp = 100 * ureg.eV
 
     while iteration < max_iterations:
         iteration += 1
