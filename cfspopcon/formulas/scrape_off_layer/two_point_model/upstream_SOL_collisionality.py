@@ -1,7 +1,5 @@
 """Routine to calculate the upstream SOL collisionality."""
 
-
-
 from ....unit_handling import Unitfull, ureg, wraps_ufunc
 
 

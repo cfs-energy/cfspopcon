@@ -8,12 +8,8 @@ import xarray as xr
 from ....named_options import MomentumLossFunction, ParallelConductionModel
 from ....unit_handling import Unitfull, ureg
 from ..separatrix_electron_temp import calc_separatrix_electron_temp
+from .kinetic_corrections import calc_solkit_kinetic_corrections, calc_Spitzer_conduction_reduction_factor_fluxlim
 from .momentum_loss_functions import calc_SOL_momentum_loss_fraction
-from .parallel_conduction import (
-    calc_delta_electron_sheath_factor,
-    calc_Spitzer_conduction_reduction_factor_fluxlim,
-    calc_Spitzer_conduction_reduction_factor_scaling,
-)
 from .separatrix_pressure import calc_upstream_total_pressure
 from .target_electron_density import (
     calc_f_other_target_electron_density,
@@ -129,31 +125,24 @@ def solve_two_point_model(
 
     iteration = 0
     target_electron_temp = initial_target_electron_temp
-    separatrix_electron_temp = 100 * ureg.eV
+    separatrix_electron_temp = 0 * ureg.eV
+    SOL_momentum_loss_fraction = 0.0
 
     while iteration < max_iterations:
         iteration += 1
 
-        if parallel_conduction_model == ParallelConductionModel.KineticCorrectionScalings:
-            if iteration != 1:
-                upstream_SOL_collisionality = calc_upstream_SOL_collisionality(
-                    separatrix_electron_density=separatrix_electron_density,
-                    separatrix_electron_temp=separatrix_electron_temp,
-                    parallel_connection_length=parallel_connection_length,
+        if iteration != 1:
+            if parallel_conduction_model == ParallelConductionModel.KineticCorrectionScalings:
+                upstream_SOL_collisionality, Spitzer_conduction_reduction_factor, delta_electron_sheath_factor = (
+                    calc_solkit_kinetic_corrections(
+                        separatrix_electron_density=separatrix_electron_density,
+                        target_electron_temp=target_electron_temp,
+                        separatrix_electron_temp=separatrix_electron_temp,
+                        parallel_connection_length=parallel_connection_length,
+                        SOL_momentum_loss_fraction=SOL_momentum_loss_fraction,
+                    )
                 )
-
-                Spitzer_conduction_reduction_factor = calc_Spitzer_conduction_reduction_factor_scaling(
-                    upstream_SOL_collisionality=upstream_SOL_collisionality,
-                )
-
-                delta_electron_sheath_factor = calc_delta_electron_sheath_factor(
-                    separatrix_electron_temp=separatrix_electron_temp,
-                    target_electron_temp=target_electron_temp,
-                    SOL_momentum_loss_fraction=calc_SOL_momentum_loss_fraction(SOL_momentum_loss_function, target_electron_temp),
-                )
-
-        if parallel_conduction_model == ParallelConductionModel.FluxLimiter:
-            if iteration != 1:
+            if parallel_conduction_model == ParallelConductionModel.FluxLimiter:
                 Spitzer_conduction_reduction_factor = calc_Spitzer_conduction_reduction_factor_fluxlim(
                     separatrix_electron_density=separatrix_electron_density,
                     separatrix_electron_temp=separatrix_electron_temp,

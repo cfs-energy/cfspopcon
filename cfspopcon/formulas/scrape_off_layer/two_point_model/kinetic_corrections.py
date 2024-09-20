@@ -6,7 +6,44 @@ import numpy as np
 import xarray as xr
 
 from ....unit_handling import Unitfull, ureg, wraps_ufunc
+from .upstream_SOL_collisionality import calc_upstream_SOL_collisionality
 
+
+def calc_solkit_kinetic_corrections(
+        separatrix_electron_density: Unitfull,
+        target_electron_temp: Unitfull,
+        separatrix_electron_temp: Unitfull,
+        parallel_connection_length: Unitfull,
+        SOL_momentum_loss_fraction: Unitfull
+) -> tuple[Unitfull, Unitfull, Unitfull]:
+    """Calculate a consistent set of kinetic corrections, based on the SOL-KiT scalings.
+
+    Args:
+        separatrix_electron_density: [m^-3] :term:`glossary_link<separatrix_electron_density>`
+        target_electron_temp: [eV] :term:`glossary_link<target_electron_temp>`
+        separatrix_electron_temp: [eV] :term:`glossary_link<separatrix_electron_temp>`
+        parallel_connection_length: [m] :term:`glossary_link<parallel_connection_length>`
+        SOL_momentum_loss_fraction: [~] :term:`glossary_link<SOL_momentum_loss_fraction>`
+
+    Returns:
+        :term:`upstream_SOL_collisionality` [~], :term:`Spitzer_conduction_reduction_factor` [~], :term:`delta_electron_sheath_factor` [~]
+    """
+    upstream_SOL_collisionality = calc_upstream_SOL_collisionality(
+        separatrix_electron_density=separatrix_electron_density,
+        separatrix_electron_temp=separatrix_electron_temp,
+        parallel_connection_length=parallel_connection_length,
+    )
+
+    Spitzer_conduction_reduction_factor = calc_Spitzer_conduction_reduction_factor_scaling(
+        upstream_SOL_collisionality=upstream_SOL_collisionality,
+    )
+
+    delta_electron_sheath_factor = calc_delta_electron_sheath_factor(
+        separatrix_electron_temp=separatrix_electron_temp,
+        target_electron_temp=target_electron_temp,
+        SOL_momentum_loss_fraction=SOL_momentum_loss_fraction,
+    )
+    return upstream_SOL_collisionality, Spitzer_conduction_reduction_factor, delta_electron_sheath_factor
 
 def calc_Spitzer_conduction_reduction_factor_scaling(
     upstream_SOL_collisionality: Unitfull,
