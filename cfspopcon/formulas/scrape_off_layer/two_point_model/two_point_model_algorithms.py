@@ -21,7 +21,7 @@ from .target_first_model import solve_target_first_two_point_model
         "kappa_e0",
         "sheath_heat_transmission_factor",
         "Spitzer_conduction_reduction_factor",
-        "upstream_SOL_collisionality",
+        "separatrix_SOL_collisionality",
         "delta_electron_sheath_factor",
     ]
 )
@@ -58,7 +58,7 @@ def two_point_model_fixed_fpow(
         two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
-        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`, :term:`kappa_e0', :term:'sheath_heat_transmission_factor', :term:`Spitzer_conduction_reduction_factor', :term:`upstream_SOL_collisionality', :term:`delta_electron_sheath_factor',
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`target_q_parallel`, :term:`kappa_e0', :term:'sheath_heat_transmission_factor', :term:`Spitzer_conduction_reduction_factor', :term:`separatrix_SOL_collisionality', :term:`delta_electron_sheath_factor',
     """
     (
         separatrix_electron_temp,
@@ -68,7 +68,7 @@ def two_point_model_fixed_fpow(
         kappa_e0,
         sheath_heat_transmission_factor,
         Spitzer_conduction_reduction_factor,
-        upstream_SOL_collisionality,
+        separatrix_SOL_collisionality,
         delta_electron_sheath_factor,
     ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
@@ -96,7 +96,7 @@ def two_point_model_fixed_fpow(
         kappa_e0,
         sheath_heat_transmission_factor,
         Spitzer_conduction_reduction_factor,
-        upstream_SOL_collisionality,
+        separatrix_SOL_collisionality,
         delta_electron_sheath_factor,
     )
 
@@ -111,7 +111,7 @@ def two_point_model_fixed_fpow(
         "kappa_e0",
         "sheath_heat_transmission_factor",
         "Spitzer_conduction_reduction_factor",
-        "upstream_SOL_collisionality",
+        "separatrix_SOL_collisionality",
         "delta_electron_sheath_factor",
     ]
 )
@@ -148,7 +148,7 @@ def two_point_model_fixed_qpart(
         two_point_model_error_nonconverged_error: Raise an error if solve does not converge
 
     Returns:
-        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`, :term:`kappa_e0', :term:'sheath_heat_transmission_factor', :term:`Spitzer_conduction_reduction_factor', :term:`upstream_SOL_collisionality', :term:`delta_electron_sheath_factor',
+        :term:`separatrix_electron_temp`, :term:`target_electron_density`, :term:`target_electron_temp`, :term:`target_electron_flux`, :term:`SOL_power_loss_fraction`, :term:`kappa_e0', :term:'sheath_heat_transmission_factor', :term:`Spitzer_conduction_reduction_factor', :term:`separatrix_SOL_collisionality', :term:`delta_electron_sheath_factor',
 
     """
     SOL_power_loss_fraction = (1.0 - target_q_parallel / q_parallel).clip(min=0.0, max=1.0)
@@ -161,7 +161,7 @@ def two_point_model_fixed_qpart(
         kappa_e0,
         sheath_heat_transmission_factor,
         Spitzer_conduction_reduction_factor,
-        upstream_SOL_collisionality,
+        separatrix_SOL_collisionality,
         delta_electron_sheath_factor,
     ) = solve_two_point_model(
         SOL_power_loss_fraction=SOL_power_loss_fraction,
@@ -187,7 +187,7 @@ def two_point_model_fixed_qpart(
         kappa_e0,
         sheath_heat_transmission_factor,
         Spitzer_conduction_reduction_factor,
-        upstream_SOL_collisionality,
+        separatrix_SOL_collisionality,
         delta_electron_sheath_factor,
     )
 

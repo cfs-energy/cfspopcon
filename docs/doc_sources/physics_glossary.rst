@@ -160,7 +160,7 @@ Physics Glossary
     The magnetic field pitch :math:`B_{tot} / B_{pol}` at the 'upstream' end of a flux tube in the scrape-off-layer, used to convert from poloidal to parallel heat flux density.
 
   flux_limit_factor_alpha
-    mutliplication factor on the "free-streaming-flux" quantity used by the flux limited conductivity
+    multiplication factor on the "free-streaming-flux" quantity used by the flux limited conductivity
 
   flux_needed_from_CS_over_rampup
     The amount of flux needed from the CS over ramp up.
@@ -485,6 +485,9 @@ Physics Glossary
   separatrix_power_transient
     Transient increase to power crossing the separatrix.  Per :cite:`Henderson_2023`
 
+  separatrix_SOL_collisionality
+    SOL collisionality calculated from the upstream quantities from two-point model
+
   separatrix_triangularity
     Separatrix triangularity (average of upper and lower triangularity).
 
@@ -583,9 +586,6 @@ Physics Glossary
 
   two_point_model_error_nonconverged_error
     Indicates whether the two-point-model should raise an error or return NaN if its iterative solver does not converge.
-
-  upstream_SOL_collisionality
-    SOL collisionality calculated from the upstream quantities from two-point model
 
   vertical_field_mutual_inductance
     This unitless mutual-inductance quantity provides the coupling between the plasma surface and the vertical magnetic field.
