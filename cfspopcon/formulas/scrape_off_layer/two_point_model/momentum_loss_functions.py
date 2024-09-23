@@ -59,5 +59,10 @@ def calc_SOL_momentum_loss_fraction(key: MomentumLossFunction, target_electron_t
     elif key == MomentumLossFunction.PerezL:
         return _calc_SOL_momentum_loss_fraction(1.1, 3.0, 0.9, target_electron_temp)
 
+    elif key == MomentumLossFunction.Kallenbach:
+        return _calc_SOL_momentum_loss_fraction(
+            A=0.8930368082596285, Tstar=2.8052494444445353, n=1.0458911899544596, target_electron_temp=target_electron_temp
+        )
+
     else:
         raise NotImplementedError(f"No implementation for MomentumLossFunction {key}")
