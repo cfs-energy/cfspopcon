@@ -50,7 +50,7 @@ def calc_lambda_q(
     if lambda_q_scaling == LambdaQScaling.Brunner:
         lambda_q = calc_lambda_q_with_brunner.unitless_func(average_total_pressure=average_total_pressure, lambda_q_factor=lambda_q_factor)
     elif lambda_q_scaling == LambdaQScaling.EichRegression9:
-        lambda_q = calc_lambda_q_with_eich_regression_9(
+        lambda_q = calc_lambda_q_with_eich_regression_9.unitless_func(
             magnetic_field_on_axis=magnetic_field_on_axis, q_star=q_star, power_crossing_separatrix=power_crossing_separatrix
         )
     elif lambda_q_scaling == LambdaQScaling.EichRegression14:
