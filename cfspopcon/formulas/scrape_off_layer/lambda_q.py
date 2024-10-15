@@ -15,6 +15,8 @@ from ...unit_handling import ureg, wraps_ufunc
         major_radius=ureg.meter,
         B_pol_out_mid=ureg.tesla,
         inverse_aspect_ratio=ureg.dimensionless,
+        magnetic_field_on_axis=ureg.T,
+        q_star=ureg.dimensionless,
         lambda_q_factor=ureg.dimensionless,
     ),
 )
@@ -25,11 +27,11 @@ def calc_lambda_q(
     major_radius: float,
     B_pol_out_mid: float,
     inverse_aspect_ratio: float,
+    magnetic_field_on_axis: float,
+    q_star: float,
     lambda_q_factor: float = 1.0,
 ) -> float:
     """Calculate SOL heat flux decay length (lambda_q) from a scaling.
-
-    TODO: Remove in next major release, in favour of using algorithms directly.
 
     Args:
         lambda_q_scaling: :term:`glossary link<lambda_q_scaling>`
@@ -38,29 +40,33 @@ def calc_lambda_q(
         major_radius: [m] :term:`glossary link<major_radius>`
         B_pol_out_mid: [T] :term:`glossary link<B_pol_out_mid>`
         inverse_aspect_ratio: [~] :term:`glossary link<inverse_aspect_ratio>`
+        magnetic_field_on_axis: [T] :term:`glossary link<magnetic_field_on_axis>`
+        q_star: [~] :term:`glossary link<q_star>`
         lambda_q_factor: [~] :term:`glossary link<lambda_q_factor>`
 
     Returns:
         :term:`lambda_q` [mm]
     """
     if lambda_q_scaling == LambdaQScaling.Brunner:
-        return float(
-            calc_lambda_q_with_brunner.unitless_func(average_total_pressure=average_total_pressure, lambda_q_factor=lambda_q_factor)
+        lambda_q = calc_lambda_q_with_brunner.unitless_func(average_total_pressure=average_total_pressure, lambda_q_factor=lambda_q_factor)
+    elif lambda_q_scaling == LambdaQScaling.EichRegression9:
+        lambda_q = calc_lambda_q_with_eich_regression_9(
+            magnetic_field_on_axis=magnetic_field_on_axis, q_star=q_star, power_crossing_separatrix=power_crossing_separatrix
         )
     elif lambda_q_scaling == LambdaQScaling.EichRegression14:
-        return float(calc_lambda_q_with_eich_regression_14.unitless_func(B_pol_out_mid=B_pol_out_mid, lambda_q_factor=lambda_q_factor))
+        lambda_q = calc_lambda_q_with_eich_regression_14.unitless_func(B_pol_out_mid=B_pol_out_mid, lambda_q_factor=lambda_q_factor)
     elif lambda_q_scaling == LambdaQScaling.EichRegression15:
-        return float(
-            calc_lambda_q_with_eich_regression_15.unitless_func(
-                power_crossing_separatrix=power_crossing_separatrix,
-                major_radius=major_radius,
-                B_pol_out_mid=B_pol_out_mid,
-                inverse_aspect_ratio=inverse_aspect_ratio,
-                lambda_q_factor=lambda_q_factor,
-            )
+        lambda_q = calc_lambda_q_with_eich_regression_15.unitless_func(
+            power_crossing_separatrix=power_crossing_separatrix,
+            major_radius=major_radius,
+            B_pol_out_mid=B_pol_out_mid,
+            inverse_aspect_ratio=inverse_aspect_ratio,
+            lambda_q_factor=lambda_q_factor,
         )
     else:
         raise NotImplementedError(f"No implementation for lambda_q scaling {lambda_q_scaling}")
+
+    return float(lambda_q)
 
 
 @Algorithm.register_algorithm(return_keys=["lambda_q"])
@@ -96,6 +102,7 @@ def calc_lambda_q_with_eich_regression_9(
     return float(lambda_q_factor * 0.7 * magnetic_field_on_axis**-0.77 * q_star**1.05 * power_crossing_separatrix**0.09)
 
 
+@Algorithm.register_algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(return_units=dict(lambda_q=ureg.millimeter), input_units=dict(B_pol_out_mid=ureg.tesla, lambda_q_factor=ureg.dimensionless))
 def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float, lambda_q_factor: float = 1.0) -> float:
     """Return lambda_q according to Eich regression 14.

@@ -63,6 +63,7 @@ class LambdaQScaling(Enum):
     """Options for heat flux decay length scaling."""
 
     Brunner = auto()
+    EichRegression9 = auto()
     EichRegression14 = auto()
     EichRegression15 = auto()
 

@@ -163,6 +163,7 @@ B_pol_out_mid:
   used_by:
   - calc_fieldline_pitch_at_omp
   - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_14
   - calc_lambda_q_with_eich_regression_15
   - calc_power_crossing_separatrix_in_electron_channel
 B_t_out_mid:
@@ -843,6 +844,7 @@ lambda_q:
   - calc_lambda_q
   - calc_lambda_q_with_brunner
   - calc_lambda_q_with_eich_regression_9
+  - calc_lambda_q_with_eich_regression_14
   - calc_lambda_q_with_eich_regression_15
   used_by:
   - calc_parallel_heat_flux_density
@@ -858,6 +860,7 @@ lambda_q_factor:
   - calc_lambda_q
   - calc_lambda_q_with_brunner
   - calc_lambda_q_with_eich_regression_9
+  - calc_lambda_q_with_eich_regression_14
   - calc_lambda_q_with_eich_regression_15
 lambda_q_scaling:
   default_units: null
@@ -906,6 +909,7 @@ magnetic_field_on_axis:
   - calc_beta_normalized
   - calc_troyon_limit
   - calc_B_tor_omp
+  - calc_lambda_q
   - calc_lambda_q_with_eich_regression_9
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
@@ -1469,6 +1473,7 @@ q_star:
   - calc_PBpRnSq
   - calc_bootstrap_fraction
   - calc_plasma_current_from_qstar
+  - calc_lambda_q
   - calc_lambda_q_with_eich_regression_9
 radas_dir:
   default_units: null
