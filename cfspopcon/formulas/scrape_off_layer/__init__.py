@@ -1,7 +1,13 @@
 """Routines to calculate the scrape-off-layer conditions and check divertor survivability."""
 
 from .heat_flux_density import calc_B_pol_omp, calc_B_tor_omp, calc_fieldline_pitch_at_omp, calc_parallel_heat_flux_density, calc_q_perp
-from .lambda_q import calc_lambda_q
+from .lambda_q import (
+    calc_lambda_q,
+    calc_lambda_q_with_brunner,
+    calc_lambda_q_with_eich_regression_9,
+    calc_lambda_q_with_eich_regression_14,
+    calc_lambda_q_with_eich_regression_15,
+)
 from .reattachment_models import (
     calc_ionization_volume_from_AUG,
     calc_neutral_flux_density_factor,
@@ -25,6 +31,10 @@ __all__ = [
     "two_point_model_fixed_qpart",
     "two_point_model_fixed_tet",
     "calc_lambda_q",
+    "calc_lambda_q_with_brunner",
+    "calc_lambda_q_with_eich_regression_14",
+    "calc_lambda_q_with_eich_regression_15",
+    "calc_lambda_q_with_eich_regression_9",
     "calc_separatrix_electron_density",
     "calc_separatrix_electron_temp",
     "calc_B_pol_omp",

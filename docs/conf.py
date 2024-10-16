@@ -51,6 +51,9 @@ linkcheck_ignore = [
     r"https://www.ipp.mpg.de/16701/jet",
     r"https://iopscience.iop.org/article/10.1088/1009-0630/13/1/01",
     r"https://www-internal.psfc.mit.edu/research/alcator/data/fst_cmod.pdf",
+    # These bib resources fail due to "403 Client Error: Forbidden for url"
+    r"https://doi.org/10.1103/PhysRevLett.121.055001",
+    r"https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.121.055001",
 ]
 linkcheck_retries = 5
 linkcheck_timeout = 120

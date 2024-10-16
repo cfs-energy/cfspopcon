@@ -153,6 +153,7 @@ average_total_pressure:
   - calc_average_total_pressure
   used_by:
   - calc_lambda_q
+  - calc_lambda_q_with_brunner
 B_pol_out_mid:
   default_units: tesla
   description:
@@ -162,6 +163,8 @@ B_pol_out_mid:
   used_by:
   - calc_fieldline_pitch_at_omp
   - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_14
+  - calc_lambda_q_with_eich_regression_15
   - calc_power_crossing_separatrix_in_electron_channel
 B_t_out_mid:
   default_units: tesla
@@ -740,6 +743,7 @@ inverse_aspect_ratio:
   - calc_plasma_current_from_qstar
   - calc_q_star_from_plasma_current
   - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_15
 invmu_0_dLedR:
   default_units: dimensionless
   description:
@@ -838,6 +842,10 @@ lambda_q:
   - The near-scrape-off-layer heat-flux-density decay length.
   set_by:
   - calc_lambda_q
+  - calc_lambda_q_with_brunner
+  - calc_lambda_q_with_eich_regression_9
+  - calc_lambda_q_with_eich_regression_14
+  - calc_lambda_q_with_eich_regression_15
   used_by:
   - calc_parallel_heat_flux_density
   - calc_q_perp
@@ -850,6 +858,10 @@ lambda_q_factor:
   set_by: []
   used_by:
   - calc_lambda_q
+  - calc_lambda_q_with_brunner
+  - calc_lambda_q_with_eich_regression_9
+  - calc_lambda_q_with_eich_regression_14
+  - calc_lambda_q_with_eich_regression_15
 lambda_q_scaling:
   default_units: null
   description:
@@ -897,6 +909,8 @@ magnetic_field_on_axis:
   - calc_beta_normalized
   - calc_troyon_limit
   - calc_B_tor_omp
+  - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_9
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
@@ -940,6 +954,7 @@ major_radius:
   - calc_parallel_heat_flux_density
   - calc_q_perp
   - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_15
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
@@ -1406,6 +1421,8 @@ power_crossing_separatrix:
   - calc_parallel_heat_flux_density
   - calc_q_perp
   - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_9
+  - calc_lambda_q_with_eich_regression_15
   - calc_ratio_P_LH
   - calc_ratio_P_LI
 pumping_duct_neutral_pressure:
@@ -1456,6 +1473,8 @@ q_star:
   - calc_PBpRnSq
   - calc_bootstrap_fraction
   - calc_plasma_current_from_qstar
+  - calc_lambda_q
+  - calc_lambda_q_with_eich_regression_9
 radas_dir:
   default_units: null
   description:
