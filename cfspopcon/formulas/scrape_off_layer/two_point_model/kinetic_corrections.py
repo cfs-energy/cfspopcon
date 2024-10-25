@@ -94,7 +94,7 @@ def calc_Spitzer_conduction_reduction_factor_fluxlim(
 ) -> Union[float, xr.DataArray]:
     """Factor to reduce the electron heat conduction (relative to Braginskii) due to kinetic effects, via a flux limiter.
 
-    #TODO: Needs reference and units need to be checked
+    Reference: "The Plasma Boundary of Magnetic Fusion Devices", Peter C Stangeby, Chapter 26
 
     Args:
         separatrix_electron_density: [m^-3] :term:`glossary_link<separatrix_electron_density>`
