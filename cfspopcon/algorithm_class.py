@@ -323,10 +323,10 @@ class CompositeAlgorithm:
         self.__doc__ = self._make_docstring()
 
     @classmethod
-    def from_list(cls, keys: list[str]) -> CompositeAlgorithm:
+    def from_list(cls, keys: list[str], name: Optional[str] = None, register: bool = False) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm from a list of Algorithm names."""
         algorithms = [Algorithm.get_algorithm(key) for key in keys]
-        return CompositeAlgorithm(algorithms=algorithms)
+        return CompositeAlgorithm(algorithms=algorithms, name=name, register=register)
 
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
