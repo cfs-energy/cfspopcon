@@ -75,8 +75,8 @@ def calc_Spitzer_conduction_reduction_factor_scaling(
         parallel_connection_length=ureg.m,
         target_electron_temp=ureg.eV,
         kappa_e0=ureg.W / (ureg.eV**3.5 * ureg.m),
-        electron_mass=ureg.kg,  # TODO: electron mass in kg?
-        electron_charge=ureg.C,  # TODO: elementary charge in Coulomb?
+        electron_mass=ureg.kg,
+        electron_charge=ureg.C,
         SOL_conduction_fraction=ureg.dimensionless,
         flux_limit_factor_alpha=ureg.dimensionless,
     ),
@@ -94,7 +94,7 @@ def calc_Spitzer_conduction_reduction_factor_fluxlim(
 ) -> Union[float, xr.DataArray]:
     """Factor to reduce the electron heat conduction (relative to Braginskii) due to kinetic effects, via a flux limiter.
 
-    Reference: "The Plasma Boundary of Magnetic Fusion Devices", Peter C Stangeby, Chapter 26
+    Reference: "The Plasma Boundary of Magnetic Fusion Devices", Peter C Stangeby, Chapter 26, Equation 26.14
 
     Args:
         separatrix_electron_density: [m^-3] :term:`glossary_link<separatrix_electron_density>`
@@ -130,7 +130,7 @@ def calc_delta_electron_sheath_factor(
 ) -> Union[float, xr.DataArray]:
     """Offset to increase the sheath heat transmission factor (relative to fluid) due to kinetic effects, according to SOL-KiT.
 
-    #TODO: needs reference
+    Reference: D. Power et al, arXiv:2208.10862v1, Equation 8
 
     Args:
         separatrix_electron_temp: [n19] :term:`glossary_link<separatrix_electron_temp>`
