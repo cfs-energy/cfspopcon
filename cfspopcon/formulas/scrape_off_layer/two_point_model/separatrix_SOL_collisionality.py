@@ -14,7 +14,7 @@ def calc_separatrix_SOL_collisionality(
 ) -> Unitfull:
     """Calculate the separatrix SOL collisionality.
 
-    #TODO: needs reference
+    Reference: "The Plasma Boundary of Magnetic Fusion Devices", Peter C Stangeby, Chapter 4, Equation 4.105
 
     Args:
         separatrix_electron_density: [m^-3]
