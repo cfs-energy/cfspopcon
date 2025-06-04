@@ -33,6 +33,7 @@ linkcheck_ignore = [
     r"https://doi.org/10.2172/1372790",
     # these work but linkcheck doesn't like them..
     r"https://doi.org/10.2172/1334107",
+    r"https://doi.org/10.1063/1.865934",
     r"https://doi.org/10.13182/FST91-A29553",
     r"https://doi.org/10.1080/10420150.2018.1462361",
     r"https://library.psfc.mit.edu/catalog/online_pubs/MFE_formulary_2014.pdf",
