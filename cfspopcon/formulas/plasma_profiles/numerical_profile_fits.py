@@ -75,8 +75,8 @@ def get_df_interpolator(dataset: str, df_name: str) -> RectBivariateSpline:
     """Return an interpolator for the given dataframe of the specified dataset."""
     df = load_dataframe(dataset, df_name)
     interpolator = RectBivariateSpline(
-        [np.floating(x[1]) for x in df.columns.values],
-        [np.floating(x[1]) for x in df.index.values],
+        [float(x[1]) for x in df.columns.values],
+        [float(x[1]) for x in df.index.values],
         df.T.values,
     )
     return interpolator

@@ -55,6 +55,8 @@ pickleshare = "^0.7.5"
 nbmake = "^1.5"
 nbsphinx = "^0.9"
 ipdb = "^0.13.13"
+# Added as workaround for sphinx bibtex issue https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345
+setuptools = "^71.0.3"
 
 [tool.coverage.report]
 fail_under = 82
@@ -72,7 +74,7 @@ markers = [
 ]
 filterwarnings = [
   "error",
-  "ignore:numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject"
+  "ignore:numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject",
 ]
 
 [build-system]
