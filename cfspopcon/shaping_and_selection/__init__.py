@@ -16,12 +16,12 @@ from .transform_coords import (
 )
 
 __all__ = [
-    "find_coords_of_contour",
-    "interpolate_onto_line",
-    "find_coords_of_minimum",
-    "find_coords_of_maximum",
     "build_mask_from_dict",
-    "order_dimensions",
-    "interpolate_array_onto_new_coords",
     "build_transform_function_from_dict",
+    "find_coords_of_contour",
+    "find_coords_of_maximum",
+    "find_coords_of_minimum",
+    "interpolate_array_onto_new_coords",
+    "interpolate_onto_line",
+    "order_dimensions",
 ]

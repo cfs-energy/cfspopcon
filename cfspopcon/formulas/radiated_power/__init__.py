@@ -16,10 +16,9 @@ from .intrinsic_radiated_power_from_core import calc_intrinsic_radiated_power_fr
 from .synchrotron import calc_synchrotron_radiation
 
 __all__ = [
-    "calc_f_rad_core",
-    "require_P_rad_less_than_P_in",
-    "calc_bremsstrahlung_radiation",
     "calc_P_rad_hydrogen_bremsstrahlung",
+    "calc_bremsstrahlung_radiation",
+    "calc_f_rad_core",
     "calc_impurity_radiated_power",
     "calc_impurity_radiated_power_mavrin_coronal",
     "calc_impurity_radiated_power_mavrin_noncoronal",
@@ -27,4 +26,5 @@ __all__ = [
     "calc_impurity_radiated_power_radas",
     "calc_intrinsic_radiated_power_from_core",
     "calc_synchrotron_radiation",
+    "require_P_rad_less_than_P_in",
 ]

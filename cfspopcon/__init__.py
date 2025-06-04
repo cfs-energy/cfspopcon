@@ -19,18 +19,18 @@ from .unit_handling import (
 
 # export main classes users should need as well as the option enums
 __all__ = [
-    "formulas",
-    "named_options",
-    "magnitude_in_default_units",
+    "Algorithm",
+    "AtomicData",
+    "CompositeAlgorithm",
     "convert_to_default_units",
-    "process_input_dictionary",
-    "set_default_units",
     "convert_units",
+    "file_io",
+    "formulas",
+    "magnitude_in_default_units",
+    "named_options",
+    "process_input_dictionary",
     "read_case",
     "read_plot_style",
-    "Algorithm",
-    "CompositeAlgorithm",
-    "file_io",
-    "AtomicData",
+    "set_default_units",
     "shaping_and_selection",
 ]

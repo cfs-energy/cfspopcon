@@ -9,10 +9,10 @@ from .switch_confinement_scaling_on_threshold import (
 )
 
 __all__ = [
+    "ConfinementScaling",
     "calc_plasma_stored_energy",
     "read_confinement_scalings",
-    "ConfinementScaling",
     "solve_energy_confinement_scaling_for_input_power",
-    "switch_to_linearised_ohmic_confinement_below_threshold",
     "switch_to_L_mode_confinement_below_threshold",
+    "switch_to_linearised_ohmic_confinement_below_threshold",
 ]

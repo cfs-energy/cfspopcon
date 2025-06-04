@@ -9,8 +9,8 @@ from .two_point_model_algorithms import (
 )
 
 __all__ = [
-    "solve_two_point_model",
     "solve_target_first_two_point_model",
+    "solve_two_point_model",
     "two_point_model_fixed_fpow",
     "two_point_model_fixed_qpart",
     "two_point_model_fixed_tet",

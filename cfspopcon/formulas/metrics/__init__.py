@@ -21,15 +21,15 @@ from .larmor_radius import (
 )
 
 __all__ = [
-    "calc_coulomb_logarithm",
-    "calc_normalised_collisionality",
-    "calc_greenwald_density_limit",
-    "calc_greenwald_fraction",
     "calc_PB_over_R",
     "calc_PBpRnSq",
-    "calc_rho_star",
-    "calc_larmor_radius",
     "calc_alpha_t",
-    "calc_edge_collisionality",
     "calc_average_electron_density_from_greenwald_fraction",
+    "calc_coulomb_logarithm",
+    "calc_edge_collisionality",
+    "calc_greenwald_density_limit",
+    "calc_greenwald_fraction",
+    "calc_larmor_radius",
+    "calc_normalised_collisionality",
+    "calc_rho_star",
 ]

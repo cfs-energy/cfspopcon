@@ -8,6 +8,6 @@ __all__ = [
     "CoordinateFormatter",
     "label_contour",
     "make_plot",
-    "units_to_string",
     "read_plot_style",
+    "units_to_string",
 ]

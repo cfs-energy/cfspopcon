@@ -11,12 +11,12 @@ from .sustainment_power import (
 )
 
 __all__ = [
-    "read_AUG_SepOS_reference",
-    "calc_SepOS_L_mode_density_limit",
     "calc_SepOS_LH_transition",
+    "calc_SepOS_L_mode_density_limit",
     "calc_SepOS_ideal_MHD_limit",
     "calc_critical_alpha_MHD",
     "calc_poloidal_sound_larmor_radius",
-    "calc_power_crossing_separatrix_in_ion_channel",
     "calc_power_crossing_separatrix_in_electron_channel",
+    "calc_power_crossing_separatrix_in_ion_channel",
+    "read_AUG_SepOS_reference",
 ]

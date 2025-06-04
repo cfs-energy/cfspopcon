@@ -15,17 +15,17 @@ from .fusion_gain import calc_fusion_gain, calc_triple_product
 from .fusion_rates import calc_fusion_power, calc_neutron_flux_to_walls
 
 __all__ = [
-    "fusion_data",
-    "calc_average_ion_mass",
-    "FusionReaction",
-    "DTFusionBoschHale",
-    "DTFusionHively",
     "DDFusionBoschHale",
     "DDFusionHively",
     "DHe3Fusion",
-    "pB11Fusion",
+    "DTFusionBoschHale",
+    "DTFusionHively",
+    "FusionReaction",
+    "calc_average_ion_mass",
     "calc_fusion_gain",
-    "calc_triple_product",
     "calc_fusion_power",
     "calc_neutron_flux_to_walls",
+    "calc_triple_product",
+    "fusion_data",
+    "pB11Fusion",
 ]

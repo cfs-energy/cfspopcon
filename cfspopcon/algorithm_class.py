@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 from collections.abc import Callable, Sequence
 from functools import wraps
-from pathlib import Path  # noqa: TCH003
+from pathlib import Path  # noqa: TC003
 from typing import Any, ClassVar, Optional, Union
 from warnings import warn
 
@@ -164,7 +164,7 @@ class Algorithm:
     def register_algorithm(
         cls, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False
     ) -> GenericFunctionType:
-        """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""  # noqa: D402
+        """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""
 
         def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
             Algorithm.from_single_function(
