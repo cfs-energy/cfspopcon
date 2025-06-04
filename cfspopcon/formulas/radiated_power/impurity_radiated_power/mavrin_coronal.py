@@ -182,7 +182,7 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
             (electron_density_profile >= temperature_bin_borders[i]) & (electron_density_profile < temperature_bin_borders[i + 1])
         )[0]
         if it.size > 0:
-            log10_Lz[it] = polyval(Tlog[it], radc[i])  # type: ignore[no-untyped-call]
+            log10_Lz[it] = polyval(Tlog[it], radc[i])
 
     radrate = 10.0**log10_Lz
     radrate[np.isnan(radrate)] = 0
