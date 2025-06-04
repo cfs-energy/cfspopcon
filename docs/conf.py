@@ -45,7 +45,6 @@ linkcheck_ignore = [
     r"https://fire.pppl.gov/iaea06_ftp7_5_matsukawa.pdf",
     r"https://escholarship.org/content/qt78k0v04v/qt78k0v04v_noSplash_c44c701847deffab65024dd9ceff9c59.pdf?t=p15pc5",
     r"https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084",
-    r"https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084",
     r"https://fire.pppl.gov/Snowmass_BP/FIRE.pdf",
     r"https://www.ipp.mpg.de/16208/einfuehrung",
     r"https://www.ipp.mpg.de/16701/jet",

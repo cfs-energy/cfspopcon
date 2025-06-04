@@ -8,7 +8,6 @@ classifiers = [
 "Development Status :: 5 - Production/Stable",
 "Intended Audience :: Science/Research",
 "Programming Language :: Python :: 3",
-"Programming Language :: Python :: 3.9",
 "Programming Language :: Python :: 3.10",
 "Programming Language :: Python :: 3.11",
 "Programming Language :: Python :: 3.12",
@@ -23,16 +22,16 @@ cfspopcon = 'cfspopcon.cli:run_popcon_cli'
 popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
+python = ">=3.10"
 numpy = "^2.0"
 pandas = "^2.2"
 scipy = "^1.8"
-seaborn = "^0.12"
+seaborn = "^0.13"
 pyyaml = "^6.0"
 toml = "^0.10.2"
 typing-extensions = "^4.12"
 pint = "^0.24"
-xarray = "^2024"
+xarray = ">=2024"
 pint-xarray = "^0.4"
 click = "^8.1.0"
 netcdf4 = "^1.7"
@@ -40,10 +39,10 @@ radas = ">=2024.8.0"
 contourpy = "^1.2.1"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.7"
+pre-commit = "^4.2"
 pytest = "^8.2"
 coverage = "^7.6"
-pytest-cov = "^5.0"
+pytest-cov = "^6.0"
 types-pyyaml = "^6.0.12.2"
 pandas-stubs = "^2.0"
 mypy = "^1.10"
@@ -51,13 +50,11 @@ sphinx = "^7.3.7"
 sphinx-rtd-theme = "^2.0.0"
 sphinxcontrib-bibtex = "^2.6.1"
 sphinx-copybutton = "^0.5.2"
-ruff = "^0.5"
+ruff = "^0.11"
 pickleshare = "^0.7.5"
 nbmake = "^1.5"
 nbsphinx = "^0.9"
 ipdb = "^0.13.13"
-# Added as workaround for shhinx bibtex issue https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345
-setuptools = "^71.0.3"
 
 [tool.coverage.report]
 fail_under = 82
