@@ -148,7 +148,7 @@ def calc_impurity_radiated_power_post_and_jensen(
     for i in range(len(radc)):
         it = np.nonzero((electron_temp_profile >= temperature_bin_borders[i]) & (electron_temp_profile < temperature_bin_borders[i + 1]))[0]
         if it.size > 0:
-            log10_Lz[it] = polyval(Tlog[it], radc[i, :, iz])  # type: ignore[no-untyped-call]
+            log10_Lz[it] = polyval(Tlog[it], radc[i, :, iz])
 
     radrate = 10.0**log10_Lz
     radrate[np.isnan(radrate)] = 0

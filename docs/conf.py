@@ -33,6 +33,7 @@ linkcheck_ignore = [
     r"https://doi.org/10.2172/1372790",
     # these work but linkcheck doesn't like them..
     r"https://doi.org/10.2172/1334107",
+    r"https://doi.org/10.1063/1.865934",
     r"https://doi.org/10.13182/FST91-A29553",
     r"https://doi.org/10.1080/10420150.2018.1462361",
     r"https://library.psfc.mit.edu/catalog/online_pubs/MFE_formulary_2014.pdf",
@@ -44,7 +45,6 @@ linkcheck_ignore = [
     # these links in the time_independent_inductances_and_fluxes notebook are on private servers that are sometimes down
     r"https://fire.pppl.gov/iaea06_ftp7_5_matsukawa.pdf",
     r"https://escholarship.org/content/qt78k0v04v/qt78k0v04v_noSplash_c44c701847deffab65024dd9ceff9c59.pdf?t=p15pc5",
-    r"https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084",
     r"https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=585f5eb3f62f3bd76f3d667c1df357562f54c084",
     r"https://fire.pppl.gov/Snowmass_BP/FIRE.pdf",
     r"https://www.ipp.mpg.de/16208/einfuehrung",

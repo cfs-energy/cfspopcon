@@ -14,17 +14,17 @@ from .separatrix_operational_space import (
 from .threshold_power import calc_LH_transition_threshold_power, calc_LI_transition_threshold_power, calc_ratio_P_LH, calc_ratio_P_LI
 
 __all__ = [
-    "calc_power_crossing_separatrix",
     "calc_LH_transition_threshold_power",
     "calc_LI_transition_threshold_power",
-    "calc_ratio_P_LH",
-    "calc_ratio_P_LI",
-    "calc_SepOS_L_mode_density_limit",
     "calc_SepOS_LH_transition",
+    "calc_SepOS_L_mode_density_limit",
     "calc_SepOS_ideal_MHD_limit",
     "calc_critical_alpha_MHD",
     "calc_poloidal_sound_larmor_radius",
-    "calc_power_crossing_separatrix_in_ion_channel",
+    "calc_power_crossing_separatrix",
     "calc_power_crossing_separatrix_in_electron_channel",
+    "calc_power_crossing_separatrix_in_ion_channel",
+    "calc_ratio_P_LH",
+    "calc_ratio_P_LI",
     "separatrix_operational_space",
 ]

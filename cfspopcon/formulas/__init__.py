@@ -17,17 +17,17 @@ from . import (
 )
 
 __all__ = [
-    "geometry",
+    "atomic_data",
+    "auxiliary_power",
     "energy_confinement",
     "fusion_power",
+    "geometry",
+    "impurities",
     "metrics",
     "plasma_current",
+    "plasma_pressure",
     "plasma_profiles",
     "radiated_power",
     "scrape_off_layer",
-    "plasma_pressure",
-    "auxiliary_power",
     "separatrix_conditions",
-    "impurities",
-    "atomic_data",
 ]

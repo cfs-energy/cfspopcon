@@ -75,8 +75,8 @@ def get_df_interpolator(dataset: str, df_name: str) -> RectBivariateSpline:
     """Return an interpolator for the given dataframe of the specified dataset."""
     df = load_dataframe(dataset, df_name)
     interpolator = RectBivariateSpline(
-        [np.float64(x[1]) for x in df.columns.values],
-        [np.float64(x[1]) for x in df.index.values],
+        [float(x[1]) for x in df.columns.values],
+        [float(x[1]) for x in df.index.values],
         df.T.values,
     )
     return interpolator
@@ -89,9 +89,9 @@ def evaluate_density_and_temperature_profile_fits(
     nu_n: float,
     aLT: float = 2.0,
     width_ped: float = 0.05,
-    rho: Optional[NDArray[np.float64]] = None,
+    rho: Optional[NDArray[np.floating]] = None,
     dataset: str = "PRF",
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:  # TODO: fill out docstring
+) -> tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating]]:  # TODO: fill out docstring
     """Evaluate temperature-density profile fits."""
     # ---- Get interpolator functions corresponding to this dataset
     width_interpolator = get_df_interpolator(dataset=dataset, df_name="width")
@@ -113,8 +113,8 @@ def evaluate_profile(
     aLT_core: float,
     width_axis: float,
     width_ped: float = 0.05,
-    rho: Optional[NDArray[np.float64]] = None,
-) -> tuple[NDArray[np.float64], NDArray[np.float64], float]:
+    rho: Optional[NDArray[np.floating]] = None,
+) -> tuple[NDArray[np.floating], NDArray[np.floating], float]:
     r"""This function generates a profile from :math:`\langle T \rangle`, aLT and :math:`x_a`.
 
     Example:
@@ -180,7 +180,7 @@ def evaluate_profile(
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Teped = Tavol / I
-    T: NDArray[np.float64] = Teped * np.hstack((Taxis, Tcore, Tedge)).ravel()
+    T: NDArray[np.floating] = Teped * np.hstack((Taxis, Tcore, Tedge)).ravel()
     if np.isclose(Tavol, 0.0) and np.isclose(T[0], 0.0):
         peaking = 0.0
     else:
