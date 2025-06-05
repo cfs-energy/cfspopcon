@@ -24,7 +24,7 @@ def make_plot(
     save_name: Optional[str] = None,
     ax: Optional[Axes] = None,
     output_dir: Path = Path("."),
-) -> None:
+):
     """Given a dictionary corresponding to a plotting style, build a standard plot from the results of the POPCON."""
     if plot_params["type"] == "popcon":
         if ax is None:
@@ -35,6 +35,8 @@ def make_plot(
 
     if save_name is not None:
         fig.savefig(output_dir / save_name)
+
+    return fig, ax
 
 
 def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points: dict, ax: Axes):
@@ -123,7 +125,7 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
     ax.set_title(f"{title} [{__version__}]")
     ax.set_xlabel(coords["x"]["label"])
     ax.set_ylabel(coords["y"]["label"])
-    ax.legend(legend_elements.values(), legend_elements.keys())
+    ax.legend(legend_elements.values(), legend_elements.keys(), loc=plot_params.get("legend_loc", "best"))
     plt.tight_layout()
 
     return fig, ax
