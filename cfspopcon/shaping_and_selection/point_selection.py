@@ -1,13 +1,59 @@
 """Routines to find the coordinates of the minimum or maximum value of a field."""
 
 from collections.abc import Sequence
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 import xarray as xr
 from xarray.core.coordinates import DataArrayCoordinates
 
-from ..unit_handling import Quantity
+from ..unit_handling import Quantity, default_unit, magnitude_in_units
+
+
+def find_point(dataset: xr.Dataset, point_params: dict, transform_func: Optional[Callable[[xr.DataArray], xr.DataArray]] = None) -> xr.Dataset:
+    """Extract values from a dataset at a point defined by point params."""
+    allowed_methods = ["minimize", "maximize", "at"]
+
+    assert np.sum([method in point_params.keys() for method in allowed_methods]) == 1, \
+        f"Must provide exactly one of [{', '.join(allowed_methods)}] for a point. Keys were {point_params.keys()}"
+    
+    if transform_func is None:
+        def transform_func(x):
+            return x
+
+    if "minimize" in point_params.keys() or "maximize" in point_params.keys():
+        mask = build_mask_from_dict(dataset, point_params)
+
+        if "minimize" in point_params.keys():
+            array = dataset[point_params["minimize"]]
+        elif "maximize" in point_params.keys():
+            array = -dataset[point_params["maximize"]]
+
+        transformed_array = transform_func(array.where(mask))
+        point_coords = find_coords_of_minimum(transformed_array, keep_dims=point_params.get("keep_dims", []))
+
+        return dataset.isel(point_coords)
+
+    elif "at" in point_params.keys():
+
+        method = point_params["at"].get("method", "nearest")
+
+        point_coords = dict()
+        for key, at_config in point_params["at"].items():
+            if f"dim_{key}" not in dataset.coords:
+                raise NotImplementedError(f"Points must be defined in terms of scanned coordinates. dim_{key} not dataset coords {dataset.coords}")
+            # Coordinates are defined in default units
+            coord_units = default_unit(key)
+            value = magnitude_in_units(Quantity(float(at_config["value"]), at_config.get("units", "")), coord_units)
+            point_coords[f"dim_{key}"] = value
+
+        if method == "nearest":
+            return dataset.sel(**point_coords, method="nearest")
+        else:
+            return dataset.interp(**point_coords, method=method)
+
+    else:
+        raise NotImplementedError(f"No method recognized for point. Please provide one of [{', '.join(allowed_methods)}].")
 
 
 def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: Optional[xr.DataArray] = None) -> DataArrayCoordinates:

@@ -8,6 +8,7 @@ from .point_selection import (
     build_mask_from_dict,
     find_coords_of_maximum,
     find_coords_of_minimum,
+    find_point,
 )
 from .transform_coords import (
     build_transform_function_from_dict,
@@ -21,6 +22,7 @@ __all__ = [
     "find_coords_of_contour",
     "find_coords_of_maximum",
     "find_coords_of_minimum",
+    "find_point",
     "interpolate_array_onto_new_coords",
     "interpolate_onto_line",
     "order_dimensions",

@@ -141,10 +141,19 @@ points:
       P_fusion:
         max: 140.0
         units: MW
+  
+  fixed_point:
+    method: "interp"
+    at:
+      average_electron_density:
+        value: 2.0e20
+        units: "m**-3"
+      average_electron_temp:
+        value: 10.0
+        units: keV
 
 plots:
   "POPCON for SPARC PRD": CASE_DIR/plot_popcon.yaml
-  "SPARC PRD $(n_e, P_{aux})$": CASE_DIR/plot_remapped.yaml
 
 # Major radius in metres
 major_radius: 1.85

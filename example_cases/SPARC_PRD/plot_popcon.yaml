@@ -2,7 +2,7 @@ type: popcon
 
 figsize: [8, 6]
 show_dpi: 150
-legend_loc: "upper right"
+legend_loc: "best"
 
 coords:
   x:
@@ -37,6 +37,11 @@ points:
     label: "PRD"
     marker: "x"
     color: "red"
+    size: 50.0
+  fixed_point:
+    label: "fixed"
+    marker: "x"
+    color: "blue"
     size: 50.0
 
 # Suggested colors are "tab:red", "tab:blue", "tab:orange", "tab:green", "tab:purple",

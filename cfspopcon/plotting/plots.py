@@ -10,9 +10,9 @@ import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
 
-from ..shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_minimum
+from ..shaping_and_selection.point_selection import build_mask_from_dict, find_point
 from ..shaping_and_selection.transform_coords import build_transform_function_from_dict
-from ..unit_handling import Quantity, Unit, dimensionless_magnitude
+from ..unit_handling import Quantity, Unit, default_unit, dimensionless_magnitude, magnitude_in_units
 from .coordinate_formatter import CoordinateFormatter
 
 
@@ -91,29 +91,24 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points:
             legend_elements[subplot_params["label"]] = legend_entry
 
     for key, point_params in points.items():
-        point_style = plot_params.get("points", dict()).get(key, dict())
+        if key not in plot_params.get("points", dict()):
+            continue
+        point_style = plot_params["points"][key]
         label = point_style.get("label", key)
 
-        mask = build_mask_from_dict(dataset, point_params)
+        point = find_point(dataset, point_params, transform_func)
 
-        if "minimize" not in point_params.keys() and "maximize" not in point_params.keys():
-            raise ValueError(f"Need to provide either minimize or maximize in point specification. Keys were {point_params.keys()}")
-
-        if "minimize" in point_params.keys():
-            field = dataset[point_params["minimize"]]
-        else:
-            field = -dataset[point_params["maximize"]]
-
-        transformed_field = transform_func(field.where(mask))
-
-        point_coords = find_coords_of_minimum(transformed_field, keep_dims=point_params.get("keep_dims", []))
-
-        point = transformed_field.isel(point_coords)
         plotting_coords = []
-        for dim in [coords["x"]["dimension"], coords["y"]["dimension"]]:
+        for coord in [coords["x"], coords["y"]]:
+            dim = coord["dimension"]
+
             if dim not in point.coords and f"dim_{dim}" in point.coords:
-                dim = f"dim_{dim}"  # noqa: PLW2901
-            plotting_coords.append(point[dim])
+                dim = f"dim_{dim}"
+
+            default_units = Quantity(1.0, default_unit(dim.lstrip("dim_")))
+            requested_units = coord.get("units", "")
+
+            plotting_coords.append(magnitude_in_units(float(point[dim]) * default_units, requested_units))
 
         legend_elements[label] = ax.scatter(
             *plotting_coords,
