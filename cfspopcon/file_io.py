@@ -11,11 +11,13 @@ if sys.version_info >= (3, 11, 0):
 else:
     from typing_extensions import Self  # type:ignore[attr-defined,unused-ignore]
 
+from enum import Enum
+
 import numpy as np
 import xarray as xr
 
 from .helpers import convert_named_options
-from .shaping_and_selection.point_selection import find_coords_of_nearest_point
+from .shaping_and_selection.point_selection import find_values_at_nearest_point
 from .unit_handling import convert_to_default_units, set_default_units
 
 ignored_keys = [
@@ -36,15 +38,18 @@ def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> Union
     except KeyError:
         pass
 
+    def get_name(val: Enum | str) -> str:
+        return getattr(val, "name", val)  # type:ignore[arg-type]
+
     if val.dtype == object:
         try:
             if val.size == 1:
                 if not coord:
-                    val = val.item().name
+                    val = get_name(val.item())  # type:ignore[assignment]
                 else:
-                    val = xr.DataArray([val.item().name])
+                    val = xr.DataArray([get_name(val.item())])
             else:
-                val = xr.DataArray([v.name for v in val.values], dims=val.dims)
+                val = xr.DataArray([get_name(v) for v in val.values], dims=val.dims)
         except AttributeError:
             warnings.warn(f"Cannot handle {key}. Dropping variable.", stacklevel=3)
             return "UNHANDLED"
@@ -144,7 +149,7 @@ class _ModifyJSONFloatRepr:
 
 def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path) -> None:
     """Write the analysis values at the named points to a json file."""
-    point = dataset.isel(find_coords_of_nearest_point(dataset, point_params))
+    point = find_values_at_nearest_point(dataset, point_params)
 
     for key in point.keys():
         if key in ignored_keys:

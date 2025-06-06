@@ -1,5 +1,6 @@
 """Routines to find the coordinates of the minimum or maximum value of a field."""
 
+import warnings
 from collections.abc import Sequence
 from typing import Optional
 
@@ -7,7 +8,46 @@ import numpy as np
 import xarray as xr
 from xarray.core.coordinates import DataArrayCoordinates
 
-from ..unit_handling import Quantity, dimensionless_magnitude
+from ..unit_handling import Quantity, dimensionless_magnitude, magnitude_in_default_units
+
+
+def find_values_at_nearest_point(dataset: xr.Dataset, point_params: dict) -> xr.Dataset:
+    """Return a dataset at a point point which best fulfills the conditions defined by point params."""
+    allowed_methods = ["minimize", "maximize", "nearest_to", "interp_to"]
+
+    method = [method for method in allowed_methods if method in point_params.keys()]
+    assert len(method) == 1, f"Must provide one of [{', '.join(allowed_methods)}] for a point. Keys were {list(point_params.keys())}"
+
+    if method[0] == "interp_to":
+        mask = build_mask_from_dict(dataset, point_params)
+
+        requested_coords = dict()
+
+        for dimension_name, request in point_params["interp_to"].items():
+            if dimension_name not in dataset.coords and f"dim_{dimension_name}" in dataset.coords:
+                dimension_name = f"dim_{dimension_name}"  # noqa: PLW2901
+
+            assert dimension_name in dataset.coords, (
+                f"Cannot interpolate to {dimension_name} since it is not in the dataset coordinates {dataset.coords}."
+            )
+
+            value = Quantity(float(request["value"]), request.get("units", ""))
+            requested_coords[dimension_name] = magnitude_in_default_units(value, key=dimension_name.lstrip("dim_"))
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            # We dequantify and then requantify the dataset, since some interpolation methods cannot handle units
+            return (  # type:ignore[no-any-return]
+                dataset.where(mask)
+                .pint.dequantify()
+                .interp(**requested_coords, method=point_params.get("method", "linear"))
+                .pint.quantify()
+            )
+
+    elif method[0] in ["minimize", "maximize", "nearest_to"]:
+        return dataset.isel(find_coords_of_nearest_point(dataset, point_params))
+    else:
+        raise NotImplementedError(f"{method[0]} not recognized.")
 
 
 def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> DataArrayCoordinates:
@@ -64,7 +104,6 @@ def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> Dat
     allowed_methods = ["minimize", "maximize", "nearest_to"]
 
     method = [method for method in allowed_methods if method in point_params.keys()]
-
     assert len(method) == 1, f"Must provide one of [{', '.join(allowed_methods)}] for a point. Keys were {list(point_params.keys())}"
 
     mask = build_mask_from_dict(dataset, point_params)

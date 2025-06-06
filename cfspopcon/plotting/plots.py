@@ -10,7 +10,7 @@ import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
 
-from ..shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_nearest_point
+from ..shaping_and_selection.point_selection import build_mask_from_dict, find_values_at_nearest_point
 from ..shaping_and_selection.transform_coords import build_transform_function_from_dict
 from ..unit_handling import Quantity, Unit, default_unit, dimensionless_magnitude, magnitude_in_units
 from .coordinate_formatter import CoordinateFormatter
@@ -96,7 +96,7 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points_
         point_style = plot_params["points"][key]
         label = point_style.get("label", key)
 
-        point = dataset.isel(find_coords_of_nearest_point(dataset, point_params))
+        point = find_values_at_nearest_point(dataset, point_params)
 
         plotting_coords = []
         for coord in [coords["x"], coords["y"]]:
