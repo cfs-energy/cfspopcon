@@ -56,7 +56,7 @@ nbmake = "^1.5"
 nbsphinx = "^0.9"
 ipdb = "^0.13.13"
 # Added as workaround for sphinx bibtex issue https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345
-setuptools = "^71.0.3"
+setuptools = ">=71.0.3,<79.0.0"
 
 [tool.coverage.report]
 fail_under = 82
