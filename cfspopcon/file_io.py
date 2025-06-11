@@ -39,7 +39,10 @@ def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> Union
         pass
 
     def get_name(val: Enum | str) -> str:
-        return getattr(val, "name", val)  # type:ignore[arg-type]
+        if isinstance(val, Enum):
+            return val.name
+        else:
+            return val
 
     if val.dtype == object:
         try:
