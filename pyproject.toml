@@ -23,7 +23,10 @@ popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'
 
 [tool.poetry.dependencies]
 python = ">=3.10"
-numpy = "^2.0"
+numpy = [
+    {version = "^2.3", python = ">=3.11"},
+    {version = "^2.2", python = "<3.11"}
+]
 pandas = "^2.2"
 scipy = "^1.8"
 seaborn = "^0.13"
@@ -32,7 +35,7 @@ toml = "^0.10.2"
 typing-extensions = "^4.12"
 pint = "^0.24"
 xarray = ">=2024"
-pint-xarray = "^0.4"
+pint-xarray = "^0.5"
 click = "^8.1.0"
 netcdf4 = "^1.7"
 radas = ">=2024.8.0"
