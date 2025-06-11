@@ -40,4 +40,7 @@ def example_inputs(cases_directory) -> dict:
     filepath = cases_directory / "SPARC_PRD" / "input.yaml"
     assert filepath.exists()
 
-    return yaml.safe_load(filepath)
+    with open(filepath) as file:
+        repr_d = yaml.load(file, Loader=yaml.FullLoader)
+
+    return repr_d
