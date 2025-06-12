@@ -11,11 +11,13 @@ if sys.version_info >= (3, 11, 0):
 else:
     from typing_extensions import Self  # type:ignore[attr-defined,unused-ignore]
 
+from enum import Enum
+
 import numpy as np
 import xarray as xr
 
 from .helpers import convert_named_options
-from .shaping_and_selection.point_selection import build_mask_from_dict, find_coords_of_minimum
+from .shaping_and_selection.point_selection import find_values_at_nearest_point
 from .unit_handling import convert_to_default_units, set_default_units
 
 ignored_keys = [
@@ -36,15 +38,21 @@ def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> Union
     except KeyError:
         pass
 
+    def get_name(val: Enum | str) -> str:
+        if isinstance(val, Enum):
+            return val.name
+        else:
+            return val
+
     if val.dtype == object:
         try:
             if val.size == 1:
                 if not coord:
-                    val = val.item().name
+                    val = get_name(val.item())  # type:ignore[assignment]
                 else:
-                    val = xr.DataArray([val.item().name])
+                    val = xr.DataArray([get_name(val.item())])
             else:
-                val = xr.DataArray([v.name for v in val.values], dims=val.dims)
+                val = xr.DataArray([get_name(v) for v in val.values], dims=val.dims)
         except AttributeError:
             warnings.warn(f"Cannot handle {key}. Dropping variable.", stacklevel=3)
             return "UNHANDLED"
@@ -144,19 +152,8 @@ class _ModifyJSONFloatRepr:
 
 def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path) -> None:
     """Write the analysis values at the named points to a json file."""
-    mask = build_mask_from_dict(dataset, point_params)
+    point = find_values_at_nearest_point(dataset, point_params)
 
-    if "minimize" not in point_params.keys() and "maximize" not in point_params.keys():
-        raise ValueError(f"Need to provide either minimize or maximize in point specification. Keys were {point_params.keys()}")
-
-    if "minimize" in point_params.keys():
-        array = dataset[point_params["minimize"]]
-    else:
-        array = -dataset[point_params["maximize"]]
-
-    point_coords = find_coords_of_minimum(array, keep_dims=point_params.get("keep_dims", []), mask=mask)
-
-    point = dataset.isel(point_coords)
     for key in point.keys():
         if key in ignored_keys:
             assert isinstance(key, str)

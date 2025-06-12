@@ -2,6 +2,7 @@ type: popcon
 
 figsize: [8, 6]
 show_dpi: 150
+legend_loc: "upper right"
 
 coords:
   x:
@@ -15,6 +16,7 @@ coords:
 
 fill:
   variable: Q
+  cbar_label: Q
   where:
       Q:
         min: 1.0
