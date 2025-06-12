@@ -60,16 +60,15 @@ def _calc_impurity_charge_state(
     Returns:
         :term:`impurity_charge_state`
     """
-    average_electron_temp, average_electron_density = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
-        impurity_species,
-        average_electron_temp,
-        average_electron_density,
+    interpolator = atomic_data.get_coronal_Z_interpolator(impurity_species)
+    interpolated_values = interpolator(
+        electron_density=average_electron_density,
+        electron_temp=average_electron_temp,
+        allow_extrap=True
     )
-    interpolator = atomic_data.coronal_Z_interpolators[impurity_species]
-    interpolated_values = np.power(10, interpolator((np.log10(average_electron_temp), np.log10(average_electron_density))))
 
     atomic_number = atomic_data.datasets[impurity_species].atomic_number
 
     interpolated_values = np.minimum(interpolated_values, atomic_number)
-    interpolated_values = np.maximum(interpolated_values, 0)
+    interpolated_values = np.maximum(interpolated_values, 0.0)
     return interpolated_values  # type:ignore[no-any-return]

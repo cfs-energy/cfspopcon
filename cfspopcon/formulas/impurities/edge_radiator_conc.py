@@ -108,7 +108,7 @@ def build_L_int_integrator(
     ne_tau_ref = magnitude(convert_units(reference_ne_tau, ureg.m**-3 * ureg.s))
 
     Lz_curve = (
-        atomic_data.get_dataset(impurity_species)
+        atomic_data[impurity_species]
         .equilibrium_Lz.sel(dim_electron_density=electron_density_ref, method="nearest", tolerance=1e-6 * electron_density_ref)
         .sel(dim_ne_tau=ne_tau_ref, method="nearest", tolerance=1e-6 * ne_tau_ref)
     )
