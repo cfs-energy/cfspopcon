@@ -45,7 +45,6 @@ class AtomicData:
 
         self.species_ne_tau: dict[AtomicSpecies, xr.DataArray] = dict()
         self.ne_tau_units = ureg.m**-3 * ureg.s
-        self.radas_git_hash: str = ""
 
         for species in self.available_species:
             dataset = self[species]
@@ -64,18 +63,6 @@ class AtomicData:
                 subds = dataset_at_single_ne_tau.squeeze(dim="dim_ne_tau")
                 self.noncoronal_Lz_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_Lz, **ref)
                 self.noncoronal_Z_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_mean_charge_state, **ref)
-
-            self._check_radas_git_hash(dataset.git_hash)
-
-    def _check_radas_git_hash(self, test_git_hash: str) -> None:
-        """Check that all of the datasets have the same git hash."""
-        if self.radas_git_hash == "":
-            self.radas_git_hash = test_git_hash
-        elif self.radas_git_hash != test_git_hash:
-            warnings.warn(
-                f"Found multiple radas git hashes ({self.radas_git_hash} != {test_git_hash}) in the requested atomic data. Will set radas_git_hash = UNDEFINED.",
-                stacklevel=2,
-            )
 
     @staticmethod
     def read_atomic_data(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
@@ -203,8 +190,8 @@ class AtomicData:
         return self.noncoronal_Z_interpolators[(self.key_to_enum(species), ne_tau)]
 
 
-@Algorithm.register_algorithm(return_keys=["atomic_data", "radas_git_hash"])
-def read_atomic_data(radas_dir: Path) -> tuple[AtomicData, str]:
+@Algorithm.register_algorithm(return_keys=["atomic_data"])
+def read_atomic_data(radas_dir: Path) -> AtomicData:
     """Construct an AtomicData interface using the atomic data in the specified directory."""
     atomic_data = AtomicData(get_item(radas_dir))
-    return atomic_data, atomic_data.radas_git_hash
+    return atomic_data

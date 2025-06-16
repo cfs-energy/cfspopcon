@@ -140,12 +140,3 @@ def test_get_functions_with_missing_ne_tau(atomic_data, species, ne_tau):
 
     with pytest.raises(KeyError):
         atomic_data.get_noncoronal_Z_interpolator(species, ne_tau, ne_tau_rel_tolerance=1e-2)
-
-
-def test_get_git_hash(atomic_data):
-    atomic_data._check_radas_git_hash(atomic_data.radas_git_hash)
-
-    with pytest.warns(UserWarning):
-        atomic_data._check_radas_git_hash("git hashes don't have spaces in them.")
-
-    assert atomic_data.radas_git_hash == atomic_data["hydrogen"].git_hash == atomic_data["helium"].git_hash

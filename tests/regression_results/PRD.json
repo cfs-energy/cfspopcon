@@ -1062,11 +1062,6 @@
             "data": 3.290275716,
             "dims": []
         },
-        "radas_git_hash": {
-            "attrs": {},
-            "data": "9741acc",
-            "dims": []
-        },
         "radiated_power_method": {
             "attrs": {},
             "data": "Radas",
