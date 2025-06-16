@@ -22,7 +22,7 @@ Setting up a virtual environment and installing all dependencies required to dev
 .. code::
 
   >>> poetry install
-  >>> poetry run radas -d ./radas_dir
+  >>> poetry run radas -d ./radas_dir -c radas_config.yaml
 
 If you are new to Poetry, we suggest that you at least read their brief introduction on `how to use this virtual environment <https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment>`_.
 You can verify that everything worked as expected by following the :ref:`Getting Started <gettingstarted>` guide.

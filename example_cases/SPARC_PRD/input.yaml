@@ -234,6 +234,8 @@ edge_impurity_species: Argon
 lengyel_overestimation_factor: 4.3
 # Ratio of edge impurity concentration in the edge to in the core (c_edge / c_core)
 edge_impurity_enrichment: 5.0
+# What ne_tau value to use? Must match a ne_tau value in radas_config.yaml
+reference_ne_tau: 0.5e+17
 
 # What set of fitting coefficients for the surface inductance?
 surface_inductance_coefficients: Barr

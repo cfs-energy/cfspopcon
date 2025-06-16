@@ -45,7 +45,7 @@ jobs:
       
       - name: Make radas data
         if: steps.radas.outputs.cache-hit != 'true'
-        run: poetry run radas
+        run: poetry run radas -c radas_config.yaml
       
       - name: Upload radas artifacts
         uses: actions/upload-artifact@v4

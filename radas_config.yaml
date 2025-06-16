@@ -10,7 +10,7 @@ globals:
 
   # electron density (ne) * residence time (tau) (in m^-3 s)
   ne_tau:
-    value: [0.5e+17, 1.0e+17]
+    value: [0.5e+17]
     units: "m^-3 s"
   
   # Number of log-spaced points to use for electron density and electron temp.
