@@ -5,8 +5,7 @@ import xarray as xr
 
 from ...algorithm_class import Algorithm
 from ...helpers import get_item
-from ...named_options import AtomicSpecies
-from ...unit_handling import Unitfull, ureg, wraps_ufunc
+from ...unit_handling import Unitfull
 from ..atomic_data import AtomicData
 
 
@@ -15,7 +14,7 @@ def calc_impurity_charge_state(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
     impurity_concentration: xr.DataArray,
-    atomic_data: xr.DataArray,
+    atomic_data: AtomicData | xr.DataArray,
 ) -> Unitfull:
     """Calculate the impurity charge state for each species in impurity_concentration.
 
@@ -28,43 +27,15 @@ def calc_impurity_charge_state(
     Returns:
         :term:`impurity_charge_state`
     """
-    return _calc_impurity_charge_state(
-        average_electron_density, average_electron_temp, impurity_concentration.dim_species, get_item(atomic_data)
-    )
+    atomic_data = get_item(atomic_data)
 
+    def calc_mean_z(impurity_concentration: xr.DataArray) -> xr.DataArray:
+        species = get_item(impurity_concentration.dim_species)
+        interpolator = atomic_data.get_coronal_Z_interpolator(species)
+        mean_z = interpolator.eval(electron_density=average_electron_density, electron_temp=average_electron_temp, allow_extrap=True)
 
-@wraps_ufunc(
-    return_units=dict(mean_charge_state=ureg.dimensionless),
-    input_units=dict(
-        average_electron_density=ureg.m**-3,
-        average_electron_temp=ureg.eV,
-        impurity_species=None,
-        atomic_data=None,
-    ),
-    pass_as_kwargs=("atomic_data",),
-)
-def _calc_impurity_charge_state(
-    average_electron_density: float,
-    average_electron_temp: float,
-    impurity_species: AtomicSpecies,
-    atomic_data: AtomicData,
-) -> float:
-    """Calculate the impurity charge state of the specified impurity species.
+        mean_z = np.minimum(mean_z, atomic_data.datasets[species].atomic_number)
+        mean_z = np.maximum(mean_z, 0.0)
+        return mean_z  # type:ignore[no-any-return]
 
-    Args:
-        average_electron_density: [m^-3] :term:`glossary link<average_electron_density>`
-        average_electron_temp: [eV] :term:`glossary link<average_electron_temp>`
-        impurity_species: [] :term:`glossary link<impurity_species>`
-        atomic_data: :term:`glossary link<atomic_data>`
-
-    Returns:
-        :term:`impurity_charge_state`
-    """
-    interpolator = atomic_data.get_coronal_Z_interpolator(impurity_species)
-    interpolated_values = interpolator(electron_density=average_electron_density, electron_temp=average_electron_temp, allow_extrap=True)
-
-    atomic_number = atomic_data.datasets[impurity_species].atomic_number
-
-    interpolated_values = np.minimum(interpolated_values, atomic_number)
-    interpolated_values = np.maximum(interpolated_values, 0.0)
-    return interpolated_values  # type:ignore[no-any-return]
+    return impurity_concentration.groupby("dim_species").map(calc_mean_z).transpose(..., "dim_species")
