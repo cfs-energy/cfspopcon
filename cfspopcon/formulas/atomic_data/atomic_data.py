@@ -1,15 +1,17 @@
 """Module defining the AtomicData class, used for interfacing with radas files."""
 
+import warnings
 from pathlib import Path
 from typing import Optional, Union
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import RegularGridInterpolator  # type: ignore[import-untyped]
 
 from ...algorithm_class import Algorithm
+from ...helpers import get_item
 from ...named_options import AtomicSpecies
-from ...unit_handling import magnitude
+from ...unit_handling import Quantity, magnitude_in_units, ureg
+from .coeff_interpolator import CoeffInterpolator
 
 
 class AtomicData:
@@ -25,12 +27,6 @@ class AtomicData:
     - noncoronal_Z_interpolators (dict): A dictionary of interpolators for non-coronal Z values.
     """
 
-    # Define constants for selecting interpolator types
-    CoronalLz = 1
-    CoronalZ = 2
-    NoncoronalLz = 3
-    NoncoronalZ = 4
-
     def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:
         """Initializes the AtomicData object by loading atomic data from the specified directory.
 
@@ -42,22 +38,44 @@ class AtomicData:
         self.available_species = list(self.datasets.keys())  # List available species based on the loaded datasets
 
         # Initialize dictionaries to hold interpolators for different data types and conditions
-        self.coronal_Lz_interpolators: dict[AtomicSpecies, RegularGridInterpolator] = dict()
-        self.coronal_Z_interpolators: dict[AtomicSpecies, RegularGridInterpolator] = dict()
-        self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
-        self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], RegularGridInterpolator] = dict()
-        self.grid_limits: dict[AtomicSpecies, tuple[float, float, float, float]] = dict()
+        self.coronal_Lz_interpolators: dict[AtomicSpecies, CoeffInterpolator] = dict()
+        self.coronal_Z_interpolators: dict[AtomicSpecies, CoeffInterpolator] = dict()
+        self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], CoeffInterpolator] = dict()
+        self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], CoeffInterpolator] = dict()
+
+        self.species_ne_tau: dict[AtomicSpecies, xr.DataArray] = dict()
+        self.ne_tau_units = ureg.m**-3 * ureg.s
+        self.radas_git_hash: str = ""
 
         for species in self.available_species:
-            dataset = self.get_dataset(species)
-            self.coronal_Lz_interpolators[species] = self.build_interpolator(dataset.coronal_Lz)
-            self.coronal_Z_interpolators[species] = self.build_interpolator(dataset.coronal_mean_charge_state)
+            dataset = self[species]
 
-            max_temp = dataset.dim_electron_temp.max().item()
-            min_temp = dataset.dim_electron_temp.min().item()
-            max_density = dataset.dim_electron_density.max().item()
-            min_density = dataset.dim_electron_density.min().item()
-            self.grid_limits[species] = (max_temp, min_temp, max_density, min_density)
+            ref = dict(
+                reference_electron_density=dataset.reference_electron_density,
+                reference_electron_temp=dataset.reference_electron_temp,
+            )
+
+            self.coronal_Lz_interpolators[species] = CoeffInterpolator(dataset.coronal_Lz, **ref)
+            self.coronal_Z_interpolators[species] = CoeffInterpolator(dataset.coronal_mean_charge_state, **ref)
+
+            self.species_ne_tau[species] = dataset["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify()
+
+            for ne_tau, dataset_at_single_ne_tau in dataset.groupby("dim_ne_tau"):
+                subds = dataset_at_single_ne_tau.squeeze(dim="dim_ne_tau")
+                self.noncoronal_Lz_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_Lz, **ref)
+                self.noncoronal_Z_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_mean_charge_state, **ref)
+
+            self._check_radas_git_hash(dataset.git_hash)
+
+    def _check_radas_git_hash(self, test_git_hash: str) -> None:
+        """Check that all of the datasets have the same git hash."""
+        if self.radas_git_hash == "":
+            self.radas_git_hash = test_git_hash
+        elif self.radas_git_hash != test_git_hash:
+            warnings.warn(
+                f"Found multiple radas git hashes ({self.radas_git_hash} != {test_git_hash}) in the requested atomic data. Will set radas_git_hash = UNDEFINED.",
+                stacklevel=2,
+            )
 
     @staticmethod
     def read_atomic_data(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
@@ -127,207 +145,66 @@ class AtomicData:
         Returns:
         - The xarray Dataset corresponding to the atomic data of the requested species.
         """
-        return self.get_dataset(species)
-
-    def get_dataset(self, species: Union[str, AtomicSpecies]) -> xr.Dataset:
-        """Retrieves the atomic data dataset for a specified species.
-
-        Parameters:
-        - species (Union[str, AtomicSpecies]): The species identifier, either as a string or an AtomicSpecies enum.
-
-        Returns:
-        - The xarray Dataset corresponding to the atomic data of the requested species.
-        """
         return self.datasets[self.key_to_enum(species)]
 
-    @staticmethod
-    def build_interpolator(z_values: xr.DataArray) -> RegularGridInterpolator:
-        """Builds a bivariate spline interpolator for the provided dataset.
+    def get_coronal_Lz_interpolator(self, species: str | AtomicSpecies) -> CoeffInterpolator:
+        """Returns a coronal_Lz_interpolator for the specified species and ne_tau value."""
+        return self.coronal_Lz_interpolators[self.key_to_enum(species)]
 
-        This method creates an interpolator based on logarithmic transformations of the temperature, density,
-        and z_values data, facilitating interpolation in log space for better accuracy over wide ranges.
+    def get_coronal_Z_interpolator(self, species: str | AtomicSpecies) -> CoeffInterpolator:
+        """Returns a coronal_Z_interpolator for the specified species and ne_tau value."""
+        return self.coronal_Z_interpolators[self.key_to_enum(species)]
 
-        Parameters:
-        - z_values (xr.DataArray): The xarray DataArray containing the data to interpolate, indexed by electron temperature and density.
+    def _get_nearest_ne_tau(
+        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: Optional[float | Quantity] = None
+    ) -> float:
+        """Find the nearest ne_tau value to the requested ne_tau value.
 
-        Returns:
-        - RegularGridInterpolator: The bivariate spline interpolator object.
+        If a tolerance is specified, raise an error if the nearest ne_tau value is outside the specified tolerance.
+        If a tolerance is not specified, raise a warning if the nearest ne_tau value is outside the specified tolerance.
         """
-        tiny = np.finfo(np.float64).tiny
+        if not isinstance(ne_tau, float):
+            ne_tau = float(magnitude_in_units(ne_tau, self.ne_tau_units))
 
-        def log10_with_floor(x: Union[xr.DataArray, np.ndarray, float]) -> Union[xr.DataArray, np.ndarray, float]:
-            floored_log: float = np.log10(np.maximum(x, tiny))
-            return floored_log
+        nearest_ne_tau = float(self.species_ne_tau[self.key_to_enum(species)].sel(dim_ne_tau=ne_tau, method="nearest"))
 
-        # Remove rows or columns with all negative or zero values
-        z_values = z_values.where(~np.all(z_values <= 0.0, axis=0), drop=True)
-        z_values = z_values.where(~np.all(z_values <= 0.0, axis=1), drop=True)
+        tolerance_specified = ne_tau_rel_tolerance is not None
+        default_ne_tau_rel_tolerance = 1e-2
 
-        # Logarithmic transformation of the temperature, density, and z_values for interpolation
-        return RegularGridInterpolator(
-            points=(
-                log10_with_floor(z_values.dim_electron_temp),
-                log10_with_floor(z_values.dim_electron_density),
-            ),
-            values=log10_with_floor(
-                magnitude(z_values.transpose("dim_electron_temp", "dim_electron_density")).to_numpy()  # type:ignore[union-attr]
-            ),
-            method="cubic",
-            bounds_error=True,
-        )
+        if tolerance_specified and not isinstance(ne_tau_rel_tolerance, float):
+            ne_tau_rel_tolerance = float(magnitude_in_units(ne_tau_rel_tolerance, self.ne_tau_units))  # type: ignore [arg-type]
+        elif not tolerance_specified:
+            ne_tau_rel_tolerance = default_ne_tau_rel_tolerance
 
-    def get_interpolator(self, kind: int, species: Union[str, AtomicSpecies], ne_tau: float = np.inf) -> RegularGridInterpolator:
-        """Retrieves or creates a bivariate spline interpolator for a given species and physical condition.
+        if np.abs((nearest_ne_tau - ne_tau) / ne_tau) > ne_tau_rel_tolerance:
+            message = f"Requested ne_tau = {ne_tau}. Nearest value {nearest_ne_tau} was further than {ne_tau_rel_tolerance} * {ne_tau} from the requested value."
 
-        This method manages a cache of interpolator objects to avoid redundant computations. It also
-        validates the requested conditions against the available data.
+            if tolerance_specified:
+                raise KeyError(message)
+            else:
+                warnings.warn(message, stacklevel=2)
 
-        Parameters:
-        - kind (int): The type of data to interpolate, specified by class constants (e.g., CoronalLz, NoncoronalZ).
-        - species (Union[str, AtomicSpecies]): The species identifier, either as a string or an AtomicSpecies enum.
-        - ne_tau (float): The electron density times ionization time product, for non-coronal conditions. Default is infinity, indicating coronal equilibrium.
+        return nearest_ne_tau
 
-        Returns:
-        - RegularGridInterpolator: The requested interpolator object.
+    def get_noncoronal_Lz_interpolator(
+        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: Optional[float | Quantity] = None
+    ) -> CoeffInterpolator:
+        """Returns a noncoronal_Lz_interpolator for the specified species and ne_tau value."""
+        ne_tau = self._get_nearest_ne_tau(species, ne_tau, ne_tau_rel_tolerance)
 
-        Raises:
-        - FileNotFoundError: If no dataset is available for the requested species.
-        - RuntimeError: For invalid ne_tau values or misapplication of ne_tau in coronal conditions.
-        """
-        species = self.key_to_enum(species)  # Convert species to enum if necessary
-        if species not in self.available_species:
-            raise FileNotFoundError(
-                f"Requested data for {species.name} but no corresponding {species.name.lower()}.nc dataset is available in {(self.atomic_data_directory / 'output').absolute()}"
-            )
+        return self.noncoronal_Lz_interpolators[(self.key_to_enum(species), ne_tau)]
 
-        noncoronal_key = (species, ne_tau)  # Create a unique noncoronal_key for caching
-        dataset = self.get_dataset(species)  # Retrieve the dataset for the species
+    def get_noncoronal_Z_interpolator(
+        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: Optional[float | Quantity] = None
+    ) -> CoeffInterpolator:
+        """Returns a noncoronal_Z_interpolator for the specified species and ne_tau value."""
+        ne_tau = self._get_nearest_ne_tau(species, ne_tau, ne_tau_rel_tolerance)
 
-        # Validate ne_tau and manage exceptions for coronal conditions
-        if (ne_tau < np.inf) and (ne_tau not in dataset.dim_ne_tau):
-            raise RuntimeError(
-                f"Requested a value of ne_tau ({ne_tau} m^-3 s) which was not in the available values ({list(dataset.dim_ne_tau.values)}). Check the documentation on configuring radas."
-            )
-        if (kind in [self.CoronalLz, self.CoronalZ]) and (ne_tau < np.inf):
-            raise RuntimeError("Requested coronal data. ne_tau will have no effect.")
-
-        # Create or retrieve the appropriate interpolator based on the kind and conditions
-        if kind == self.CoronalLz:
-            if species not in self.coronal_Lz_interpolators:
-                self.coronal_Lz_interpolators[species] = self.build_interpolator(dataset.coronal_Lz)
-            return self.coronal_Lz_interpolators[species]
-
-        if kind == self.CoronalZ:
-            if species not in self.coronal_Z_interpolators:
-                self.coronal_Z_interpolators[species] = self.build_interpolator(dataset.coronal_mean_charge_state)
-            return self.coronal_Z_interpolators[species]
-
-        if kind == self.NoncoronalLz:
-            if noncoronal_key not in self.noncoronal_Lz_interpolators:
-                self.noncoronal_Lz_interpolators[noncoronal_key] = self.build_interpolator(dataset.equilibrium_Lz.sel(dim_ne_tau=ne_tau))
-            return self.noncoronal_Lz_interpolators[noncoronal_key]
-
-        if kind == self.NoncoronalZ:
-            if noncoronal_key not in self.noncoronal_Z_interpolators:
-                self.noncoronal_Z_interpolators[noncoronal_key] = self.build_interpolator(
-                    dataset.equilibrium_mean_charge_state.sel(dim_ne_tau=ne_tau)
-                )
-            return self.noncoronal_Z_interpolators[noncoronal_key]
-
-    def eval_interpolator(
-        self,
-        electron_density: Union[xr.DataArray, np.ndarray, float],
-        electron_temp: Union[xr.DataArray, np.ndarray, float],
-        kind: int,
-        species: Union[str, AtomicSpecies],
-        ne_tau: float = np.inf,
-        allow_extrapolation: bool = False,
-        grid: bool = True,
-        coords: Optional[dict[str, Union[xr.DataArray, np.ndarray, float]]] = None,
-    ) -> xr.DataArray:
-        """Evaluates the interpolator for given electron densities and temperatures, returning interpolated values.
-
-        N.b. Not recommended for performant code! It is better to directly work with the interpolators, and use this
-        only as a convenience function.
-
-        This method allows for the interpolation of data (e.g., ionization rates) over a grid of electron densities
-        and temperatures for a specific species and physical condition.
-
-        If allow_extrapolation, off-grid points are replaced by their nearest on-grid neighbours.
-
-        Parameters:
-        - electron_density (xr.DataArray): The electron densities for which to interpolate data.
-        - electron_temp (xr.DataArray): The electron temperatures for which to interpolate data.
-        - kind (int): The type of data to interpolate, specified by class constants.
-        - species (Union[str, AtomicSpecies]): The species identifier, either as a string or an AtomicSpecies enum.
-        - ne_tau (float): The electron density times ionization time product, for non-coronal conditions. Default is infinity, indicating coronal equilibrium.
-        - allow_extrapolation (bool): Whether to allow extrapolation beyond the data range. Default is False.
-        - grid (bool): Whether the interpolation is done on a meshgrid of electron densities and temperatures. Default is True.
-
-        Returns:
-        - xr.DataArray: The interpolated values as an xarray DataArray.
-
-        Raises:
-        - AssertionError: If the input ranges for temperature or density are beyond the available data range, unless extrapolation is allowed.
-        """
-        species = self.key_to_enum(species)
-        interpolator = self.get_interpolator(kind=kind, species=species, ne_tau=ne_tau)  # Retrieve the appropriate interpolator
-
-        if coords is None:
-            coords = dict(
-                dim_electron_density=electron_density,
-                dim_electron_temp=electron_temp,
-            )  # Prepare coordinates for the result DataArray
-
-        # Handle optional extrapolation
-        if allow_extrapolation:
-            # Adjust electron_temp and electron_density to fit within the dataset's bounds, if necessary
-            electron_temp, electron_density = self.nearest_neighbour_off_grid(
-                species=species, electron_temp=electron_temp, electron_density=electron_density
-            )
-        else:
-            # Assert that the electron_temp and electron_density are within the dataset's bounds
-            self.assert_on_grid(species=species, electron_temp=electron_temp, electron_density=electron_density)
-
-        # Perform the interpolation and convert back from logarithmic values
-        if grid:
-            electron_temp, electron_density = np.meshgrid(electron_temp, electron_density)
-        interpolated_values = np.power(10, interpolator((np.log10(electron_temp), np.log10(electron_density))))
-
-        return xr.DataArray(interpolated_values, coords=coords)  # Return the interpolated values as an xarray DataArray
-
-    def nearest_neighbour_off_grid(
-        self,
-        species: AtomicSpecies,
-        electron_temp: Union[xr.DataArray, np.ndarray, float],
-        electron_density: Union[xr.DataArray, np.ndarray, float],
-    ) -> tuple[Union[xr.DataArray, np.ndarray, float], Union[xr.DataArray, np.ndarray, float]]:
-        """Replaces off-grid points with their nearest on-grid neighbour."""
-        max_temp, min_temp, max_density, min_density = self.grid_limits[species]
-        electron_temp = np.minimum(electron_temp, max_temp)
-        electron_temp = np.maximum(electron_temp, min_temp)
-        electron_density = np.minimum(electron_density, max_density)
-        electron_density = np.maximum(electron_density, min_density)
-        return electron_temp, electron_density
-
-    def assert_on_grid(
-        self,
-        species: AtomicSpecies,
-        electron_temp: Union[xr.DataArray, np.ndarray, float],
-        electron_density: Union[xr.DataArray, np.ndarray, float],
-    ) -> None:
-        """Raises an AssertionError if any points are off-grid."""
-        max_temp, min_temp, max_density, min_density = self.grid_limits[species]
-        assert np.max(electron_temp) <= max_temp, f"{np.max(electron_temp)} > {max_temp}"
-        assert np.min(electron_temp) >= min_temp, f"{np.min(electron_temp)} < {min_temp}"
-        assert np.max(electron_density) <= max_density, f"{np.max(electron_density)} > {max_density}"
-        assert np.min(electron_density) >= min_density, f"{np.min(electron_density)} < {min_density}"
+        return self.noncoronal_Z_interpolators[(self.key_to_enum(species), ne_tau)]
 
 
-@Algorithm.register_algorithm(return_keys=["atomic_data"])
-def read_atomic_data(radas_dir: Path) -> AtomicData:
+@Algorithm.register_algorithm(return_keys=["atomic_data", "radas_git_hash"])
+def read_atomic_data(radas_dir: Path) -> tuple[AtomicData, str]:
     """Construct an AtomicData interface using the atomic data in the specified directory."""
-    if isinstance(radas_dir, xr.DataArray):
-        return AtomicData(radas_dir.item())
-    else:
-        return AtomicData(radas_dir)
+    atomic_data = AtomicData(get_item(radas_dir))
+    return atomic_data, atomic_data.radas_git_hash

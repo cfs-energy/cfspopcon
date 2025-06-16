@@ -17,7 +17,7 @@
             "attrs": {
                 "units": "tesla"
             },
-            "data": 0.3265306124,
+            "data": 0.3265306122,
             "dims": []
         },
         "B_t_out_mid": {
@@ -185,7 +185,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 0.7413990365,
+            "data": 0.7413990360,
             "dims": []
         },
         "sustainment_power_in_ion_channel": {

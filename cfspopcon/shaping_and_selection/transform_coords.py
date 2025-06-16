@@ -5,7 +5,7 @@ from typing import Callable, Optional, Union
 
 import numpy as np
 import xarray as xr
-from scipy.interpolate import griddata  # type:ignore[import-untyped]
+from scipy.interpolate import griddata
 
 from cfspopcon.unit_handling import Unit, magnitude
 
@@ -97,7 +97,7 @@ def interpolate_array_onto_new_coords(
     array = broadcast_arrays[-1]
 
     interpolated_array = xr.DataArray(
-        griddata(
+        griddata(  # type: ignore[call-overload]
             sample_points,
             np.ravel(magnitude(array)),
             mesh_coords,

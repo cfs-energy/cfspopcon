@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 
 from ...algorithm_class import Algorithm
+from ...helpers import get_item
 from ...named_options import AtomicSpecies
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from ..atomic_data import AtomicData
@@ -27,10 +28,9 @@ def calc_impurity_charge_state(
     Returns:
         :term:`impurity_charge_state`
     """
-    if isinstance(atomic_data, xr.DataArray):
-        atomic_data = atomic_data.item()
-
-    return _calc_impurity_charge_state(average_electron_density, average_electron_temp, impurity_concentration.dim_species, atomic_data)
+    return _calc_impurity_charge_state(
+        average_electron_density, average_electron_temp, impurity_concentration.dim_species, get_item(atomic_data)
+    )
 
 
 @wraps_ufunc(
@@ -60,16 +60,11 @@ def _calc_impurity_charge_state(
     Returns:
         :term:`impurity_charge_state`
     """
-    average_electron_temp, average_electron_density = atomic_data.nearest_neighbour_off_grid(  # type:ignore[assignment]
-        impurity_species,
-        average_electron_temp,
-        average_electron_density,
-    )
-    interpolator = atomic_data.coronal_Z_interpolators[impurity_species]
-    interpolated_values = np.power(10, interpolator((np.log10(average_electron_temp), np.log10(average_electron_density))))
+    interpolator = atomic_data.get_coronal_Z_interpolator(impurity_species)
+    interpolated_values = interpolator(electron_density=average_electron_density, electron_temp=average_electron_temp, allow_extrap=True)
 
     atomic_number = atomic_data.datasets[impurity_species].atomic_number
 
     interpolated_values = np.minimum(interpolated_values, atomic_number)
-    interpolated_values = np.maximum(interpolated_values, 0)
+    interpolated_values = np.maximum(interpolated_values, 0.0)
     return interpolated_values  # type:ignore[no-any-return]

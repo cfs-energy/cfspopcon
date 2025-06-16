@@ -422,6 +422,9 @@ Physics Glossary
   radas_dir
     A path to the `radas <https://github.com/cfs-energy/radas>`_ working directory.
 
+  radas_git_hash
+    Git hash for the version of radas used to construct the atomic data files.
+
   radiated_power_method
     A :class:`~cfspopcon.named_options.RadiationMethod` indicating how we should calculate the power radiated from the confined region.
 

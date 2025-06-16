@@ -54,7 +54,7 @@ import numpy as np
 import pandas as pd
 import yaml
 from numpy.typing import NDArray
-from scipy.interpolate import RectBivariateSpline  # type: ignore[import-untyped]
+from scipy.interpolate import RectBivariateSpline
 
 # TODO: Replace with importlib.resources
 plasma_profiles_directory = Path(__file__).parent
@@ -98,8 +98,8 @@ def evaluate_density_and_temperature_profile_fits(
     aLT_interpolator = get_df_interpolator(dataset=dataset, df_name="aLT")
 
     # ---- Find parameters consistent with peaking
-    x_a = width_interpolator(aLT, temperature_peaking)[0]
-    aLn = aLT_interpolator(x_a, nu_n)[0]
+    x_a = width_interpolator(aLT, temperature_peaking)[0]  # type: ignore[arg-type]
+    aLn = aLT_interpolator(x_a, nu_n)[0]  # type: ignore[arg-type]
 
     # ---- Evaluate profiles
     x, T, _ = evaluate_profile(T_avol, width_ped=width_ped, aLT_core=aLT, width_axis=x_a, rho=rho)
@@ -122,9 +122,9 @@ def evaluate_profile(
     """
     # ~~~~ Grid
     if rho is None:
-        x = np.linspace(0, 1, 100)
+        x = np.linspace(0.0, 1.0, 100)
     else:
-        x = rho
+        x = rho  # type: ignore [assignment]
 
     ix_c = np.argmin(np.abs(x - (1 - width_ped)))  # Extend of core
     ix_a = np.min([ix_c, np.argmin(np.abs(x - width_axis))])  # Extend of axis

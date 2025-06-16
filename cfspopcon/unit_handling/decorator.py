@@ -85,7 +85,7 @@ def wraps_ufunc(  # noqa: PLR0915
         func_parameters = func_signature.parameters
 
         if not list(input_units.keys()) == list(func_parameters.keys()):
-            message = f"Keys for input_units for {func.__name__} did not match the declared function inputs (n.b. order matters!)"
+            message = f"Keys for input_units for {getattr(func, '__name__', 'UNNAMED')} did not match the declared function inputs (n.b. order matters!)"
             message += "\ni: input_key, func_param"
             for i, (input_key, func_param) in enumerate(
                 itertools.zip_longest(list(input_units.keys()), list(func_parameters.keys()), fillvalue="MISSING")

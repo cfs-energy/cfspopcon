@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cfspopcon"
-version = "7.1.0"
+version = "7.1.1"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"
@@ -23,7 +23,10 @@ popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'
 
 [tool.poetry.dependencies]
 python = ">=3.10"
-numpy = "^2.0"
+numpy = [
+    {version = "^2.3", python = ">=3.11"},
+    {version = "^2.2", python = "<3.11"}
+]
 pandas = "^2.2"
 scipy = "^1.8"
 seaborn = "^0.13"
@@ -32,7 +35,7 @@ toml = "^0.10.2"
 typing-extensions = "^4.12"
 pint = "^0.24"
 xarray = ">=2024"
-pint-xarray = "^0.4"
+pint-xarray = "^0.5"
 click = "^8.1.0"
 netcdf4 = "^1.7"
 radas = ">=2024.8.0"
@@ -46,6 +49,7 @@ pytest-cov = "^6.0"
 types-pyyaml = "^6.0.12.2"
 pandas-stubs = "^2.0"
 mypy = "^1.10"
+scipy-stubs = "^1.15.3.0"
 sphinx = "^7.3.7"
 sphinx-rtd-theme = "^2.0.0"
 sphinxcontrib-bibtex = "^2.6.1"
@@ -82,7 +86,6 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-plugins = "numpy.typing.mypy_plugin"
 strict = true
 disallow_any_generics=false
 exclude = [
