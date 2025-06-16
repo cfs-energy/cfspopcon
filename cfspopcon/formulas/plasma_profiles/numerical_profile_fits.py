@@ -53,7 +53,6 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 import yaml
-from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline
 
 # TODO: Replace with importlib.resources
@@ -89,9 +88,9 @@ def evaluate_density_and_temperature_profile_fits(
     nu_n: float,
     aLT: float = 2.0,
     width_ped: float = 0.05,
-    rho: Optional[NDArray[np.floating]] = None,
+    rho: Optional[np.ndarray] = None,
     dataset: str = "PRF",
-) -> tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating]]:  # TODO: fill out docstring
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:  # TODO: fill out docstring
     """Evaluate temperature-density profile fits."""
     # ---- Get interpolator functions corresponding to this dataset
     width_interpolator = get_df_interpolator(dataset=dataset, df_name="width")
@@ -113,8 +112,8 @@ def evaluate_profile(
     aLT_core: float,
     width_axis: float,
     width_ped: float = 0.05,
-    rho: Optional[NDArray[np.floating]] = None,
-) -> tuple[NDArray[np.floating], NDArray[np.floating], float]:
+    rho: Optional[np.ndarray] = None,
+) -> tuple[np.ndarray, np.ndarray, float]:
     r"""This function generates a profile from :math:`\langle T \rangle`, aLT and :math:`x_a`.
 
     Example:
@@ -124,7 +123,7 @@ def evaluate_profile(
     if rho is None:
         x = np.linspace(0.0, 1.0, 100)
     else:
-        x = rho  # type: ignore [assignment]
+        x = rho
 
     ix_c = np.argmin(np.abs(x - (1 - width_ped)))  # Extend of core
     ix_a = np.min([ix_c, np.argmin(np.abs(x - width_axis))])  # Extend of axis
@@ -180,7 +179,7 @@ def evaluate_profile(
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Teped = Tavol / I
-    T: NDArray[np.floating] = Teped * np.hstack((Taxis, Tcore, Tedge)).ravel()
+    T: np.ndarray = Teped * np.hstack((Taxis, Tcore, Tedge)).ravel()
     if np.isclose(Tavol, 0.0) and np.isclose(T[0], 0.0):
         peaking = 0.0
     else:

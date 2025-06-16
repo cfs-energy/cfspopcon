@@ -3,7 +3,6 @@
 from typing import Any
 
 import numpy as np
-from numpy.typing import NDArray
 
 from ...algorithm_class import Algorithm
 from ...named_options import ProfileForm
@@ -142,7 +141,7 @@ def calc_1D_plasma_profiles(
     dilution: float,
     normalized_inverse_temp_scale_length: float,
     n_points_for_confined_region_profiles: int = 50,
-) -> tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.floating]]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles.
 
     Args:
@@ -209,7 +208,7 @@ def calc_analytic_profiles(
     temperature_peaking: float,
     dilution: float,
     npoints: int = 50,
-) -> tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.floating]]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles using a simple analytic fit.
 
     Args:
@@ -247,7 +246,7 @@ def calc_prf_profiles(
     dilution: float,
     normalized_inverse_temp_scale_length: float,
     npoints: int = 50,
-) -> tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.floating]]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles using profiles from Pablo Rodriguez-Fernandez.
 
     Args:
@@ -264,7 +263,7 @@ def calc_prf_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho: NDArray[np.floating] = np.linspace(0.0, 1.0, num=npoints, endpoint=False)
+    rho: np.ndarray = np.linspace(0.0, 1.0, num=npoints, endpoint=False)
 
     rho, electron_temp_profile, electron_density_profile = evaluate_density_and_temperature_profile_fits(
         average_electron_temp,
