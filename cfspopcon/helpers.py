@@ -2,7 +2,8 @@
 
 from typing import Any
 
-from .formulas.impurities.impurity_array_helpers import make_impurity_concentration_array
+import xarray as xr
+
 from .named_options import (
     AtomicSpecies,
     ConfinementPowerScaling,
@@ -15,6 +16,8 @@ from .named_options import (
 
 def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
     """Given a 'key' matching a named_option, return the corresponding Enum value."""
+    from .formulas.impurities.impurity_array_helpers import make_impurity_concentration_array
+
     if key in ["temp_profile_form", "density_profile_form"]:
         return ProfileForm[val]
     elif key == "radiated_power_method":
@@ -34,3 +37,19 @@ def convert_named_options(key: str, val: Any) -> Any:  # noqa: PLR0911
     else:
         # If the key doesn't match, don't convert the value
         return val
+
+
+def get_item(value: Any) -> Any:
+    """Check if an object is an xr.DataArray, and if so, return the ".item()" element."""
+    if isinstance(value, xr.DataArray):
+        return value.item()
+    else:
+        return value
+
+
+def get_values(array: Any) -> Any:
+    """Check if an object is an xr.DataArray, and if so, return the ".values" element."""
+    if isinstance(array, xr.DataArray):
+        return array.values
+    else:
+        return array

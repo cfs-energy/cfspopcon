@@ -4,6 +4,7 @@ import xarray as xr
 
 from ... import named_options
 from ...algorithm_class import Algorithm
+from ...helpers import get_item
 from ...unit_handling import Unitfull
 from .bremsstrahlung import calc_bremsstrahlung_radiation
 from .impurity_radiated_power import calc_impurity_radiated_power
@@ -73,7 +74,7 @@ def calc_intrinsic_radiated_power_from_core(
             electron_density_profile=electron_density_profile,
             impurity_concentration=impurity_concentration,
             plasma_volume=plasma_volume,
-            atomic_data=atomic_data.item(),
+            atomic_data=get_item(atomic_data),
         )
 
         return radiated_power_scalar * (P_rad_bremsstrahlung_from_hydrogen + P_rad_synchrotron + P_rad_impurity.sum(dim="dim_species"))

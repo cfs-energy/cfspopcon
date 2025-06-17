@@ -131,7 +131,7 @@ class _RoundingFloat(float):
     From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
     """
 
-    __repr__ = staticmethod(lambda x: f"{x:#.10g}")  # type:ignore[assignment,unused-ignore]
+    __repr__ = staticmethod(lambda x: f"{x:#.6g}")  # type:ignore[assignment,unused-ignore]
 
 
 class _ModifyJSONFloatRepr:

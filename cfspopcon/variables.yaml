@@ -665,7 +665,6 @@ impurity_species:
   - calc_impurity_radiated_power_mavrin_coronal
   - calc_impurity_radiated_power_mavrin_noncoronal
   - calc_impurity_radiated_power_post_and_jensen
-  - calc_impurity_radiated_power_radas
 inductive_plasma_current:
   default_units: ampere
   description:
@@ -1482,6 +1481,13 @@ radas_dir:
   set_by: []
   used_by:
   - read_atomic_data
+radas_version:
+  default_units: null
+  description:
+  - Version of radas used to construct the atomic data files.
+  set_by:
+  - read_atomic_data
+  used_by: []
 radiated_power_method:
   default_units: null
   description:

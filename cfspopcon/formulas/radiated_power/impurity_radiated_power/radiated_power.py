@@ -42,15 +42,18 @@ def calc_impurity_radiated_power(
         electron_temp_profile=electron_temp_profile,
         electron_density_profile=electron_density_profile,
         impurity_concentration=impurity_concentration,
-        impurity_species=impurity_concentration.dim_species,
         plasma_volume=plasma_volume,
     )
+    species = impurity_concentration.dim_species
+
     if radiated_power_method == RadiationMethod.PostJensen:
-        P_rad_impurity = calc_impurity_radiated_power_post_and_jensen(**P_rad_kwargs)
+        P_rad_impurity = calc_impurity_radiated_power_post_and_jensen(**P_rad_kwargs, impurity_species=species)
     elif radiated_power_method == RadiationMethod.MavrinCoronal:
-        P_rad_impurity = calc_impurity_radiated_power_mavrin_coronal(**P_rad_kwargs)
+        P_rad_impurity = calc_impurity_radiated_power_mavrin_coronal(**P_rad_kwargs, impurity_species=species)
     elif radiated_power_method == RadiationMethod.MavrinNoncoronal:
-        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(**P_rad_kwargs, impurity_residence_time=np.inf * ureg.s)
+        P_rad_impurity = calc_impurity_radiated_power_mavrin_noncoronal(
+            **P_rad_kwargs, impurity_species=species, impurity_residence_time=np.inf * ureg.s
+        )
     elif radiated_power_method == RadiationMethod.Radas:
         P_rad_impurity = calc_impurity_radiated_power_radas(**P_rad_kwargs, atomic_data=atomic_data)
     else:

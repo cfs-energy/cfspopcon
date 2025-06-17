@@ -2,7 +2,7 @@
 
 import xarray as xr
 from contourpy import contour_generator
-from scipy.interpolate import RegularGridInterpolator  # type:ignore[import-untyped]
+from scipy.interpolate import RegularGridInterpolator
 
 from cfspopcon.unit_handling import Quantity, convert_units, get_units, magnitude
 
@@ -46,7 +46,7 @@ def interpolate_onto_line(
     x_coord, y_coord = line_x.name, line_y.name
     array = array.transpose(x_coord, y_coord)
 
-    interpolator = RegularGridInterpolator(
+    interpolator = RegularGridInterpolator(  # type: ignore[call-overload]
         points=((array.coords[x_coord], array.coords[y_coord])),
         values=magnitude(array).to_numpy(),  # type:ignore[union-attr]
         method=interpolation_method,

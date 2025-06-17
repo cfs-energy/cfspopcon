@@ -1,7 +1,7 @@
 """Calculate the parallel and perpendicular heat flux density entering the scrape-off-layer."""
 
 import numpy as np
-from scipy import constants  # type: ignore[import-untyped]
+from scipy import constants
 
 from ...algorithm_class import Algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc

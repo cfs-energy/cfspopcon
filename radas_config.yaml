@@ -1,0 +1,462 @@
+globals:
+  # How long to run the time-integrator for (in s)
+  evolution_start:
+    value: 1.0E-8
+    units: "s"
+
+  evolution_stop:
+    value: 1.0E+2
+    units: "s"
+
+  # electron density (ne) * residence time (tau) (in m^-3 s)
+  ne_tau:
+    value: [0.5e+17]
+    units: "m^-3 s"
+  
+  # Number of log-spaced points to use for electron density and electron temp.
+  # Interpolation is used to map from raw data to points.
+  # To disable interpolation, do not provide these inputs.
+  electron_density_resolution: 50
+  electron_temp_resolution: 100
+
+data_file_config:
+  adf11:
+    effective_recombination:
+      prefix: "ACD"
+      code: 1
+      stored_units: "cm**3 / s"
+      desired_units: "m**3 / s"
+
+    effective_ionisation:
+      prefix: "SCD"
+      code: 2
+      stored_units: "cm**3 / s"
+      desired_units: "m**3 / s"
+
+    charge_exchange_cross_coupling:
+      prefix: "CCD"
+      code: 3
+      stored_units: "cm**3 / s"
+      desired_units: "m**3 / s"
+
+    recombination_and_bremsstrahlung:
+      prefix: "PRB"
+      code: 4
+      stored_units: "W cm**3"
+      desired_units: "W m**3"
+
+    charge_exchange_emission:
+      prefix: "PRC"
+      code: 5
+      stored_units: "W cm**3"
+      desired_units: "W m**3"
+
+    parent_cross_coupling:
+      prefix: "QCD"
+      code: 6
+
+    cross_coupling:
+      prefix: "XCD"
+      code: 7
+
+    line_emission_from_excitation:
+      prefix: "PLT"
+      code: 8
+      stored_units: "W cm**3"
+      desired_units: "W m**3"
+
+    specific_line_emission:
+      prefix: "PLS"
+      code: 9
+
+    mean_charge_state:
+      prefix: "ZCD"
+      code: 10
+
+    mean_charge_state_squared:
+      prefix: "YCD"
+      code: 11
+
+    mean_ionisation_potential:
+      prefix: "ECD"
+      code: 12
+      stored_units: "eV"
+      desired_units: "eV"
+
+
+species:
+  hydrogen:
+    atomic_symbol: "H"
+    atomic_number:  1
+    data_files:
+      # For each dataset, give the year to use
+      effective_recombination: 2012
+      effective_ionisation: 2012
+      line_emission_from_excitation: 2012
+      recombination_and_bremsstrahlung: 2012
+      charge_exchange_cross_coupling: 1996
+      charge_exchange_emission: 1996
+      mean_ionisation_potential: 1996
+  deuterium:
+    atomic_symbol: "D"
+    atomic_number:  1
+    data_files:
+      # We can use a length-2 list to specific a different
+      # species as well as a year. Here, we use the hydrogen
+      # data for everything except the CX rates.
+      effective_recombination: ["H", 2012]
+      effective_ionisation: ["H", 2012]
+      line_emission_from_excitation: ["H", 2012]
+      recombination_and_bremsstrahlung: ["H", 2012]
+      charge_exchange_cross_coupling: 1996
+      charge_exchange_emission: 1996
+      mean_ionisation_potential: ["H", 1996]
+  tritium:
+    atomic_symbol: "T"
+    atomic_number:  1
+    data_files:
+      effective_recombination: ["H", 2012]
+      effective_ionisation: ["H", 2012]
+      line_emission_from_excitation: ["H", 2012]
+      recombination_and_bremsstrahlung: ["H", 2012]
+      charge_exchange_cross_coupling: 1996
+      charge_exchange_emission: 1996
+      mean_ionisation_potential: ["H", 1996]
+  helium:
+    atomic_symbol: "He"
+    atomic_number:  2
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1996
+      charge_exchange_emission: 1996
+      mean_ionisation_potential: 1996
+  lithium:
+    atomic_symbol: "Li"
+    atomic_number:  3
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1996
+  beryllium:
+    atomic_symbol: "Be"
+    atomic_number:  4
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1996
+  boron:
+    atomic_symbol: "B"
+    atomic_number:  5
+    data_files:
+      effective_recombination: 1989
+      effective_ionisation: 1989
+      line_emission_from_excitation: 1989
+      recombination_and_bremsstrahlung: 1989
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1989
+  carbon:
+    atomic_symbol: "C"
+    atomic_number:  6
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1996
+      charge_exchange_emission: 1996
+      mean_ionisation_potential: 1996
+  nitrogen:
+    atomic_symbol: "N"
+    atomic_number:  7
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1996
+      charge_exchange_emission: 1996
+      mean_ionisation_potential: 1996
+  oxygen:
+    atomic_symbol: "O"
+    atomic_number:  8
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1996
+  fluorine:
+    atomic_symbol: "F"
+    atomic_number:  9
+  neon:
+    atomic_symbol: "Ne"
+    atomic_number: 10
+    data_files:
+      effective_recombination: 1996
+      effective_ionisation: 1996
+      line_emission_from_excitation: 1996
+      recombination_and_bremsstrahlung: 1996
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1996
+  sodium:
+    atomic_symbol: "Na"
+    atomic_number: 11
+  magnesium:
+    atomic_symbol: "Mg"
+    atomic_number: 12
+  aluminium:
+    atomic_symbol: "Al"
+    atomic_number: 13
+  silicon:
+    atomic_symbol: "Si"
+    atomic_number: 14
+  phosphorus:
+    atomic_symbol: "P"
+    atomic_number: 15
+  sulfur:
+    atomic_symbol: "S"
+    atomic_number: 16
+  chlorine:
+    atomic_symbol: "Cl"
+    atomic_number: 17
+  argon:
+    atomic_symbol: "Ar"
+    atomic_number: 18
+    data_files:
+      effective_recombination: 1989
+      effective_ionisation: 1989
+      line_emission_from_excitation: 1989
+      recombination_and_bremsstrahlung: 1989
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1989
+  potassium:
+    atomic_symbol: "K"
+    atomic_number: 19
+  calcium:
+    atomic_symbol: "Ca"
+    atomic_number: 20
+  scandium:
+    atomic_symbol: "Sc"
+    atomic_number: 21
+  titanium:
+    atomic_symbol: "Ti"
+    atomic_number: 22
+  vanadium:
+    atomic_symbol: "V"
+    atomic_number: 23
+  chromium:
+    atomic_symbol: "Cr"
+    atomic_number: 24
+  manganese:
+    atomic_symbol: "Mn"
+    atomic_number: 25
+  iron:
+    atomic_symbol: "Fe"
+    atomic_number: 26
+  cobalt:
+    atomic_symbol: "Co"
+    atomic_number: 27
+  nickel:
+    atomic_symbol: "Ni"
+    atomic_number: 28
+  copper:
+    atomic_symbol: "Cu"
+    atomic_number: 29
+  zinc:
+    atomic_symbol: "Zn"
+    atomic_number: 30
+  gallium:
+    atomic_symbol: "Ga"
+    atomic_number: 31
+  germanium:
+    atomic_symbol: "Ge"
+    atomic_number: 32
+  arsenic:
+    atomic_symbol: "As"
+    atomic_number: 33
+  selenium:
+    atomic_symbol: "Se"
+    atomic_number: 34
+  bromine:
+    atomic_symbol: "Br"
+    atomic_number: 35
+  krypton:
+    atomic_symbol: "Kr"
+    atomic_number: 36
+    data_files:
+      effective_recombination: 1989
+      effective_ionisation: 1989
+      line_emission_from_excitation: 1989
+      recombination_and_bremsstrahlung: 1989
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1989
+  rubidium:
+    atomic_symbol: "Rb"
+    atomic_number: 37
+  strontium:
+    atomic_symbol: "Sr"
+    atomic_number: 38
+  yttrium:
+    atomic_symbol: "Y"
+    atomic_number: 39
+  zirconium:
+    atomic_symbol: "Zr"
+    atomic_number: 40
+  niobium:
+    atomic_symbol: "Nb"
+    atomic_number: 41
+  molybdenum:
+    atomic_symbol: "Mo"
+    atomic_number: 42
+  technetium:
+    atomic_symbol: "Tc"
+    atomic_number: 43
+  ruthenium:
+    atomic_symbol: "Ru"
+    atomic_number: 44
+  rhodium:
+    atomic_symbol: "Rh"
+    atomic_number: 45
+  palladium:
+    atomic_symbol: "Pd"
+    atomic_number: 46
+  silver:
+    atomic_symbol: "Ag"
+    atomic_number: 47
+  cadmium:
+    atomic_symbol: "Cd"
+    atomic_number: 48
+  indium:
+    atomic_symbol: "In"
+    atomic_number: 49
+  tin:
+    atomic_symbol: "Sn"
+    atomic_number: 50
+  antimony:
+    atomic_symbol: "Sb"
+    atomic_number: 51
+  tellurium:
+    atomic_symbol: "Te"
+    atomic_number: 52
+  iodine:
+    atomic_symbol: "I"
+    atomic_number: 53
+  xenon:
+    atomic_symbol: "Xe"
+    atomic_number: 54
+    data_files:
+      effective_recombination: 1989
+      effective_ionisation: 1989
+      line_emission_from_excitation: 1989
+      recombination_and_bremsstrahlung: 1989
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+      mean_ionisation_potential: 1989
+  cesium:
+    atomic_symbol: "Cs"
+    atomic_number: 55
+  barium:
+    atomic_symbol: "Ba"
+    atomic_number: 56
+  lanthanum:
+    atomic_symbol: "La"
+    atomic_number: 57
+  cerium:
+    atomic_symbol: "Ce"
+    atomic_number: 58
+  praseodymium:
+    atomic_symbol: "Pr"
+    atomic_number: 59
+  neodymium:
+    atomic_symbol: "Nd"
+    atomic_number: 60
+  promethium:
+    atomic_symbol: "Pm"
+    atomic_number: 61
+  samarium:
+    atomic_symbol: "Sm"
+    atomic_number: 62
+  europium:
+    atomic_symbol: "Eu"
+    atomic_number: 63
+  gadolinium:
+    atomic_symbol: "Gd"
+    atomic_number: 64
+  terbium:
+    atomic_symbol: "Tb"
+    atomic_number: 65
+  dysprosium:
+    atomic_symbol: "Dy"
+    atomic_number: 66
+  holmium:
+    atomic_symbol: "Ho"
+    atomic_number: 67
+  erbium:
+    atomic_symbol: "Er"
+    atomic_number: 68
+  thulium:
+    atomic_symbol: "Tm"
+    atomic_number: 69
+  ytterbium:
+    atomic_symbol: "Yb"
+    atomic_number: 70
+  lutetium:
+    atomic_symbol: "Lu"
+    atomic_number: 71
+  hafnium:
+    atomic_symbol: "Hf"
+    atomic_number: 72
+  tantalum:
+    atomic_symbol: "Ta"
+    atomic_number: 73
+  tungsten:
+    atomic_symbol: "W"
+    atomic_number: 74
+    data_files:
+      effective_recombination: 1989
+      effective_ionisation: 1989
+      line_emission_from_excitation: 1989
+      recombination_and_bremsstrahlung: 1989
+      charge_exchange_cross_coupling: 1989
+      charge_exchange_emission: 1989
+  rhenium:
+    atomic_symbol: "Re"
+    atomic_number: 75
+  osmium:
+    atomic_symbol: "Os"
+    atomic_number: 76
+  iridium:
+    atomic_symbol: "Ir"
+    atomic_number: 77
+  platinum:
+    atomic_symbol: "Pt"
+    atomic_number: 78
+  gold:
+    atomic_symbol: "Au"
+    atomic_number: 79
+  mercury:
+    atomic_symbol: "Hg"
+    atomic_number: 80
+  thallium:
+    atomic_symbol: "Tl"
+    atomic_number: 81
+  lead:
+    atomic_symbol: "Pb"
+    atomic_number: 82

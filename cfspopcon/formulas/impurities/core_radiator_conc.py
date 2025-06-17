@@ -5,8 +5,10 @@ import xarray as xr
 
 from ... import named_options
 from ...algorithm_class import Algorithm
+from ...helpers import get_item
 from ...unit_handling import Unitfull
 from .. import radiated_power
+from ..atomic_data import AtomicData
 from .impurity_array_helpers import extend_impurity_concentration_array, make_impurity_concentration_array
 
 
@@ -80,7 +82,7 @@ def calc_core_seeded_impurity_concentration(
     radiated_power_method: named_options.RadiationMethod,
     radiated_power_scalar: Unitfull,
     core_impurity_species: named_options.AtomicSpecies,
-    atomic_data: xr.DataArray,
+    atomic_data: xr.DataArray | AtomicData,
 ) -> Unitfull:
     """Calculate the concentration of a core radiator required to increase the radiated power by a desired amount.
 
@@ -110,7 +112,7 @@ def calc_core_seeded_impurity_concentration(
         electron_temp_profile=electron_temp_profile,
         electron_density_profile=electron_density_profile,
         plasma_volume=plasma_volume,
-        atomic_data=atomic_data.item(),
+        atomic_data=get_item(atomic_data),
     )
 
     P_radiated_per_unit_concentration = radiated_power_scalar * radiated_power.impurity_radiated_power.calc_impurity_radiated_power(

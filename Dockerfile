@@ -28,4 +28,4 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --without dev
 
 # 6. Run radas to get the atomic data files
-RUN poetry run radas
+RUN poetry run radas -c radas_config.yaml
