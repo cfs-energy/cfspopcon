@@ -1,7 +1,6 @@
 import numpy as np
 import xarray as xr
 import pytest
-# from warnings import UserWarning
 
 from cfspopcon.formulas.atomic_data import AtomicData
 from cfspopcon.named_options import AtomicSpecies
