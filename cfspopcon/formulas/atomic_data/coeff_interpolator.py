@@ -15,7 +15,7 @@ class CoeffInterpolator(RectBivariateSpline):
 
     tiny = np.finfo(np.float64).tiny
 
-    def log10_with_floor(self, x: Union[xr.DataArray, np.ndarray, float]) -> Union[xr.DataArray, np.ndarray, float]:
+    def log10_with_floor(self, x: xr.DataArray | np.ndarray | float) -> xr.DataArray | np.ndarray | float:
         """Return the log of x if x > 0, and otherwise return the log of the smallest representable float."""
         return np.log10(np.maximum(x, self.tiny))  # type: ignore[no-any-return]
 
