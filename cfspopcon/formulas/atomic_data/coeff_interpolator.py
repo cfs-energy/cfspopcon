@@ -1,7 +1,6 @@
 """Class definition for CoeffInterpolator which is used to interpolate atomic data."""
 
 from functools import partial
-from typing import Union
 
 import numpy as np
 import xarray as xr
@@ -38,11 +37,14 @@ class CoeffInterpolator(RectBivariateSpline):
         Returns:
         - CoeffInterpolator: The bivariate spline interpolator object with eval, vector_eval and grid_eval methods.
         """
-        assert np.all(coeff.dim_electron_density > 0.0), "Encountered null or negative values in electron density for CoeffInterpolator"
+        if not np.all(coeff.dim_electron_density > 0.0):
+            raise ValueError("Encountered null or negative values in electron density for CoeffInterpolator")
 
-        assert np.all(coeff.dim_electron_temp > 0.0), "Encountered null or negative values in electron temp for CoeffInterpolator"
+        if not np.all(coeff.dim_electron_temp > 0.0):
+            raise ValueError("Encountered null or negative values in electron temp for CoeffInterpolator")
 
-        assert np.all(coeff >= 0.0), "Encountered negative values in coeff for CoeffInterpolator"
+        if not np.all(coeff >= 0.0):
+            raise ValueError("Encountered negative values in coeff for CoeffInterpolator")
 
         self.units = get_units(coeff)
         coeff_magnitude = magnitude_in_units(coeff.transpose("dim_electron_temp", "dim_electron_density"), self.units)
@@ -66,7 +68,8 @@ class CoeffInterpolator(RectBivariateSpline):
                 np.zeros_like(coeff_magnitude),
             )
         else:
-            assert np.all(coeff > 0.0), "Encountered mix of null and positive values in coeff for CoeffInterpolator"
+            if not np.all(coeff > 0.0):
+                raise ValueError("Encountered mix of null and positive values in coeff for CoeffInterpolator")
 
             super().__init__(
                 self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]

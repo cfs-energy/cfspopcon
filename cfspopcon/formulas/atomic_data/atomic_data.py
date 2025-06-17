@@ -2,7 +2,7 @@
 
 import warnings
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 import xarray as xr
@@ -69,7 +69,11 @@ class AtomicData:
                 self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
 
     def _check_radas_version(self, test_version: str) -> None:
-        """Check that all of the datasets have the same radas version."""
+        """Checks that the provided test_version matches radas_version (if set).
+
+        If radas_version is not set, sets radas_version = test_version.
+        If a mismatch is found, sets radas_version = UNDEFINED.
+        """
         if self.radas_version == "":
             self.radas_version = test_version
         elif self.radas_version != test_version:
@@ -157,7 +161,7 @@ class AtomicData:
         return self.coronal_Z_interpolators[self.key_to_enum(species)]
 
     def _get_nearest_ne_tau(
-        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: Optional[float | Quantity] = None
+        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: float | Quantity | None = None
     ) -> float:
         """Find the nearest ne_tau value to the requested ne_tau value.
 
@@ -188,7 +192,7 @@ class AtomicData:
         return nearest_ne_tau
 
     def get_noncoronal_Lz_interpolator(
-        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: Optional[float | Quantity] = None
+        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: float | Quantity | None = None
     ) -> CoeffInterpolator:
         """Returns a noncoronal_Lz_interpolator for the specified species and ne_tau value."""
         ne_tau = self._get_nearest_ne_tau(species, ne_tau, ne_tau_rel_tolerance)
@@ -196,7 +200,7 @@ class AtomicData:
         return self.noncoronal_Lz_interpolators[(self.key_to_enum(species), ne_tau)]
 
     def get_noncoronal_Z_interpolator(
-        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: Optional[float | Quantity] = None
+        self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: float | Quantity | None = None
     ) -> CoeffInterpolator:
         """Returns a noncoronal_Z_interpolator for the specified species and ne_tau value."""
         ne_tau = self._get_nearest_ne_tau(species, ne_tau, ne_tau_rel_tolerance)
