@@ -50,8 +50,14 @@ types-pyyaml = "^6.0.12.2"
 pandas-stubs = "^2.0"
 mypy = "^1.10"
 scipy-stubs = "^1.15.3.0"
-sphinx = "^7.3.7"
-sphinx-rtd-theme = "^2.0.0"
+sphinx = [
+    {version = "^8.0", python = ">=3.11"},
+    {version = "^7.3", python = "<3.11"}
+]
+sphinx-rtd-theme = [
+    {version = "^3.0", python = ">=3.11"},
+    {version = "^2.0", python = "<3.11"}
+]
 sphinxcontrib-bibtex = "^2.6.1"
 sphinx-copybutton = "^0.5.2"
 ruff = "^0.11"
