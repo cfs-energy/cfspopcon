@@ -38,4 +38,4 @@ def calc_impurity_charge_state(
         mean_z = np.maximum(mean_z, 0.0)
         return mean_z  # type:ignore[no-any-return]
 
-    return impurity_concentration.groupby("dim_species").map(calc_mean_z).transpose(..., "dim_species")
+    return impurity_concentration.groupby("dim_species").map(calc_mean_z)

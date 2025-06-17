@@ -320,14 +320,14 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.07464545710,
+            "data": 0.07464537513,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.01492909142,
+            "data": 0.01492907503,
             "dims": []
         },
         "edge_impurity_enrichment": {
@@ -687,7 +687,7 @@
             "data": [
                 0.06000000000,
                 0.003100000000,
-                0.01492909142,
+                0.01492907503,
                 0.000000000,
                 1.500000000e-05
             ],
@@ -1060,6 +1060,11 @@
                 "units": "dimensionless"
             },
             "data": 3.290275716,
+            "dims": []
+        },
+        "radas_version": {
+            "attrs": {},
+            "data": "2025.6.2",
             "dims": []
         },
         "radiated_power_method": {

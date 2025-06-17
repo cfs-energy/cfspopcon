@@ -1481,6 +1481,13 @@ radas_dir:
   set_by: []
   used_by:
   - read_atomic_data
+radas_version:
+  default_units: null
+  description:
+  - Version of radas used to construct the atomic data files.
+  set_by:
+  - read_atomic_data
+  used_by: []
 radiated_power_method:
   default_units: null
   description:

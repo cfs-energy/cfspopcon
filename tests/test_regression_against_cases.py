@@ -13,6 +13,8 @@ from xarray.testing import assert_allclose
 from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
 
+ignored_variables = ["radas_version"]
+
 
 @pytest.mark.regression
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
@@ -24,11 +26,19 @@ def test_regression_against_case(case: Path):
     dataset = algorithm.run(**input_parameters).merge(input_parameters)
     write_dataset_to_netcdf(dataset, Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc")
 
-    dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc").load()
-    reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+    dataset = (
+        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc")
+        .load()
+        .drop_vars(ignored_variables, errors="ignore")
+    )
+    reference_dataset = (
+        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc")
+        .load()
+        .drop_vars(ignored_variables, errors="ignore")
+    )
 
-    dataset, reference_dataset = xr.align(dataset, reference_dataset)
-    assert_allclose(dataset, reference_dataset)
+    ordered_dims = [dim for dim in reference_dataset.dims]
+    assert_allclose(dataset.transpose(*ordered_dims), reference_dataset.transpose(*ordered_dims))
 
 
 @pytest.mark.regression
@@ -43,11 +53,19 @@ def test_regression_against_case_with_update(case: Path):
     dataset = algorithm.update_dataset(dataset)
     write_dataset_to_netcdf(dataset, Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc")
 
-    dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc").load()
-    reference_dataset = read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc").load()
+    dataset = (
+        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc")
+        .load()
+        .drop_vars(ignored_variables, errors="ignore")
+    )
+    reference_dataset = (
+        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc")
+        .load()
+        .drop_vars(ignored_variables, errors="ignore")
+    )
 
-    dataset, reference_dataset = xr.align(dataset, reference_dataset)
-    assert_allclose(dataset, reference_dataset)
+    ordered_dims = [dim for dim in reference_dataset.dims]
+    assert_allclose(dataset.transpose(*ordered_dims), reference_dataset.transpose(*ordered_dims))
 
 
 @pytest.mark.regression

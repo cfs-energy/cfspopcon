@@ -46,6 +46,8 @@ class AtomicData:
         self.species_ne_tau: dict[AtomicSpecies, xr.DataArray] = dict()
         self.ne_tau_units = ureg.m**-3 * ureg.s
 
+        self.radas_version: str = ""
+
         for species in self.available_species:
             dataset = self[species]
 
@@ -63,6 +65,18 @@ class AtomicData:
                 subds = dataset_at_single_ne_tau.squeeze(dim="dim_ne_tau")
                 self.noncoronal_Lz_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_Lz, **ref)
                 self.noncoronal_Z_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_mean_charge_state, **ref)
+
+                self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
+
+    def _check_radas_version(self, test_version: str) -> None:
+        """Check that all of the datasets have the same radas version."""
+        if self.radas_version == "":
+            self.radas_version = test_version
+        elif self.radas_version != test_version:
+            warnings.warn(
+                f"Found multiple radas radas versions ({self.radas_version} != {test_version}) in the requested atomic data. Will set radas_version = UNDEFINED.",
+                stacklevel=2,
+            )
 
     @staticmethod
     def read_atomic_data(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
@@ -190,8 +204,8 @@ class AtomicData:
         return self.noncoronal_Z_interpolators[(self.key_to_enum(species), ne_tau)]
 
 
-@Algorithm.register_algorithm(return_keys=["atomic_data"])
-def read_atomic_data(radas_dir: Path) -> AtomicData:
+@Algorithm.register_algorithm(return_keys=["atomic_data", "radas_version"])
+def read_atomic_data(radas_dir: Path) -> tuple[AtomicData, str]:
     """Construct an AtomicData interface using the atomic data in the specified directory."""
     atomic_data = AtomicData(get_item(radas_dir))
-    return atomic_data
+    return atomic_data, atomic_data.radas_version
