@@ -3,12 +3,12 @@
     "coords": {
         "dim_separatrix_electron_density": {
             "attrs": {},
-            "data": 1.443846154,
+            "data": 1.44385,
             "dims": []
         },
         "dim_separatrix_electron_temp": {
             "attrs": {},
-            "data": 57.51724138,
+            "data": 57.5172,
             "dims": []
         }
     },
@@ -17,203 +17,203 @@
             "attrs": {
                 "units": "tesla"
             },
-            "data": 0.3265306122,
+            "data": 0.326531,
             "dims": []
         },
         "B_t_out_mid": {
             "attrs": {
                 "units": "tesla"
             },
-            "data": 1.927570093,
+            "data": 1.92757,
             "dims": []
         },
         "SepOS_LH_transition": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.002508127,
+            "data": 1.00251,
             "dims": []
         },
         "SepOS_MHD_limit": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.3560483425,
+            "data": 0.356048,
             "dims": []
         },
         "SepOS_density_limit": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.5502074424,
+            "data": 0.550207,
             "dims": []
         },
         "alpha_t": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.5195258260,
+            "data": 0.519526,
             "dims": []
         },
         "areal_elongation": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.640000000,
+            "data": 1.64000,
             "dims": []
         },
         "average_ion_mass": {
             "attrs": {
                 "units": "unified_atomic_mass_unit"
             },
-            "data": 2.000000000,
+            "data": 2.00000,
             "dims": []
         },
         "critical_alpha_MHD": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 2.548660460,
+            "data": 2.54866,
             "dims": []
         },
         "cylindrical_safety_factor": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 4.476700876,
+            "data": 4.47670,
             "dims": []
         },
         "elongation_psi95": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.600000000,
+            "data": 1.60000,
             "dims": []
         },
         "elongation_ratio_areal_to_psi95": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.025000000,
+            "data": 1.02500,
             "dims": []
         },
         "fraction_of_P_SOL_to_divertor": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.6000000000,
+            "data": 0.600000,
             "dims": []
         },
         "inverse_aspect_ratio": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.2969696970,
+            "data": 0.296970,
             "dims": []
         },
         "ion_heat_diffusivity": {
             "attrs": {
                 "units": "meter ** 2 / second"
             },
-            "data": 0.5000000000,
+            "data": 0.500000,
             "dims": []
         },
         "magnetic_field_on_axis": {
             "attrs": {
                 "units": "tesla"
             },
-            "data": 2.500000000,
+            "data": 2.50000,
             "dims": []
         },
         "major_radius": {
             "attrs": {
                 "units": "meter"
             },
-            "data": 1.650000000,
+            "data": 1.65000,
             "dims": []
         },
         "mean_ion_charge_state": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.000000000,
+            "data": 1.00000,
             "dims": []
         },
         "minor_radius": {
             "attrs": {
                 "units": "meter"
             },
-            "data": 0.4900000000,
+            "data": 0.490000,
             "dims": []
         },
         "plasma_current": {
             "attrs": {
                 "units": "ampere"
             },
-            "data": 800000.0000,
+            "data": 800000.,
             "dims": []
         },
         "poloidal_sound_larmor_radius": {
             "attrs": {
                 "units": "millimeter"
             },
-            "data": 4.479472029,
+            "data": 4.47947,
             "dims": []
         },
         "separatrix_electron_density": {
             "attrs": {
                 "units": "_1e19_per_cubic_metre"
             },
-            "data": 1.443846154,
+            "data": 1.44385,
             "dims": []
         },
         "separatrix_electron_temp": {
             "attrs": {
                 "units": "electron_volt"
             },
-            "data": 57.51724138,
+            "data": 57.5172,
             "dims": []
         },
         "surface_area": {
             "attrs": {
                 "units": "meter ** 2"
             },
-            "data": 40.01085452,
+            "data": 40.0109,
             "dims": []
         },
         "sustainment_power_in_electron_channel": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 0.7413990360,
+            "data": 0.741399,
             "dims": []
         },
         "sustainment_power_in_ion_channel": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 0.1674496459,
+            "data": 0.167450,
             "dims": []
         },
         "target_electron_temp": {
             "attrs": {
                 "units": "electron_volt"
             },
-            "data": 10.00000000,
+            "data": 10.0000,
             "dims": []
         },
         "triangularity_psi95": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.3000000000,
+            "data": 0.300000,
             "dims": []
         },
         "z_effective": {
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.250000000,
+            "data": 1.25000,
             "dims": []
         }
     },
