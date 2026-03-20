@@ -1151,6 +1151,7 @@ P_in:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
+  - calc_power_balance_from_input_P_aux  # Add this line
   used_by:
   - calc_auxiliary_power
   - switch_to_linearised_ohmic_confinement_below_threshold
@@ -2028,3 +2029,32 @@ z_effective:
   - calc_effective_collisionality
   - calc_peaked_profiles
   - calc_power_crossing_separatrix_in_electron_channel
+
+
+required_H98:
+  description: Required H98 factor to maintain power balance with a specified P_aux.
+  default_units: dimensionless
+  set_by:
+  - calc_power_balance_from_input_P_aux  # Add this
+  - solve_energy_confinement_scaling_for_input_power  # Added for compatibility
+
+t_sep:
+  description: Electron temperature at the separatrix.
+  default_units: kiloelectron_volt
+  used_by:
+  - calc_peaked_profiles                 # Add this
+  - calc_1D_plasma_profiles              # Add this
+
+pedestal_width:
+  description: Width of the edge pedestal in normalized rho space.
+  default_units: dimensionless
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
+
+n_sep_ratio:
+  description: Ratio of separatrix density to pedestal density.
+  default_units: dimensionless
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles

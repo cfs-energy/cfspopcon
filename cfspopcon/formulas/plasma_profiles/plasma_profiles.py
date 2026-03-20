@@ -9,7 +9,8 @@ from ...named_options import ProfileForm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
-
+from scipy.optimize import root_scalar
+from cfspopcon.unit_handling import magnitude
 
 @Algorithm.register_algorithm(
     return_keys=[
@@ -41,6 +42,9 @@ def calc_peaked_profiles(
     normalized_inverse_temp_scale_length: Unitfull,
     density_profile_form: ProfileForm,
     temp_profile_form: ProfileForm,
+    pedestal_width: Unitfull = 0.05 * ureg.dimensionless,     
+    t_sep: Unitfull = 0.2 * ureg.keV,               
+    n_sep_ratio: Unitfull = 0.5 * ureg.dimensionless,         
 ) -> tuple[Unitfull, ...]:
     """Calculate density peaking and the corresponding density and temperature profiles.
 
@@ -85,6 +89,9 @@ def calc_peaked_profiles(
         temperature_peaking=temperature_peaking,
         dilution=dilution,
         normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length,
+        pedestal_width=pedestal_width,   
+        t_sep=t_sep,                     
+        n_sep_ratio=n_sep_ratio,         
     )
 
     return (
@@ -126,6 +133,9 @@ def calc_peaked_profiles(
         dilution=ureg.dimensionless,
         normalized_inverse_temp_scale_length=ureg.dimensionless,
         n_points_for_confined_region_profiles=None,
+        pedestal_width=ureg.dimensionless,    
+        t_sep=ureg.keV,                       
+        n_sep_ratio=ureg.dimensionless,        
     ),
     output_core_dims=[("dim_rho",), ("dim_rho",), ("dim_rho",), ("dim_rho",), ("dim_rho",)],
 )
@@ -141,6 +151,9 @@ def calc_1D_plasma_profiles(
     dilution: float,
     normalized_inverse_temp_scale_length: float,
     n_points_for_confined_region_profiles: int = 50,
+    pedestal_width: float = 0.05 * ureg.dimensionless,       
+    t_sep: float = 0.2 * ureg.keV,                 
+    n_sep_ratio: float = 0.5 * ureg.dimensionless,           
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles.
 
@@ -187,6 +200,25 @@ def calc_1D_plasma_profiles(
         electron_temp_profiles[ProfileForm.prf],
         ion_temp_profiles[ProfileForm.prf],
     ) = calc_prf_profiles(**kwargs, normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length)
+
+    (
+        rho_3,
+        electron_density_profiles[ProfileForm.jch],
+        fuel_ion_density_profiles[ProfileForm.jch],
+        electron_temp_profiles[ProfileForm.jch],
+        ion_temp_profiles[ProfileForm.jch],
+    ) = calc_jch_profiles(
+        average_electron_density=average_electron_density,
+        average_electron_temp=average_electron_temp,
+        average_ion_temp=average_ion_temp,
+        electron_density_peaking=electron_density_peaking,
+        temperature_peaking=temperature_peaking,
+        dilution=dilution,
+        n_points=n_points_for_confined_region_profiles,
+        pedestal_width=pedestal_width,
+        t_sep=t_sep,
+        n_sep_ratio=n_sep_ratio
+    )
 
     assert np.allclose(rho_1, rho_2)
 
@@ -285,3 +317,185 @@ def calc_prf_profiles(
     )
 
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
+
+
+
+def _safe_extract_numpy(val):
+    if val is None:
+        return None
+    try:
+        mag = magnitude(val)
+        return np.asarray(mag.values if hasattr(mag, 'values') else mag, dtype=float)
+    except Exception:
+        return np.asarray(val.values if hasattr(val, 'values') else val, dtype=float)
+
+def _solve_jch_density_gradient(target_peaking, rho, rho_ped, I_edge1, I_edge2, n_sep_r):
+    def objective(a_L):
+        core_mask = rho <= rho_ped
+        prof_core = np.exp(a_L * (rho_ped - rho[core_mask]))
+        I_core = np.trapz(prof_core * 2.0 * rho[core_mask], x=rho[core_mask])
+        vol_avg = I_core + I_edge1 + n_sep_r * I_edge2
+        return (prof_core[0] / vol_avg) - target_peaking
+        
+    res = root_scalar(objective, bracket=[-2.0, 20.0], method='brentq')
+    a_L = res.root
+    
+    core_mask = rho <= rho_ped
+    prof_core = np.exp(a_L * (rho_ped - rho[core_mask]))
+    I_core = np.trapz(prof_core * 2.0 * rho[core_mask], x=rho[core_mask])
+    return a_L, I_core
+
+def calc_jch_profiles(
+    average_electron_density,
+    average_electron_temp,
+    average_ion_temp,
+    electron_density_peaking,
+    temperature_peaking,
+    dilution,
+    n_points,
+    pedestal_width,
+    t_sep,
+    n_sep_ratio
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    
+    # 1. Extract inputs 
+    ne = _safe_extract_numpy(average_electron_density) 
+    te = _safe_extract_numpy(average_electron_temp) 
+    ti = _safe_extract_numpy(average_ion_temp)   
+    dil = _safe_extract_numpy(dilution)
+    t_sep_arr = _safe_extract_numpy(t_sep)
+    
+    # These shape the profile geometry, so we extract them as scalars
+    w_ped = float(np.mean(_safe_extract_numpy(pedestal_width)))
+    n_sep_r = float(np.mean(_safe_extract_numpy(n_sep_ratio)))
+    n_peak = float(np.mean(_safe_extract_numpy(electron_density_peaking)))
+    t_peak = float(np.mean(_safe_extract_numpy(temperature_peaking)))
+    
+    # 2. Generate 1D Rho array
+    rho_ped = 1.0 - w_ped
+    rho = np.linspace(0.0, 1.0, int(n_points))
+    
+    # 3. Pre-calculate Edge Basis Integrals
+    edge_mask = rho > rho_ped
+    if np.any(edge_mask):
+        rho_edge = rho[edge_mask]
+        basis1 = (1.0 - rho_edge) / w_ped       
+        basis2 = (rho_edge - rho_ped) / w_ped   
+        I_edge1 = np.trapz(basis1 * 2.0 * rho_edge, x=rho_edge)
+        I_edge2 = np.trapz(basis2 * 2.0 * rho_edge, x=rho_edge)
+    else:
+        I_edge1, I_edge2 = 0.0, 0.0
+
+    # 4. Solve Gradients
+    val_a_Ln, I_core_n = _solve_jch_density_gradient(n_peak, rho, rho_ped, I_edge1, I_edge2, n_sep_r)
+    
+    val_a_LT = np.log(t_peak) / rho_ped
+    core_mask = rho <= rho_ped
+    prof_core_T = np.exp(val_a_LT * (rho_ped - rho[core_mask]))
+    I_core_T = np.trapz(prof_core_T * 2.0 * rho[core_mask], x=rho[core_mask])
+
+    # 5. Exact Linear Handoffs (Zero division hazards here)
+    nped = ne / (I_core_n + I_edge1 + n_sep_r * I_edge2)
+    
+    tped = (te - (t_sep_arr * I_edge2)) / (I_core_T + I_edge1)
+    tped = np.maximum(tped, t_sep_arr)
+    
+    # Safely calculate ion pedestal independently instead of using ratios
+    tiped = (ti - (t_sep_arr * I_edge2)) / (I_core_T + I_edge1)
+    tiped = np.maximum(tiped, t_sep_arr)
+
+    # 6. Construct Full Profiles
+    n_prof = np.zeros_like(ne * rho) 
+    t_prof = np.zeros_like(te * rho)
+    ti_prof = np.zeros_like(ti * rho)
+    
+    # Core
+    n_prof[..., core_mask] = nped * np.exp(val_a_Ln * (rho_ped - rho[core_mask]))
+    t_prof[..., core_mask] = tped * np.exp(val_a_LT * (rho_ped - rho[core_mask]))
+    ti_prof[..., core_mask] = tiped * np.exp(val_a_LT * (rho_ped - rho[core_mask]))
+    
+    # Edge
+    if np.any(edge_mask):
+        n_prof[..., edge_mask] = nped * basis1 + (nped * n_sep_r) * basis2
+        t_prof[..., edge_mask] = tped * basis1 + t_sep_arr * basis2
+        ti_prof[..., edge_mask] = tiped * basis1 + t_sep_arr * basis2
+        
+    ni_prof = n_prof * dil
+        
+    return rho, n_prof, ni_prof, t_prof, ti_prof
+
+
+
+@Algorithm.register_algorithm(
+    return_keys=[
+        "P_in",
+        "P_auxiliary_absorbed",
+        "energy_confinement_time",
+        "required_H98"
+    ]
+)
+@wraps_ufunc(
+    return_units=dict(
+        P_in=ureg.MW,
+        P_auxiliary_absorbed=ureg.MW,
+        energy_confinement_time=ureg.s,
+        required_H98=ureg.dimensionless,
+    ),
+    input_units={
+        "plasma_stored_energy": ureg.MJ,
+        "P_ohmic": ureg.MW,
+        "P_fusion": ureg.MW,
+        "average_electron_density": ureg.n19,
+        "plasma_current": ureg.MA,
+        "major_radius": ureg.m,
+        "minor_radius": ureg.m,
+        "magnetic_field_on_axis": ureg.T,
+        "average_ion_mass": ureg.amu,
+        "areal_elongation": ureg.dimensionless,
+        "P_auxiliary_launched": ureg.MW,
+        "fraction_of_external_power_coupled": ureg.dimensionless,
+    },
+    output_core_dims=[(), (), (), ()],
+)
+def calc_power_balance_from_input_P_aux(
+    plasma_stored_energy,
+    P_ohmic,
+    P_fusion,
+    average_electron_density,
+    plasma_current,
+    major_radius,
+    minor_radius,
+    magnetic_field_on_axis,
+    average_ion_mass,
+    areal_elongation,
+    P_auxiliary_launched,
+    fraction_of_external_power_coupled,
+):
+    # 1. Calculate absorbed auxiliary power from the input
+    P_aux_abs = P_auxiliary_launched * fraction_of_external_power_coupled
+    
+    # 2. Total power loss required to maintain steady state
+    P_alpha = 0.2 * P_fusion
+    P_in = P_alpha + P_ohmic + P_aux_abs
+    
+    # 3. Required confinement time
+    tau_req = plasma_stored_energy / np.maximum(P_in, 1e-3)
+    
+    # 4. ITER98y2 Scaling Prediction based on the ACTUAL total heating
+    epsilon = minor_radius / major_radius
+    tau_scaling = (
+        0.0562
+        * (plasma_current**0.93)
+        * (magnetic_field_on_axis**0.15)
+        * (np.maximum(P_in, 1e-3)**-0.69)
+        * (average_electron_density**0.41)
+        * (average_ion_mass**0.19)
+        * (major_radius**1.97)
+        * (epsilon**0.58)
+        * (areal_elongation**0.78)
+    )
+    
+    # 5. Required H98 factor
+    required_H98 = tau_req / tau_scaling
+    
+    return P_in, P_aux_abs, tau_req, required_H98

@@ -7,9 +7,9 @@ from ...unit_handling import ureg, wraps_ufunc
 from .read_energy_confinement_scalings import ConfinementScaling
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
+@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in", "required_H98"])
 @wraps_ufunc(
-    return_units=dict(tau_e=ureg.s, P_tau=ureg.MW),
+    return_units=dict(energy_confinement_time=ureg.s, P_in=ureg.MW, required_H98=ureg.dimensionless),
     input_units=dict(
         confinement_time_scalar=ureg.dimensionless,
         plasma_current=ureg.MA,
@@ -26,7 +26,7 @@ from .read_energy_confinement_scalings import ConfinementScaling
         q_star=ureg.dimensionless,
         energy_confinement_scaling=None,
     ),
-    output_core_dims=[(), ()],
+    output_core_dims=[(), (), ()],
 )
 def solve_energy_confinement_scaling_for_input_power(
     confinement_time_scalar: float,
@@ -43,8 +43,8 @@ def solve_energy_confinement_scaling_for_input_power(
     plasma_stored_energy: float,
     q_star: float,
     energy_confinement_scaling: str,
-) -> tuple[float, float]:
-    r"""Calculate energy confinement time and input power from a tau_E scaling.
+) -> tuple[float, float, float]:
+    """Calculate energy confinement time and input power from a tau_E scaling.
 
     The energy confinement time can generally be written as
 
@@ -140,4 +140,4 @@ def solve_energy_confinement_scaling_for_input_power(
 
     tau_E = plasma_stored_energy / P_tau
 
-    return tau_E, P_tau
+    return tau_E, P_tau, confinement_time_scalar
