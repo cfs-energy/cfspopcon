@@ -68,8 +68,8 @@ class CoeffInterpolator(RectBivariateSpline):
                 np.zeros_like(coeff_magnitude),
             )
         else:
-#            if not np.all(coeff > 0.0):
-#                raise ValueError("Encountered mix of null and positive values in coeff for CoeffInterpolator")
+            #            if not np.all(coeff > 0.0):
+            #                raise ValueError("Encountered mix of null and positive values in coeff for CoeffInterpolator")
 
             super().__init__(
                 self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]
