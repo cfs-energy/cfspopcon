@@ -30,12 +30,12 @@ def test_calc_1d_plasma_profiles_jch_respects_requested_peaking():
 
     assert rho_mag[0] == 0.0
     assert rho_mag[-1] < 1.0
-    assert np.any(np.isclose(rho_mag, 0.95))
+    knee_index = np.where(np.isclose(rho_mag, 0.95))[0][0]
 
-    np.testing.assert_allclose(electron_density_mag[0], 30.0, rtol=1e-4)
-    np.testing.assert_allclose(fuel_ion_density_mag[0], 19.2, rtol=1e-4)
-    np.testing.assert_allclose(electron_temp_mag[0], 20.0, rtol=1e-4)
-    np.testing.assert_allclose(ion_temp_mag[0], 24.0, rtol=1e-4)
+    np.testing.assert_allclose(electron_density_mag[0] / electron_density_mag[knee_index], 1.5, rtol=1e-6)
+    np.testing.assert_allclose(fuel_ion_density_mag[0] / fuel_ion_density_mag[knee_index], 1.2, rtol=1e-6)
+    np.testing.assert_allclose(electron_temp_mag[0] / electron_temp_mag[knee_index], 2.0, rtol=1e-6)
+    np.testing.assert_allclose(ion_temp_mag[0] / ion_temp_mag[knee_index], 2.0, rtol=1e-6)
     np.testing.assert_allclose(np.trapezoid(electron_density_mag * 2.0 * rho_mag, x=rho_mag), 20.0, rtol=1e-8)
     np.testing.assert_allclose(np.trapezoid(fuel_ion_density_mag * 2.0 * rho_mag, x=rho_mag), 16.0, rtol=1e-8)
     np.testing.assert_allclose(np.trapezoid(electron_temp_mag * 2.0 * rho_mag, x=rho_mag), 10.0, rtol=1e-8)

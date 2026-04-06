@@ -4,8 +4,6 @@ from bisect import bisect_left
 from typing import Any
 
 import numpy as np
-from scipy.optimize import root_scalar
-
 from ...algorithm_class import Algorithm
 from ...named_options import ProfileForm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
@@ -382,24 +380,9 @@ def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: floa
     return float(np.trapezoid(profile * 2.0 * rho_core, x=rho_core))
 
 
-def _solve_jch_gradient(objective: Any, lower: float = -2.0, upper: float = 20.0) -> float:
-    """Solve a monotonic JCH profile objective with a bracket that expands if needed."""
-    f_lower = objective(lower)
-    f_upper = objective(upper)
-
-    while f_lower * f_upper > 0.0 and upper < 200.0:
-        upper *= 2.0
-        f_upper = objective(upper)
-
-    if f_lower * f_upper > 0.0:
-        raise ValueError("Unable to bracket a valid JCH profile gradient for the requested inputs.")
-
-    return float(root_scalar(objective, bracket=[lower, upper], method="brentq").root)
-
-
 def _build_jch_density_profile(
     volume_average: float,
-    peak_to_average: float,
+    peak_to_pedestal: float,
     rho: np.ndarray,
     rho_ped: float,
     edge_basis_1: np.ndarray,
@@ -408,16 +391,10 @@ def _build_jch_density_profile(
     edge_integral_2: float,
     separatrix_to_pedestal_ratio: float,
 ) -> np.ndarray:
-    """Construct a density profile with an exponential core and linear pedestal."""
+    """Construct a density profile with a requested center-to-pedestal ratio."""
     rho_core = rho[rho <= rho_ped]
     rho_edge = rho[rho >= rho_ped]
-
-    def objective(gradient: float) -> float:
-        core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
-        normalization = core_integral + edge_integral_1 + separatrix_to_pedestal_ratio * edge_integral_2
-        return np.exp(gradient * rho_ped) / normalization - peak_to_average
-
-    gradient = _solve_jch_gradient(objective)
+    gradient = float(np.log(peak_to_pedestal) / rho_ped)
     core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
     pedestal_value = volume_average / (core_integral + edge_integral_1 + separatrix_to_pedestal_ratio * edge_integral_2)
 
@@ -431,7 +408,7 @@ def _build_jch_density_profile(
 
 def _build_jch_temperature_profile(
     volume_average: float,
-    peak_to_average: float,
+    peak_to_pedestal: float,
     rho: np.ndarray,
     rho_ped: float,
     edge_basis_1: np.ndarray,
@@ -440,17 +417,10 @@ def _build_jch_temperature_profile(
     edge_integral_2: float,
     separatrix_temperature: float,
 ) -> np.ndarray:
-    """Construct a temperature profile that matches the requested average and core peaking."""
+    """Construct a temperature profile with a requested center-to-pedestal ratio."""
     rho_core = rho[rho <= rho_ped]
     rho_edge = rho[rho >= rho_ped]
-    target_peak = volume_average * peak_to_average
-
-    def objective(gradient: float) -> float:
-        core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
-        pedestal_temperature = (volume_average - separatrix_temperature * edge_integral_2) / (core_integral + edge_integral_1)
-        return pedestal_temperature * np.exp(gradient * rho_ped) - target_peak
-
-    gradient = _solve_jch_gradient(objective)
+    gradient = float(np.log(peak_to_pedestal) / rho_ped)
     core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
     pedestal_temperature = (volume_average - separatrix_temperature * edge_integral_2) / (core_integral + edge_integral_1)
 
@@ -481,8 +451,8 @@ def calc_jch_profiles(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate JCH profiles with an exponential core and linear pedestal handoff.
 
-    The requested peak-to-average ratios are enforced independently for electron density,
-    fuel-ion density, and the electron and ion temperature profiles.
+    The JCH peaking inputs are interpreted as center-to-pedestal ratios for the
+    density and temperature profiles.
     """
     n_points = int(n_points)
     pedestal_width = float(pedestal_width)
@@ -515,7 +485,7 @@ def calc_jch_profiles(
 
     electron_density_profile = _build_jch_density_profile(
         volume_average=float(average_electron_density),
-        peak_to_average=float(electron_density_peaking),
+        peak_to_pedestal=float(electron_density_peaking),
         rho=rho,
         rho_ped=rho_ped,
         edge_basis_1=edge_basis_1,
@@ -526,7 +496,7 @@ def calc_jch_profiles(
     )
     fuel_ion_density_profile = _build_jch_density_profile(
         volume_average=float(average_electron_density * dilution),
-        peak_to_average=float(ion_density_peaking),
+        peak_to_pedestal=float(ion_density_peaking),
         rho=rho,
         rho_ped=rho_ped,
         edge_basis_1=edge_basis_1,
@@ -537,7 +507,7 @@ def calc_jch_profiles(
     )
     electron_temp_profile = _build_jch_temperature_profile(
         volume_average=float(average_electron_temp),
-        peak_to_average=float(temperature_peaking),
+        peak_to_pedestal=float(temperature_peaking),
         rho=rho,
         rho_ped=rho_ped,
         edge_basis_1=edge_basis_1,
@@ -548,7 +518,7 @@ def calc_jch_profiles(
     )
     ion_temp_profile = _build_jch_temperature_profile(
         volume_average=float(average_ion_temp),
-        peak_to_average=float(temperature_peaking),
+        peak_to_pedestal=float(temperature_peaking),
         rho=rho,
         rho_ped=rho_ped,
         edge_basis_1=edge_basis_1,
