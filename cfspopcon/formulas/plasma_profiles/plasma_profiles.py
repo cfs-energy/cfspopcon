@@ -1,5 +1,6 @@
 """Estimate 1D plasma profiles of density and temperature."""
 
+from bisect import bisect_left
 from typing import Any
 
 import numpy as np
@@ -183,6 +184,12 @@ def calc_1D_plasma_profiles(
         :term:`fuel_ion_density_profile` [1e19 m^-3], :term:`electron_temp_profile` [keV],
         :term:`ion_temp_profile` [keV]
     """
+    needs_jch_profiles = ProfileForm.jch in {density_profile_form, temp_profile_form}
+    rho_grid = _build_profile_grid(
+        n_points_for_confined_region_profiles,
+        (1.0 - float(pedestal_width)) if needs_jch_profiles else None,
+    )
+
     kwargs: dict[str, Any] = dict(
         average_electron_density=average_electron_density,
         average_electron_temp=average_electron_temp,
@@ -192,6 +199,7 @@ def calc_1D_plasma_profiles(
         temperature_peaking=temperature_peaking,
         dilution=dilution,
         npoints=n_points_for_confined_region_profiles,
+        rho=rho_grid,
     )
 
     electron_density_profiles, fuel_ion_density_profiles, electron_temp_profiles, ion_temp_profiles = dict(), dict(), dict(), dict()
@@ -211,28 +219,31 @@ def calc_1D_plasma_profiles(
         ion_temp_profiles[ProfileForm.prf],
     ) = calc_prf_profiles(**kwargs, normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length)
 
-    (
-        rho_3,
-        electron_density_profiles[ProfileForm.jch],
-        fuel_ion_density_profiles[ProfileForm.jch],
-        electron_temp_profiles[ProfileForm.jch],
-        ion_temp_profiles[ProfileForm.jch],
-    ) = calc_jch_profiles(
-        average_electron_density=average_electron_density,
-        average_electron_temp=average_electron_temp,
-        average_ion_temp=average_ion_temp,
-        electron_density_peaking=electron_density_peaking,
-        ion_density_peaking=ion_density_peaking,
-        temperature_peaking=temperature_peaking,
-        dilution=dilution,
-        n_points=n_points_for_confined_region_profiles,
-        pedestal_width=pedestal_width,
-        t_sep=t_sep,
-        n_sep_ratio=n_sep_ratio,
-    )
+    if needs_jch_profiles:
+        (
+            rho_3,
+            electron_density_profiles[ProfileForm.jch],
+            fuel_ion_density_profiles[ProfileForm.jch],
+            electron_temp_profiles[ProfileForm.jch],
+            ion_temp_profiles[ProfileForm.jch],
+        ) = calc_jch_profiles(
+            average_electron_density=average_electron_density,
+            average_electron_temp=average_electron_temp,
+            average_ion_temp=average_ion_temp,
+            electron_density_peaking=electron_density_peaking,
+            ion_density_peaking=ion_density_peaking,
+            temperature_peaking=temperature_peaking,
+            dilution=dilution,
+            n_points=n_points_for_confined_region_profiles,
+            pedestal_width=pedestal_width,
+            t_sep=t_sep,
+            n_sep_ratio=n_sep_ratio,
+            rho=rho_grid,
+        )
 
     assert np.allclose(rho_1, rho_2)
-    assert np.allclose(rho_1, rho_3)
+    if needs_jch_profiles:
+        assert np.allclose(rho_1, rho_3)
 
     return (
         rho_1,
@@ -252,6 +263,7 @@ def calc_analytic_profiles(
     temperature_peaking: float,
     dilution: float,
     npoints: int = 50,
+    rho: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles using a simple analytic fit.
 
@@ -268,7 +280,10 @@ def calc_analytic_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho = np.linspace(0, 1, num=npoints, endpoint=False)
+    if rho is None:
+        rho = _build_profile_grid(npoints)
+    else:
+        rho = np.asarray(rho, dtype=float)
 
     electron_density_profile = average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
     fuel_ion_density_profile = (
@@ -290,6 +305,7 @@ def calc_prf_profiles(
     dilution: float,
     normalized_inverse_temp_scale_length: float,
     npoints: int = 50,
+    rho: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles using profiles from Pablo Rodriguez-Fernandez.
 
@@ -307,7 +323,10 @@ def calc_prf_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho: np.ndarray = np.linspace(0.0, 1.0, num=npoints, endpoint=False)
+    if rho is None:
+        rho = _build_profile_grid(npoints)
+    else:
+        rho = np.asarray(rho, dtype=float)
 
     rho, electron_temp_profile, electron_density_profile = evaluate_density_and_temperature_profile_fits(
         average_electron_temp,
@@ -329,6 +348,32 @@ def calc_prf_profiles(
     )
 
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
+
+
+def _find_nearest_grid_index(values: np.ndarray, target: float) -> int:
+    """Find the nearest point in a sorted grid using a bisection search."""
+    insertion_index = bisect_left(values.tolist(), target)
+
+    if insertion_index == 0:
+        return 0
+    if insertion_index == len(values):
+        return len(values) - 1
+    if (values[insertion_index] - target) < (target - values[insertion_index - 1]):
+        return insertion_index
+
+    return insertion_index - 1
+
+
+def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarray:
+    """Build the radial grid and optionally snap the nearest point to the pedestal knee."""
+    rho = np.linspace(0.0, 1.0, num=npoints, endpoint=False)
+
+    if rho_ped is None:
+        return rho
+
+    rho = rho.copy()
+    rho[_find_nearest_grid_index(rho, rho_ped)] = rho_ped
+    return rho
 
 
 def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: float) -> float:
@@ -365,7 +410,7 @@ def _build_jch_density_profile(
 ) -> np.ndarray:
     """Construct a density profile with an exponential core and linear pedestal."""
     rho_core = rho[rho <= rho_ped]
-    rho_edge = rho[rho > rho_ped]
+    rho_edge = rho[rho >= rho_ped]
 
     def objective(gradient: float) -> float:
         core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
@@ -379,7 +424,7 @@ def _build_jch_density_profile(
     profile = np.empty_like(rho)
     profile[rho <= rho_ped] = pedestal_value * np.exp(gradient * (rho_ped - rho_core))
     if rho_edge.size:
-        profile[rho > rho_ped] = pedestal_value * edge_basis_1 + (pedestal_value * separatrix_to_pedestal_ratio) * edge_basis_2
+        profile[rho >= rho_ped] = pedestal_value * edge_basis_1 + (pedestal_value * separatrix_to_pedestal_ratio) * edge_basis_2
 
     return profile
 
@@ -397,7 +442,7 @@ def _build_jch_temperature_profile(
 ) -> np.ndarray:
     """Construct a temperature profile that matches the requested average and core peaking."""
     rho_core = rho[rho <= rho_ped]
-    rho_edge = rho[rho > rho_ped]
+    rho_edge = rho[rho >= rho_ped]
     target_peak = volume_average * peak_to_average
 
     def objective(gradient: float) -> float:
@@ -415,7 +460,7 @@ def _build_jch_temperature_profile(
     profile = np.empty_like(rho)
     profile[rho <= rho_ped] = pedestal_temperature * np.exp(gradient * (rho_ped - rho_core))
     if rho_edge.size:
-        profile[rho > rho_ped] = pedestal_temperature * edge_basis_1 + separatrix_temperature * edge_basis_2
+        profile[rho >= rho_ped] = pedestal_temperature * edge_basis_1 + separatrix_temperature * edge_basis_2
 
     return profile
 
@@ -432,6 +477,7 @@ def calc_jch_profiles(
     pedestal_width: float,
     t_sep: float,
     n_sep_ratio: float,
+    rho: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate JCH profiles with an exponential core and linear pedestal handoff.
 
@@ -449,9 +495,13 @@ def calc_jch_profiles(
         raise ValueError("pedestal_width must lie strictly between 0 and 1 for JCH profiles.")
 
     rho_ped = 1.0 - pedestal_width
-    rho = np.linspace(0.0, 1.0, num=n_points, endpoint=False)
+    if rho is None:
+        rho = _build_profile_grid(n_points, rho_ped)
+    else:
+        rho = np.asarray(rho, dtype=float).copy()
+        rho[_find_nearest_grid_index(rho, rho_ped)] = rho_ped
 
-    rho_edge = rho[rho > rho_ped]
+    rho_edge = rho[rho >= rho_ped]
     if rho_edge.size:
         edge_basis_1 = (1.0 - rho_edge) / pedestal_width
         edge_basis_2 = (rho_edge - rho_ped) / pedestal_width

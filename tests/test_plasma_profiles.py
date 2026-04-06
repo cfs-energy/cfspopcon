@@ -22,16 +22,38 @@ def test_calc_1d_plasma_profiles_jch_respects_requested_peaking():
         n_sep_ratio=0.5,
     )
 
-    rho_mag = magnitude_in_units(rho, ureg.dimensionless)
-    electron_density_mag = magnitude_in_units(electron_density, ureg.n19)
-    fuel_ion_density_mag = magnitude_in_units(fuel_ion_density, ureg.n19)
-    electron_temp_mag = magnitude_in_units(electron_temp, ureg.keV)
-    ion_temp_mag = magnitude_in_units(ion_temp, ureg.keV)
+    rho_mag = np.asarray(magnitude_in_units(rho, ureg.dimensionless))
+    electron_density_mag = np.asarray(magnitude_in_units(electron_density, ureg.n19))
+    fuel_ion_density_mag = np.asarray(magnitude_in_units(fuel_ion_density, ureg.n19))
+    electron_temp_mag = np.asarray(magnitude_in_units(electron_temp, ureg.keV))
+    ion_temp_mag = np.asarray(magnitude_in_units(ion_temp, ureg.keV))
 
     assert rho_mag[0] == 0.0
     assert rho_mag[-1] < 1.0
+    assert np.any(np.isclose(rho_mag, 0.95))
 
     np.testing.assert_allclose(electron_density_mag[0], 30.0, rtol=1e-4)
     np.testing.assert_allclose(fuel_ion_density_mag[0], 19.2, rtol=1e-4)
     np.testing.assert_allclose(electron_temp_mag[0], 20.0, rtol=1e-4)
     np.testing.assert_allclose(ion_temp_mag[0], 24.0, rtol=1e-4)
+    np.testing.assert_allclose(np.trapezoid(electron_density_mag * 2.0 * rho_mag, x=rho_mag), 20.0, rtol=1e-8)
+    np.testing.assert_allclose(np.trapezoid(fuel_ion_density_mag * 2.0 * rho_mag, x=rho_mag), 16.0, rtol=1e-8)
+    np.testing.assert_allclose(np.trapezoid(electron_temp_mag * 2.0 * rho_mag, x=rho_mag), 10.0, rtol=1e-8)
+    np.testing.assert_allclose(np.trapezoid(ion_temp_mag * 2.0 * rho_mag, x=rho_mag), 12.0, rtol=1e-8)
+
+
+def test_calc_1d_plasma_profiles_skips_jch_when_not_requested():
+    rho, electron_density, fuel_ion_density, electron_temp, ion_temp = calc_1D_plasma_profiles(
+        density_profile_form=ProfileForm.analytic,
+        temp_profile_form=ProfileForm.analytic,
+        average_electron_density=20.0 * ureg.n19,
+        average_electron_temp=0.1 * ureg.keV,
+        average_ion_temp=0.1 * ureg.keV,
+        electron_density_peaking=1.5,
+        ion_density_peaking=1.2,
+        temperature_peaking=1.1,
+        dilution=0.8,
+        normalized_inverse_temp_scale_length=2.5,
+    )
+
+    assert rho.shape == electron_density.shape == fuel_ion_density.shape == electron_temp.shape == ion_temp.shape
