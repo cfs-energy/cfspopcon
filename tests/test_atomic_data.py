@@ -116,7 +116,7 @@ def test_eval_interpolator(atomic_data):
     assert np.allclose(magnitude_in_units(vector_eval, interpolator.units), magnitude_in_units(scalar_eval, interpolator.units))
 
 
-def test_mixed_zero_and_positive_coefficients_are_supported():
+def test_mixed_zero_and_positive_coefficients_raise():
     coeff = xr.DataArray(
         [[0.0, 1.0, 2.0, 3.0], [0.5, 1.5, 2.5, 3.5], [1.0, 2.0, 3.0, 4.0], [1.5, 2.5, 3.5, 4.5]],
         coords=dict(
@@ -125,11 +125,8 @@ def test_mixed_zero_and_positive_coefficients_are_supported():
         ),
     )
 
-    interpolator = CoeffInterpolator(coeff)
-
-    result = interpolator(2.0, 2.0)
-
-    assert np.isfinite(result)
+    with pytest.raises(ValueError, match="mix of null and positive values"):
+        CoeffInterpolator(coeff)
 
 
 @pytest.mark.parametrize("species", ["helium", AtomicSpecies.Nitrogen], ids=["str", "AtomicSpecies"])

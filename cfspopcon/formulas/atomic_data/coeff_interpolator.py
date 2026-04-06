@@ -68,9 +68,9 @@ class CoeffInterpolator(RectBivariateSpline):
                 np.zeros_like(coeff_magnitude),
             )
         else:
-            # Some RADAS tables contain a mix of zeros and positive values near the
-            # grid boundary. We floor the zeros before taking log10 so the table
-            # remains interpolable without treating the whole dataset as identically zero.
+            if not np.all(coeff > 0.0):
+                raise ValueError("Encountered mix of null and positive values in coeff for CoeffInterpolator")
+
             super().__init__(
                 self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]
                 self.log10_with_floor(electron_density_coord),  # type: ignore[arg-type]
