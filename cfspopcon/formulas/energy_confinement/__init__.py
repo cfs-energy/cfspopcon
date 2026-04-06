@@ -2,7 +2,7 @@
 
 from .plasma_stored_energy import calc_plasma_stored_energy
 from .read_energy_confinement_scalings import ConfinementScaling, read_confinement_scalings
-from .solve_for_input_power import solve_energy_confinement_scaling_for_input_power
+from .solve_for_input_power import calc_power_balance_from_input_P_aux, solve_energy_confinement_scaling_for_input_power
 from .switch_confinement_scaling_on_threshold import (
     switch_to_L_mode_confinement_below_threshold,
     switch_to_linearised_ohmic_confinement_below_threshold,
@@ -10,6 +10,7 @@ from .switch_confinement_scaling_on_threshold import (
 
 __all__ = [
     "ConfinementScaling",
+    "calc_power_balance_from_input_P_aux",
     "calc_plasma_stored_energy",
     "read_confinement_scalings",
     "solve_energy_confinement_scaling_for_input_power",

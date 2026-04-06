@@ -3,14 +3,13 @@
 from typing import Any
 
 import numpy as np
+from scipy.optimize import root_scalar
 
 from ...algorithm_class import Algorithm
 from ...named_options import ProfileForm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
-from scipy.optimize import root_scalar
-from cfspopcon.unit_handling import magnitude
 
 
 @Algorithm.register_algorithm(
@@ -63,10 +62,15 @@ def calc_peaked_profiles(
         normalized_inverse_temp_scale_length: :term:`glossary link<normalized_inverse_temp_scale_length>`
         density_profile_form: :term:`glossary link<density_profile_form>`
         temp_profile_form: :term:`glossary link<temp_profile_form>`
+        pedestal_width: Pedestal width in normalized rho.
+        t_sep: Separatrix temperature used to anchor the JCH edge temperature profile.
+        n_sep_ratio: Ratio of separatrix density to pedestal density for JCH profiles.
 
     Returns:
-    `effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`, :term:`peak_electron_density`, :term:`peak_electron_temp`, :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`, :term:`electron_temp_profile`, :term:`ion_temp_profile`
-
+        :term:`effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`,
+        :term:`peak_electron_density`, :term:`peak_fuel_ion_density`, :term:`peak_electron_temp`,
+        :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`,
+        :term:`fuel_ion_density_profile`, :term:`electron_temp_profile`, :term:`ion_temp_profile`
     """
     effective_collisionality = calc_effective_collisionality(average_electron_density, average_electron_temp, major_radius, z_effective)
     ion_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
@@ -159,8 +163,8 @@ def calc_1D_plasma_profiles(
     """Estimate density and temperature profiles.
 
     Args:
-        density_profile_form: :term:`<glossary link<density_profile_form>`
-        temp_profile_form: :term:`<glossary link<temp_profile_form>`
+        density_profile_form: :term:`glossary link<density_profile_form>`
+        temp_profile_form: :term:`glossary link<temp_profile_form>`
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
         average_electron_temp: [keV] :term:`glossary link<average_electron_temp>`
         average_ion_temp: [keV] :term:`glossary link<average_ion_temp>`
@@ -169,10 +173,15 @@ def calc_1D_plasma_profiles(
         temperature_peaking: [~] :term:`glossary link<temperature_peaking>`
         dilution: dilution of main ions [~]
         normalized_inverse_temp_scale_length: [~] :term:`glossary link<normalized_inverse_temp_scale_length>`
-        n_points_for_confined_region_profiles: number of points to return in profile
+        n_points_for_confined_region_profiles: Number of points to return in the profile grid.
+        pedestal_width: Pedestal width in normalized rho for JCH profiles.
+        t_sep: Separatrix temperature used to anchor the JCH edge temperature profile.
+        n_sep_ratio: Ratio of separatrix density to pedestal density for JCH profiles.
 
     Returns:
-        :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
+        :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3],
+        :term:`fuel_ion_density_profile` [1e19 m^-3], :term:`electron_temp_profile` [keV],
+        :term:`ion_temp_profile` [keV]
     """
     kwargs: dict[str, Any] = dict(
         average_electron_density=average_electron_density,
@@ -213,6 +222,7 @@ def calc_1D_plasma_profiles(
         average_electron_temp=average_electron_temp,
         average_ion_temp=average_ion_temp,
         electron_density_peaking=electron_density_peaking,
+        ion_density_peaking=ion_density_peaking,
         temperature_peaking=temperature_peaking,
         dilution=dilution,
         n_points=n_points_for_confined_region_profiles,
@@ -222,6 +232,7 @@ def calc_1D_plasma_profiles(
     )
 
     assert np.allclose(rho_1, rho_2)
+    assert np.allclose(rho_1, rho_3)
 
     return (
         rho_1,
@@ -320,175 +331,181 @@ def calc_prf_profiles(
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 
 
-def _safe_extract_numpy(val):
-    if val is None:
-        return None
-    try:
-        mag = magnitude(val)
-        return np.asarray(mag.values if hasattr(mag, "values") else mag, dtype=float)
-    except Exception:
-        return np.asarray(val.values if hasattr(val, "values") else val, dtype=float)
+def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: float) -> float:
+    """Integrate a pedestal-normalized exponential core profile over the confined volume."""
+    profile = np.exp(gradient * (rho_ped - rho_core))
+    return float(np.trapezoid(profile * 2.0 * rho_core, x=rho_core))
 
 
-def _solve_jch_density_gradient(target_peaking, rho, rho_ped, I_edge1, I_edge2, n_sep_r):
-    def objective(a_L):
-        core_mask = rho <= rho_ped
-        prof_core = np.exp(a_L * (rho_ped - rho[core_mask]))
-        I_core = np.trapz(prof_core * 2.0 * rho[core_mask], x=rho[core_mask])
-        vol_avg = I_core + I_edge1 + n_sep_r * I_edge2
-        return (prof_core[0] / vol_avg) - target_peaking
+def _solve_jch_gradient(objective: Any, lower: float = -2.0, upper: float = 20.0) -> float:
+    """Solve a monotonic JCH profile objective with a bracket that expands if needed."""
+    f_lower = objective(lower)
+    f_upper = objective(upper)
 
-    res = root_scalar(objective, bracket=[-2.0, 20.0], method="brentq")
-    a_L = res.root
+    while f_lower * f_upper > 0.0 and upper < 200.0:
+        upper *= 2.0
+        f_upper = objective(upper)
 
-    core_mask = rho <= rho_ped
-    prof_core = np.exp(a_L * (rho_ped - rho[core_mask]))
-    I_core = np.trapz(prof_core * 2.0 * rho[core_mask], x=rho[core_mask])
-    return a_L, I_core
+    if f_lower * f_upper > 0.0:
+        raise ValueError("Unable to bracket a valid JCH profile gradient for the requested inputs.")
+
+    return float(root_scalar(objective, bracket=[lower, upper], method="brentq").root)
+
+
+def _build_jch_density_profile(
+    volume_average: float,
+    peak_to_average: float,
+    rho: np.ndarray,
+    rho_ped: float,
+    edge_basis_1: np.ndarray,
+    edge_basis_2: np.ndarray,
+    edge_integral_1: float,
+    edge_integral_2: float,
+    separatrix_to_pedestal_ratio: float,
+) -> np.ndarray:
+    """Construct a density profile with an exponential core and linear pedestal."""
+    rho_core = rho[rho <= rho_ped]
+    rho_edge = rho[rho > rho_ped]
+
+    def objective(gradient: float) -> float:
+        core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
+        normalization = core_integral + edge_integral_1 + separatrix_to_pedestal_ratio * edge_integral_2
+        return np.exp(gradient * rho_ped) / normalization - peak_to_average
+
+    gradient = _solve_jch_gradient(objective)
+    core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
+    pedestal_value = volume_average / (core_integral + edge_integral_1 + separatrix_to_pedestal_ratio * edge_integral_2)
+
+    profile = np.empty_like(rho)
+    profile[rho <= rho_ped] = pedestal_value * np.exp(gradient * (rho_ped - rho_core))
+    if rho_edge.size:
+        profile[rho > rho_ped] = pedestal_value * edge_basis_1 + (pedestal_value * separatrix_to_pedestal_ratio) * edge_basis_2
+
+    return profile
+
+
+def _build_jch_temperature_profile(
+    volume_average: float,
+    peak_to_average: float,
+    rho: np.ndarray,
+    rho_ped: float,
+    edge_basis_1: np.ndarray,
+    edge_basis_2: np.ndarray,
+    edge_integral_1: float,
+    edge_integral_2: float,
+    separatrix_temperature: float,
+) -> np.ndarray:
+    """Construct a temperature profile that matches the requested average and core peaking."""
+    rho_core = rho[rho <= rho_ped]
+    rho_edge = rho[rho > rho_ped]
+    target_peak = volume_average * peak_to_average
+
+    def objective(gradient: float) -> float:
+        core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
+        pedestal_temperature = (volume_average - separatrix_temperature * edge_integral_2) / (core_integral + edge_integral_1)
+        return pedestal_temperature * np.exp(gradient * rho_ped) - target_peak
+
+    gradient = _solve_jch_gradient(objective)
+    core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
+    pedestal_temperature = (volume_average - separatrix_temperature * edge_integral_2) / (core_integral + edge_integral_1)
+
+    if pedestal_temperature < separatrix_temperature:
+        raise ValueError("Requested JCH temperature profile gives an unphysical pedestal below the separatrix temperature.")
+
+    profile = np.empty_like(rho)
+    profile[rho <= rho_ped] = pedestal_temperature * np.exp(gradient * (rho_ped - rho_core))
+    if rho_edge.size:
+        profile[rho > rho_ped] = pedestal_temperature * edge_basis_1 + separatrix_temperature * edge_basis_2
+
+    return profile
 
 
 def calc_jch_profiles(
-    average_electron_density,
-    average_electron_temp,
-    average_ion_temp,
-    electron_density_peaking,
-    temperature_peaking,
-    dilution,
-    n_points,
-    pedestal_width,
-    t_sep,
-    n_sep_ratio,
+    average_electron_density: float,
+    average_electron_temp: float,
+    average_ion_temp: float,
+    electron_density_peaking: float,
+    ion_density_peaking: float,
+    temperature_peaking: float,
+    dilution: float,
+    n_points: int,
+    pedestal_width: float,
+    t_sep: float,
+    n_sep_ratio: float,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    # 1. Extract inputs
-    ne = _safe_extract_numpy(average_electron_density)
-    te = _safe_extract_numpy(average_electron_temp)
-    ti = _safe_extract_numpy(average_ion_temp)
-    dil = _safe_extract_numpy(dilution)
-    t_sep_arr = _safe_extract_numpy(t_sep)
+    """Estimate JCH profiles with an exponential core and linear pedestal handoff.
 
-    # These shape the profile geometry, so we extract them as scalars
-    w_ped = float(np.mean(_safe_extract_numpy(pedestal_width)))
-    n_sep_r = float(np.mean(_safe_extract_numpy(n_sep_ratio)))
-    n_peak = float(np.mean(_safe_extract_numpy(electron_density_peaking)))
-    t_peak = float(np.mean(_safe_extract_numpy(temperature_peaking)))
+    The requested peak-to-average ratios are enforced independently for electron density,
+    fuel-ion density, and the electron and ion temperature profiles.
+    """
+    n_points = int(n_points)
+    pedestal_width = float(pedestal_width)
+    separatrix_temperature = float(t_sep)
+    separatrix_to_pedestal_ratio = float(n_sep_ratio)
 
-    # 2. Generate 1D Rho array
-    rho_ped = 1.0 - w_ped
-    rho = np.linspace(0.0, 1.0, int(n_points))
+    if n_points < 2:
+        raise ValueError("JCH profiles require at least two radial grid points.")
+    if not 0.0 < pedestal_width < 1.0:
+        raise ValueError("pedestal_width must lie strictly between 0 and 1 for JCH profiles.")
 
-    # 3. Pre-calculate Edge Basis Integrals
-    edge_mask = rho > rho_ped
-    if np.any(edge_mask):
-        rho_edge = rho[edge_mask]
-        basis1 = (1.0 - rho_edge) / w_ped
-        basis2 = (rho_edge - rho_ped) / w_ped
-        I_edge1 = np.trapz(basis1 * 2.0 * rho_edge, x=rho_edge)
-        I_edge2 = np.trapz(basis2 * 2.0 * rho_edge, x=rho_edge)
+    rho_ped = 1.0 - pedestal_width
+    rho = np.linspace(0.0, 1.0, num=n_points, endpoint=False)
+
+    rho_edge = rho[rho > rho_ped]
+    if rho_edge.size:
+        edge_basis_1 = (1.0 - rho_edge) / pedestal_width
+        edge_basis_2 = (rho_edge - rho_ped) / pedestal_width
+        edge_integral_1 = float(np.trapezoid(edge_basis_1 * 2.0 * rho_edge, x=rho_edge))
+        edge_integral_2 = float(np.trapezoid(edge_basis_2 * 2.0 * rho_edge, x=rho_edge))
     else:
-        I_edge1, I_edge2 = 0.0, 0.0
+        edge_basis_1 = np.empty(0)
+        edge_basis_2 = np.empty(0)
+        edge_integral_1 = 0.0
+        edge_integral_2 = 0.0
 
-    # 4. Solve Gradients
-    val_a_Ln, I_core_n = _solve_jch_density_gradient(n_peak, rho, rho_ped, I_edge1, I_edge2, n_sep_r)
-
-    val_a_LT = np.log(t_peak) / rho_ped
-    core_mask = rho <= rho_ped
-    prof_core_T = np.exp(val_a_LT * (rho_ped - rho[core_mask]))
-    I_core_T = np.trapz(prof_core_T * 2.0 * rho[core_mask], x=rho[core_mask])
-
-    # 5. Exact Linear Handoffs (Zero division hazards here)
-    nped = ne / (I_core_n + I_edge1 + n_sep_r * I_edge2)
-
-    tped = (te - (t_sep_arr * I_edge2)) / (I_core_T + I_edge1)
-    tped = np.maximum(tped, t_sep_arr)
-
-    # Safely calculate ion pedestal independently instead of using ratios
-    tiped = (ti - (t_sep_arr * I_edge2)) / (I_core_T + I_edge1)
-    tiped = np.maximum(tiped, t_sep_arr)
-
-    # 6. Construct Full Profiles
-    n_prof = np.zeros_like(ne * rho)
-    t_prof = np.zeros_like(te * rho)
-    ti_prof = np.zeros_like(ti * rho)
-
-    # Core
-    n_prof[..., core_mask] = nped * np.exp(val_a_Ln * (rho_ped - rho[core_mask]))
-    t_prof[..., core_mask] = tped * np.exp(val_a_LT * (rho_ped - rho[core_mask]))
-    ti_prof[..., core_mask] = tiped * np.exp(val_a_LT * (rho_ped - rho[core_mask]))
-
-    # Edge
-    if np.any(edge_mask):
-        n_prof[..., edge_mask] = nped * basis1 + (nped * n_sep_r) * basis2
-        t_prof[..., edge_mask] = tped * basis1 + t_sep_arr * basis2
-        ti_prof[..., edge_mask] = tiped * basis1 + t_sep_arr * basis2
-
-    ni_prof = n_prof * dil
-
-    return rho, n_prof, ni_prof, t_prof, ti_prof
-
-
-@Algorithm.register_algorithm(return_keys=["P_in", "P_auxiliary_absorbed", "energy_confinement_time", "required_H98"])
-@wraps_ufunc(
-    return_units=dict(
-        P_in=ureg.MW,
-        P_auxiliary_absorbed=ureg.MW,
-        energy_confinement_time=ureg.s,
-        required_H98=ureg.dimensionless,
-    ),
-    input_units={
-        "plasma_stored_energy": ureg.MJ,
-        "P_ohmic": ureg.MW,
-        "P_fusion": ureg.MW,
-        "average_electron_density": ureg.n19,
-        "plasma_current": ureg.MA,
-        "major_radius": ureg.m,
-        "minor_radius": ureg.m,
-        "magnetic_field_on_axis": ureg.T,
-        "average_ion_mass": ureg.amu,
-        "areal_elongation": ureg.dimensionless,
-        "P_auxiliary_launched": ureg.MW,
-        "fraction_of_external_power_coupled": ureg.dimensionless,
-    },
-    output_core_dims=[(), (), (), ()],
-)
-def calc_power_balance_from_input_P_aux(
-    plasma_stored_energy,
-    P_ohmic,
-    P_fusion,
-    average_electron_density,
-    plasma_current,
-    major_radius,
-    minor_radius,
-    magnetic_field_on_axis,
-    average_ion_mass,
-    areal_elongation,
-    P_auxiliary_launched,
-    fraction_of_external_power_coupled,
-):
-    # 1. Calculate absorbed auxiliary power from the input
-    P_aux_abs = P_auxiliary_launched * fraction_of_external_power_coupled
-
-    # 2. Total power loss required to maintain steady state
-    P_alpha = 0.2 * P_fusion
-    P_in = P_alpha + P_ohmic + P_aux_abs
-
-    # 3. Required confinement time
-    tau_req = plasma_stored_energy / np.maximum(P_in, 1e-3)
-
-    # 4. ITER98y2 Scaling Prediction based on the ACTUAL total heating
-    epsilon = minor_radius / major_radius
-    tau_scaling = (
-        0.0562
-        * (plasma_current**0.93)
-        * (magnetic_field_on_axis**0.15)
-        * (np.maximum(P_in, 1e-3) ** -0.69)
-        * (average_electron_density**0.41)
-        * (average_ion_mass**0.19)
-        * (major_radius**1.97)
-        * (epsilon**0.58)
-        * (areal_elongation**0.78)
+    electron_density_profile = _build_jch_density_profile(
+        volume_average=float(average_electron_density),
+        peak_to_average=float(electron_density_peaking),
+        rho=rho,
+        rho_ped=rho_ped,
+        edge_basis_1=edge_basis_1,
+        edge_basis_2=edge_basis_2,
+        edge_integral_1=edge_integral_1,
+        edge_integral_2=edge_integral_2,
+        separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
+    )
+    fuel_ion_density_profile = _build_jch_density_profile(
+        volume_average=float(average_electron_density * dilution),
+        peak_to_average=float(ion_density_peaking),
+        rho=rho,
+        rho_ped=rho_ped,
+        edge_basis_1=edge_basis_1,
+        edge_basis_2=edge_basis_2,
+        edge_integral_1=edge_integral_1,
+        edge_integral_2=edge_integral_2,
+        separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
+    )
+    electron_temp_profile = _build_jch_temperature_profile(
+        volume_average=float(average_electron_temp),
+        peak_to_average=float(temperature_peaking),
+        rho=rho,
+        rho_ped=rho_ped,
+        edge_basis_1=edge_basis_1,
+        edge_basis_2=edge_basis_2,
+        edge_integral_1=edge_integral_1,
+        edge_integral_2=edge_integral_2,
+        separatrix_temperature=separatrix_temperature,
+    )
+    ion_temp_profile = _build_jch_temperature_profile(
+        volume_average=float(average_ion_temp),
+        peak_to_average=float(temperature_peaking),
+        rho=rho,
+        rho_ped=rho_ped,
+        edge_basis_1=edge_basis_1,
+        edge_basis_2=edge_basis_2,
+        edge_integral_1=edge_integral_1,
+        edge_integral_2=edge_integral_2,
+        separatrix_temperature=separatrix_temperature,
     )
 
-    # 5. Required H98 factor
-    required_H98 = tau_req / tau_scaling
-
-    return P_in, P_aux_abs, tau_req, required_H98
+    return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
