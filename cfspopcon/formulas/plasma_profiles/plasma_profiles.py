@@ -483,9 +483,7 @@ def calc_jch_profiles(
         edge_integral_1 = 0.0
         edge_integral_2 = 0.0
 
-    electron_density_profile = _build_jch_density_profile(
-        volume_average=float(average_electron_density),
-        peak_to_pedestal=float(electron_density_peaking),
+    common_density_profile_kwargs = dict(
         rho=rho,
         rho_ped=rho_ped,
         edge_basis_1=edge_basis_1,
@@ -493,39 +491,36 @@ def calc_jch_profiles(
         edge_integral_1=edge_integral_1,
         edge_integral_2=edge_integral_2,
         separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
+    )
+    common_temperature_profile_kwargs = dict(
+        rho=rho,
+        rho_ped=rho_ped,
+        edge_basis_1=edge_basis_1,
+        edge_basis_2=edge_basis_2,
+        edge_integral_1=edge_integral_1,
+        edge_integral_2=edge_integral_2,
+        separatrix_temperature=separatrix_temperature,
+    )
+
+    electron_density_profile = _build_jch_density_profile(
+        volume_average=float(average_electron_density),
+        peak_to_pedestal=float(electron_density_peaking),
+        **common_density_profile_kwargs,
     )
     fuel_ion_density_profile = _build_jch_density_profile(
         volume_average=float(average_electron_density * dilution),
         peak_to_pedestal=float(ion_density_peaking),
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
+        **common_density_profile_kwargs,
     )
     electron_temp_profile = _build_jch_temperature_profile(
         volume_average=float(average_electron_temp),
         peak_to_pedestal=float(temperature_peaking),
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_temperature=separatrix_temperature,
+        **common_temperature_profile_kwargs,
     )
     ion_temp_profile = _build_jch_temperature_profile(
         volume_average=float(average_ion_temp),
         peak_to_pedestal=float(temperature_peaking),
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_temperature=separatrix_temperature,
+        **common_temperature_profile_kwargs,
     )
 
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
