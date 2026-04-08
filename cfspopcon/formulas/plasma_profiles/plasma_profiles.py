@@ -161,6 +161,10 @@ def calc_1D_plasma_profiles(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate density and temperature profiles.
 
+    For analytic and PRF profiles, the peaking inputs are interpreted relative
+    to the volume-averaged values. For JCH profiles, they are interpreted
+    relative to the pedestal values instead.
+
     Args:
         density_profile_form: :term:`glossary link<density_profile_form>`
         temp_profile_form: :term:`glossary link<temp_profile_form>`
@@ -452,7 +456,8 @@ def calc_jch_profiles(
     """Estimate JCH profiles with an exponential core and linear pedestal handoff.
 
     The JCH peaking inputs are interpreted as center-to-pedestal ratios for the
-    density and temperature profiles.
+    density and temperature profiles, unlike other profile forms that interpret
+    peaking relative to the volume-averaged values.
     """
     n_points = int(n_points)
     pedestal_width = float(pedestal_width)
