@@ -27,6 +27,5 @@ def integrate_profile_over_volume(
     Returns:
          volume_integrated_value [units]
     """
-    drho = rho[1] - rho[0]
-    result: float = np.sum(array_per_m3 * 2.0 * rho * drho) * plasma_volume
+    result: float = float(np.trapezoid(array_per_m3 * 2.0 * rho, x=rho)) * plasma_volume
     return result
