@@ -39,7 +39,7 @@ def calc_fusion_power(
     if isinstance(fusion_reaction, xr.DataArray):
         fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
-    if not isinstance(reaction, (DTFusionBoschHale, DTFusionHively)):
+    if not isinstance(reaction, DTFusionBoschHale | DTFusionHively):
         raise NotImplementedError(
             f"Reaction {fusion_reaction} is currently disabled. See https://github.com/cfs-energy/cfspopcon/issues/43"
         )
@@ -101,7 +101,7 @@ def calc_neutron_flux_to_walls(
     if isinstance(fusion_reaction, xr.DataArray):
         fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
-    if not isinstance(reaction, (DTFusionBoschHale, DTFusionHively)):
+    if not isinstance(reaction, DTFusionBoschHale | DTFusionHively):
         raise NotImplementedError(
             f"Reaction {fusion_reaction} is currently disabled. See https://github.com/cfs-energy/cfspopcon/issues/43"
         )

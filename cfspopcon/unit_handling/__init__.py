@@ -1,7 +1,5 @@
 """Uses pint and xarray to enable unit-handling over multi-dimensional arrays."""
 
-from typing import Union
-
 import xarray as xr
 from pint import DimensionalityError, UndefinedUnitError, UnitStrippedWarning
 
@@ -18,7 +16,7 @@ from .setup_unit_handling import (
     ureg,
 )
 
-Unitfull = Union[Quantity, xr.DataArray]
+Unitfull = Quantity | xr.DataArray
 
 __all__ = [
     "DimensionalityError",

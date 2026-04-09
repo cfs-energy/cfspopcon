@@ -1,17 +1,14 @@
 """Functions for saving results to file and loading those files."""
 
 import json
-import sys
 import warnings
-from pathlib import Path
-from typing import Any, Literal, Union
-
-if sys.version_info >= (3, 11, 0):
-    from typing import Self  # type:ignore[attr-defined,unused-ignore]
-else:
-    from typing_extensions import Self  # type:ignore[attr-defined,unused-ignore]
-
 from enum import Enum
+from pathlib import Path
+from typing import (
+    Any,
+    Literal,
+    Self,  # type:ignore[attr-defined,unused-ignore]
+)
 
 import numpy as np
 import xarray as xr
@@ -26,7 +23,7 @@ ignored_keys = [
 ]
 
 
-def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> Union[xr.DataArray, str]:
+def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> xr.DataArray | str:
     """Strip units and Enum values from a variable so that it can be stored in a NetCDF file.
 
     If you set coord=True and you pass in a scalar val, val is wrapped in a length-1 array to

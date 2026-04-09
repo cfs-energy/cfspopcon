@@ -1,6 +1,5 @@
 """Algorithms for different formulations of the extended two point model."""
 
-from typing import Union
 
 import xarray as xr
 
@@ -29,7 +28,7 @@ def two_point_model_fixed_fpow(
     toroidal_flux_expansion: Unitfull,
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
-    SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    SOL_momentum_loss_function: MomentumLossFunction | xr.DataArray,
     sheath_heat_transmission_factor: Unitfull,
     two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
@@ -92,7 +91,7 @@ def two_point_model_fixed_qpart(
     toroidal_flux_expansion: Unitfull,
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
-    SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    SOL_momentum_loss_function: MomentumLossFunction | xr.DataArray,
     sheath_heat_transmission_factor: Unitfull,
     two_point_model_error_nonconverged_error: bool = False,
 ) -> tuple[Unitfull, ...]:
@@ -155,7 +154,7 @@ def two_point_model_fixed_tet(
     toroidal_flux_expansion: Unitfull,
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
-    SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    SOL_momentum_loss_function: MomentumLossFunction | xr.DataArray,
     sheath_heat_transmission_factor: Unitfull,
 ) -> tuple[Unitfull, ...]:
     """Run the two point model with a fixed sheath entrance temperature.

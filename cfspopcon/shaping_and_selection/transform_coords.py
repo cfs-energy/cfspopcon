@@ -1,7 +1,6 @@
 """Functions to reshape xarrays."""
 
-from collections.abc import Sequence
-from typing import Callable, Optional, Union
+from collections.abc import Callable, Sequence
 
 import numpy as np
 import xarray as xr
@@ -13,8 +12,8 @@ from cfspopcon.unit_handling import Unit, magnitude
 def order_dimensions(
     array: xr.DataArray,
     dims: Sequence[str],
-    units: Optional[dict[str, Unit]] = None,
-    template: Optional[Union[xr.DataArray, xr.Dataset]] = None,
+    units: dict[str, Unit] | None = None,
+    template: xr.DataArray | xr.Dataset | None = None,
     order_for_plotting: bool = True,
 ) -> xr.DataArray:
     """Reorder the dimensions of the array, broadcasting against `template` if necessary.
@@ -47,7 +46,7 @@ def order_dimensions(
                 raise ValueError(f"Array does not have dimension {dim.lstrip('dim_')}")
 
     if units is not None:
-        for dim, processed_dim in zip(dims, processed_dims):
+        for dim, processed_dim in zip(dims, processed_dims, strict=False):
             array[processed_dim] = magnitude(template[dim.lstrip("dim_")].pint.to(units[dim]))
 
     if order_for_plotting:
@@ -59,9 +58,9 @@ def order_dimensions(
 def interpolate_array_onto_new_coords(
     array: xr.DataArray,
     new_coords: dict[str, xr.DataArray],
-    resolution: Optional[dict[str, int]] = None,
-    coord_min: Optional[dict[str, int]] = None,
-    coord_max: Optional[dict[str, int]] = None,
+    resolution: dict[str, int] | None = None,
+    coord_min: dict[str, int] | None = None,
+    coord_max: dict[str, int] | None = None,
     default_resolution: int = 50,
     max_distance: float = 2.0,
     griddata_method: str = "linear",

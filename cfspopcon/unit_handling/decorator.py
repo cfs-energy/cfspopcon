@@ -6,7 +6,7 @@ import warnings
 from collections.abc import Callable, Mapping, Sequence, Set
 from inspect import Parameter, Signature, signature
 from types import GenericAlias
-from typing import Any, Optional, Union
+from typing import Any
 
 import xarray as xr
 from pint import Unit, UnitStrippedWarning
@@ -17,21 +17,21 @@ FunctionType = Callable[..., Any]
 
 
 def wraps_ufunc(  # noqa: PLR0915
-    input_units: dict[str, Union[str, Unit, None]],
-    return_units: dict[str, Union[str, Unit, None]],
+    input_units: dict[str, str | Unit | None],
+    return_units: dict[str, str | Unit | None],
     pass_as_kwargs: tuple = (),
     #  kwargs for apply_ufunc
-    input_core_dims: Optional[Sequence[Sequence]] = None,
-    output_core_dims: Optional[Sequence[Sequence]] = ((),),
+    input_core_dims: Sequence[Sequence] | None = None,
+    output_core_dims: Sequence[Sequence] | None = ((),),
     exclude_dims: Set = frozenset(),
     vectorize: bool = True,
     join: str = "exact",
     dataset_join: str = "exact",
     keep_attrs: str = "drop_conflicts",
     dask: str = "forbidden",
-    output_dtypes: Optional[Sequence] = None,
-    output_sizes: Optional[Mapping[Any, int]] = None,
-    dask_gufunc_kwargs: Optional[dict[str, Any]] = None,
+    output_dtypes: Sequence | None = None,
+    output_sizes: Mapping[Any, int] | None = None,
+    dask_gufunc_kwargs: dict[str, Any] | None = None,
 ) -> FunctionType:
     """Decorator for functions to add in unit and dimension handling.
 
@@ -103,7 +103,7 @@ def wraps_ufunc(  # noqa: PLR0915
             """Transform args and kwargs, then call the inner function."""
             # if anything goes wrong we can do some extra work to provide a better error below
             try:
-                args_dict = dict(zip(input_keys, args))
+                args_dict = dict(zip(input_keys, args, strict=False))
 
                 if not set(args_dict.keys()).isdisjoint(kwargs.keys()):
                     raise RuntimeError(
@@ -182,7 +182,7 @@ def wraps_ufunc(  # noqa: PLR0915
     return _wraps_ufunc
 
 
-def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Union[str, Unit, None]]:
+def _check_units(units_dict: dict[str, str | Unit | None]) -> dict[str, str | Unit | None]:
     for key, unit in units_dict.items():
         if unit is None:
             pass
@@ -194,7 +194,7 @@ def _check_units(units_dict: dict[str, Union[str, Unit, None]]) -> dict[str, Uni
     return units_dict
 
 
-def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
+def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, str | Unit | None]) -> dict[str, Any]:
     vals_set, units_set = set(vals.keys()), set(units_mapping)
     if not vals_set == units_set:
         message = "Incorrect input arguments."
@@ -228,7 +228,7 @@ def _return_magnitude_in_specified_units(vals: Any, units_mapping: dict[str, Uni
     return converted_vals
 
 
-def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str, Unit, None]]) -> dict[str, Any]:
+def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, str | Unit | None]) -> dict[str, Any]:
     if isinstance(vals, xr.DataArray) and vals.ndim == 0:
         # Calling wraps_ufunc with scalar values and multiple returns results in
         # a xr.DataArray with a single tuple element.
@@ -243,7 +243,7 @@ def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str,
         for i, (return_key, return_param) in enumerate(itertools.zip_longest(list(units_mapping.keys()), vals, fillvalue="MISSING")):
             message += f"\n{i}: {return_key}, {return_param}"
         raise ValueError(message)
-    vals = dict(zip(units_mapping.keys(), vals))
+    vals = dict(zip(units_mapping.keys(), vals, strict=False))
 
     converted_vals = {}
 
@@ -268,8 +268,8 @@ def _convert_return_to_quantities(vals: Any, units_mapping: dict[str, Union[str,
 
 def _make_new_sig(
     sig: Signature,
-    input_units: Mapping[str, Union[str, Unit, None]],
-    return_units: Mapping[str, Union[str, Unit, None]],
+    input_units: Mapping[str, str | Unit | None],
+    return_units: Mapping[str, str | Unit | None],
 ) -> Signature:
     """Create a new signature for a wrapped function that replaces the plain floats/arrays with Quantity/DataArray."""
     parameters = list(sig.parameters.values())
@@ -277,11 +277,11 @@ def _make_new_sig(
 
     # update parameter annotations
     new_parameters: list[Parameter] = []
-    for param, unit in zip(parameters, input_units.values()):
+    for param, unit in zip(parameters, input_units.values(), strict=False):
         if unit is None:
             new_parameters.append(param)
         else:
-            new_parameters.append(param.replace(annotation=Union[Quantity, xr.DataArray]))
+            new_parameters.append(param.replace(annotation=Quantity | xr.DataArray))
 
     # update return annotation
     units_list = list(return_units.values())
@@ -313,7 +313,7 @@ def _make_new_sig(
     ret_types = tuple(xr.DataArray if units_list[i] is not None else old_types[i] for i in range(len(units_list)))
 
     if len(ret_types) == 0:
-        new_ret_ann: Union[type, None, GenericAlias] = None
+        new_ret_ann: type | None | GenericAlias = None
     elif len(ret_types) == 1:
         new_ret_ann = ret_types[0]
     else:

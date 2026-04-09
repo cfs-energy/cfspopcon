@@ -1,6 +1,5 @@
 """Routines to calculate the target electron flux, following the 2-point-model method of Stangeby, PPCF 2018."""
 
-from typing import Union
 
 import xarray as xr
 
@@ -8,10 +7,10 @@ from ....unit_handling import Quantity
 
 
 def calc_target_electron_flux(
-    target_electron_flux_basic: Union[Quantity, xr.DataArray],
-    f_vol_loss_target_electron_flux: Union[float, xr.DataArray],
-    f_other_target_electron_flux: Union[float, xr.DataArray],
-) -> Union[Quantity, xr.DataArray]:
+    target_electron_flux_basic: Quantity | xr.DataArray,
+    f_vol_loss_target_electron_flux: float | xr.DataArray,
+    f_other_target_electron_flux: float | xr.DataArray,
+) -> Quantity | xr.DataArray:
     """Calculate the target electron flux, correcting for volume-losses and other effects.
 
     Components are calculated using the other functions in this file.
@@ -20,11 +19,11 @@ def calc_target_electron_flux(
 
 
 def calc_target_electron_flux_basic(
-    average_ion_mass: Union[Quantity, xr.DataArray],
-    q_parallel: Union[Quantity, xr.DataArray],
-    upstream_total_pressure: Union[Quantity, xr.DataArray],
-    sheath_heat_transmission_factor: Union[float, xr.DataArray],
-) -> Union[Quantity, xr.DataArray]:
+    average_ion_mass: Quantity | xr.DataArray,
+    q_parallel: Quantity | xr.DataArray,
+    upstream_total_pressure: Quantity | xr.DataArray,
+    sheath_heat_transmission_factor: float | xr.DataArray,
+) -> Quantity | xr.DataArray:
     """Calculate the flux of electrons (particles per square-metre per second) at the target according to the basic two-point-model.
 
     From equation 24, :cite:`stangeby_2018`.
@@ -42,9 +41,9 @@ def calc_target_electron_flux_basic(
 
 
 def calc_f_vol_loss_target_electron_flux(
-    SOL_power_loss_fraction: Union[float, xr.DataArray],
-    SOL_momentum_loss_fraction: Union[float, xr.DataArray],
-) -> Union[float, xr.DataArray]:
+    SOL_power_loss_fraction: float | xr.DataArray,
+    SOL_momentum_loss_fraction: float | xr.DataArray,
+) -> float | xr.DataArray:
     """Calculate the volume-loss correction term for the electron flux at the target.
 
     From equation 24, :cite:`stangeby_2018`.
@@ -60,11 +59,11 @@ def calc_f_vol_loss_target_electron_flux(
 
 
 def calc_f_other_target_electron_flux(
-    target_ratio_of_ion_to_electron_temp: Union[float, xr.DataArray],
-    target_ratio_of_electron_to_ion_density: Union[float, xr.DataArray],
-    target_mach_number: Union[float, xr.DataArray],
-    toroidal_flux_expansion: Union[float, xr.DataArray],
-) -> Union[float, xr.DataArray]:
+    target_ratio_of_ion_to_electron_temp: float | xr.DataArray,
+    target_ratio_of_electron_to_ion_density: float | xr.DataArray,
+    target_mach_number: float | xr.DataArray,
+    toroidal_flux_expansion: float | xr.DataArray,
+) -> float | xr.DataArray:
     """Calculate correction terms other than the volume-loss correction for the electron flux at the target.
 
     Includes flux expansion, dilution of ions, different electron and ion temperatures and sub/super-sonic outflow.

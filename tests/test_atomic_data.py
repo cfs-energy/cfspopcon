@@ -1,10 +1,10 @@
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
 
 from cfspopcon.formulas.atomic_data import AtomicData
 from cfspopcon.named_options import AtomicSpecies
-from cfspopcon.unit_handling import magnitude_in_units, dimensionless_magnitude, Quantity, ureg
+from cfspopcon.unit_handling import Quantity, magnitude_in_units, ureg
 
 
 def test_read_atomic_data():

@@ -1,6 +1,5 @@
 """Compute all terms in the two-point-model for a fixed target electron temperature."""
 
-from typing import Union
 
 import xarray as xr
 
@@ -33,7 +32,7 @@ def solve_target_first_two_point_model(
     toroidal_flux_expansion: Unitfull,
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
-    SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    SOL_momentum_loss_function: MomentumLossFunction | xr.DataArray,
     sheath_heat_transmission_factor: Unitfull = 7.5 * ureg.dimensionless,
     SOL_conduction_fraction: Unitfull = 1.0 * ureg.dimensionless,
     target_ratio_of_ion_to_electron_temp: Unitfull = 1.0 * ureg.dimensionless,

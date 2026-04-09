@@ -3,7 +3,7 @@
 from collections.abc import Iterable
 from importlib.resources import as_file, files
 from numbers import Number
-from typing import Any, Union, overload
+from typing import Any, overload
 
 import numpy as np
 import xarray as xr
@@ -19,7 +19,7 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
     for key, units in units_dictionary.items():
         try:
             Quantity(1.0, units)
-        except UndefinedUnitError:  # noqa: PERF203
+        except UndefinedUnitError:
             invalid_units.append((key, units))
 
     if invalid_units:
@@ -63,7 +63,7 @@ def reset_default_units() -> None:
     _DEFAULT_UNITS = {}
 
 
-def default_unit(var: str) -> Union[str, None]:
+def default_unit(var: str) -> str | None:
     """Return cfspopcon's default unit for a given quantity.
 
     The mapping of variable name to default unit is loaded upon module import.
@@ -87,7 +87,7 @@ def default_unit(var: str) -> Union[str, None]:
         ) from None
 
 
-def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -> Union[float, list[float], Any]:
+def magnitude_in_default_units(value: Quantity | xr.DataArray, key: str) -> float | list[float] | Any:
     """Convert values to default units and then return the magnitude.
 
     Args:
@@ -111,7 +111,7 @@ def magnitude_in_default_units(value: Union[Quantity, xr.DataArray], key: str) -
 
     # single value arrays -> float
     # np,xr array -> list
-    if isinstance(mag, (np.ndarray, xr.DataArray)):
+    if isinstance(mag, np.ndarray | xr.DataArray):
         if mag.size == 1:
             return float(mag)
         else:
@@ -150,7 +150,7 @@ def set_default_units(value: Any, key: str) -> Any:
         if not isinstance(val, Iterable):
             return False
 
-        if isinstance(val, (np.ndarray, xr.DataArray)) and val.ndim == 0:
+        if isinstance(val, np.ndarray | xr.DataArray) and val.ndim == 0:
             return _is_number_not_bool(val.item())
 
         return all(_is_number_not_bool(v) for v in value)
@@ -181,12 +181,12 @@ def convert_to_default_units(value: xr.DataArray, key: str) -> xr.DataArray: ...
 def convert_to_default_units(value: Quantity, key: str) -> Quantity: ...
 
 
-def convert_to_default_units(value: Union[float, Quantity, xr.DataArray], key: str) -> Union[float, Quantity, xr.DataArray]:
+def convert_to_default_units(value: float | Quantity | xr.DataArray, key: str) -> float | Quantity | xr.DataArray:
     """Convert an array or scalar to default units."""
     unit = default_unit(key)
     if unit is None:
         return value
-    elif isinstance(value, (xr.DataArray, Quantity)):
+    elif isinstance(value, xr.DataArray | Quantity):
         return convert_units(value, unit)
     else:
         raise NotImplementedError(f"No implementation for 'convert_to_default_units' with an array of type {type(value)} ({value})")

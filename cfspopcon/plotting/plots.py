@@ -1,7 +1,6 @@
 """Plot creation functions."""
 
 from pathlib import Path
-from typing import Optional
 
 import matplotlib
 import matplotlib.contour
@@ -21,8 +20,8 @@ def make_plot(
     plot_params: dict,
     points: dict,
     title: str,
-    save_name: Optional[str] = None,
-    ax: Optional[Axes] = None,
+    save_name: str | None = None,
+    ax: Axes | None = None,
     output_dir: Path = Path("."),
 ):
     """Given a dictionary corresponding to a plotting style, build a standard plot from the results of the POPCON."""

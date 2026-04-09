@@ -6,7 +6,7 @@ import inspect
 from collections.abc import Callable, Sequence
 from functools import wraps
 from pathlib import Path  # noqa: TC003
-from typing import Any, ClassVar, Optional, Union
+from typing import Any, ClassVar
 from warnings import warn
 
 import xarray as xr
@@ -21,10 +21,10 @@ GenericFunctionType = Callable[..., Any]
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    instances: ClassVar[dict[str, Union[Algorithm, CompositeAlgorithm]]] = dict()
+    instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
-        self, function: LabelledReturnFunctionType, return_keys: list[str], name: Optional[str] = None, skip_registration: bool = False
+        self, function: LabelledReturnFunctionType, return_keys: list[str], name: str | None = None, skip_registration: bool = False
     ):
         """Initialise an Algorithm.
 
@@ -120,7 +120,7 @@ class Algorithm:
         result = self._function(**input_values)
         return xr.Dataset(result).merge(dataset, join="left", compat=("override" if allow_overwrite else "no_conflicts"))
 
-    def __add__(self, other: Union[Algorithm, CompositeAlgorithm]) -> CompositeAlgorithm:
+    def __add__(self, other: Algorithm | CompositeAlgorithm) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this Algorithm and another Algorithm or CompositeAlgorithm."""
         if isinstance(other, CompositeAlgorithm):
             return CompositeAlgorithm(algorithms=[self, *other.algorithms])
@@ -132,7 +132,7 @@ class Algorithm:
         cls,
         func: Callable,
         return_keys: list[str],
-        name: Optional[str] = None,
+        name: str | None = None,
         skip_unit_conversion: bool = False,
         skip_registration: bool = False,
     ) -> Algorithm:
@@ -162,7 +162,7 @@ class Algorithm:
 
     @classmethod
     def register_algorithm(
-        cls, return_keys: list[str], name: Optional[str] = None, skip_unit_conversion: bool = False
+        cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False
     ) -> GenericFunctionType:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""
 
@@ -185,7 +185,7 @@ class Algorithm:
         return cls(do_nothing, return_keys=[], name="empty", skip_registration=True)
 
     def validate_inputs(
-        self, configuration: Union[dict, xr.Dataset], quiet: bool = False, raise_error_on_missing_inputs: bool = False
+        self, configuration: dict | xr.Dataset, quiet: bool = False, raise_error_on_missing_inputs: bool = False
     ) -> bool:
         """Check that all required inputs are defined, and warn if inputs are unused."""
         return _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
@@ -215,7 +215,7 @@ class Algorithm:
         return list(cls.instances.keys())
 
     @classmethod
-    def get_algorithm(cls, key: str) -> Union[Algorithm, CompositeAlgorithm]:
+    def get_algorithm(cls, key: str) -> Algorithm | CompositeAlgorithm:
         """Retrieves an algorithm by name."""
         if key not in cls.algorithms():
             error_message = (
@@ -234,7 +234,7 @@ class CompositeAlgorithm:
     """A class which combined multiple Algorithms into a single object which behaves like an Algorithm."""
 
     def __init__(  # noqa: PLR0912
-        self, algorithms: Sequence[Union[Algorithm, CompositeAlgorithm]], name: Optional[str] = None, register: bool = False
+        self, algorithms: Sequence[Algorithm | CompositeAlgorithm], name: str | None = None, register: bool = False
     ):
         """Initialise a CompositeAlgorithm, combining several other Algorithms.
 
@@ -243,7 +243,7 @@ class CompositeAlgorithm:
             name: a name used to refer to the composite algorithm.
             register: flag register a named CompositeAlgorithm to 'Algorithm.instances' (ignored if name = None)
         """
-        if not (isinstance(algorithms, Sequence) and all(isinstance(alg, (Algorithm, CompositeAlgorithm)) for alg in algorithms)):
+        if not (isinstance(algorithms, Sequence) and all(isinstance(alg, Algorithm | CompositeAlgorithm) for alg in algorithms)):
             raise TypeError("Should pass a list of algorithms or composites to CompositeAlgorithm.")
 
         self.algorithms: list[Algorithm] = []
@@ -323,7 +323,7 @@ class CompositeAlgorithm:
         self.__doc__ = self._make_docstring()
 
     @classmethod
-    def from_list(cls, keys: list[str], name: Optional[str] = None, register: bool = False) -> CompositeAlgorithm:
+    def from_list(cls, keys: list[str], name: str | None = None, register: bool = False) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm from a list of Algorithm names."""
         algorithms = [Algorithm.get_algorithm(key) for key in keys]
         return CompositeAlgorithm(algorithms=algorithms, name=name, register=register)
@@ -393,7 +393,7 @@ class CompositeAlgorithm:
 
         return dataset
 
-    def __add__(self, other: Union[Algorithm, CompositeAlgorithm]) -> CompositeAlgorithm:
+    def __add__(self, other: Algorithm | CompositeAlgorithm) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this CompositeAlgorithm and another Algorithm or CompositeAlgorithm."""
         if isinstance(other, Algorithm):
             return CompositeAlgorithm(algorithms=[*self.algorithms, other])
@@ -402,7 +402,7 @@ class CompositeAlgorithm:
 
     def validate_inputs(  # noqa: PLR0912
         self,
-        configuration: Union[dict, xr.Dataset],
+        configuration: dict | xr.Dataset,
         quiet: bool = False,
         raise_error_on_missing_inputs: bool = True,
         warn_for_overridden_variables: bool = False,
@@ -460,8 +460,8 @@ class CompositeAlgorithm:
 
 
 def _validate_inputs(
-    algorithm: Union[Algorithm, CompositeAlgorithm],
-    configuration: Union[dict, xr.Dataset],
+    algorithm: Algorithm | CompositeAlgorithm,
+    configuration: dict | xr.Dataset,
     quiet: bool = False,
     raise_error_on_missing_inputs: bool = False,
 ) -> bool:

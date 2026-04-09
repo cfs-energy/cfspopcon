@@ -1,6 +1,5 @@
 """Compute all terms in the two-point-model for a fixed SOL power loss fraction."""
 
-from typing import Union
 
 import numpy as np
 import xarray as xr
@@ -38,7 +37,7 @@ def solve_two_point_model(
     toroidal_flux_expansion: Unitfull,
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
-    SOL_momentum_loss_function: Union[MomentumLossFunction, xr.DataArray],
+    SOL_momentum_loss_function: MomentumLossFunction | xr.DataArray,
     initial_target_electron_temp: Unitfull = 10.0 * ureg.eV,
     sheath_heat_transmission_factor: Unitfull = 7.5 * ureg.dimensionless,
     SOL_conduction_fraction: Unitfull = 1.0 * ureg.dimensionless,
@@ -60,7 +59,7 @@ def solve_two_point_model(
     two_point_model_error_nonconverged_error: bool = True,
     # Print information about the solve to terminal
     quiet: bool = True,
-) -> tuple[Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray], Union[Quantity, xr.DataArray]]:
+) -> tuple[Quantity | xr.DataArray, Quantity | xr.DataArray, Quantity | xr.DataArray, Quantity | xr.DataArray]:
     """Calculate the upstream and target electron temperature and target electron density according to the extended two-point-model.
 
     Args:

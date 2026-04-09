@@ -1,7 +1,7 @@
 """Methods to run analyses configured via input files."""
 
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -13,8 +13,8 @@ from .unit_handling import set_default_units
 
 
 def read_case(
-    case: Union[str, Path], kwargs: Optional[dict[str, str]] = None
-) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
+    case: str | Path, kwargs: dict[str, str] | None = None
+) -> tuple[dict[str, Any], CompositeAlgorithm | Algorithm, dict[str, Any], dict[str, Path]]:
     """Read a yaml file corresponding to a given case.
 
     case should be passed either as a complete filepath to an input.yaml file or to
@@ -45,7 +45,7 @@ def read_case(
 
 def process_input_dictionary(
     repr_d: dict[str, Any], case_dir: Path
-) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
+) -> tuple[dict[str, Any], CompositeAlgorithm | Algorithm, dict[str, Any], dict[str, Path]]:
     """Convert an input dictionary into an processed dictionary, a CompositeAlgorithm and dictionaries defining points and plots.
 
     Several processing steps are applied, including;
@@ -60,7 +60,7 @@ def process_input_dictionary(
         case_dir: Relative paths specified in repr_d are interpreted as relative to this directory
     """
     algorithms = repr_d.pop("algorithms", dict())
-    algorithm_list: list[Union[Algorithm, CompositeAlgorithm]] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
+    algorithm_list: list[Algorithm | CompositeAlgorithm] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
 
     if len(algorithm_list) > 1:
         algorithm = CompositeAlgorithm(algorithm_list)
@@ -100,7 +100,7 @@ def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
 def process_named_options(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
     """Process named options (enums), handling also list arguments."""
     for key, val in repr_d.items():
-        if isinstance(val, (list, tuple)):
+        if isinstance(val, list | tuple):
             repr_d[key] = [convert_named_options(key=key, val=v) for v in val]
         else:
             repr_d[key] = convert_named_options(key=key, val=val)
