@@ -33,7 +33,7 @@ ureg.define("_1e20_per_cubic_metre = 1e20 m^-3 = 1e20 m^-3 = n20")
 pint.set_application_registry(ureg)  # type:ignore[no-untyped-call]
 
 
-def suppress_downcast_warning(func: Callable[Params, Ret]) -> Callable[Params, Ret]:
+def suppress_downcast_warning[**Params, Ret](func: Callable[Params, Ret]) -> Callable[Params, Ret]:
     """Suppresses a common warning about downcasting quantities to arrays."""
 
     @wraps(func)

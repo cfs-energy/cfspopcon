@@ -46,15 +46,15 @@ pytest = "^9.0.3"
 pytest-cov = "^7.1.0"
 coverage = "^7.13.5"
 types-pyyaml = "^6.0.12.2"
-pandas-stubs = "^2.0"
+pandas-stubs = "^3.0.0.260204"
 mypy = "^1.15"
 scipy-stubs = "^1.15.3.0"
 ipdb = "^0.13.13"
 nbmake = "^1.5"
-ruff = "^0.11"
+ruff = "^0.15.10"
 
 # Documentation
-sphinx = "^8.1.0"
+sphinx = "^9.1.0"
 sphinx-rtd-theme = "^3.0"
 sphinxcontrib-bibtex = "^2.6.1"
 sphinx-copybutton = "^0.5.2"
@@ -99,6 +99,7 @@ ignore = [
     "PLR2004", # Magic values are common in physics constants
     "C408",    # Allow dict() calls
     "ISC001",  # Recommended ignore for ruff formatter
+    "PLC0415", # Allow imports not at top of file
 ]
 
 [tool.ruff.lint.pyupgrade]
