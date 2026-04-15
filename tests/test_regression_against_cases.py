@@ -13,7 +13,13 @@ from xarray.testing import assert_allclose
 from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
 
-ignored_variables = ["radas_version"]
+ignored_variables = [
+    "radas_version",
+    "electron_density_pedestal_peaking",
+    "ion_density_pedestal_peaking",
+    "electron_temp_pedestal_peaking",
+    "ion_temp_pedestal_peaking",
+]
 
 
 @pytest.mark.regression

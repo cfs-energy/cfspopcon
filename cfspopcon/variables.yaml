@@ -398,6 +398,14 @@ electron_density_peaking:
   used_by:
   - calc_bootstrap_fraction
   - calc_1D_plasma_profiles
+electron_density_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak electron density to the pedestal electron density for JCH
+    profiles. This output is only meaningful when `density_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 electron_density_peaking_offset:
   default_units: dimensionless
   description:
@@ -763,6 +771,14 @@ ion_density_peaking:
   used_by:
   - calc_bootstrap_fraction
   - calc_1D_plasma_profiles
+ion_density_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak fuel ion density to the pedestal fuel ion density for JCH
+    profiles. This output is only meaningful when `density_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 ion_density_peaking_offset:
   default_units: dimensionless
   description:
@@ -1297,6 +1313,15 @@ peak_electron_temp:
   - calc_temperature_peaking
   used_by:
   - calc_peak_pressure
+electron_temp_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak electron temperature to the pedestal electron temperature
+    for JCH profiles. This output is only meaningful when `temp_profile_form =
+    jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 peak_fuel_ion_density:
   default_units: _1e19_per_cubic_metre
   description:
@@ -1318,6 +1343,14 @@ peak_ion_temp:
   used_by:
   - calc_triple_product
   - calc_peak_pressure
+ion_temp_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak ion temperature to the pedestal ion temperature for JCH
+    profiles. This output is only meaningful when `temp_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 peak_pressure:
   default_units: pascal
   description:
