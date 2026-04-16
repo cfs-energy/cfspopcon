@@ -31,11 +31,11 @@ def test_solve_energy_confinement_scaling_reports_required_h98():
     np.testing.assert_allclose(magnitude_in_units(required_h98, ureg.dimensionless), 1.35, rtol=1e-6)
 
 
-def test_calc_power_balance_from_input_p_aux():
+def test_calc_power_balance_from_input_p_aux_uses_explicit_alpha_power():
     p_in, p_aux_absorbed, tau_e, required_h98 = calc_power_balance_from_input_P_aux(
         plasma_stored_energy=20.0 * ureg.MJ,
         P_ohmic=1.5 * ureg.MW,
-        P_fusion=120.0 * ureg.MW,
+        P_alpha=31.0 * ureg.MW,
         average_electron_density=25.0 * ureg.n19,
         plasma_current=8.7 * ureg.MA,
         major_radius=1.85 * ureg.m,
@@ -48,6 +48,6 @@ def test_calc_power_balance_from_input_p_aux():
     )
 
     np.testing.assert_allclose(magnitude_in_units(p_aux_absorbed, ureg.MW), 22.4, rtol=1e-9)
-    np.testing.assert_allclose(magnitude_in_units(p_in, ureg.MW), 47.9, rtol=1e-9)
-    np.testing.assert_allclose(magnitude_in_units(tau_e, ureg.s), 20.0 / 47.9, rtol=1e-9)
+    np.testing.assert_allclose(magnitude_in_units(p_in, ureg.MW), 54.9, rtol=1e-9)
+    np.testing.assert_allclose(magnitude_in_units(tau_e, ureg.s), 20.0 / 54.9, rtol=1e-9)
     assert magnitude_in_units(required_h98, ureg.dimensionless) > 0.0

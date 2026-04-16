@@ -1126,12 +1126,14 @@ P_alpha:
   - calc_fusion_power
   used_by:
   - calc_auxiliary_power
+  - calc_power_balance_from_input_P_aux
 P_auxiliary_absorbed:
   default_units: megawatt
   description:
   - auxiliary heating absorbed by the plasma integrated over the plasma volume.
   set_by:
   - calc_auxiliary_power
+  - calc_power_balance_from_input_P_aux
   used_by: []
 P_auxiliary_launched:
   default_units: megawatt

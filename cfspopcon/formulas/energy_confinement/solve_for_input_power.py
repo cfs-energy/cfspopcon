@@ -4,7 +4,15 @@ import numpy as np
 
 from ...algorithm_class import Algorithm
 from ...unit_handling import ureg, wraps_ufunc
-from .read_energy_confinement_scalings import ConfinementScaling
+from .read_energy_confinement_scalings import ConfinementScaling, read_confinement_scalings
+
+
+def _get_confinement_scaling(name: str) -> ConfinementScaling:
+    """Return a confinement scaling, loading the shared scaling table on first use."""
+    if name not in ConfinementScaling.instances:
+        read_confinement_scalings()
+
+    return ConfinementScaling.instances[name]
 
 
 def _calc_iter98y2_baseline_confinement_time(
@@ -17,19 +25,24 @@ def _calc_iter98y2_baseline_confinement_time(
     average_ion_mass: float,
     areal_elongation: float,
 ) -> float:
-    """Evaluate the ITER98y2 confinement time with the baseline H98 = 1 assumption."""
+    """Evaluate the ITER98y2 confinement time with the baseline H98 = 1 assumption.
+
+    The coefficient and exponents are sourced from the shared ITER98y2 scaling
+    definition so there is only one authoritative copy of those constants.
+    """
+    scaling = _get_confinement_scaling("ITER98y2")
     clipped_input_power = np.maximum(input_power, 1e-3)
 
     return (
-        0.0562
-        * plasma_current**0.93
-        * magnetic_field_on_axis**0.15
-        * clipped_input_power**-0.69
-        * average_electron_density**0.41
-        * average_ion_mass**0.19
-        * major_radius**1.97
-        * inverse_aspect_ratio**0.58
-        * areal_elongation**0.78
+        scaling.constant
+        * plasma_current**scaling.plasma_current_alpha
+        * magnetic_field_on_axis**scaling.field_on_axis_alpha
+        * clipped_input_power**scaling.input_power_alpha
+        * average_electron_density**scaling.average_density_alpha
+        * average_ion_mass**scaling.mass_ratio_alpha
+        * major_radius**scaling.major_radius_alpha
+        * inverse_aspect_ratio**scaling.inverse_aspect_ratio_alpha
+        * areal_elongation**scaling.areal_elongation_alpha
     )
 
 
@@ -142,7 +155,7 @@ def solve_energy_confinement_scaling_for_input_power(
     Returns:
         :term:`energy_confinement_time` [s], :term:`P_in` [MW], required_H98 [~]
     """
-    scaling = ConfinementScaling.instances[energy_confinement_scaling]
+    scaling = _get_confinement_scaling(energy_confinement_scaling)
 
     gamma = (
         confinement_time_scalar
@@ -191,7 +204,7 @@ def solve_energy_confinement_scaling_for_input_power(
     input_units=dict(
         plasma_stored_energy=ureg.MJ,
         P_ohmic=ureg.MW,
-        P_fusion=ureg.MW,
+        P_alpha=ureg.MW,
         average_electron_density=ureg.n19,
         plasma_current=ureg.MA,
         major_radius=ureg.m,
@@ -207,7 +220,7 @@ def solve_energy_confinement_scaling_for_input_power(
 def calc_power_balance_from_input_P_aux(
     plasma_stored_energy: float,
     P_ohmic: float,
-    P_fusion: float,
+    P_alpha: float,
     average_electron_density: float,
     plasma_current: float,
     major_radius: float,
@@ -218,9 +231,13 @@ def calc_power_balance_from_input_P_aux(
     P_auxiliary_launched: float,
     fraction_of_external_power_coupled: float,
 ) -> tuple[float, float, float, float]:
-    """Calculate the power balance and required H98 for a specified launched auxiliary power."""
+    """Calculate the power balance and required H98 for a specified launched auxiliary power.
+
+    This helper uses the explicit alpha heating input instead of inferring it
+    from total fusion power, so it remains valid for non-DT fuel mixtures.
+    """
     P_auxiliary_absorbed = P_auxiliary_launched * fraction_of_external_power_coupled
-    P_in = (0.2 * P_fusion) + P_ohmic + P_auxiliary_absorbed
+    P_in = P_alpha + P_ohmic + P_auxiliary_absorbed
     energy_confinement_time = plasma_stored_energy / np.maximum(P_in, 1e-3)
 
     required_H98 = energy_confinement_time / _calc_iter98y2_baseline_confinement_time(
