@@ -12,16 +12,14 @@ from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
 
+RHO_GRID_EDGE_NUDGE = 1.0e-6
+
 
 @Algorithm.register_algorithm(
     return_keys=[
         "effective_collisionality",
         "ion_density_peaking",
-        "ion_density_pedestal_peaking",
         "electron_density_peaking",
-        "electron_density_pedestal_peaking",
-        "electron_temp_pedestal_peaking",
-        "ion_temp_pedestal_peaking",
         "peak_electron_density",
         "peak_fuel_ion_density",
         "peak_electron_temp",
@@ -31,6 +29,10 @@ from .numerical_profile_fits import evaluate_density_and_temperature_profile_fit
         "fuel_ion_density_profile",
         "electron_temp_profile",
         "ion_temp_profile",
+        "ion_density_pedestal_peaking",
+        "electron_density_pedestal_peaking",
+        "electron_temp_pedestal_peaking",
+        "ion_temp_pedestal_peaking",
     ]
 )
 def calc_peaked_profiles(
@@ -73,11 +75,11 @@ def calc_peaked_profiles(
 
     Returns:
         :term:`effective_collisionality`, :term:`ion_density_peaking`, :term:`electron_density_peaking`,
-        :term:`ion_density_pedestal_peaking`, :term:`electron_density_pedestal_peaking`,
-        :term:`electron_temp_pedestal_peaking`, :term:`ion_temp_pedestal_peaking`,
         :term:`peak_electron_density`, :term:`peak_fuel_ion_density`, :term:`peak_electron_temp`,
         :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`,
-        :term:`electron_temp_profile`, :term:`ion_temp_profile`
+        :term:`electron_temp_profile`, :term:`ion_temp_profile`, :term:`ion_density_pedestal_peaking`,
+        :term:`electron_density_pedestal_peaking`, :term:`electron_temp_pedestal_peaking`,
+        :term:`ion_temp_pedestal_peaking`
     """
     effective_collisionality = calc_effective_collisionality(average_electron_density, average_electron_temp, major_radius, z_effective)
     ion_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
@@ -132,11 +134,7 @@ def calc_peaked_profiles(
     return (
         effective_collisionality,
         ion_density_peaking,
-        ion_density_pedestal_peaking,
         electron_density_peaking,
-        electron_density_pedestal_peaking,
-        electron_temp_pedestal_peaking,
-        ion_temp_pedestal_peaking,
         peak_electron_density,
         peak_fuel_ion_density,
         peak_electron_temp,
@@ -146,6 +144,10 @@ def calc_peaked_profiles(
         fuel_ion_density_profile,
         electron_temp_profile,
         ion_temp_profile,
+        ion_density_pedestal_peaking,
+        electron_density_pedestal_peaking,
+        electron_temp_pedestal_peaking,
+        ion_temp_pedestal_peaking,
     )
 
 
@@ -213,6 +215,8 @@ def calc_1D_plasma_profiles(
         dilution: dilution of main ions [~]
         normalized_inverse_temp_scale_length: [~] :term:`glossary link<normalized_inverse_temp_scale_length>`
         n_points_for_confined_region_profiles: Number of points to return in the profile grid.
+            Non-JCH grids stop at ``rho = 1 - 1e-6`` instead of exactly 1.0 so
+            hollow analytic profiles remain finite at the separatrix.
         pedestal_width: Pedestal width in normalized rho for JCH profiles.
         t_sep: Separatrix temperature used to anchor the JCH edge temperature profile.
         n_sep_ratio: Ratio of separatrix density to pedestal density for JCH profiles.
@@ -517,11 +521,17 @@ def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
 
 
 def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarray:
-    """Build the radial grid and optionally reserve four points across the pedestal."""
-    rho = np.linspace(0.0, 1.0, num=npoints)
+    """Build the radial grid and optionally reserve four points across the pedestal.
 
+    Non-JCH grids nudge the final sample to ``rho = 1 - 1e-6`` so the analytic
+    hollow-profile form is never evaluated exactly at its separatrix singularity.
+    JCH grids keep the explicit separatrix point because the pedestal model is
+    anchored there.
+    """
     if rho_ped is None:
-        return rho
+        # Keep the final sample infinitesimally inside the LCFS so hollow
+        # analytic profiles do not diverge at rho = 1.
+        return np.linspace(0.0, 1.0 - RHO_GRID_EDGE_NUDGE, num=npoints)
 
     pedestal_points = 4
     if npoints < pedestal_points + 1:

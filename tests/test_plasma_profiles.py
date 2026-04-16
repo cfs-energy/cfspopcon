@@ -69,7 +69,7 @@ def test_calc_1d_plasma_profiles_jch_uses_four_pedestal_points_without_growing_g
     np.testing.assert_allclose(rho_mag[-4:], np.linspace(0.95, 1.0, 4), rtol=0.0, atol=1e-12)
 
 
-def test_calc_1d_plasma_profiles_default_grid_reaches_separatrix():
+def test_calc_1d_plasma_profiles_default_grid_stops_just_short_of_separatrix():
     rho, *_ = calc_1D_plasma_profiles(
         density_profile_form=ProfileForm.analytic,
         temp_profile_form=ProfileForm.analytic,
@@ -85,8 +85,35 @@ def test_calc_1d_plasma_profiles_default_grid_reaches_separatrix():
 
     rho_mag = np.asarray(magnitude_in_units(rho, ureg.dimensionless))
 
-    np.testing.assert_allclose(rho_mag[[0, -1]], [0.0, 1.0])
-    np.testing.assert_allclose(np.trapezoid(np.ones_like(rho_mag) * 2.0 * rho_mag, x=rho_mag), 1.0, rtol=1e-12)
+    np.testing.assert_allclose(rho_mag[[0, -1]], [0.0, 1.0 - 1.0e-6], rtol=0.0, atol=1e-12)
+    np.testing.assert_allclose(np.trapezoid(np.ones_like(rho_mag) * 2.0 * rho_mag, x=rho_mag), rho_mag[-1] ** 2, rtol=1e-12)
+
+
+def test_calc_1d_plasma_profiles_hollow_analytic_profiles_stay_finite_at_edge():
+    rho, electron_density, fuel_ion_density, electron_temp, ion_temp = calc_1D_plasma_profiles(
+        density_profile_form=ProfileForm.analytic,
+        temp_profile_form=ProfileForm.analytic,
+        average_electron_density=20.0 * ureg.n19,
+        average_electron_temp=10.0 * ureg.keV,
+        average_ion_temp=12.0 * ureg.keV,
+        electron_density_peaking=0.8,
+        ion_density_peaking=0.7,
+        temperature_peaking=0.6,
+        dilution=0.8,
+        normalized_inverse_temp_scale_length=2.5,
+    )
+
+    rho_mag = np.asarray(magnitude_in_units(rho, ureg.dimensionless))
+    electron_density_mag = np.asarray(magnitude_in_units(electron_density, ureg.n19))
+    fuel_ion_density_mag = np.asarray(magnitude_in_units(fuel_ion_density, ureg.n19))
+    electron_temp_mag = np.asarray(magnitude_in_units(electron_temp, ureg.keV))
+    ion_temp_mag = np.asarray(magnitude_in_units(ion_temp, ureg.keV))
+
+    np.testing.assert_allclose(rho_mag[-1], 1.0 - 1.0e-6, rtol=0.0, atol=1e-12)
+    assert np.isfinite(electron_density_mag).all()
+    assert np.isfinite(fuel_ion_density_mag).all()
+    assert np.isfinite(electron_temp_mag).all()
+    assert np.isfinite(ion_temp_mag).all()
 
 
 def test_calc_1d_plasma_profiles_jch_small_pedestal_keeps_separatrix_point():
@@ -160,11 +187,7 @@ def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
     (
         _,
         ion_density_peaking,
-        ion_density_pedestal_peaking,
         electron_density_peaking,
-        electron_density_pedestal_peaking,
-        electron_temp_pedestal_peaking,
-        ion_temp_pedestal_peaking,
         peak_electron_density,
         peak_fuel_ion_density,
         peak_electron_temp,
@@ -174,6 +197,10 @@ def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
         fuel_ion_density_profile,
         electron_temp_profile,
         ion_temp_profile,
+        ion_density_pedestal_peaking,
+        electron_density_pedestal_peaking,
+        electron_temp_pedestal_peaking,
+        ion_temp_pedestal_peaking,
     ) = calc_peaked_profiles(
         average_electron_density=20.0 * ureg.n19,
         average_electron_temp=10.0 * ureg.keV,
