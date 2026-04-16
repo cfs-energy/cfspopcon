@@ -12,8 +12,6 @@ from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
 
-RHO_GRID_EDGE_NUDGE = 1.0e-6
-
 
 @Algorithm.register_algorithm(
     return_keys=[
@@ -215,8 +213,9 @@ def calc_1D_plasma_profiles(
         dilution: dilution of main ions [~]
         normalized_inverse_temp_scale_length: [~] :term:`glossary link<normalized_inverse_temp_scale_length>`
         n_points_for_confined_region_profiles: Number of points to return in the profile grid.
-            Non-JCH grids stop at ``rho = 1 - 1e-6`` instead of exactly 1.0 so
-            hollow analytic profiles remain finite at the separatrix.
+            All profile grids stop about one tenth of a grid spacing inside the
+            LCFS so hollow analytic profiles remain finite without letting the
+            final trapezoid dominate the volume integral.
         pedestal_width: Pedestal width in normalized rho for JCH profiles.
         t_sep: Separatrix temperature used to anchor the JCH edge temperature profile.
         n_sep_ratio: Ratio of separatrix density to pedestal density for JCH profiles.
@@ -520,18 +519,29 @@ def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
     return 1 + _find_nearest_grid_index(values[1:-1], target)
 
 
+def _calc_profile_grid_edge_nudge(npoints: int) -> float:
+    """Return the edge offset that keeps the last sample about one tenth of a grid spacing inside the LCFS."""
+    if npoints <= 1:
+        return 0.0
+
+    # Choose the endpoint offset so it is one tenth of the induced grid
+    # spacing: nudge = 0.1 * drho, drho = (1 - nudge) / (npoints - 1).
+    return 0.1 / (npoints - 1 + 0.1)
+
+
 def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarray:
     """Build the radial grid and optionally reserve four points across the pedestal.
 
-    Non-JCH grids nudge the final sample to ``rho = 1 - 1e-6`` so the analytic
-    hollow-profile form is never evaluated exactly at its separatrix singularity.
-    JCH grids keep the explicit separatrix point because the pedestal model is
-    anchored there.
+    Non-JCH grids stop about one tenth of a grid spacing inside the LCFS so the
+    analytic hollow-profile form is regularized without overweighting the final
+    trapezoid. JCH grids use the same offset so mixed analytic/JCH calls can
+    safely share a single grid without evaluating analytic hollow profiles at
+    ``rho = 1``.
     """
+    edge_nudge = _calc_profile_grid_edge_nudge(npoints)
+
     if rho_ped is None:
-        # Keep the final sample infinitesimally inside the LCFS so hollow
-        # analytic profiles do not diverge at rho = 1.
-        return np.linspace(0.0, 1.0 - RHO_GRID_EDGE_NUDGE, num=npoints)
+        return np.linspace(0.0, 1.0 - edge_nudge, num=npoints)
 
     pedestal_points = 4
     if npoints < pedestal_points + 1:
@@ -539,7 +549,7 @@ def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarra
 
     core_points = npoints - pedestal_points + 1
     rho_core = np.linspace(0.0, rho_ped, num=core_points)
-    rho_pedestal = np.linspace(rho_ped, 1.0, num=pedestal_points)
+    rho_pedestal = np.linspace(rho_ped, 1.0 - edge_nudge, num=pedestal_points)
     return np.concatenate((rho_core, rho_pedestal[1:]))
 
 
