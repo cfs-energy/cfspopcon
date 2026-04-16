@@ -167,7 +167,9 @@ class AtomicData:
         Raises:
         - FileNotFoundError: If the atomic_data_directory or its 'output' subdirectory does not exist.
         """
-        return {species: xr.open_dataset(file).pint.quantify() for species, file in cls.find_atomic_data_files(atomic_data_directory).items()}
+        return {
+            species: xr.open_dataset(file).pint.quantify() for species, file in cls.find_atomic_data_files(atomic_data_directory).items()
+        }
 
     @staticmethod
     def key_to_enum(species: Union[str, AtomicSpecies]) -> AtomicSpecies:

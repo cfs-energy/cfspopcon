@@ -46,6 +46,29 @@ def test_calc_1d_plasma_profiles_jch_respects_requested_peaking():
     np.testing.assert_allclose(np.trapezoid(ion_temp_mag * 2.0 * rho_mag, x=rho_mag), 12.0, rtol=1e-8)
 
 
+def test_calc_1d_plasma_profiles_jch_uses_four_pedestal_points_without_growing_grid():
+    rho, *_ = calc_1D_plasma_profiles(
+        density_profile_form=ProfileForm.jch,
+        temp_profile_form=ProfileForm.jch,
+        average_electron_density=20.0 * ureg.n19,
+        average_electron_temp=10.0 * ureg.keV,
+        average_ion_temp=12.0 * ureg.keV,
+        electron_density_peaking=1.5,
+        ion_density_peaking=1.2,
+        temperature_peaking=2.0,
+        dilution=0.8,
+        normalized_inverse_temp_scale_length=2.5,
+        pedestal_width=0.05,
+        t_sep=0.2 * ureg.keV,
+        n_sep_ratio=0.5,
+    )
+
+    rho_mag = np.asarray(magnitude_in_units(rho, ureg.dimensionless))
+
+    assert rho_mag.size == 50
+    np.testing.assert_allclose(rho_mag[-4:], np.linspace(0.95, 1.0, 4), rtol=0.0, atol=1e-12)
+
+
 def test_calc_1d_plasma_profiles_default_grid_reaches_separatrix():
     rho, *_ = calc_1D_plasma_profiles(
         density_profile_form=ProfileForm.analytic,
@@ -91,7 +114,7 @@ def test_calc_1d_plasma_profiles_jch_small_pedestal_keeps_separatrix_point():
 
     np.testing.assert_allclose(rho_mag[-1], 1.0)
     assert knee_index < len(rho_mag) - 1
-    assert np.count_nonzero(rho_mag >= 0.99) >= 2
+    np.testing.assert_allclose(rho_mag[-4:], np.linspace(0.99, 1.0, 4), rtol=0.0, atol=1e-12)
     np.testing.assert_allclose(electron_density_mag[-1] / electron_density_mag[knee_index], 0.5, rtol=1e-6)
     np.testing.assert_allclose(electron_temp_mag[-1], 0.2, rtol=1e-6)
 

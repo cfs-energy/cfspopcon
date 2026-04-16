@@ -105,7 +105,7 @@ def calc_peaked_profiles(
         n_sep_ratio=n_sep_ratio,
     )
 
-    if ProfileForm.jch in {density_profile_form, temp_profile_form}:
+    if density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch:
         (
             electron_density_pedestal_peaking,
             ion_density_pedestal_peaking,
@@ -222,7 +222,7 @@ def calc_1D_plasma_profiles(
         :term:`fuel_ion_density_profile` [1e19 m^-3], :term:`electron_temp_profile` [keV],
         :term:`ion_temp_profile` [keV]
     """
-    needs_jch_profiles = ProfileForm.jch in {density_profile_form, temp_profile_form}
+    needs_jch_profiles = density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch
     rho_grid = _build_profile_grid(
         n_points_for_confined_region_profiles,
         (1.0 - float(pedestal_width)) if needs_jch_profiles else None,
@@ -339,7 +339,7 @@ def calc_jch_pedestal_peaking(
     n_sep_ratio: float = 0.5 * ureg.dimensionless,
 ) -> tuple[float, float, float, float]:
     """Convert volume peaking values into the JCH peak-to-pedestal ratios."""
-    if ProfileForm.jch not in {density_profile_form, temp_profile_form}:
+    if density_profile_form != ProfileForm.jch and temp_profile_form != ProfileForm.jch:
         return np.nan, np.nan, np.nan, np.nan
 
     pedestal_width = float(pedestal_width)
@@ -517,15 +517,20 @@ def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
 
 
 def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarray:
-    """Build the radial grid and optionally snap the nearest point to the pedestal knee."""
+    """Build the radial grid and optionally reserve four points across the pedestal."""
     rho = np.linspace(0.0, 1.0, num=npoints)
 
     if rho_ped is None:
         return rho
 
-    rho = rho.copy()
-    rho[_find_nearest_interior_grid_index(rho, rho_ped)] = rho_ped
-    return rho
+    pedestal_points = 4
+    if npoints < pedestal_points + 1:
+        raise ValueError("JCH profile grids require at least five radial points to preserve the axis and four pedestal samples.")
+
+    core_points = npoints - pedestal_points + 1
+    rho_core = np.linspace(0.0, rho_ped, num=core_points)
+    rho_pedestal = np.linspace(rho_ped, 1.0, num=pedestal_points)
+    return np.concatenate((rho_core, rho_pedestal[1:]))
 
 
 def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: float) -> float:
@@ -632,7 +637,9 @@ def _solve_jch_peak_to_pedestal(
         if np.isclose(target_volume_peaking, maximum_volume_peaking):
             return upper_bound
 
-    return float(brentq(lambda peak_to_pedestal: volume_peaking_function(peak_to_pedestal) - target_volume_peaking, lower_bound, upper_bound))
+    return float(
+        brentq(lambda peak_to_pedestal: volume_peaking_function(peak_to_pedestal) - target_volume_peaking, lower_bound, upper_bound)
+    )
 
 
 def _solve_jch_density_pedestal_peaking(
@@ -680,28 +687,34 @@ def _solve_jch_temperature_pedestal_peaking(
 
     maximum_peak_to_pedestal: float | None = None
     if separatrix_temperature > 0.0:
-        if _calc_jch_temperature_pedestal_temperature(
-            volume_average=volume_average,
-            peak_to_pedestal=1.0,
-            rho_core=rho_core,
-            rho_ped=rho_ped,
-            edge_integral_1=edge_integral_1,
-            edge_integral_2=edge_integral_2,
-            separatrix_temperature=separatrix_temperature,
-        ) < separatrix_temperature:
+        if (
+            _calc_jch_temperature_pedestal_temperature(
+                volume_average=volume_average,
+                peak_to_pedestal=1.0,
+                rho_core=rho_core,
+                rho_ped=rho_ped,
+                edge_integral_1=edge_integral_1,
+                edge_integral_2=edge_integral_2,
+                separatrix_temperature=separatrix_temperature,
+            )
+            < separatrix_temperature
+        ):
             raise ValueError("Requested JCH temperature profile gives an unphysical pedestal below the separatrix temperature.")
 
         lower_bound = 1.0
         upper_bound = 2.0
-        while _calc_jch_temperature_pedestal_temperature(
-            volume_average=volume_average,
-            peak_to_pedestal=upper_bound,
-            rho_core=rho_core,
-            rho_ped=rho_ped,
-            edge_integral_1=edge_integral_1,
-            edge_integral_2=edge_integral_2,
-            separatrix_temperature=separatrix_temperature,
-        ) >= separatrix_temperature:
+        while (
+            _calc_jch_temperature_pedestal_temperature(
+                volume_average=volume_average,
+                peak_to_pedestal=upper_bound,
+                rho_core=rho_core,
+                rho_ped=rho_ped,
+                edge_integral_1=edge_integral_1,
+                edge_integral_2=edge_integral_2,
+                separatrix_temperature=separatrix_temperature,
+            )
+            >= separatrix_temperature
+        ):
             lower_bound, upper_bound = upper_bound, upper_bound * 2.0
             if upper_bound > 1.0e12:
                 raise ValueError("Could not bracket the maximum valid JCH temperature pedestal peaking.")
