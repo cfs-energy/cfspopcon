@@ -2,7 +2,6 @@
 
 from bisect import bisect_left
 from collections.abc import Callable
-from typing import Any
 
 import numpy as np
 from scipy.optimize import brentq
@@ -77,7 +76,9 @@ def calc_peaked_profiles(
         :term:`peak_ion_temp`, :term:`rho`, :term:`electron_density_profile`, :term:`fuel_ion_density_profile`,
         :term:`electron_temp_profile`, :term:`ion_temp_profile`, :term:`ion_density_pedestal_peaking`,
         :term:`electron_density_pedestal_peaking`, :term:`electron_temp_pedestal_peaking`,
-        :term:`ion_temp_pedestal_peaking`
+        :term:`ion_temp_pedestal_peaking`. The pedestal peaking outputs are only
+        defined for JCH branches; other profile forms return ``NaN`` placeholders
+        so the Algorithm output contract stays fixed.
     """
     effective_collisionality = calc_effective_collisionality(average_electron_density, average_electron_temp, major_radius, z_effective)
     ion_density_peaking = calc_density_peaking(effective_collisionality, beta_toroidal, nu_noffset=ion_density_peaking_offset)
@@ -124,6 +125,8 @@ def calc_peaked_profiles(
             n_sep_ratio=n_sep_ratio,
         )
     else:
+        # Preserve the fixed return contract even when the chosen profile family
+        # has no pedestal concept.
         electron_density_pedestal_peaking = electron_density_peaking * np.nan
         ion_density_pedestal_peaking = ion_density_peaking * np.nan
         electron_temp_pedestal_peaking = temperature_peaking * np.nan
@@ -199,7 +202,12 @@ def calc_1D_plasma_profiles(
     The peaking inputs are interpreted as peak-to-volume-average ratios for all
     profile forms. When JCH profiles are requested, those volume peaking values
     are converted internally to the peak-to-pedestal ratios required by the
-    JCH parameterization.
+    JCH parameterization. Different profile families may use different
+    construction grids internally, but the returned profiles always share one
+    common output ``rho`` grid. In mixed-form cases this means PRF can be built
+    on its own default-compatible grid and then remapped onto a JCH-shaped
+    output grid without letting JCH-only pedestal choices distort the PRF
+    volume average.
 
     Args:
         density_profile_form: :term:`glossary link<density_profile_form>`
@@ -226,83 +234,120 @@ def calc_1D_plasma_profiles(
         :term:`ion_temp_profile` [keV]
     """
     needs_jch_profiles = density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch
+    default_rho_grid = _build_profile_grid(n_points_for_confined_region_profiles)
+    # When a JCH branch is requested, expose the edge-refined JCH grid as the
+    # public rho coordinate. Other profile families are remapped onto it if
+    # needed so downstream consumers still see one shared radial coordinate.
     rho_grid = _build_profile_grid(
         n_points_for_confined_region_profiles,
         (1.0 - float(pedestal_width)) if needs_jch_profiles else None,
     )
-
-    kwargs: dict[str, Any] = dict(
-        average_electron_density=average_electron_density,
-        average_electron_temp=average_electron_temp,
-        average_ion_temp=average_ion_temp,
-        electron_density_peaking=electron_density_peaking,
-        ion_density_peaking=ion_density_peaking,
-        temperature_peaking=temperature_peaking,
-        dilution=dilution,
-        npoints=n_points_for_confined_region_profiles,
-        rho=rho_grid,
+    selected_forms = {density_profile_form, temp_profile_form}
+    family_profiles: dict[ProfileForm, tuple[np.ndarray, np.ndarray | None, np.ndarray | None, np.ndarray | None, np.ndarray | None]] = (
+        dict()
     )
 
-    electron_density_profiles, fuel_ion_density_profiles, electron_temp_profiles, ion_temp_profiles = dict(), dict(), dict(), dict()
-    (
-        rho_1,
-        electron_density_profiles[ProfileForm.analytic],
-        fuel_ion_density_profiles[ProfileForm.analytic],
-        electron_temp_profiles[ProfileForm.analytic],
-        ion_temp_profiles[ProfileForm.analytic],
-    ) = calc_analytic_profiles(**kwargs)
+    # Only build the profile families that were actually requested; mixed-form
+    # runs then combine the density branch from one family with the temperature
+    # branch from another on the shared output grid.
+    for profile_form in selected_forms:
+        if profile_form == ProfileForm.analytic:
+            family_profiles[profile_form] = calc_analytic_profiles(
+                average_electron_density=average_electron_density,
+                average_electron_temp=average_electron_temp,
+                average_ion_temp=average_ion_temp,
+                electron_density_peaking=electron_density_peaking,
+                ion_density_peaking=ion_density_peaking,
+                temperature_peaking=temperature_peaking,
+                dilution=dilution,
+                npoints=n_points_for_confined_region_profiles,
+                rho=rho_grid,
+            )
+        elif profile_form == ProfileForm.prf:
+            prf_profiles = calc_prf_profiles(
+                average_electron_density=average_electron_density,
+                average_electron_temp=average_electron_temp,
+                average_ion_temp=average_ion_temp,
+                electron_density_peaking=electron_density_peaking,
+                ion_density_peaking=ion_density_peaking,
+                temperature_peaking=temperature_peaking,
+                dilution=dilution,
+                normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length,
+                npoints=n_points_for_confined_region_profiles,
+                rho=default_rho_grid,
+            )
 
-    (
-        rho_2,
-        electron_density_profiles[ProfileForm.prf],
-        fuel_ion_density_profiles[ProfileForm.prf],
-        electron_temp_profiles[ProfileForm.prf],
-        ion_temp_profiles[ProfileForm.prf],
-    ) = calc_prf_profiles(**kwargs, normalized_inverse_temp_scale_length=normalized_inverse_temp_scale_length)
+            prf_rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = prf_profiles
+            # PRF uses its own construction grid and pedestal assumptions, so in
+            # mixed-form cases we remap it onto the common output rho grid
+            # rather than letting JCH-specific grid choices perturb the PRF
+            # volume averages directly.
+            electron_density_profile = _remap_profile_onto_grid(
+                electron_density_profile,
+                prf_rho,
+                rho_grid,
+                target_volume_average=float(average_electron_density),
+            )
+            fuel_ion_density_profile = _remap_profile_onto_grid(
+                fuel_ion_density_profile,
+                prf_rho,
+                rho_grid,
+                target_volume_average=float(average_electron_density * dilution),
+            )
+            electron_temp_profile = _remap_profile_onto_grid(
+                electron_temp_profile,
+                prf_rho,
+                rho_grid,
+                target_volume_average=float(average_electron_temp),
+            )
+            ion_temp_profile = _remap_profile_onto_grid(
+                ion_temp_profile,
+                prf_rho,
+                rho_grid,
+                target_volume_average=float(average_ion_temp),
+            )
+            prf_rho = rho_grid
 
-    if needs_jch_profiles:
-        (
-            rho_3,
-            electron_density_profile_jch,
-            fuel_ion_density_profile_jch,
-            electron_temp_profile_jch,
-            ion_temp_profile_jch,
-        ) = calc_jch_profiles(
-            average_electron_density=average_electron_density,
-            average_electron_temp=average_electron_temp,
-            average_ion_temp=average_ion_temp,
-            electron_density_volume_peaking=electron_density_peaking if density_profile_form == ProfileForm.jch else None,
-            ion_density_volume_peaking=ion_density_peaking if density_profile_form == ProfileForm.jch else None,
-            electron_temp_volume_peaking=temperature_peaking if temp_profile_form == ProfileForm.jch else None,
-            ion_temp_volume_peaking=temperature_peaking if temp_profile_form == ProfileForm.jch else None,
-            dilution=dilution,
-            n_points=n_points_for_confined_region_profiles,
-            pedestal_width=pedestal_width,
-            t_sep=t_sep,
-            n_sep_ratio=n_sep_ratio,
-            rho=rho_grid,
-        )
-        if density_profile_form == ProfileForm.jch:
-            assert electron_density_profile_jch is not None
-            assert fuel_ion_density_profile_jch is not None
-            electron_density_profiles[ProfileForm.jch] = electron_density_profile_jch
-            fuel_ion_density_profiles[ProfileForm.jch] = fuel_ion_density_profile_jch
-        if temp_profile_form == ProfileForm.jch:
-            assert electron_temp_profile_jch is not None
-            assert ion_temp_profile_jch is not None
-            electron_temp_profiles[ProfileForm.jch] = electron_temp_profile_jch
-            ion_temp_profiles[ProfileForm.jch] = ion_temp_profile_jch
+            family_profiles[profile_form] = (
+                prf_rho,
+                electron_density_profile,
+                fuel_ion_density_profile,
+                electron_temp_profile,
+                ion_temp_profile,
+            )
+        else:
+            family_profiles[profile_form] = calc_jch_profiles(
+                average_electron_density=average_electron_density,
+                average_electron_temp=average_electron_temp,
+                average_ion_temp=average_ion_temp,
+                electron_density_volume_peaking=electron_density_peaking if density_profile_form == ProfileForm.jch else None,
+                ion_density_volume_peaking=ion_density_peaking if density_profile_form == ProfileForm.jch else None,
+                electron_temp_volume_peaking=temperature_peaking if temp_profile_form == ProfileForm.jch else None,
+                ion_temp_volume_peaking=temperature_peaking if temp_profile_form == ProfileForm.jch else None,
+                dilution=dilution,
+                n_points=n_points_for_confined_region_profiles,
+                pedestal_width=pedestal_width,
+                t_sep=t_sep,
+                n_sep_ratio=n_sep_ratio,
+                rho=rho_grid,
+            )
 
-    assert np.allclose(rho_1, rho_2)
-    if needs_jch_profiles:
-        assert np.allclose(rho_1, rho_3)
+    density_rho, electron_density_profile, fuel_ion_density_profile, _, _ = family_profiles[density_profile_form]
+    temp_rho, _, _, electron_temp_profile, ion_temp_profile = family_profiles[temp_profile_form]
+
+    assert np.allclose(density_rho, rho_grid)
+    assert np.allclose(temp_rho, rho_grid)
+    assert electron_density_profile is not None
+    assert fuel_ion_density_profile is not None
+    assert electron_temp_profile is not None
+    assert ion_temp_profile is not None
 
     return (
-        rho_1,
-        electron_density_profiles[density_profile_form],
-        fuel_ion_density_profiles[density_profile_form],
-        electron_temp_profiles[temp_profile_form],
-        ion_temp_profiles[temp_profile_form],
+        rho_grid,
+        electron_density_profile,
+        fuel_ion_density_profile,
+        electron_temp_profile,
+        ion_temp_profile,
     )
 
 
@@ -341,7 +386,15 @@ def calc_jch_pedestal_peaking(
     t_sep: float = 0.2 * ureg.keV,
     n_sep_ratio: float = 0.5 * ureg.dimensionless,
 ) -> tuple[float, float, float, float]:
-    """Convert volume peaking values into the JCH peak-to-pedestal ratios."""
+    """Convert volume peaking values into the JCH peak-to-pedestal ratios.
+
+    The public API reports peaking as center-to-volume-average ratios for every
+    profile family. JCH profile construction instead needs center-to-pedestal
+    ratios, so this helper performs the inversion using the same pedestal
+    geometry and integration rules as :func:`calc_jch_profiles`.
+
+    Returns ``NaN`` for branches that are not using ``ProfileForm.jch``.
+    """
     if density_profile_form != ProfileForm.jch and temp_profile_form != ProfileForm.jch:
         return np.nan, np.nan, np.nan, np.nan
 
@@ -423,6 +476,8 @@ def calc_analytic_profiles(
         temperature_peaking: [~] :term:`glossary link<temperature_peaking>`
         dilution: dilution of main ions [~]
         npoints: number of points to return in profile
+        rho: optional output grid. If omitted, the helper builds its own
+            regularized profile grid.
 
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
@@ -466,6 +521,9 @@ def calc_prf_profiles(
         dilution: dilution of main ions [~]
         normalized_inverse_temp_scale_length: [~] :term:`glossary link<normalized_inverse_temp_scale_length>`
         npoints: number of points to return in profile
+        rho: optional construction grid. The PRF fit tables were tuned for
+            their own default grid, so mixed-form callers typically build PRF on
+            that grid first and remap onto the shared output grid afterward.
 
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
@@ -498,7 +556,11 @@ def calc_prf_profiles(
 
 
 def _find_nearest_grid_index(values: np.ndarray, target: float) -> int:
-    """Find the nearest point in a sorted grid using a bisection search."""
+    """Find the nearest point in a sorted grid using a bisection search.
+
+    This is used when an externally supplied grid needs to be snapped to the
+    exact JCH pedestal knee without scanning the whole array.
+    """
     insertion_index = bisect_left(values.tolist(), target)
 
     if insertion_index == 0:
@@ -512,7 +574,11 @@ def _find_nearest_grid_index(values: np.ndarray, target: float) -> int:
 
 
 def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
-    """Find the nearest interior point in a sorted grid."""
+    """Find the nearest interior point in a sorted grid.
+
+    JCH profile construction reserves the axis and edge points, so the pedestal
+    knee must be snapped onto an interior point only.
+    """
     if len(values) < 3:
         raise ValueError("JCH profiles require at least three radial grid points to preserve both the axis and separatrix.")
 
@@ -520,7 +586,12 @@ def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
 
 
 def _calc_profile_grid_edge_nudge(npoints: int) -> float:
-    """Return the edge offset that keeps the last sample about one tenth of a grid spacing inside the LCFS."""
+    """Return the resolution-dependent LCFS offset used to regularize the grid.
+
+    Hollow analytic profiles are singular exactly at ``rho = 1``. Rather than
+    using one fixed epsilon, the nudge is scaled to the grid spacing so the last
+    trapezoid stays well behaved across different resolutions.
+    """
     if npoints <= 1:
         return 0.0
 
@@ -543,6 +614,8 @@ def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarra
     if rho_ped is None:
         return np.linspace(0.0, 1.0 - edge_nudge, num=npoints)
 
+    # Reserve four samples for the pedestal region: the knee, two interior
+    # points that can capture some curvature, and the edge point.
     pedestal_points = 4
     if npoints < pedestal_points + 1:
         raise ValueError("JCH profile grids require at least five radial points to preserve the axis and four pedestal samples.")
@@ -553,6 +626,35 @@ def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarra
     return np.concatenate((rho_core, rho_pedestal[1:]))
 
 
+def _remap_profile_onto_grid(
+    profile: np.ndarray,
+    source_rho: np.ndarray,
+    target_rho: np.ndarray,
+    target_volume_average: float,
+) -> np.ndarray:
+    """Interpolate a profile onto a new rho grid and renormalize its volume average.
+
+    Mixed-form runs keep one public ``rho`` output even when different profile
+    families need different construction grids internally. This helper is what
+    lets PRF keep its own native construction grid and then move onto the common
+    output grid without losing the requested volume average.
+    """
+    if np.allclose(source_rho, target_rho):
+        return profile
+
+    remapped_profile = np.interp(target_rho, source_rho, profile)
+    if np.isclose(target_volume_average, 0.0):
+        return np.zeros_like(remapped_profile)
+
+    # Renormalize with the same cylindrical-volume measure used elsewhere in
+    # the profile code so the remapped profile still hits the requested average.
+    remapped_volume_average = float(np.trapezoid(remapped_profile * 2.0 * target_rho, x=target_rho))
+    if np.isclose(remapped_volume_average, 0.0):
+        raise ValueError("Cannot renormalize a remapped profile with zero volume average.")
+
+    return remapped_profile * (target_volume_average / remapped_volume_average)
+
+
 def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: float) -> float:
     """Integrate a pedestal-normalized exponential core profile over the confined volume."""
     profile = np.exp(gradient * (rho_ped - rho_core))
@@ -560,7 +662,12 @@ def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: floa
 
 
 def _calc_jch_edge_integrals(rho: np.ndarray, rho_ped: float, pedestal_width: float) -> tuple[np.ndarray, np.ndarray, float, float]:
-    """Compute the linear pedestal basis functions and their volume integrals."""
+    """Compute the linear pedestal basis functions and their volume integrals.
+
+    The JCH edge is represented as a linear blend between the pedestal value and
+    the separatrix anchor. Returning both basis arrays and their integrals lets
+    the solver and profile builder share the same geometry bookkeeping.
+    """
     rho_edge = rho[rho >= rho_ped]
     edge_basis_1 = (1.0 - rho_edge) / pedestal_width
     edge_basis_2 = (rho_edge - rho_ped) / pedestal_width
@@ -579,7 +686,11 @@ def _calc_jch_density_volume_peaking(
     edge_integral_2: float,
     separatrix_to_pedestal_ratio: float,
 ) -> float:
-    """Return the peak-to-volume-average ratio for a JCH density profile."""
+    """Return the peak-to-volume-average ratio for a JCH density profile.
+
+    ``peak_to_pedestal`` is the natural JCH input. This helper translates it
+    into the public volume-peaking definition used elsewhere in the codebase.
+    """
     gradient = float(np.log(peak_to_pedestal) / rho_ped)
     core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
     return peak_to_pedestal / (core_integral + edge_integral_1 + separatrix_to_pedestal_ratio * edge_integral_2)
@@ -594,7 +705,12 @@ def _calc_jch_temperature_pedestal_temperature(
     edge_integral_2: float,
     separatrix_temperature: float,
 ) -> float:
-    """Return the pedestal temperature implied by a JCH peak-to-pedestal ratio."""
+    """Return the pedestal temperature implied by a JCH peak-to-pedestal ratio.
+
+    Temperature profiles are additionally constrained by the separatrix
+    temperature, so the pedestal value must be solved from the requested volume
+    average before the profile can be constructed.
+    """
     gradient = float(np.log(peak_to_pedestal) / rho_ped)
     core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
     return (volume_average - separatrix_temperature * edge_integral_2) / (core_integral + edge_integral_1)
@@ -628,7 +744,13 @@ def _solve_jch_peak_to_pedestal(
     quantity_name: str,
     maximum_peak_to_pedestal: float | None = None,
 ) -> float:
-    """Solve for the JCH peak-to-pedestal ratio that matches a target volume peaking."""
+    """Solve for the JCH peak-to-pedestal ratio that matches a target volume peaking.
+
+    The mapping from peak-to-pedestal to peak-to-volume is monotonic but does
+    not have a closed-form inverse here, so we bracket the valid range and use a
+    scalar root find. Temperature profiles can optionally impose an additional
+    upper bound from the separatrix-temperature constraint.
+    """
     minimum_volume_peaking = volume_peaking_function(1.0)
     if target_volume_peaking < minimum_volume_peaking and not np.isclose(target_volume_peaking, minimum_volume_peaking):
         raise ValueError(
@@ -707,6 +829,8 @@ def _solve_jch_temperature_pedestal_peaking(
 
     maximum_peak_to_pedestal: float | None = None
     if separatrix_temperature > 0.0:
+        # First ensure the flat-core limit is already physical. If not, no valid
+        # peak-to-pedestal ratio exists for the requested average temperature.
         if (
             _calc_jch_temperature_pedestal_temperature(
                 volume_average=volume_average,
@@ -723,6 +847,8 @@ def _solve_jch_temperature_pedestal_peaking(
 
         lower_bound = 1.0
         upper_bound = 2.0
+        # Find the largest peak-to-pedestal ratio that still leaves the
+        # pedestal at or above the separatrix temperature.
         while (
             _calc_jch_temperature_pedestal_temperature(
                 volume_average=volume_average,
@@ -775,7 +901,11 @@ def _build_jch_density_profile(
     edge_integral_2: float,
     separatrix_to_pedestal_ratio: float,
 ) -> np.ndarray:
-    """Construct a density profile with a requested center-to-pedestal ratio."""
+    """Construct a density profile with a requested center-to-pedestal ratio.
+
+    The pedestal value is solved so that the full piecewise profile integrates
+    back to the requested volume average.
+    """
     rho_core = rho[rho <= rho_ped]
     rho_edge = rho[rho >= rho_ped]
     gradient = float(np.log(peak_to_pedestal) / rho_ped)
@@ -801,7 +931,12 @@ def _build_jch_temperature_profile(
     edge_integral_2: float,
     separatrix_temperature: float,
 ) -> np.ndarray:
-    """Construct a temperature profile with a requested center-to-pedestal ratio."""
+    """Construct a temperature profile with a requested center-to-pedestal ratio.
+
+    Unlike density, the edge branch is anchored to an absolute separatrix
+    temperature, so the pedestal temperature must be solved before the profile
+    can be filled in.
+    """
     rho_core = rho[rho <= rho_ped]
     rho_edge = rho[rho >= rho_ped]
     gradient = float(np.log(peak_to_pedestal) / rho_ped)
@@ -845,7 +980,9 @@ def calc_jch_profiles(
 
     The public peaking inputs remain center-to-volume-average ratios. This
     helper converts them to the peak-to-pedestal ratios required by the JCH
-    profile parameterization.
+    profile parameterization. Density and temperature branches can be requested
+    independently; the unused branch returns ``None`` so the caller can splice
+    together mixed-form runs.
     """
     n_points = int(n_points)
     pedestal_width = float(pedestal_width)
@@ -866,6 +1003,8 @@ def calc_jch_profiles(
         rho = _build_profile_grid(n_points, rho_ped)
     else:
         rho = np.asarray(rho, dtype=float).copy()
+        # Preserve the caller's overall grid while guaranteeing that the exact
+        # pedestal knee appears on one interior point.
         rho[_find_nearest_interior_grid_index(rho, rho_ped)] = rho_ped
 
     rho_core = rho[rho <= rho_ped]

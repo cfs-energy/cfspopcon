@@ -8,7 +8,13 @@ from .read_energy_confinement_scalings import ConfinementScaling, read_confineme
 
 
 def _get_confinement_scaling(name: str) -> ConfinementScaling:
-    """Return a confinement scaling, loading the shared scaling table on first use."""
+    """Return a confinement scaling, loading the shared table on first use.
+
+    Some callers reach this module directly instead of coming through package
+    import paths that have already populated ``ConfinementScaling.instances``.
+    This helper keeps those direct calls working without duplicating registry
+    initialization logic.
+    """
     if name not in ConfinementScaling.instances:
         read_confinement_scalings()
 
@@ -31,6 +37,7 @@ def _calc_iter98y2_baseline_confinement_time(
     definition so there is only one authoritative copy of those constants.
     """
     scaling = _get_confinement_scaling("ITER98y2")
+    # Avoid passing zero power into a negative input-power exponent.
     clipped_input_power = np.maximum(input_power, 1e-3)
 
     return (
@@ -154,6 +161,8 @@ def solve_energy_confinement_scaling_for_input_power(
 
     Returns:
         :term:`energy_confinement_time` [s], :term:`P_in` [MW], required_H98 [~]
+        where ``required_H98`` is the implied confinement multiplier relative to
+        the ITER98y2 baseline at the solved heating power.
     """
     scaling = _get_confinement_scaling(energy_confinement_scaling)
 
@@ -178,6 +187,8 @@ def solve_energy_confinement_scaling_for_input_power(
         P_tau = np.inf
 
     tau_E = plasma_stored_energy / P_tau
+    # Report the solved confinement in the common H98 language even when the
+    # requested scaling is not ITER98y2.
     tau_iter98 = _calc_iter98y2_baseline_confinement_time(
         input_power=P_tau,
         average_electron_density=average_electron_density,
@@ -235,8 +246,12 @@ def calc_power_balance_from_input_P_aux(
 
     This helper uses the explicit alpha heating input instead of inferring it
     from total fusion power, so it remains valid for non-DT fuel mixtures.
+    ``required_H98`` is again reported relative to the ITER98y2 baseline at the
+    resulting total heating power.
     """
     P_auxiliary_absorbed = P_auxiliary_launched * fraction_of_external_power_coupled
+    # Form the total heating power directly from the modeled power channels
+    # rather than assuming a DT-specific charged-particle fraction.
     P_in = P_alpha + P_ohmic + P_auxiliary_absorbed
     energy_confinement_time = plasma_stored_energy / np.maximum(P_in, 1e-3)
 

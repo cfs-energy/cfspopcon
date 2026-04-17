@@ -21,11 +21,14 @@ def integrate_profile_over_volume(
 
     Args:
         array_per_m3: a profile of values [units * m^-3]
-        rho: [~] :term:`glossary link<rho>`
+        rho: [~] :term:`glossary link<rho>`. The grid may be nonuniform; the
+            integral follows the caller-supplied knot placement directly.
         plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
 
     Returns:
          volume_integrated_value [units]
     """
+    # Use the explicit rho coordinates so edge-refined profile grids integrate
+    # correctly without assuming uniform spacing.
     result: float = float(np.trapezoid(array_per_m3 * 2.0 * rho, x=rho)) * plasma_volume
     return result

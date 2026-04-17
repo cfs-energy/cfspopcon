@@ -16,38 +16,45 @@ from .coeff_interpolator import CoeffInterpolator
 
 
 class _LazyValueDict(dict):
-    """Dictionary which populates missing values on first access."""
+    """Dictionary that memoizes values loaded on first access.
+
+    AtomicData uses this for datasets, ``ne_tau`` grids, and interpolators so
+    object construction only indexes the RADAS files. The heavier xarray loads
+    and interpolator construction stay deferred until a specific species or
+    charge-state table is actually requested.
+    """
 
     def __init__(self, loader: Callable):
         super().__init__()
         self._loader = loader
 
     def __missing__(self, key):
+        """Populate and cache a missing value via the configured loader."""
         value = self._loader(key)
         self[key] = value
         return value
 
 
 class AtomicData:
-    """A class to manage atomic data for various species, providing facilities for accessing datasets directly or by constructing interpolators for different datasets (i.e. radiated power curves).
+    """Manage RADAS datasets and interpolators for the available species.
 
-    Attributes:
-    - atomic_data_directory (Path): Path to the directory containing atomic data files.
-    - datasets (dict): A dictionary storing the atomic data for different species.
-    - available_species (list): A list of species for which atomic data is available.
-    - coronal_Lz_interpolators (dict): A dictionary of interpolators for coronal Lz values.
-    - coronal_Z_interpolators (dict): A dictionary of interpolators for coronal Z values.
-    - noncoronal_Lz_interpolators (dict): A dictionary of interpolators for non-coronal Lz values.
-    - noncoronal_Z_interpolators (dict): A dictionary of interpolators for non-coronal Z values.
+    The object records which netCDF files are present up front, but it opens
+    each dataset and builds each interpolator lazily. That keeps startup cheap
+    for workflows that only touch a small subset of species or ``ne_tau``
+    slices while preserving the same public access patterns as the eager
+    implementation.
     """
 
     def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:
-        """Initializes the AtomicData object by indexing the atomic data files in the specified directory.
+        """Index the RADAS output directory and initialize the lazy caches.
 
         Parameters:
-        - atomic_data_directory (Path): The path to the directory containing atomic data files.
+        - atomic_data_directory (Path): The path to the directory containing
+          atomic data files.
         """
         self.atomic_data_directory = atomic_data_directory
+        # Keep an index of files up front, then load each dataset/interpolator
+        # only when it is requested by a downstream formula.
         self.atomic_data_files = self.find_atomic_data_files(atomic_data_directory)
         self.datasets: dict[AtomicSpecies, xr.Dataset] = _LazyValueDict(self._load_dataset)
         self.available_species = list(self.atomic_data_files.keys())
@@ -70,12 +77,18 @@ class AtomicData:
 
     @property
     def radas_version(self) -> str:
-        """Return the RADAS version after checking the available datasets."""
+        """Return the aggregate RADAS version string after checking all datasets.
+
+        RADAS stores the version metadata per netCDF file, so this property
+        forces each available species dataset through the lazy loader before it
+        exposes the aggregate version summary.
+        """
         for species in self.available_species:
             _ = self[species]
         return self._radas_version
 
     def _load_dataset(self, species: AtomicSpecies) -> xr.Dataset:
+        """Open, quantify, and version-check the dataset for one species."""
         dataset = xr.open_dataset(self.atomic_data_files[species]).pint.quantify()
         if species not in self._radas_version_checked_species:
             self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
@@ -83,6 +96,7 @@ class AtomicData:
         return dataset
 
     def _get_reference_values(self, species: AtomicSpecies) -> dict[str, Quantity]:
+        """Return the shared normalization references used by interpolators."""
         dataset = self[species]
         return dict(
             reference_electron_density=dataset.reference_electron_density,
@@ -90,24 +104,31 @@ class AtomicData:
         )
 
     def _load_coronal_Lz_interpolator(self, species: AtomicSpecies) -> CoeffInterpolator:
+        """Build the coronal radiated-power interpolator for one species."""
         dataset = self[species]
         return CoeffInterpolator(dataset.coronal_Lz, **self._get_reference_values(species))
 
     def _load_coronal_Z_interpolator(self, species: AtomicSpecies) -> CoeffInterpolator:
+        """Build the coronal mean-charge-state interpolator for one species."""
         dataset = self[species]
         return CoeffInterpolator(dataset.coronal_mean_charge_state, **self._get_reference_values(species))
 
     def _load_species_ne_tau(self, species: AtomicSpecies) -> xr.DataArray:
+        """Extract the supported ``ne_tau`` grid for one species."""
         return self[species]["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify()
 
     def _load_noncoronal_Lz_interpolator(self, key: tuple[AtomicSpecies, float]) -> CoeffInterpolator:
+        """Build the non-coronal radiated-power interpolator for one species and ``ne_tau``."""
         species, ne_tau = key
         dataset = self[species].sel(dim_ne_tau=ne_tau)
+        # ``sel`` can keep a length-1 dimension depending on xarray indexing;
+        # strip it so the interpolator always sees a pure 2D coefficient table.
         if "dim_ne_tau" in dataset.dims:
             dataset = dataset.squeeze(dim="dim_ne_tau")
         return CoeffInterpolator(dataset.equilibrium_Lz, **self._get_reference_values(species))
 
     def _load_noncoronal_Z_interpolator(self, key: tuple[AtomicSpecies, float]) -> CoeffInterpolator:
+        """Build the non-coronal mean-charge-state interpolator for one species and ``ne_tau``."""
         species, ne_tau = key
         dataset = self[species].sel(dim_ne_tau=ne_tau)
         if "dim_ne_tau" in dataset.dims:
@@ -115,22 +136,27 @@ class AtomicData:
         return CoeffInterpolator(dataset.equilibrium_mean_charge_state, **self._get_reference_values(species))
 
     def _check_radas_version(self, test_version: str) -> None:
-        """Checks that the provided test_version matches radas_version (if set).
+        """Fold one dataset's RADAS version into the aggregate version summary.
 
-        If radas_version is not set, sets radas_version = test_version.
-        If a mismatch is found, sets radas_version = UNDEFINED.
+        The first observed version becomes the summary value. Later mismatches
+        raise a warning so callers know the summary is no longer uniform across
+        the loaded files.
         """
         if self._radas_version == "":
             self._radas_version = test_version
         elif self._radas_version != test_version:
             warnings.warn(
-                f"Found multiple radas radas versions ({self._radas_version} != {test_version}) in the requested atomic data. Will set radas_version = UNDEFINED.",
+                f"Found multiple RADAS versions ({self._radas_version} != {test_version}) in the requested atomic data. Retaining the first observed version.",
                 stacklevel=2,
             )
 
     @staticmethod
     def find_atomic_data_files(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, Path]:
-        """Return the available RADAS netCDF files indexed by species."""
+        """Return the available RADAS netCDF files indexed by species.
+
+        This helper only scans the directory structure; it does not open any of
+        the datasets.
+        """
         if not atomic_data_directory.exists():
             raise FileNotFoundError(f"atomic_data_directory ({atomic_data_directory.absolute()}) does not exist.")
 
@@ -257,6 +283,6 @@ class AtomicData:
 
 @Algorithm.register_algorithm(return_keys=["atomic_data", "radas_version"])
 def read_atomic_data(radas_dir: Path) -> tuple[AtomicData, str]:
-    """Construct an AtomicData interface using the atomic data in the specified directory."""
+    """Construct an AtomicData interface and report the checked RADAS version summary."""
     atomic_data = AtomicData(get_item(radas_dir))
     return atomic_data, atomic_data.radas_version
