@@ -51,9 +51,9 @@ class AtomicData:
     def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:
         """Index the RADAS output directory and initialize the lazy caches.
 
-        Parameters:
-        - atomic_data_directory (Path): The path to the directory containing
-          atomic data files.
+        Args:
+            atomic_data_directory: Path to the directory containing RADAS
+                output files.
         """
         self.atomic_data_directory = atomic_data_directory
         # Keep an index of files up front, then load each dataset/interpolator
