@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+from utils.variable_consistency_checker import VariableConsistencyChecker
 
 from cfspopcon import named_options
 from cfspopcon.formulas.impurities.impurity_array_helpers import (
@@ -65,3 +66,9 @@ def test_impurity_array_helpers():
 
     assert np.isclose(ds["array2"].sel(dim_species=AtomicSpecies.Helium).isel(a=0, b=1).item(), 0.1)
     assert np.isclose(ds["array2"].sel(dim_species=AtomicSpecies.Tungsten).isel(a=1, b=1).item(), 0.4)
+
+
+def test_variable_consistency_checker_normalize_description():
+    assert VariableConsistencyChecker.normalize_description("single line") == ["single line"]
+    assert VariableConsistencyChecker.normalize_description("first line\nsecond line") == ["first line", "second line"]
+    assert VariableConsistencyChecker.normalize_description(["first line", "second line"]) == ["first line", "second line"]

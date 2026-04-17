@@ -1078,7 +1078,8 @@ n_points_for_confined_region_profiles:
   - calc_1D_plasma_profiles
 n_sep_ratio:
   default_units: dimensionless
-  description: Ratio of separatrix density to pedestal density.
+  description:
+  - Ratio of separatrix density to pedestal density.
   set_by: []
   used_by:
   - calc_peaked_profiles
@@ -1378,7 +1379,8 @@ peak_pressure:
   used_by: []
 pedestal_width:
   default_units: dimensionless
-  description: Width of the edge pedestal in normalized rho space.
+  description:
+  - Width of the edge pedestal in normalized rho space.
   set_by: []
   used_by:
   - calc_peaked_profiles
@@ -1626,7 +1628,8 @@ reference_ne_tau:
   - calc_edge_impurity_concentration
 required_H98:
   default_units: dimensionless
-  description: Required H98 factor to maintain power balance with a specified P_aux.
+  description:
+  - Required H98 factor to maintain power balance with a specified P_aux.
   set_by:
   - solve_energy_confinement_scaling_for_input_power
   - calc_power_balance_from_input_P_aux
@@ -1883,7 +1886,8 @@ sustainment_power_in_ion_channel:
   used_by: []
 t_sep:
   default_units: kiloelectron_volt
-  description: Electron temperature at the separatrix.
+  description:
+  - Electron temperature at the separatrix.
   set_by: []
   used_by:
   - calc_peaked_profiles
