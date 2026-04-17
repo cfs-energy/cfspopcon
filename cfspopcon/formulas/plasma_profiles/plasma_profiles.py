@@ -7,6 +7,7 @@ from typing import TypeAlias, cast
 import numpy as np
 from numpy.typing import NDArray
 from scipy.optimize import brentq
+
 from ...algorithm_class import Algorithm
 from ...named_options import ProfileForm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
@@ -111,7 +112,7 @@ def calc_peaked_profiles(
         n_sep_ratio=n_sep_ratio,
     )
 
-    if density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch:
+    if ProfileForm.jch in {density_profile_form, temp_profile_form}:
         (
             electron_density_pedestal_peaking,
             ion_density_pedestal_peaking,
@@ -238,7 +239,7 @@ def calc_1D_plasma_profiles(
         :term:`fuel_ion_density_profile` [1e19 m^-3], :term:`electron_temp_profile` [keV],
         :term:`ion_temp_profile` [keV]
     """
-    needs_jch_profiles = density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch
+    needs_jch_profiles = ProfileForm.jch in {density_profile_form, temp_profile_form}
     default_rho_grid = _build_profile_grid(n_points_for_confined_region_profiles)
     # When a JCH branch is requested, expose the edge-refined JCH grid as the
     # public rho coordinate. Other profile families are remapped onto it if
@@ -411,7 +412,7 @@ def calc_jch_pedestal_peaking(
 
     Returns ``NaN`` for branches that are not using ``ProfileForm.jch``.
     """
-    if density_profile_form != ProfileForm.jch and temp_profile_form != ProfileForm.jch:
+    if ProfileForm.jch not in {density_profile_form, temp_profile_form}:
         return np.nan, np.nan, np.nan, np.nan
 
     pedestal_width = float(pedestal_width)
@@ -639,7 +640,7 @@ def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarra
     core_points = npoints - pedestal_points + 1
     rho_core = np.linspace(0.0, rho_ped, num=core_points)
     rho_pedestal = np.linspace(rho_ped, 1.0 - edge_nudge, num=pedestal_points)
-    return cast(FloatArray, np.concatenate((rho_core, rho_pedestal[1:])))
+    return cast("FloatArray", np.concatenate((rho_core, rho_pedestal[1:])))
 
 
 def _remap_profile_onto_grid(
@@ -658,7 +659,7 @@ def _remap_profile_onto_grid(
     if np.allclose(source_rho, target_rho):
         return profile
 
-    remapped_profile = cast(FloatArray, np.interp(target_rho, source_rho, profile))
+    remapped_profile = cast("FloatArray", np.interp(target_rho, source_rho, profile))
     if np.isclose(target_volume_average, 0.0):
         return np.zeros_like(remapped_profile)
 
@@ -833,15 +834,17 @@ def _solve_jch_temperature_pedestal_peaking(
     separatrix_temperature: float,
 ) -> float:
     """Convert a temperature peak-to-average ratio into the JCH peak-to-pedestal ratio."""
-    volume_peaking_function = lambda peak_to_pedestal: _calc_jch_temperature_volume_peaking(
-        volume_average=volume_average,
-        peak_to_pedestal=peak_to_pedestal,
-        rho_core=rho_core,
-        rho_ped=rho_ped,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_temperature=separatrix_temperature,
-    )
+
+    def volume_peaking_function(peak_to_pedestal: float) -> float:
+        return _calc_jch_temperature_volume_peaking(
+            volume_average=volume_average,
+            peak_to_pedestal=peak_to_pedestal,
+            rho_core=rho_core,
+            rho_ped=rho_ped,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_temperature=separatrix_temperature,
+        )
 
     maximum_peak_to_pedestal: float | None = None
     if separatrix_temperature > 0.0:

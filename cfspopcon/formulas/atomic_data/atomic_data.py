@@ -92,7 +92,7 @@ class AtomicData:
 
     def _load_dataset(self, species: AtomicSpecies) -> xr.Dataset:
         """Open, quantify, and version-check the dataset for one species."""
-        dataset = cast(xr.Dataset, xr.open_dataset(self.atomic_data_files[species]).pint.quantify())
+        dataset = cast("xr.Dataset", xr.open_dataset(self.atomic_data_files[species]).pint.quantify())
         if species not in self._radas_version_checked_species:
             self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
             self._radas_version_checked_species.add(species)
@@ -118,7 +118,7 @@ class AtomicData:
 
     def _load_species_ne_tau(self, species: AtomicSpecies) -> xr.DataArray:
         """Extract the supported ``ne_tau`` grid for one species."""
-        return cast(xr.DataArray, self[species]["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify())
+        return cast("xr.DataArray", self[species]["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify())
 
     def _load_noncoronal_Lz_interpolator(self, key: tuple[AtomicSpecies, float]) -> CoeffInterpolator:
         """Build the non-coronal radiated-power interpolator for one species and ``ne_tau``."""

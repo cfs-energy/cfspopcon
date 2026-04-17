@@ -10,8 +10,8 @@ from .switch_confinement_scaling_on_threshold import (
 
 __all__ = [
     "ConfinementScaling",
-    "calc_power_balance_from_input_P_aux",
     "calc_plasma_stored_energy",
+    "calc_power_balance_from_input_P_aux",
     "read_confinement_scalings",
     "solve_energy_confinement_scaling_for_input_power",
     "switch_to_L_mode_confinement_below_threshold",
