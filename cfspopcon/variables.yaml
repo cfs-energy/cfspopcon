@@ -19,6 +19,7 @@ areal_elongation:
   - calc_areal_elongation_from_elongation_at_psi95
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_plasma_volume
@@ -58,6 +59,7 @@ average_electron_density:
   used_by:
   - calc_plasma_stored_energy
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_impurity_charge_state
@@ -115,6 +117,7 @@ average_ion_mass:
   - calc_average_ion_mass
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_alpha_t
@@ -398,14 +401,6 @@ electron_density_peaking:
   used_by:
   - calc_bootstrap_fraction
   - calc_1D_plasma_profiles
-electron_density_pedestal_peaking:
-  default_units: dimensionless
-  description:
-  - Ratio of the peak electron density to the pedestal electron density for JCH
-    profiles. This output is only meaningful when `density_profile_form = jch`.
-  set_by:
-  - calc_peaked_profiles
-  used_by: []
 electron_density_peaking_offset:
   default_units: dimensionless
   description:
@@ -415,6 +410,14 @@ electron_density_peaking_offset:
   used_by:
   - calc_electron_density_peaking
   - calc_peaked_profiles
+electron_density_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak electron density to the pedestal electron density for JCH profiles.
+    This output is only meaningful when `density_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 electron_density_profile:
   default_units: _1e19_per_cubic_metre
   description:
@@ -433,6 +436,14 @@ electron_density_profile:
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
+electron_temp_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak electron temperature to the pedestal electron temperature for
+    JCH profiles. This output is only meaningful when `temp_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 electron_temp_profile:
   default_units: kiloelectron_volt
   description:
@@ -501,6 +512,7 @@ energy_confinement_time:
     steady-state, :math:`\tau_e=W_p / P_in`.
   set_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   used_by:
@@ -564,6 +576,7 @@ fraction_of_external_power_coupled:
   set_by: []
   used_by:
   - calc_auxiliary_power
+  - calc_power_balance_from_input_P_aux
 fraction_of_P_SOL_to_divertor:
   default_units: dimensionless
   description:
@@ -771,14 +784,6 @@ ion_density_peaking:
   used_by:
   - calc_bootstrap_fraction
   - calc_1D_plasma_profiles
-ion_density_pedestal_peaking:
-  default_units: dimensionless
-  description:
-  - Ratio of the peak fuel ion density to the pedestal fuel ion density for JCH
-    profiles. This output is only meaningful when `density_profile_form = jch`.
-  set_by:
-  - calc_peaked_profiles
-  used_by: []
 ion_density_peaking_offset:
   default_units: dimensionless
   description:
@@ -787,6 +792,14 @@ ion_density_peaking_offset:
   used_by:
   - calc_ion_density_peaking
   - calc_peaked_profiles
+ion_density_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak fuel ion density to the pedestal fuel ion density for JCH profiles.
+    This output is only meaningful when `density_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 ion_heat_diffusivity:
   default_units: meter ** 2 / second
   description:
@@ -795,6 +808,14 @@ ion_heat_diffusivity:
   set_by: []
   used_by:
   - calc_power_crossing_separatrix_in_ion_channel
+ion_temp_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak ion temperature to the pedestal ion temperature for JCH profiles.
+    This output is only meaningful when `temp_profile_form = jch`.
+  set_by:
+  - calc_peaked_profiles
+  used_by: []
 ion_temp_profile:
   default_units: kiloelectron_volt
   description:
@@ -910,6 +931,7 @@ magnetic_field_on_axis:
   set_by: []
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_synchrotron_radiation
@@ -938,6 +960,7 @@ major_radius:
   set_by: []
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_plasma_volume
@@ -1026,6 +1049,7 @@ minor_radius:
   set_by:
   - calc_minor_radius_from_inverse_aspect_ratio
   used_by:
+  - calc_power_balance_from_input_P_aux
   - calc_plasma_poloidal_circumference
   - calc_inverse_aspect_ratio
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
@@ -1051,6 +1075,13 @@ n_points_for_confined_region_profiles:
   - The number of points to use for the confined region profiles.
   set_by: []
   used_by:
+  - calc_1D_plasma_profiles
+n_sep_ratio:
+  default_units: dimensionless
+  description: Ratio of separatrix density to pedestal density.
+  set_by: []
+  used_by:
+  - calc_peaked_profiles
   - calc_1D_plasma_profiles
 neoclassical_loop_resistivity:
   default_units: meter * ohm
@@ -1143,6 +1174,7 @@ P_auxiliary_launched:
   set_by:
   - calc_auxiliary_power
   used_by:
+  - calc_power_balance_from_input_P_aux
   - calc_fusion_gain
 P_external:
   default_units: megawatt
@@ -1167,9 +1199,9 @@ P_in:
   - Total input power to the plasma. Sum of ohmic, auxiliary and alpha power.
   set_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
-  - calc_power_balance_from_input_P_aux
   used_by:
   - calc_auxiliary_power
   - switch_to_linearised_ohmic_confinement_below_threshold
@@ -1212,6 +1244,7 @@ P_ohmic:
   - calc_ohmic_power
   used_by:
   - calc_auxiliary_power
+  - calc_power_balance_from_input_P_aux
   - calc_fusion_gain
 P_rad_bremsstrahlung:
   default_units: megawatt
@@ -1315,15 +1348,6 @@ peak_electron_temp:
   - calc_temperature_peaking
   used_by:
   - calc_peak_pressure
-electron_temp_pedestal_peaking:
-  default_units: dimensionless
-  description:
-  - Ratio of the peak electron temperature to the pedestal electron temperature
-    for JCH profiles. This output is only meaningful when `temp_profile_form =
-    jch`.
-  set_by:
-  - calc_peaked_profiles
-  used_by: []
 peak_fuel_ion_density:
   default_units: _1e19_per_cubic_metre
   description:
@@ -1345,14 +1369,6 @@ peak_ion_temp:
   used_by:
   - calc_triple_product
   - calc_peak_pressure
-ion_temp_pedestal_peaking:
-  default_units: dimensionless
-  description:
-  - Ratio of the peak ion temperature to the pedestal ion temperature for JCH
-    profiles. This output is only meaningful when `temp_profile_form = jch`.
-  set_by:
-  - calc_peaked_profiles
-  used_by: []
 peak_pressure:
   default_units: pascal
   description:
@@ -1360,6 +1376,13 @@ peak_pressure:
   set_by:
   - calc_peak_pressure
   used_by: []
+pedestal_width:
+  default_units: dimensionless
+  description: Width of the edge pedestal in normalized rho space.
+  set_by: []
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
 plasma_current:
   default_units: ampere
   description:
@@ -1368,6 +1391,7 @@ plasma_current:
   - calc_plasma_current_from_qstar
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_greenwald_density_limit
@@ -1393,6 +1417,7 @@ plasma_stored_energy:
   - calc_plasma_stored_energy
   used_by:
   - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
 plasma_volume:
@@ -1599,6 +1624,13 @@ reference_ne_tau:
   set_by: []
   used_by:
   - calc_edge_impurity_concentration
+required_H98:
+  default_units: dimensionless
+  description: Required H98 factor to maintain power balance with a specified P_aux.
+  set_by:
+  - solve_energy_confinement_scaling_for_input_power
+  - calc_power_balance_from_input_P_aux
+  used_by: []
 resistive_flux:
   default_units: weber
   description:
@@ -1849,6 +1881,13 @@ sustainment_power_in_ion_channel:
   set_by:
   - calc_power_crossing_separatrix_in_ion_channel
   used_by: []
+t_sep:
+  default_units: kiloelectron_volt
+  description: Electron temperature at the separatrix.
+  set_by: []
+  used_by:
+  - calc_peaked_profiles
+  - calc_1D_plasma_profiles
 target_angle_of_incidence:
   default_units: degree
   description:
@@ -2064,32 +2103,3 @@ z_effective:
   - calc_effective_collisionality
   - calc_peaked_profiles
   - calc_power_crossing_separatrix_in_electron_channel
-
-
-required_H98:
-  description: Required H98 factor to maintain power balance with a specified P_aux.
-  default_units: dimensionless
-  set_by:
-  - calc_power_balance_from_input_P_aux
-  - solve_energy_confinement_scaling_for_input_power
-
-t_sep:
-  description: Electron temperature at the separatrix.
-  default_units: kiloelectron_volt
-  used_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
-
-pedestal_width:
-  description: Width of the edge pedestal in normalized rho space.
-  default_units: dimensionless
-  used_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
-
-n_sep_ratio:
-  description: Ratio of separatrix density to pedestal density.
-  default_units: dimensionless
-  used_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles

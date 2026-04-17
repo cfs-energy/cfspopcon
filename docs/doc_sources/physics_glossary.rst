@@ -119,8 +119,14 @@ Physics Glossary
   electron_density_peaking_offset
     Scalar offset of the electron density peaking relative to the density peaking scaling.
 
+  electron_density_pedestal_peaking
+    Ratio of the peak electron density to the pedestal electron density for JCH profiles. This output is only meaningful when `density_profile_form = jch`.
+
   electron_density_profile
     A 1D profile of the electron density as a function of :math:`\rho_{pol}`.
+
+  electron_temp_pedestal_peaking
+    Ratio of the peak electron temperature to the pedestal electron temperature for JCH profiles. This output is only meaningful when `temp_profile_form = jch`.
 
   electron_temp_profile
     A 1D profile of the electron temperature as a function of :math:`\rho_{pol}`.
@@ -223,8 +229,14 @@ Physics Glossary
   ion_density_peaking_offset
     Scalar offset of the ion density peaking relative to the density peaking scaling.
 
+  ion_density_pedestal_peaking
+    Ratio of the peak fuel ion density to the pedestal fuel ion density for JCH profiles. This output is only meaningful when `density_profile_form = jch`.
+
   ion_heat_diffusivity
     A heat diffusion constant which gives a heat flux corresponding to an ion temperature gradient.
+
+  ion_temp_pedestal_peaking
+    Ratio of the peak ion temperature to the pedestal ion temperature for JCH profiles. This output is only meaningful when `temp_profile_form = jch`.
 
   ion_temp_profile
     A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
@@ -286,6 +298,56 @@ Physics Glossary
 
   n_points_for_confined_region_profiles
     The number of points to use for the confined region profiles.
+
+  n_sep_ratio
+    R
+    a
+    t
+    i
+    o
+     
+    o
+    f
+     
+    s
+    e
+    p
+    a
+    r
+    a
+    t
+    r
+    i
+    x
+     
+    d
+    e
+    n
+    s
+    i
+    t
+    y
+     
+    t
+    o
+     
+    p
+    e
+    d
+    e
+    s
+    t
+    a
+    l
+     
+    d
+    e
+    n
+    s
+    i
+    t
+    y
+    .
 
   neoclassical_loop_resistivity
     Plasma loop neoclassical resistivity.
@@ -383,6 +445,59 @@ Physics Glossary
   peak_pressure
     Peak total pressure in the core.
 
+  pedestal_width
+    W
+    i
+    d
+    t
+    h
+     
+    o
+    f
+     
+    t
+    h
+    e
+     
+    e
+    d
+    g
+    e
+     
+    p
+    e
+    d
+    e
+    s
+    t
+    a
+    l
+     
+    i
+    n
+     
+    n
+    o
+    r
+    m
+    a
+    l
+    i
+    z
+    e
+    d
+     
+    r
+    h
+    o
+     
+    s
+    p
+    a
+    c
+    e
+    .
+
   plasma_current
     Current carried by the plasma :math:`I_p`.
 
@@ -451,6 +566,77 @@ Physics Glossary
 
   reference_ne_tau
     A constant :math:`n_e\tau` (upstream electron density times impurity residence time) used when evaluating the :math:`L_Z` impurity radiation curve.
+
+  required_H98
+    R
+    e
+    q
+    u
+    i
+    r
+    e
+    d
+     
+    H
+    9
+    8
+     
+    f
+    a
+    c
+    t
+    o
+    r
+     
+    t
+    o
+     
+    m
+    a
+    i
+    n
+    t
+    a
+    i
+    n
+     
+    p
+    o
+    w
+    e
+    r
+     
+    b
+    a
+    l
+    a
+    n
+    c
+    e
+     
+    w
+    i
+    t
+    h
+     
+    a
+     
+    s
+    p
+    e
+    c
+    i
+    f
+    i
+    e
+    d
+     
+    P
+    _
+    a
+    u
+    x
+    .
 
   resistive_flux
     Usually this is the magnetic flux induced by the resistance of the plasma. However, given that POPCON calculates this with the empirical :math:`C_E`, it may also hold information about flux induced coupling with the wall. :math:`\psi_{res} = C_E\mu_0R_0I_p`.
@@ -523,6 +709,47 @@ Physics Glossary
 
   sustainment_power_in_ion_channel
     The power in the ion channel required to maintain the ion temperature gradient at the separatrix.
+
+  t_sep
+    E
+    l
+    e
+    c
+    t
+    r
+    o
+    n
+     
+    t
+    e
+    m
+    p
+    e
+    r
+    a
+    t
+    u
+    r
+    e
+     
+    a
+    t
+     
+    t
+    h
+    e
+     
+    s
+    e
+    p
+    a
+    r
+    a
+    t
+    r
+    i
+    x
+    .
 
   target_angle_of_incidence
     Angle of incidence between magnetic field vector and surface normal vector at divertor target.
