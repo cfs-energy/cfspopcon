@@ -9,6 +9,7 @@ from numpy.typing import NDArray
 from scipy.optimize import brentq
 
 from ...algorithm_class import Algorithm
+from ...helpers import get_item
 from ...named_options import ProfileForm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
@@ -112,10 +113,7 @@ def calc_peaked_profiles(
         n_sep_ratio=n_sep_ratio,
     )
 
-    # Keep these comparisons explicit rather than using a set membership check.
-    # ``Algorithm.update_dataset`` can supply 0-D xarray DataArray scalars here,
-    # and those are unhashable.
-    if density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch:  # noqa: PLR1714
+    if ProfileForm.jch in {get_item(density_profile_form), get_item(temp_profile_form)}:
         (
             electron_density_pedestal_peaking,
             ion_density_pedestal_peaking,
@@ -242,7 +240,7 @@ def calc_1D_plasma_profiles(
         :term:`fuel_ion_density_profile` [1e19 m^-3], :term:`electron_temp_profile` [keV],
         :term:`ion_temp_profile` [keV]
     """
-    needs_jch_profiles = density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch  # noqa: PLR1714
+    needs_jch_profiles = ProfileForm.jch in {get_item(density_profile_form), get_item(temp_profile_form)}
     default_rho_grid = _build_profile_grid(n_points_for_confined_region_profiles)
     # When a JCH branch is requested, expose the edge-refined JCH grid as the
     # public rho coordinate. Other profile families are remapped onto it if
@@ -415,7 +413,7 @@ def calc_jch_pedestal_peaking(
 
     Returns ``NaN`` for branches that are not using ``ProfileForm.jch``.
     """
-    if density_profile_form != ProfileForm.jch and temp_profile_form != ProfileForm.jch:  # noqa: PLR1714
+    if ProfileForm.jch not in {get_item(density_profile_form), get_item(temp_profile_form)}:
         return np.nan, np.nan, np.nan, np.nan
 
     pedestal_width = float(pedestal_width)
