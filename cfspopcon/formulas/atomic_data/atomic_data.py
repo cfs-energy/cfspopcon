@@ -3,7 +3,7 @@
 import warnings
 from collections.abc import Callable
 from pathlib import Path
-from typing import Union
+from typing import TypeVar, Union, cast
 
 import numpy as np
 import xarray as xr
@@ -14,8 +14,11 @@ from ...named_options import AtomicSpecies
 from ...unit_handling import Quantity, magnitude_in_units, ureg
 from .coeff_interpolator import CoeffInterpolator
 
+K = TypeVar("K")
+V = TypeVar("V")
 
-class _LazyValueDict(dict):
+
+class _LazyValueDict(dict[K, V]):
     """Dictionary that memoizes values loaded on first access.
 
     AtomicData uses this for datasets, ``ne_tau`` grids, and interpolators so
@@ -24,11 +27,11 @@ class _LazyValueDict(dict):
     charge-state table is actually requested.
     """
 
-    def __init__(self, loader: Callable):
+    def __init__(self, loader: Callable[[K], V]) -> None:
         super().__init__()
         self._loader = loader
 
-    def __missing__(self, key):
+    def __missing__(self, key: K) -> V:
         """Populate and cache a missing value via the configured loader."""
         value = self._loader(key)
         self[key] = value
@@ -89,7 +92,7 @@ class AtomicData:
 
     def _load_dataset(self, species: AtomicSpecies) -> xr.Dataset:
         """Open, quantify, and version-check the dataset for one species."""
-        dataset = xr.open_dataset(self.atomic_data_files[species]).pint.quantify()
+        dataset = cast(xr.Dataset, xr.open_dataset(self.atomic_data_files[species]).pint.quantify())
         if species not in self._radas_version_checked_species:
             self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
             self._radas_version_checked_species.add(species)
@@ -115,7 +118,7 @@ class AtomicData:
 
     def _load_species_ne_tau(self, species: AtomicSpecies) -> xr.DataArray:
         """Extract the supported ``ne_tau`` grid for one species."""
-        return self[species]["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify()
+        return cast(xr.DataArray, self[species]["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify())
 
     def _load_noncoronal_Lz_interpolator(self, key: tuple[AtomicSpecies, float]) -> CoeffInterpolator:
         """Build the non-coronal radiated-power interpolator for one species and ``ne_tau``."""

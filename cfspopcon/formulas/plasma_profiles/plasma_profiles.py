@@ -2,14 +2,19 @@
 
 from bisect import bisect_left
 from collections.abc import Callable
+from typing import TypeAlias, cast
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.optimize import brentq
 from ...algorithm_class import Algorithm
 from ...named_options import ProfileForm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .density_peaking import calc_density_peaking, calc_effective_collisionality
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
+
+FloatArray: TypeAlias = NDArray[np.float64]
+ProfileFamily: TypeAlias = tuple[FloatArray, FloatArray | None, FloatArray | None, FloatArray | None, FloatArray | None]
 
 
 @Algorithm.register_algorithm(
@@ -243,9 +248,7 @@ def calc_1D_plasma_profiles(
         (1.0 - float(pedestal_width)) if needs_jch_profiles else None,
     )
     selected_forms = {density_profile_form, temp_profile_form}
-    family_profiles: dict[ProfileForm, tuple[np.ndarray, np.ndarray | None, np.ndarray | None, np.ndarray | None, np.ndarray | None]] = (
-        dict()
-    )
+    family_profiles: dict[ProfileForm, ProfileFamily] = dict()
 
     # Only build the profile families that were actually requested; mixed-form
     # runs then combine the density branch from one family with the temperature
@@ -277,31 +280,37 @@ def calc_1D_plasma_profiles(
                 rho=default_rho_grid,
             )
 
-            prf_rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile = prf_profiles
+            (
+                prf_rho,
+                prf_electron_density_profile,
+                prf_fuel_ion_density_profile,
+                prf_electron_temp_profile,
+                prf_ion_temp_profile,
+            ) = prf_profiles
             # PRF uses its own construction grid and pedestal assumptions, so in
             # mixed-form cases we remap it onto the common output rho grid
             # rather than letting JCH-specific grid choices perturb the PRF
             # volume averages directly.
-            electron_density_profile = _remap_profile_onto_grid(
-                electron_density_profile,
+            prf_electron_density_profile = _remap_profile_onto_grid(
+                prf_electron_density_profile,
                 prf_rho,
                 rho_grid,
                 target_volume_average=float(average_electron_density),
             )
-            fuel_ion_density_profile = _remap_profile_onto_grid(
-                fuel_ion_density_profile,
+            prf_fuel_ion_density_profile = _remap_profile_onto_grid(
+                prf_fuel_ion_density_profile,
                 prf_rho,
                 rho_grid,
                 target_volume_average=float(average_electron_density * dilution),
             )
-            electron_temp_profile = _remap_profile_onto_grid(
-                electron_temp_profile,
+            prf_electron_temp_profile = _remap_profile_onto_grid(
+                prf_electron_temp_profile,
                 prf_rho,
                 rho_grid,
                 target_volume_average=float(average_electron_temp),
             )
-            ion_temp_profile = _remap_profile_onto_grid(
-                ion_temp_profile,
+            prf_ion_temp_profile = _remap_profile_onto_grid(
+                prf_ion_temp_profile,
                 prf_rho,
                 rho_grid,
                 target_volume_average=float(average_ion_temp),
@@ -310,10 +319,10 @@ def calc_1D_plasma_profiles(
 
             family_profiles[profile_form] = (
                 prf_rho,
-                electron_density_profile,
-                fuel_ion_density_profile,
-                electron_temp_profile,
-                ion_temp_profile,
+                prf_electron_density_profile,
+                prf_fuel_ion_density_profile,
+                prf_electron_temp_profile,
+                prf_ion_temp_profile,
             )
         else:
             family_profiles[profile_form] = calc_jch_profiles(
@@ -332,8 +341,15 @@ def calc_1D_plasma_profiles(
                 rho=rho_grid,
             )
 
-    density_rho, electron_density_profile, fuel_ion_density_profile, _, _ = family_profiles[density_profile_form]
-    temp_rho, _, _, electron_temp_profile, ion_temp_profile = family_profiles[temp_profile_form]
+    density_family = family_profiles[density_profile_form]
+    temp_family = family_profiles[temp_profile_form]
+
+    density_rho = density_family[0]
+    electron_density_profile = density_family[1]
+    fuel_ion_density_profile = density_family[2]
+    temp_rho = temp_family[0]
+    electron_temp_profile = temp_family[3]
+    ion_temp_profile = temp_family[4]
 
     assert np.allclose(density_rho, rho_grid)
     assert np.allclose(temp_rho, rho_grid)
@@ -623,7 +639,7 @@ def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarra
     core_points = npoints - pedestal_points + 1
     rho_core = np.linspace(0.0, rho_ped, num=core_points)
     rho_pedestal = np.linspace(rho_ped, 1.0 - edge_nudge, num=pedestal_points)
-    return np.concatenate((rho_core, rho_pedestal[1:]))
+    return cast(FloatArray, np.concatenate((rho_core, rho_pedestal[1:])))
 
 
 def _remap_profile_onto_grid(
@@ -642,7 +658,7 @@ def _remap_profile_onto_grid(
     if np.allclose(source_rho, target_rho):
         return profile
 
-    remapped_profile = np.interp(target_rho, source_rho, profile)
+    remapped_profile = cast(FloatArray, np.interp(target_rho, source_rho, profile))
     if np.isclose(target_volume_average, 0.0):
         return np.zeros_like(remapped_profile)
 
@@ -1010,28 +1026,10 @@ def calc_jch_profiles(
     rho_core = rho[rho <= rho_ped]
     edge_basis_1, edge_basis_2, edge_integral_1, edge_integral_2 = _calc_jch_edge_integrals(rho, rho_ped, pedestal_width)
 
-    common_density_profile_kwargs = dict(
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
-    )
-    common_temperature_profile_kwargs = dict(
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_temperature=separatrix_temperature,
-    )
-
     electron_density_profile = None
     fuel_ion_density_profile = None
     if electron_density_volume_peaking is not None:
+        assert ion_density_volume_peaking is not None
         electron_density_pedestal_peaking = _solve_jch_density_pedestal_peaking(
             target_volume_peaking=float(electron_density_volume_peaking),
             rho_core=rho_core,
@@ -1051,17 +1049,30 @@ def calc_jch_profiles(
         electron_density_profile = _build_jch_density_profile(
             volume_average=float(average_electron_density),
             peak_to_pedestal=electron_density_pedestal_peaking,
-            **common_density_profile_kwargs,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
         )
         fuel_ion_density_profile = _build_jch_density_profile(
             volume_average=float(average_electron_density * dilution),
             peak_to_pedestal=ion_density_pedestal_peaking,
-            **common_density_profile_kwargs,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
         )
 
     electron_temp_profile = None
     ion_temp_profile = None
     if electron_temp_volume_peaking is not None:
+        assert ion_temp_volume_peaking is not None
         electron_temp_pedestal_peaking = _solve_jch_temperature_pedestal_peaking(
             target_volume_peaking=float(electron_temp_volume_peaking),
             volume_average=float(average_electron_temp),
@@ -1083,12 +1094,24 @@ def calc_jch_profiles(
         electron_temp_profile = _build_jch_temperature_profile(
             volume_average=float(average_electron_temp),
             peak_to_pedestal=electron_temp_pedestal_peaking,
-            **common_temperature_profile_kwargs,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_temperature=separatrix_temperature,
         )
         ion_temp_profile = _build_jch_temperature_profile(
             volume_average=float(average_ion_temp),
             peak_to_pedestal=ion_temp_pedestal_peaking,
-            **common_temperature_profile_kwargs,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_temperature=separatrix_temperature,
         )
 
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile

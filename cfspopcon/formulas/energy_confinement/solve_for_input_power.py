@@ -40,7 +40,7 @@ def _calc_iter98y2_baseline_confinement_time(
     # Avoid passing zero power into a negative input-power exponent.
     clipped_input_power = np.maximum(input_power, 1e-3)
 
-    return (
+    return float(
         scaling.constant
         * plasma_current**scaling.plasma_current_alpha
         * magnetic_field_on_axis**scaling.field_on_axis_alpha
