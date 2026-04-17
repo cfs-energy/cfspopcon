@@ -311,7 +311,21 @@ def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
 
     np.testing.assert_allclose(magnitude_in_units(electron_density_peaking, ureg.dimensionless), electron_density_mag[0] / 20.0, rtol=1e-6)
     np.testing.assert_allclose(magnitude_in_units(ion_density_peaking, ureg.dimensionless), fuel_ion_density_mag[0] / 16.0, rtol=1e-6)
-    np.testing.assert_allclose(magnitude_in_units(electron_density_pedestal_peaking, ureg.dimensionless), electron_density_mag[0] / electron_density_mag[knee_index], rtol=1e-8)
-    np.testing.assert_allclose(magnitude_in_units(ion_density_pedestal_peaking, ureg.dimensionless), fuel_ion_density_mag[0] / fuel_ion_density_mag[knee_index], rtol=1e-8)
-    np.testing.assert_allclose(magnitude_in_units(electron_temp_pedestal_peaking, ureg.dimensionless), electron_temp_mag[0] / electron_temp_mag[knee_index], rtol=1e-8)
-    np.testing.assert_allclose(magnitude_in_units(ion_temp_pedestal_peaking, ureg.dimensionless), ion_temp_mag[0] / ion_temp_mag[knee_index], rtol=1e-8)
+    np.testing.assert_allclose(
+        magnitude_in_units(electron_density_pedestal_peaking, ureg.dimensionless),
+        electron_density_mag[0] / electron_density_mag[knee_index],
+        rtol=1e-8,
+    )
+    np.testing.assert_allclose(
+        magnitude_in_units(ion_density_pedestal_peaking, ureg.dimensionless),
+        fuel_ion_density_mag[0] / fuel_ion_density_mag[knee_index],
+        rtol=1e-8,
+    )
+    np.testing.assert_allclose(
+        magnitude_in_units(electron_temp_pedestal_peaking, ureg.dimensionless),
+        electron_temp_mag[0] / electron_temp_mag[knee_index],
+        rtol=1e-8,
+    )
+    np.testing.assert_allclose(
+        magnitude_in_units(ion_temp_pedestal_peaking, ureg.dimensionless), ion_temp_mag[0] / ion_temp_mag[knee_index], rtol=1e-8
+    )
