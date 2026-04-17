@@ -1,6 +1,5 @@
 """Routines to calculate the combined electron and ion pressure in the SOL."""
 
-
 import xarray as xr
 
 from ....unit_handling import Quantity

@@ -161,9 +161,7 @@ class Algorithm:
         return cls(wrapped_function, return_keys, name=name if name is not None else func.__name__, skip_registration=skip_registration)
 
     @classmethod
-    def register_algorithm(
-        cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False
-    ) -> GenericFunctionType:
+    def register_algorithm(cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False) -> GenericFunctionType:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""
 
         def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
@@ -184,9 +182,7 @@ class Algorithm:
 
         return cls(do_nothing, return_keys=[], name="empty", skip_registration=True)
 
-    def validate_inputs(
-        self, configuration: dict | xr.Dataset, quiet: bool = False, raise_error_on_missing_inputs: bool = False
-    ) -> bool:
+    def validate_inputs(self, configuration: dict | xr.Dataset, quiet: bool = False, raise_error_on_missing_inputs: bool = False) -> bool:
         """Check that all required inputs are defined, and warn if inputs are unused."""
         return _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
 

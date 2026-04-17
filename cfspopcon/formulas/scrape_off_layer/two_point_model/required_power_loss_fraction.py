@@ -1,6 +1,5 @@
 """Calculate the SOL power loss fraction required to achieve a specified target electron temperature."""
 
-
 import numpy as np
 import xarray as xr
 

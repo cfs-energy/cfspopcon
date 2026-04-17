@@ -1,6 +1,5 @@
 """Compute all terms in the two-point-model for a fixed SOL power loss fraction."""
 
-
 import numpy as np
 import xarray as xr
 

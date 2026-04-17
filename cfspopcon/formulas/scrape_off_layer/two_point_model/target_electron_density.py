@@ -1,6 +1,5 @@
 """Routines to calculate the target electron density, following the 2-point-model method of Stangeby, PPCF 2018."""
 
-
 import xarray as xr
 
 from ....unit_handling import Quantity

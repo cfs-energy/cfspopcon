@@ -1,6 +1,5 @@
 """Routines to calculate the upstream electron temperature."""
 
-
 import xarray as xr
 
 from ...algorithm_class import Algorithm

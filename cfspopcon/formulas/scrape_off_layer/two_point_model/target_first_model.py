@@ -1,6 +1,5 @@
 """Compute all terms in the two-point-model for a fixed target electron temperature."""
 
-
 import xarray as xr
 
 from ....named_options import MomentumLossFunction

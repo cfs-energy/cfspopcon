@@ -1,6 +1,5 @@
 """Algorithms for different formulations of the extended two point model."""
 
-
 import xarray as xr
 
 from ....algorithm_class import Algorithm
