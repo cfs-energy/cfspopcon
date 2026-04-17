@@ -112,7 +112,10 @@ def calc_peaked_profiles(
         n_sep_ratio=n_sep_ratio,
     )
 
-    if ProfileForm.jch in {density_profile_form, temp_profile_form}:
+    # Keep these comparisons explicit rather than using a set membership check.
+    # ``Algorithm.update_dataset`` can supply 0-D xarray DataArray scalars here,
+    # and those are unhashable.
+    if density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch:  # noqa: PLR1714
         (
             electron_density_pedestal_peaking,
             ion_density_pedestal_peaking,
@@ -239,7 +242,7 @@ def calc_1D_plasma_profiles(
         :term:`fuel_ion_density_profile` [1e19 m^-3], :term:`electron_temp_profile` [keV],
         :term:`ion_temp_profile` [keV]
     """
-    needs_jch_profiles = ProfileForm.jch in {density_profile_form, temp_profile_form}
+    needs_jch_profiles = density_profile_form == ProfileForm.jch or temp_profile_form == ProfileForm.jch  # noqa: PLR1714
     default_rho_grid = _build_profile_grid(n_points_for_confined_region_profiles)
     # When a JCH branch is requested, expose the edge-refined JCH grid as the
     # public rho coordinate. Other profile families are remapped onto it if
@@ -412,7 +415,7 @@ def calc_jch_pedestal_peaking(
 
     Returns ``NaN`` for branches that are not using ``ProfileForm.jch``.
     """
-    if ProfileForm.jch not in {density_profile_form, temp_profile_form}:
+    if density_profile_form != ProfileForm.jch and temp_profile_form != ProfileForm.jch:  # noqa: PLR1714
         return np.nan, np.nan, np.nan, np.nan
 
     pedestal_width = float(pedestal_width)
