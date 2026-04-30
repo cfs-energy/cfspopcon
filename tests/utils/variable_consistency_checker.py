@@ -39,8 +39,8 @@ class VariableConsistencyChecker:
 
         # Define patterns for identifying blank lines, keys and descriptions.
         pattern_for_key = re.compile(r"^\s{2}\S+\s*$")
-        pattern_for_description = re.compile(r"^\s{4}\S.+")
-        pattern_for_blank = re.compile(r"^\s*$")
+        pattern_for_description = re.compile(r"^\s{4}.*$")
+        pattern_for_blank = re.compile(r"^$")
 
         # Store the results in a dictionary
         glossary: dict[str, list[str]] = dict()
@@ -98,6 +98,24 @@ class VariableConsistencyChecker:
 
         return variables_dict, set(variables_dict.keys())
 
+    @staticmethod
+    def normalize_description(description: str | list[str]) -> list[str]:
+        """Normalize a variable description into a list of glossary lines.
+
+        ``variables.yaml`` historically contains a mix of plain strings and
+        explicit line lists. The glossary writer expects a list, so string
+        descriptions must be wrapped as single entries rather than iterated
+        character-by-character.
+        """
+        if isinstance(description, str):
+            return description.splitlines() or [description]
+
+        normalized_description: list[str] = []
+        for line in description:
+            normalized_description.extend(line.splitlines() or [line])
+
+        return normalized_description
+
     def run(self, apply_changes: bool = True) -> None:  # noqa: PLR0912, PLR0915
         """Check the files and, if apply_changes = True, modify the files in place."""
         success = True
@@ -153,7 +171,7 @@ class VariableConsistencyChecker:
                 default_units = self.variables_dict[key]["default_units"]
                 if default_units is not None:
                     default_units = str(Quantity(1.0, default_units).units)
-                description = self.variables_dict[key]["description"]
+                description = self.normalize_description(self.variables_dict[key]["description"])
                 if key not in self.glossary:
                     print(f"Adding description for '{key}'.{linebreak}New: '{description}'.{linebreak}")
                 elif not (description == self.glossary[key]):
@@ -204,8 +222,8 @@ class VariableConsistencyChecker:
                 for line in description:
                     glossary_text += [f"    {line}"]
 
-                with as_file(files("cfspopcon").parents[0] / "docs" / "doc_sources" / "physics_glossary.rst") as filepath:  # type:ignore[attr-defined]
-                    filepath.write_text("\n".join(glossary_text))
+            with as_file(files("cfspopcon").parents[0] / "docs" / "doc_sources" / "physics_glossary.rst") as filepath:  # type:ignore[attr-defined]
+                filepath.write_text("\n".join(glossary_text))
 
         exit(0) if success else exit(1)
 

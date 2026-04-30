@@ -8,6 +8,7 @@ class ProfileForm(Enum):
 
     analytic = auto()
     prf = auto()
+    jch = auto()
 
 
 class RadiationMethod(Enum):

@@ -25,12 +25,12 @@ def test_switch_to_L_mode_confinement_below_threshold():
 
     read_confinement_scalings()
 
-    tau_E_H_mode, P_in_H_mode = solve_energy_confinement_scaling_for_input_power(
+    tau_E_H_mode, P_in_H_mode, _ = solve_energy_confinement_scaling_for_input_power(
         **kwargs,
         energy_confinement_scaling="ITER98y2",
     )
 
-    tau_E_L_mode, _ = solve_energy_confinement_scaling_for_input_power(
+    tau_E_L_mode, _, _ = solve_energy_confinement_scaling_for_input_power(
         **kwargs,
         energy_confinement_scaling="ITER89P",
     )

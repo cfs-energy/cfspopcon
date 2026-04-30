@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+from utils.variable_consistency_checker import VariableConsistencyChecker
 
 from cfspopcon import named_options
 from cfspopcon.formulas.impurities.impurity_array_helpers import (
@@ -17,6 +18,7 @@ from cfspopcon.named_options import AtomicSpecies
 def test_convert_named_options():
     for val, key in (
         (named_options.ProfileForm.analytic, "density_profile_form"),
+        (named_options.ProfileForm.jch, "temp_profile_form"),
         (named_options.RadiationMethod.Radas, "radiated_power_method"),
         (named_options.AtomicSpecies.Neon, "edge_impurity_species"),
         (named_options.AtomicSpecies.Xenon, "core_impurity_species"),
@@ -64,3 +66,9 @@ def test_impurity_array_helpers():
 
     assert np.isclose(ds["array2"].sel(dim_species=AtomicSpecies.Helium).isel(a=0, b=1).item(), 0.1)
     assert np.isclose(ds["array2"].sel(dim_species=AtomicSpecies.Tungsten).isel(a=1, b=1).item(), 0.4)
+
+
+def test_variable_consistency_checker_normalize_description():
+    assert VariableConsistencyChecker.normalize_description("single line") == ["single line"]
+    assert VariableConsistencyChecker.normalize_description("first line\nsecond line") == ["first line", "second line"]
+    assert VariableConsistencyChecker.normalize_description(["first line", "second line"]) == ["first line", "second line"]

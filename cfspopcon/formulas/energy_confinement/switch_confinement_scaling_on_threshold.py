@@ -47,7 +47,7 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
     Returns:
         :term:`energy_confinement_time`, :term:`P_in`, :term:`SOC_LOC_ratio`
     """
-    tau_e_LOC, P_in_LOC = solve_energy_confinement_scaling_for_input_power(
+    tau_e_LOC, P_in_LOC, _ = solve_energy_confinement_scaling_for_input_power(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,
@@ -116,7 +116,7 @@ def switch_to_L_mode_confinement_below_threshold(
     Returns:
         :term:`energy_confinement_time`, :term:`P_in`
     """
-    tau_e_L_mode, P_in_L_mode = solve_energy_confinement_scaling_for_input_power(
+    tau_e_L_mode, P_in_L_mode, _ = solve_energy_confinement_scaling_for_input_power(
         confinement_time_scalar=confinement_time_scalar,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,

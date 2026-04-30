@@ -119,8 +119,14 @@ Physics Glossary
   electron_density_peaking_offset
     Scalar offset of the electron density peaking relative to the density peaking scaling.
 
+  electron_density_pedestal_peaking
+    Ratio of the peak electron density to the pedestal electron density for JCH profiles. This output is only meaningful when `density_profile_form = jch`.
+
   electron_density_profile
     A 1D profile of the electron density as a function of :math:`\rho_{pol}`.
+
+  electron_temp_pedestal_peaking
+    Ratio of the peak electron temperature to the pedestal electron temperature for JCH profiles. This output is only meaningful when `temp_profile_form = jch`.
 
   electron_temp_profile
     A 1D profile of the electron temperature as a function of :math:`\rho_{pol}`.
@@ -223,8 +229,14 @@ Physics Glossary
   ion_density_peaking_offset
     Scalar offset of the ion density peaking relative to the density peaking scaling.
 
+  ion_density_pedestal_peaking
+    Ratio of the peak fuel ion density to the pedestal fuel ion density for JCH profiles. This output is only meaningful when `density_profile_form = jch`.
+
   ion_heat_diffusivity
     A heat diffusion constant which gives a heat flux corresponding to an ion temperature gradient.
+
+  ion_temp_pedestal_peaking
+    Ratio of the peak ion temperature to the pedestal ion temperature for JCH profiles. This output is only meaningful when `temp_profile_form = jch`.
 
   ion_temp_profile
     A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
@@ -286,6 +298,9 @@ Physics Glossary
 
   n_points_for_confined_region_profiles
     The number of points to use for the confined region profiles.
+
+  n_sep_ratio
+    Ratio of separatrix density to pedestal density.
 
   neoclassical_loop_resistivity
     Plasma loop neoclassical resistivity.
@@ -383,6 +398,9 @@ Physics Glossary
   peak_pressure
     Peak total pressure in the core.
 
+  pedestal_width
+    Width of the edge pedestal in normalized rho space.
+
   plasma_current
     Current carried by the plasma :math:`I_p`.
 
@@ -451,6 +469,9 @@ Physics Glossary
 
   reference_ne_tau
     A constant :math:`n_e\tau` (upstream electron density times impurity residence time) used when evaluating the :math:`L_Z` impurity radiation curve.
+
+  required_H98
+    Required H98 factor to maintain power balance with a specified P_aux.
 
   resistive_flux
     Usually this is the magnetic flux induced by the resistance of the plasma. However, given that POPCON calculates this with the empirical :math:`C_E`, it may also hold information about flux induced coupling with the wall. :math:`\psi_{res} = C_E\mu_0R_0I_p`.
@@ -523,6 +544,9 @@ Physics Glossary
 
   sustainment_power_in_ion_channel
     The power in the ion channel required to maintain the ion temperature gradient at the separatrix.
+
+  t_sep
+    Electron temperature at the separatrix.
 
   target_angle_of_incidence
     Angle of incidence between magnetic field vector and surface normal vector at divertor target.
