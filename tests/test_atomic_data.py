@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 import pytest
 
-from cfspopcon.formulas.atomic_data import AtomicData
+from cfspopcon.formulas.atomic_data import AtomicData, CoeffInterpolator
 from cfspopcon.named_options import AtomicSpecies
 from cfspopcon.unit_handling import magnitude_in_units, dimensionless_magnitude, Quantity, ureg
 
@@ -114,6 +114,19 @@ def test_eval_interpolator(atomic_data):
     vector_eval = interpolator.vector_eval(test_electron_density * ones, test_electron_temp * ones)
 
     assert np.allclose(magnitude_in_units(vector_eval, interpolator.units), magnitude_in_units(scalar_eval, interpolator.units))
+
+
+def test_mixed_zero_and_positive_coefficients_raise():
+    coeff = xr.DataArray(
+        [[0.0, 1.0, 2.0, 3.0], [0.5, 1.5, 2.5, 3.5], [1.0, 2.0, 3.0, 4.0], [1.5, 2.5, 3.5, 4.5]],
+        coords=dict(
+            dim_electron_temp=[1.0, 2.0, 3.0, 4.0],
+            dim_electron_density=[1.0, 2.0, 3.0, 4.0],
+        ),
+    )
+
+    with pytest.raises(ValueError, match="mix of null and positive values"):
+        CoeffInterpolator(coeff)
 
 
 @pytest.mark.parametrize("species", ["helium", AtomicSpecies.Nitrogen], ids=["str", "AtomicSpecies"])
