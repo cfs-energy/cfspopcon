@@ -48,7 +48,6 @@ ____________________________________________________________________
 import warnings
 from functools import cache
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -86,11 +85,11 @@ def evaluate_density_and_temperature_profile_fits(
     n_avol: float,
     temperature_peaking: float,
     nu_n: float,
+    rho: np.ndarray,
     aLT: float = 2.0,
     width_ped: float = 0.05,
-    rho: Optional[np.ndarray] = None,
     dataset: str = "PRF",
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:  # TODO: fill out docstring
+) -> tuple[np.ndarray, np.ndarray]:  # TODO: fill out docstring
     """Evaluate temperature-density profile fits."""
     # ---- Get interpolator functions corresponding to this dataset
     width_interpolator = get_df_interpolator(dataset=dataset, df_name="width")
@@ -101,29 +100,26 @@ def evaluate_density_and_temperature_profile_fits(
     aLn = aLT_interpolator(x_a, nu_n)[0]  # type: ignore[arg-type]
 
     # ---- Evaluate profiles
-    x, T, _ = evaluate_profile(T_avol, width_ped=width_ped, aLT_core=aLT, width_axis=x_a, rho=rho)
-    x, n, _ = evaluate_profile(n_avol, width_ped=width_ped, aLT_core=aLn, width_axis=x_a, rho=rho)
+    T, _ = evaluate_profile(T_avol, width_ped=width_ped, aLT_core=aLT, width_axis=x_a, rho=rho)
+    n, _ = evaluate_profile(n_avol, width_ped=width_ped, aLT_core=aLn, width_axis=x_a, rho=rho)
 
-    return x, T, n
+    return T, n
 
 
 def evaluate_profile(
     Tavol: float,
     aLT_core: float,
     width_axis: float,
+    rho: np.ndarray,
     width_ped: float = 0.05,
-    rho: Optional[np.ndarray] = None,
-) -> tuple[np.ndarray, np.ndarray, float]:
+) -> tuple[np.ndarray, float]:
     r"""This function generates a profile from :math:`\langle T \rangle`, aLT and :math:`x_a`.
 
     Example:
             x, T, temperature_peaking = evaluate_profile(7.6, 2.0, 0.2)
     """
     # ~~~~ Grid
-    if rho is None:
-        x = np.linspace(0.0, 1.0, 100)
-    else:
-        x = rho
+    x = rho
 
     ix_c = np.argmin(np.abs(x - (1 - width_ped)))  # Extend of core
     ix_a = np.min([ix_c, np.argmin(np.abs(x - width_axis))])  # Extend of axis
@@ -185,7 +181,7 @@ def evaluate_profile(
     else:
         peaking = float(T[0] / Tavol)
 
-    return x, T, peaking
+    return T, peaking
 
 
 def load_metadata(dataset: str) -> dict[str, str]:
