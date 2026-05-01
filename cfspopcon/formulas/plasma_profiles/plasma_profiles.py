@@ -1,6 +1,5 @@
 """Estimate 1D plasma profiles of density and temperature."""
 
-
 import numpy as np
 import xarray as xr
 
@@ -8,15 +7,16 @@ from ...algorithm_class import Algorithm, CompositeAlgorithm
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
 
 
-@Algorithm.register_algorithm(
-    return_keys=["rho"]
-)
+@Algorithm.register_algorithm(return_keys=["rho"])
 def define_radial_grid(n_points_for_confined_region_profiles: int = 50) -> np.ndarray:
     """Define the radial grid for profiles."""
     x = np.linspace(0, 1, num=n_points_for_confined_region_profiles, endpoint=False)
     return xr.DataArray(x, coords=dict(dim_rho=x))
 
-@Algorithm.register_algorithm(return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"])
+
+@Algorithm.register_algorithm(
+    return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
+)
 def calc_analytic_profiles(
     rho: np.ndarray,
     average_electron_density: float,
@@ -51,7 +51,10 @@ def calc_analytic_profiles(
 
     return electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 
-@Algorithm.register_algorithm(return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"])
+
+@Algorithm.register_algorithm(
+    return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
+)
 def calc_prf_profiles(
     rho: np.ndarray,
     average_electron_density: float,
@@ -81,19 +84,19 @@ def calc_prf_profiles(
     """
     electron_temp_profile, electron_density_profile = evaluate_density_and_temperature_profile_fits(
         rho=rho,
-        T_avol = average_electron_temp,
-        n_avol = average_electron_density,
-        temperature_peaking = temperature_peaking,
-        nu_n = electron_density_peaking,
+        T_avol=average_electron_temp,
+        n_avol=average_electron_density,
+        temperature_peaking=temperature_peaking,
+        nu_n=electron_density_peaking,
         aLT=normalized_inverse_temp_scale_length,
         dataset="PRF",
     )
     ion_temp_profile, fuel_ion_density_profile = evaluate_density_and_temperature_profile_fits(
         rho=rho,
-        T_avol = average_ion_temp,
-        n_avol = average_electron_density * dilution,
-        temperature_peaking = temperature_peaking,
-        nu_n = ion_density_peaking,
+        T_avol=average_ion_temp,
+        n_avol=average_electron_density * dilution,
+        temperature_peaking=temperature_peaking,
+        nu_n=ion_density_peaking,
         aLT=normalized_inverse_temp_scale_length,
         dataset="PRF",
     )
@@ -103,13 +106,13 @@ def calc_prf_profiles(
 
 calc_peak_electron_temp = Algorithm.from_single_function(
     lambda average_electron_temp, temperature_peaking: average_electron_temp * temperature_peaking,
-    return_keys = ["peak_electron_temp"],
-    name = "calc_peak_electron_temp"
+    return_keys=["peak_electron_temp"],
+    name="calc_peak_electron_temp",
 )
 calc_peak_ion_temp = Algorithm.from_single_function(
     lambda average_ion_temp, temperature_peaking: average_ion_temp * temperature_peaking,
-    return_keys = ["peak_ion_temp"],
-    name = "calc_peak_ion_temp"
+    return_keys=["peak_ion_temp"],
+    name="calc_peak_ion_temp",
 )
 
 calc_peaking_and_analytic_profiles = CompositeAlgorithm(
@@ -146,7 +149,8 @@ calc_peaking_and_prf_profiles = CompositeAlgorithm(
     register=True,
 )
 
+
 @Algorithm.register_algorithm(return_keys=[])
 def calc_peaked_profiles():
-    """Deprecated entry point for setting up profiles.""" #TODO: remove in a later release
+    """Deprecated entry point for setting up profiles."""  # TODO: remove in a later release
     raise NotImplementedError("calc_peaked_profiles is deprecated.")
