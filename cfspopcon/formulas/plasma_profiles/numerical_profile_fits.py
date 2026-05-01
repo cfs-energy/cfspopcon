@@ -54,6 +54,8 @@ import pandas as pd
 import yaml
 from scipy.interpolate import RectBivariateSpline
 
+from ...unit_handling import ureg, wraps_ufunc
+
 # TODO: Replace with importlib.resources
 plasma_profiles_directory = Path(__file__).parent
 
@@ -79,13 +81,30 @@ def get_df_interpolator(dataset: str, df_name: str) -> RectBivariateSpline:
     )
     return interpolator
 
-
+@wraps_ufunc(
+    input_units=dict(
+        rho = ureg.dimensionless,
+        T_avol = ureg.keV,
+        n_avol = ureg.n19,
+        temperature_peaking = ureg.dimensionless,
+        nu_n = ureg.dimensionless,
+        aLT = ureg.dimensionless,
+        width_ped = ureg.dimensionless,
+        dataset = None,
+    ),
+    return_units=dict(
+        temp_profile = ureg.keV,
+        density_profile = ureg.n19
+    ),
+    input_core_dims=[("dim_rho",)] + 7 * [(),],
+    output_core_dims=2*[("dim_rho",)]
+)
 def evaluate_density_and_temperature_profile_fits(
+    rho: np.ndarray,
     T_avol: float,
     n_avol: float,
     temperature_peaking: float,
     nu_n: float,
-    rho: np.ndarray,
     aLT: float = 2.0,
     width_ped: float = 0.05,
     dataset: str = "PRF",

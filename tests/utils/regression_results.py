@@ -7,6 +7,7 @@ import xarray as xr
 
 from cfspopcon.file_io import write_dataset_to_netcdf, write_point_to_file
 from cfspopcon.input_file_handling import read_case
+from cfspopcon.deprecation_handler import handle_deprecated_arguments
 
 CASES_DIR = Path(__file__).parent.parent.parent / "example_cases"
 ALL_CASE_PATHS = list(CASES_DIR.rglob("input.yaml"))
@@ -17,7 +18,9 @@ ALL_CASE_NAMES = [path.parent.relative_to(CASES_DIR).stem for path in ALL_CASE_P
 def update_regression_results_cli() -> None:
     """Run the example cases and save them in tests/regression_results."""
     for case in ALL_CASE_PATHS:
-        input_parameters, algorithm, points, _ = read_case(case)
+        input_parameters, algorithm, points, plots = read_case(case)
+
+        input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
 
         dataset = xr.Dataset(input_parameters)
 

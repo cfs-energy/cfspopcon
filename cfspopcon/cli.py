@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 
 from cfspopcon import file_io
+from cfspopcon.deprecation_handler import handle_deprecated_arguments
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.plotting import make_plot, read_plot_style
 from cfspopcon.unit_handling import UnitStrippedWarning
@@ -61,7 +62,7 @@ def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
         cli_args: command-line arguments, takes precedence over config.
     """
     input_parameters, algorithm, points, plots = read_case(case, cli_args)
-
+    input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
     dataset = xr.Dataset(input_parameters)
 
     algorithm.validate_inputs(dataset)
