@@ -1,6 +1,7 @@
 """Routines to calculate estimate 1D profiles for the confined region."""
 
 from .density_peaking import calc_density_peaking, calc_effective_collisionality, calc_electron_density_peaking, calc_ion_density_peaking
+from .jch_profiles import calc_jch_pedestal_peaking, calc_jch_profiles
 from .plasma_profiles import (
     calc_analytic_profiles,
     calc_peak_electron_temp,
@@ -19,6 +20,8 @@ __all__ = [
     "calc_effective_collisionality",
     "calc_electron_density_peaking",
     "calc_ion_density_peaking",
+    "calc_jch_pedestal_peaking",
+    "calc_jch_profiles",
     "calc_peak_electron_temp",
     "calc_peak_ion_temp",
     "calc_peaked_profiles",
