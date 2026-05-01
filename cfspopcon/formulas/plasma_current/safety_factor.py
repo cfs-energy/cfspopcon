@@ -10,7 +10,7 @@ from ...unit_handling import Unitfull, ureg, wraps_ufunc
 def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, triangularity_psi95: Unitfull) -> Unitfull:
     """Calculate the shaping function.
 
-    Equation A11 from ITER Physics Basis Ch. 1. Eqn. A-11 :cite:`editors_iter_1999`
+    Using formula from "Geometric formulas for system codes including the effect of negative triangularity" (O.Sauter,Fusion Engineering and Design 112 (2016) 633–645).
     See following discussion for how this function is used.
     q_95 = 5 * minor_radius^2 * magnetic_field_on_axis / (R * plasma_current) f_shaping
 
@@ -22,10 +22,14 @@ def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: U
     Returns:
         :term:`f_shaping` [~]
     """
-    return ((1.0 + areal_elongation**2.0 * (1.0 + 2.0 * triangularity_psi95**2.0 - 1.2 * triangularity_psi95**3.0)) / 2.0) * (
-        (1.17 - 0.65 * inverse_aspect_ratio) / (1.0 - inverse_aspect_ratio**2.0) ** 2.0
-    )
+    
+    elongation_term = 1.0 + 1.2 * (areal_elongation - 1.0) + 0.56 * (areal_elongation - 1.0) ** 2.0
+    triangularity_term = 1.0 + 0.09 * triangularity_psi95 + 0.16 * triangularity_psi95**2.0
+    aspect_ratio_term = (1.0 + 0.45 * triangularity_psi95 * inverse_aspect_ratio) / (1.0 - 0.74 * inverse_aspect_ratio)
+    w_07 = 1.0 # for zero squareness plasma
+    squareness_term = 1.0 + 0.55 * (w_07 - 1.0)
 
+    return (4.1 / 5.0) * elongation_term * triangularity_term * aspect_ratio_term * squareness_term
 
 @Algorithm.register_algorithm(return_keys=["plasma_current"])
 @wraps_ufunc(
