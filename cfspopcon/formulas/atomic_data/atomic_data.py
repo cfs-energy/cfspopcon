@@ -3,7 +3,7 @@
 import warnings
 from collections.abc import Callable
 from pathlib import Path
-from typing import TypeVar, Union, cast
+from typing import TypeVar, cast
 
 import numpy as np
 import xarray as xr
