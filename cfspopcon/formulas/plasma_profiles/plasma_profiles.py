@@ -194,12 +194,12 @@ def calc_prf_profiles(
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 
 
-Algorithm.from_single_function(
+calc_peak_electron_temp = Algorithm.from_single_function(
     lambda average_electron_temp, temperature_peaking: average_electron_temp * temperature_peaking,
     return_keys = ["peak_electron_temp"],
     name = "calc_peak_electron_temp"
 )
-Algorithm.from_single_function(
+calc_peak_ion_temp = Algorithm.from_single_function(
     lambda average_ion_temp, temperature_peaking: average_ion_temp * temperature_peaking,
     return_keys = ["peak_ion_temp"],
     name = "calc_peak_ion_temp"
