@@ -12,6 +12,7 @@ from xarray.testing import assert_allclose
 
 from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
+from cfspopcon.deprecation_handler import handle_deprecated_arguments
 
 ignored_variables = ["radas_version"]
 
@@ -20,7 +21,9 @@ ignored_variables = ["radas_version"]
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
 @pytest.mark.filterwarnings("ignore:Not all input parameters were used")
 def test_regression_against_case(case: Path):
-    input_parameters, algorithm, _, _ = read_case(case)
+    input_parameters, algorithm, points, plots = read_case(case)
+    input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
+
     case_name = case.parent.stem
 
     dataset = algorithm.run(**input_parameters).merge(input_parameters)
@@ -45,7 +48,8 @@ def test_regression_against_case(case: Path):
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
 @pytest.mark.filterwarnings("ignore:Not all input parameters were used")
 def test_regression_against_case_with_update(case: Path):
-    input_parameters, algorithm, _, _ = read_case(case)
+    input_parameters, algorithm, points, plots = read_case(case)
+    input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
     case_name = case.parent.stem
 
     dataset = xr.Dataset(input_parameters)
@@ -73,7 +77,8 @@ def test_regression_against_case_with_update(case: Path):
 def test_regression_against_case_with_repeated_update():
     case = CASES_DIR / "SPARC_PRD" / "input.yaml"
 
-    input_parameters, algorithm, _, _ = read_case(case)
+    input_parameters, algorithm, points, plots = read_case(case)
+    input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
     input_parameters["average_electron_density"] = input_parameters["average_electron_density"][::5]
     input_parameters["average_electron_temp"] = input_parameters["average_electron_temp"][::5]
 

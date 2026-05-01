@@ -7,6 +7,7 @@ __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
 from .algorithm_class import Algorithm, CompositeAlgorithm
+from .deprecation_handler import handle_deprecated_arguments
 from .formulas.atomic_data import AtomicData
 from .input_file_handling import process_input_dictionary, read_case
 from .plotting import read_plot_style
@@ -26,6 +27,7 @@ __all__ = [
     "convert_units",
     "file_io",
     "formulas",
+    "handle_deprecated_arguments",
     "magnitude_in_default_units",
     "named_options",
     "process_input_dictionary",
