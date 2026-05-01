@@ -126,7 +126,7 @@ def test_get_functions(atomic_data, species, ne_tau):
 
 
 @pytest.mark.parametrize("species", ["helium", AtomicSpecies.Nitrogen], ids=["str", "AtomicSpecies"])
-@pytest.mark.parametrize("ne_tau", [0.75e17, Quantity(0.05, ureg.ms * ureg.n20)], ids=["float", "Quantity"])
+@pytest.mark.parametrize("ne_tau", [0.75e17, Quantity(0.075, ureg.ms * ureg.n20)], ids=["float", "Quantity"])
 def test_get_functions_with_missing_ne_tau(atomic_data, species, ne_tau):
     with pytest.warns(UserWarning):
         atomic_data.get_noncoronal_Lz_interpolator(species, ne_tau)

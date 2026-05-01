@@ -1064,7 +1064,7 @@
         },
         "radas_version": {
             "attrs": {},
-            "data": "1!1.0.0",
+            "data": "1!1.0.1",
             "dims": []
         },
         "radiated_power_method": {
