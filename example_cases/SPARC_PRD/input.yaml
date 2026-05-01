@@ -27,7 +27,7 @@ algorithms:
   - calc_beta_total
   - calc_beta_normalized
   # Calculate peaked profiles
-  - calc_peaked_profiles
+  - calc_peaking_and_prf_profiles
   # Once we have the profiles, we can then estimate the power
   # radiated from the confined region.
   - calc_intrinsic_radiated_power_from_core
@@ -43,7 +43,7 @@ algorithms:
   # We then recompute the profiles with the dilution due to the
   # core radiator and recompute the profiles.
   - calc_zeff_and_dilution_due_to_impurities
-  - calc_peaked_profiles
+  - calc_peaking_and_prf_profiles
   # We compute the ohmic heating power from the inductive current and
   # loop voltage, and then set P_auxiliary_absorbed = P_in - P_ohmic
   - calc_bootstrap_fraction
@@ -172,9 +172,6 @@ fusion_reaction: DTFusionBoschHale
 # Fraction of fuel ions which are the heavier species
 heavier_fuel_species_fraction: 0.5
 
-# What sort of 1D profiles should be assumed?
-density_profile_form: prf
-temp_profile_form: prf
 # Inverse normalized electron temp scale length a / L_Te = a / (Te / grad(Te))
 normalized_inverse_temp_scale_length: 2.5
 # Offset for the electron density peaking factor
