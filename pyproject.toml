@@ -25,7 +25,7 @@ popcon_algorithms = 'cfspopcon.cli:write_algorithms_yaml'
 python = ">=3.12"
 
 # Synchronized with radas to ensure environment consistency
-radas = "^1!1.0.0"
+radas = "^1!1.0.1"
 numpy = "^2.4.4"
 scipy = "^1.17.1"
 pandas = "^3.0.2"
