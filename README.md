@@ -10,3 +10,9 @@ cfspopcon: 0D Plasma Calculations & Plasma OPerating CONtours
 POPCONs (Plasma OPerating CONtours) is a tool developed to explore the performance and constraints of tokamak designs based on 0D scaling laws, model plasma kinetic profiles, and physics assumptions on the properties and behavior of the core plasma.
 
 All of our documentation is available at [cfspopcon.readthedocs.io](https://cfspopcon.readthedocs.io/en/latest/). There, you can find installation instructions, instructions for how to run `cfsPOPCON` via the command-line-interface and also explanations of the example Jupyter notebooks in [docs/doc_sources](docs/doc_sources).
+
+To re-generate the saved regression reference outputs in `tests/regression_results`, run the existing CLI helper from the repository root:
+
+```bash
+poetry run python tests/utils/regression_results.py
+```
