@@ -82,6 +82,7 @@ filterwarnings = [
 strict = true
 disallow_any_generics = false
 exclude = ['^cfspopcon/plotting/.*\.py$']
+incremental = false
 
 [tool.ruff]
 target-version = "py312"
