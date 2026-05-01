@@ -362,11 +362,6 @@
             "data": 2.67512,
             "dims": []
         },
-        "density_profile_form": {
-            "attrs": {},
-            "data": "prf",
-            "dims": []
-        },
         "dilution": {
             "attrs": {
                 "units": "dimensionless"
@@ -1319,11 +1314,6 @@
                 "units": "gigawatt / meter ** 2"
             },
             "data": 0.412938,
-            "dims": []
-        },
-        "temp_profile_form": {
-            "attrs": {},
-            "data": "prf",
             "dims": []
         },
         "temperature_peaking": {

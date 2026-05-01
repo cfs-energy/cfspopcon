@@ -4,7 +4,7 @@ from enum import Enum, auto
 
 
 class ProfileForm(Enum):
-    """Methods to calculate nT profiles."""
+    """Methods to calculate nT profiles. Deprecated!""" #TODO: remove in future release.
 
     analytic = auto()
     prf = auto()
