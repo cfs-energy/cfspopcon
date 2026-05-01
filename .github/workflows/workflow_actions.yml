@@ -1,9 +1,10 @@
 name: CI/CD Pipeline
 
 on:
+  release:
+    types: [published]
   push:
     branches: [main]
-    tags: ['*']
   pull_request:
     branches: [main]
   workflow_dispatch:
