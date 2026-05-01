@@ -7,7 +7,7 @@ from .plasma_profiles import (
     calc_analytic_profiles,
     calc_peak_electron_temp,
     calc_peak_ion_temp,
-    calc_peaked_profiles,  #deprecated placeholder function
+    calc_peaked_profiles,  # deprecated placeholder function
     calc_peaking_and_analytic_profiles,
     calc_peaking_and_prf_profiles,
     calc_prf_profiles,

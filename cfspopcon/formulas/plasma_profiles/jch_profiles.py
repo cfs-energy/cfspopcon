@@ -10,7 +10,9 @@ from ...algorithm_class import Algorithm
 from ...unit_handling import ureg, magnitude_in_units
 
 
-@Algorithm.register_algorithm(return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"])
+@Algorithm.register_algorithm(
+    return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
+)
 def calc_jch_profiles(
     average_electron_density: float,
     average_electron_temp: float,
@@ -67,28 +69,34 @@ def calc_jch_profiles(
         edge_integral_2=edge_integral_2,
         separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
     )
-    electron_density_profile = _build_jch_density_profile(
-        volume_average=magnitude_in_units(average_electron_density, ureg.n19),
-        peak_to_pedestal=electron_density_pedestal_peaking,
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
-    ) * ureg.n19
-    fuel_ion_density_profile = _build_jch_density_profile(
-        volume_average=magnitude_in_units(average_electron_density * dilution, ureg.n19),
-        peak_to_pedestal=ion_density_pedestal_peaking,
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
-    ) * ureg.n19
+    electron_density_profile = (
+        _build_jch_density_profile(
+            volume_average=magnitude_in_units(average_electron_density, ureg.n19),
+            peak_to_pedestal=electron_density_pedestal_peaking,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
+        )
+        * ureg.n19
+    )
+    fuel_ion_density_profile = (
+        _build_jch_density_profile(
+            volume_average=magnitude_in_units(average_electron_density * dilution, ureg.n19),
+            peak_to_pedestal=ion_density_pedestal_peaking,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_to_pedestal_ratio=separatrix_to_pedestal_ratio,
+        )
+        * ureg.n19
+    )
 
     electron_temp_pedestal_peaking = _solve_jch_temperature_pedestal_peaking(
         target_volume_peaking=magnitude_in_units(electron_temp_peaking, ureg.dimensionless),
@@ -108,32 +116,46 @@ def calc_jch_profiles(
         edge_integral_2=edge_integral_2,
         separatrix_temperature=separatrix_temperature,
     )
-    electron_temp_profile = _build_jch_temperature_profile(
-        volume_average=magnitude_in_units(average_electron_temp, ureg.keV),
-        peak_to_pedestal=electron_temp_pedestal_peaking,
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_temperature=separatrix_temperature,
-    ) * ureg.keV
-    ion_temp_profile = _build_jch_temperature_profile(
-        volume_average=magnitude_in_units(average_ion_temp, ureg.keV),
-        peak_to_pedestal=ion_temp_pedestal_peaking,
-        rho=rho,
-        rho_ped=rho_ped,
-        edge_basis_1=edge_basis_1,
-        edge_basis_2=edge_basis_2,
-        edge_integral_1=edge_integral_1,
-        edge_integral_2=edge_integral_2,
-        separatrix_temperature=separatrix_temperature,
-    ) * ureg.keV
+    electron_temp_profile = (
+        _build_jch_temperature_profile(
+            volume_average=magnitude_in_units(average_electron_temp, ureg.keV),
+            peak_to_pedestal=electron_temp_pedestal_peaking,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_temperature=separatrix_temperature,
+        )
+        * ureg.keV
+    )
+    ion_temp_profile = (
+        _build_jch_temperature_profile(
+            volume_average=magnitude_in_units(average_ion_temp, ureg.keV),
+            peak_to_pedestal=ion_temp_pedestal_peaking,
+            rho=rho,
+            rho_ped=rho_ped,
+            edge_basis_1=edge_basis_1,
+            edge_basis_2=edge_basis_2,
+            edge_integral_1=edge_integral_1,
+            edge_integral_2=edge_integral_2,
+            separatrix_temperature=separatrix_temperature,
+        )
+        * ureg.keV
+    )
 
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 
-@Algorithm.register_algorithm(return_keys=["electron_density_pedestal_peaking", "ion_density_pedestal_peaking", "electron_temp_pedestal_peaking", "ion_temp_pedestal_peaking"])
+
+@Algorithm.register_algorithm(
+    return_keys=[
+        "electron_density_pedestal_peaking",
+        "ion_density_pedestal_peaking",
+        "electron_temp_pedestal_peaking",
+        "ion_temp_pedestal_peaking",
+    ]
+)
 def calc_jch_pedestal_peaking(
     average_electron_temp: float,
     average_ion_temp: float,
@@ -201,10 +223,12 @@ def calc_jch_pedestal_peaking(
         ion_temp_pedestal_peaking,
     )
 
+
 def _calc_jch_core_integral(gradient: float, rho_core: np.ndarray, rho_ped: float) -> float:
     """Integrate a pedestal-normalized exponential core profile over the confined volume."""
     profile = np.exp(gradient * (rho_ped - rho_core))
     return float(np.trapezoid(profile * 2.0 * rho_core, x=rho_core))
+
 
 def _calc_jch_edge_integrals(rho: np.ndarray, rho_ped: float, pedestal_width: float) -> tuple[np.ndarray, np.ndarray, float, float]:
     """Compute the linear pedestal basis functions and their volume integrals.
@@ -222,6 +246,7 @@ def _calc_jch_edge_integrals(rho: np.ndarray, rho_ped: float, pedestal_width: fl
 
     return edge_basis_1, edge_basis_2, edge_integral_1, edge_integral_2
 
+
 def _calc_jch_density_volume_peaking(
     peak_to_pedestal: float,
     rho_core: np.ndarray,
@@ -238,6 +263,7 @@ def _calc_jch_density_volume_peaking(
     gradient = float(np.log(peak_to_pedestal) / rho_ped)
     core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
     return peak_to_pedestal / (core_integral + edge_integral_1 + separatrix_to_pedestal_ratio * edge_integral_2)
+
 
 def _calc_jch_temperature_pedestal_temperature(
     volume_average: float,
@@ -257,6 +283,7 @@ def _calc_jch_temperature_pedestal_temperature(
     gradient = float(np.log(peak_to_pedestal) / rho_ped)
     core_integral = _calc_jch_core_integral(gradient, rho_core, rho_ped)
     return (volume_average - separatrix_temperature * edge_integral_2) / (core_integral + edge_integral_1)
+
 
 def _calc_jch_temperature_volume_peaking(
     volume_average: float,
@@ -278,6 +305,7 @@ def _calc_jch_temperature_volume_peaking(
         separatrix_temperature=separatrix_temperature,
     )
     return peak_to_pedestal * pedestal_temperature / volume_average
+
 
 def _solve_jch_peak_to_pedestal(
     target_volume_peaking: float,
@@ -324,6 +352,7 @@ def _solve_jch_peak_to_pedestal(
         brentq(lambda peak_to_pedestal: volume_peaking_function(peak_to_pedestal) - target_volume_peaking, lower_bound, upper_bound)
     )
 
+
 def _solve_jch_density_pedestal_peaking(
     target_volume_peaking: float,
     rho_core: np.ndarray,
@@ -345,6 +374,7 @@ def _solve_jch_density_pedestal_peaking(
         ),
         quantity_name="density",
     )
+
 
 def _solve_jch_temperature_pedestal_peaking(
     target_volume_peaking: float,
@@ -430,6 +460,7 @@ def _solve_jch_temperature_pedestal_peaking(
         maximum_peak_to_pedestal=maximum_peak_to_pedestal,
     )
 
+
 def _build_jch_density_profile(
     volume_average: float,
     peak_to_pedestal: float,
@@ -458,6 +489,7 @@ def _build_jch_density_profile(
         profile[rho >= rho_ped] = pedestal_value * edge_basis_1 + (pedestal_value * separatrix_to_pedestal_ratio) * edge_basis_2
 
     return profile
+
 
 def _build_jch_temperature_profile(
     volume_average: float,
@@ -499,6 +531,7 @@ def _build_jch_temperature_profile(
 
     return profile
 
+
 def _find_nearest_grid_index(values: np.ndarray, target: float) -> int:
     """Find the nearest point in a sorted grid using a bisection search.
 
@@ -516,6 +549,7 @@ def _find_nearest_grid_index(values: np.ndarray, target: float) -> int:
 
     return insertion_index - 1
 
+
 def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
     """Find the nearest interior point in a sorted grid.
 
@@ -526,6 +560,7 @@ def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
         raise ValueError("JCH profiles require at least three radial grid points to preserve both the axis and separatrix.")
 
     return 1 + _find_nearest_grid_index(values[1:-1], target)
+
 
 def _calc_profile_grid_edge_nudge(npoints: int) -> float:
     """Return the resolution-dependent LCFS offset used to regularize the grid.
@@ -540,6 +575,7 @@ def _calc_profile_grid_edge_nudge(npoints: int) -> float:
     # Choose the endpoint offset so it is one tenth of the induced grid
     # spacing: nudge = 0.1 * drho, drho = (1 - nudge) / (npoints - 1).
     return 0.1 / (npoints - 1 + 0.1)
+
 
 def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarray:
     """Build the radial grid and optionally reserve four points across the pedestal.

@@ -81,23 +81,25 @@ def get_df_interpolator(dataset: str, df_name: str) -> RectBivariateSpline:
     )
     return interpolator
 
+
 @wraps_ufunc(
     input_units=dict(
-        rho = ureg.dimensionless,
-        T_avol = ureg.keV,
-        n_avol = ureg.n19,
-        temperature_peaking = ureg.dimensionless,
-        nu_n = ureg.dimensionless,
-        aLT = ureg.dimensionless,
-        width_ped = ureg.dimensionless,
-        dataset = None,
+        rho=ureg.dimensionless,
+        T_avol=ureg.keV,
+        n_avol=ureg.n19,
+        temperature_peaking=ureg.dimensionless,
+        nu_n=ureg.dimensionless,
+        aLT=ureg.dimensionless,
+        width_ped=ureg.dimensionless,
+        dataset=None,
     ),
-    return_units=dict(
-        temp_profile = ureg.keV,
-        density_profile = ureg.n19
-    ),
-    input_core_dims=[("dim_rho",)] + 7 * [(),],
-    output_core_dims=2*[("dim_rho",)]
+    return_units=dict(temp_profile=ureg.keV, density_profile=ureg.n19),
+    input_core_dims=[("dim_rho",)]
+    + 7
+    * [
+        (),
+    ],
+    output_core_dims=2 * [("dim_rho",)],
 )
 def evaluate_density_and_temperature_profile_fits(
     rho: np.ndarray,

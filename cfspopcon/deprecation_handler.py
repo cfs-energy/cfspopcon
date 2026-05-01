@@ -1,4 +1,5 @@
 """Updates popcon inputs from older versions to be compatible with the latest version."""
+
 import warnings
 from pathlib import Path
 from typing import Any, Union
@@ -7,11 +8,17 @@ from .algorithm_class import Algorithm, CompositeAlgorithm
 from .named_options import ProfileForm
 
 
-def handle_deprecated_arguments(input_parameters: dict[str, Any], algorithm: Union[CompositeAlgorithm, Algorithm], points: dict[str, Any], plots: dict[str, Path]) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
+def handle_deprecated_arguments(
+    input_parameters: dict[str, Any], algorithm: Union[CompositeAlgorithm, Algorithm], points: dict[str, Any], plots: dict[str, Path]
+) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
     """Updates popcon inputs from older versions to be compatible with the latest version."""
     # Handles new way of switching between profile forms
     if ("density_profile_form" in input_parameters) or ("temp_profile_form" in input_parameters):
-        warnings.warn(message="Providing 'density_profile_form' or 'temp_profile_form' is deprecated. Replace 'calc_peaked_profiles' with an algorithm in plasma_profiles such as 'calc_analytic_profiles'.", category=FutureWarning, stacklevel=1)
+        warnings.warn(
+            message="Providing 'density_profile_form' or 'temp_profile_form' is deprecated. Replace 'calc_peaked_profiles' with an algorithm in plasma_profiles such as 'calc_analytic_profiles'.",
+            category=FutureWarning,
+            stacklevel=1,
+        )
 
         for key in ("density_profile_form", "temp_profile_form"):
             if key not in input_parameters:
@@ -32,13 +39,9 @@ def handle_deprecated_arguments(input_parameters: dict[str, Any], algorithm: Uni
         else:
             raise NotImplementedError(f"Cannot handle a profile type of {profile_type}")
 
-        updated_alg_list = [
-            new_alg if alg._name == "calc_peaked_profiles" else alg
-            for alg in algorithm.algorithms
-        ]
+        updated_alg_list = [new_alg if alg._name == "calc_peaked_profiles" else alg for alg in algorithm.algorithms]
         algorithm = CompositeAlgorithm(
             algorithms=updated_alg_list,
         )
-
 
     return input_parameters, algorithm, points, plots
