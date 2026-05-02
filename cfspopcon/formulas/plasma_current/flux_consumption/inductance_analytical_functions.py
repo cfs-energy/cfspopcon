@@ -32,8 +32,8 @@ def calc_fa_Sums_Na(inverse_aspect_ratio: Unitfull, coeffs: dict[str, np.ndarray
     def func2(sqrt_eps: float) -> float:
         return float(np.sum(a[2:] * sqrt_eps**m))
 
-    sum1 = xr.apply_ufunc(func1, dmag(sqrt_aspect_ratio), vectorize=True)  # type:ignore[arg-type]
-    sum2 = xr.apply_ufunc(func2, dmag(sqrt_aspect_ratio), vectorize=True)  # type:ignore[arg-type]
+    sum1 = xr.apply_ufunc(func1, dmag(sqrt_aspect_ratio), vectorize=True)
+    sum2 = xr.apply_ufunc(func2, dmag(sqrt_aspect_ratio), vectorize=True)
 
     return sum1, sum2
 

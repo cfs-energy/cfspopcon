@@ -19,7 +19,7 @@ class CoordinateFormatter:
 
     def __call__(self, mouse_x, mouse_y):  # pragma: nocover
         """Returns a string which gives the field value at the queried mouse position."""
-        lookup = dict(zip(self.array.dims, (mouse_y, mouse_x)))
+        lookup = dict(zip(self.array.dims, (mouse_y, mouse_x), strict=False))
 
         mouse_z = float(self.array.sel(lookup, method="nearest").item())
 

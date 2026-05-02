@@ -1,6 +1,6 @@
 """Lengyel model to compute the edge impurity concentration."""
 
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 import xarray as xr

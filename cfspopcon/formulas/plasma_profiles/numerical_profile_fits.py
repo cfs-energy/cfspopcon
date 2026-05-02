@@ -48,7 +48,6 @@ ____________________________________________________________________
 import warnings
 from functools import cache
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -88,7 +87,7 @@ def evaluate_density_and_temperature_profile_fits(
     nu_n: float,
     aLT: float = 2.0,
     width_ped: float = 0.05,
-    rho: Optional[np.ndarray] = None,
+    rho: np.ndarray | None = None,
     dataset: str = "PRF",
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:  # TODO: fill out docstring
     """Evaluate temperature-density profile fits."""
@@ -112,7 +111,7 @@ def evaluate_profile(
     aLT_core: float,
     width_axis: float,
     width_ped: float = 0.05,
-    rho: Optional[np.ndarray] = None,
+    rho: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, float]:
     r"""This function generates a profile from :math:`\langle T \rangle`, aLT and :math:`x_a`.
 

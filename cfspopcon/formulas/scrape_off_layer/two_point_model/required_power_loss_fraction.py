@@ -1,7 +1,5 @@
 """Calculate the SOL power loss fraction required to achieve a specified target electron temperature."""
 
-from typing import Union
-
 import numpy as np
 import xarray as xr
 
@@ -9,11 +7,11 @@ from ....unit_handling import Quantity
 
 
 def calc_required_SOL_power_loss_fraction(
-    target_electron_temp_basic: Union[Quantity, xr.DataArray],
-    f_other_target_electron_temp: Union[float, xr.DataArray],
-    SOL_momentum_loss_fraction: Union[Quantity, xr.DataArray],
-    required_target_electron_temp: Union[Quantity, xr.DataArray],
-) -> Union[float, xr.DataArray]:
+    target_electron_temp_basic: Quantity | xr.DataArray,
+    f_other_target_electron_temp: float | xr.DataArray,
+    SOL_momentum_loss_fraction: Quantity | xr.DataArray,
+    required_target_electron_temp: Quantity | xr.DataArray,
+) -> float | xr.DataArray:
     """Calculate the SOL radiated power fraction required to reach a desired target electron temperature.
 
     This equation is equation 15 of :cite:`stangeby_2018`, rearranged for $f_{cooling}$.

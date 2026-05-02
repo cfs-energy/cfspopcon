@@ -1,6 +1,6 @@
 """Helper functions for dealing with the arrays of species."""
 
-from typing import Any, Union
+from typing import Any
 
 import xarray as xr
 
@@ -10,8 +10,8 @@ from ...named_options import (
 
 
 def make_impurity_concentration_array(
-    species_list: Union[list[Union[str, AtomicSpecies]], Union[str, AtomicSpecies]],
-    concentrations_list: Union[list[Union[float, xr.DataArray]], Union[float, xr.DataArray]],
+    species_list: list[str | AtomicSpecies] | str | AtomicSpecies,
+    concentrations_list: list[float | xr.DataArray] | float | xr.DataArray,
 ) -> xr.DataArray:
     """Make an xr.DataArray with impurity species and their corresponding concentrations.
 
@@ -21,11 +21,11 @@ def make_impurity_concentration_array(
     if isinstance(species_list, (xr.DataArray)):
         species_list = species_list.values.tolist()
     # Deal with single-value input (not recommended, but avoids a confusing user error)
-    if isinstance(species_list, (str, AtomicSpecies)):
+    if isinstance(species_list, str | AtomicSpecies):
         species_list = [
             species_list,
         ]
-    if isinstance(concentrations_list, (float, xr.DataArray)):
+    if isinstance(concentrations_list, float | xr.DataArray):
         concentrations_list = [
             concentrations_list,
         ]
@@ -34,7 +34,7 @@ def make_impurity_concentration_array(
         raise ValueError(f"Dimension mismatch. Input was species list [{species_list}], concentrations list [{concentrations_list}]")
 
     array = xr.DataArray()
-    for species, concentration in zip(species_list, concentrations_list):
+    for species, concentration in zip(species_list, concentrations_list, strict=False):
         array = extend_impurity_concentration_array(array, species, concentration)
 
     return array
@@ -46,7 +46,7 @@ def make_impurity_concentration_array_from_kwargs(**kwargs: Any) -> xr.DataArray
 
 
 def extend_impurity_concentration_array(
-    array: xr.DataArray, species: Union[str, AtomicSpecies], concentration: Union[float, xr.DataArray]
+    array: xr.DataArray, species: str | AtomicSpecies, concentration: float | xr.DataArray
 ) -> xr.DataArray:
     """Append a new element to the impurity_concentration array.
 

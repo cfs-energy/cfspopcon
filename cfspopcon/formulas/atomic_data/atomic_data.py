@@ -2,7 +2,6 @@
 
 import warnings
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import xarray as xr
@@ -125,7 +124,7 @@ class AtomicData:
         return atomic_data
 
     @staticmethod
-    def key_to_enum(species: Union[str, AtomicSpecies]) -> AtomicSpecies:
+    def key_to_enum(species: str | AtomicSpecies) -> AtomicSpecies:
         """Converts a species identifier to an AtomicSpecies enum.
 
         This method allows for flexible specification of species, accepting either a string (which is then capitalized
@@ -141,7 +140,7 @@ class AtomicData:
             species = AtomicSpecies[species.capitalize()]
         return species
 
-    def __getitem__(self, species: Union[str, AtomicSpecies]) -> xr.Dataset:
+    def __getitem__(self, species: str | AtomicSpecies) -> xr.Dataset:
         """Allows direct access to the atomic data dataset for a given species using dictionary-style indexing.
 
         Parameters:

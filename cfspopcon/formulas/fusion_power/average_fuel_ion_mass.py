@@ -21,9 +21,9 @@ def calc_average_ion_mass(fusion_reaction: str, heavier_fuel_species_fraction: U
     if isinstance(fusion_reaction, xr.DataArray):
         fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
-    if isinstance(reaction, (DTFusionBoschHale, DTFusionHively, DHe3Fusion, pB11Fusion)):
+    if isinstance(reaction, DTFusionBoschHale | DTFusionHively | DHe3Fusion | pB11Fusion):
         return reaction.calc_average_ion_mass(heavier_fuel_species_fraction)
-    elif isinstance(reaction, (DDFusionBoschHale, DDFusionHively)):
+    elif isinstance(reaction, DDFusionBoschHale | DDFusionHively):
         return reaction.calc_average_ion_mass()
     else:
         raise NotImplementedError(f"No implementation for calc_average_ion_mass for {fusion_reaction}")

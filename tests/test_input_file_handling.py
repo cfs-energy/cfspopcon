@@ -4,7 +4,7 @@ import pytest
 import yaml
 
 from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
-from cfspopcon.input_file_handling import read_case, process_input_dictionary
+from cfspopcon.input_file_handling import process_input_dictionary, read_case
 
 
 @pytest.fixture
