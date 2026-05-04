@@ -86,9 +86,6 @@ Physics Glossary
   cylindrical_safety_factor
     Analytical approximation of safety factor at :math:`\rho=0.95` (confusingly, still has some shaping corrections despite being called the 'cylindrical' safety factor).
 
-  density_profile_form
-    A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use for the density profiles.
-
   dilution
     Fuel-species concentration as a fraction of the electron density :math:`n_{DT}/n_e`.
 
@@ -119,8 +116,14 @@ Physics Glossary
   electron_density_peaking_offset
     Scalar offset of the electron density peaking relative to the density peaking scaling.
 
+  electron_density_pedestal_peaking
+    Ratio of the peak electron density to the pedestal electron density.
+
   electron_density_profile
     A 1D profile of the electron density as a function of :math:`\rho_{pol}`.
+
+  electron_temp_pedestal_peaking
+    Ratio of the peak electron temperature to the pedestal electron temperature.
 
   electron_temp_profile
     A 1D profile of the electron temperature as a function of :math:`\rho_{pol}`.
@@ -226,8 +229,14 @@ Physics Glossary
   ion_density_peaking_offset
     Scalar offset of the ion density peaking relative to the density peaking scaling.
 
+  ion_density_pedestal_peaking
+    Ratio of the peak fuel ion density to the pedestal fuel ion density.
+
   ion_heat_diffusivity
     A heat diffusion constant which gives a heat flux corresponding to an ion temperature gradient.
+
+  ion_temp_pedestal_peaking
+    Ratio of the peak ion temperature to the pedestal ion temperature.
 
   ion_temp_profile
     A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
@@ -386,6 +395,9 @@ Physics Glossary
   peak_pressure
     Peak total pressure in the core.
 
+  pedestal_width
+    Width of the edge pedestal in rho space.
+
   plasma_current
     Current carried by the plasma :math:`I_p`.
 
@@ -445,6 +457,9 @@ Physics Glossary
 
   ratio_of_P_SOL_to_P_LI
     The ratio of the power crossing the separatrix to the LI transition threshold power.
+
+  ratio_of_separatrix_to_pedestal_density
+    Ratio of the separatrix electron density to the pedestal electron density :math:`n_{e,sep} / n_{e,ped}`.
 
   reattachment_time
     Time duration for detachment front to reach the target in response to a transient.  Per :cite:`Henderson_2023`
@@ -547,9 +562,6 @@ Physics Glossary
 
   target_q_parallel
     The parallel heat flux density at the divertor target.
-
-  temp_profile_form
-    A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed profile shape we should use for the temperature profiles.
 
   temp_scale_length_ratio
     The ratio of the electron and ion temperature scale lengths at the separatrix :math:`T_i / T_e * \lambda_{T_e} / \lambda_{T_i} = L_{T_e} / L_{T_i}`.

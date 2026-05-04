@@ -77,6 +77,18 @@ class Algorithm:
         """Return a simple string description of the Algorithm."""
         return f"Algorithm: {self._name}"
 
+    def __call__(self, *args: Any, return_labelled_dictionary: bool = False, **kwargs: Any) -> Any:
+        """Allows the instance to be called like a function, delegating to self.run."""
+        result_dict = self._function(*args, **kwargs)
+        if return_labelled_dictionary:
+            return result_dict
+        else:
+            results = tuple(result_dict[key] for key in self.return_keys)
+            if len(results) == 1:
+                return results[0]
+            else:
+                return results
+
     @classmethod
     def _make_run(cls, func: LabelledReturnFunctionType) -> Callable[..., xr.Dataset]:
         """Helper to create the `run()` function with correct doc string.

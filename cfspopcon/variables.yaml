@@ -75,8 +75,17 @@ average_electron_density:
   - calc_ion_density_peaking
   - calc_electron_density_peaking
   - calc_effective_collisionality
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - calc_separatrix_electron_density
@@ -99,8 +108,17 @@ average_electron_temp:
   - calc_average_ion_temp_from_temperature_ratio
   - calc_average_total_pressure
   - calc_effective_collisionality
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peak_electron_temp
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
 average_ion_density:
   default_units: _1e19_per_cubic_metre
@@ -148,8 +166,15 @@ average_ion_temp:
   - calc_beta_toroidal
   - calc_beta_poloidal
   - calc_average_total_pressure
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peak_ion_temp
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
 average_total_pressure:
   default_units: pascal
@@ -205,7 +230,10 @@ beta_toroidal:
   - calc_beta_total
   - calc_ion_density_peaking
   - calc_electron_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
 beta_total:
   default_units: dimensionless
   description:
@@ -319,15 +347,6 @@ cylindrical_safety_factor:
   - calc_internal_inductivity
   - calc_SepOS_ideal_MHD_limit
   - calc_power_crossing_separatrix_in_electron_channel
-density_profile_form:
-  default_units: null
-  description:
-  - A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed
-    profile shape we should use for the density profiles.
-  set_by: []
-  used_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
 dilution:
   default_units: dimensionless
   description:
@@ -336,8 +355,13 @@ dilution:
   - calc_zeff_and_dilution_due_to_impurities
   used_by:
   - calc_ion_density_peaking
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
 edge_collisionality:
   default_units: dimensionless
   description:
@@ -383,7 +407,8 @@ effective_collisionality:
   - Estimate of collisionality used for computing the expected density peaking.
   set_by:
   - calc_effective_collisionality
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_ion_density_peaking
   - calc_electron_density_peaking
@@ -401,10 +426,14 @@ electron_density_peaking:
   - Ratio of the peak ion density to the volume-averaged electron density.
   set_by:
   - calc_electron_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_bootstrap_fraction
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
+  - calc_analytic_profiles
+  - calc_prf_profiles
 electron_density_peaking_offset:
   default_units: dimensionless
   description:
@@ -413,14 +442,25 @@ electron_density_peaking_offset:
   set_by: []
   used_by:
   - calc_electron_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+electron_density_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak electron density to the pedestal electron density.
+  set_by:
+  - calc_jch_pedestal_peaking
+  used_by: []
 electron_density_profile:
   default_units: _1e19_per_cubic_metre
   description:
   - A 1D profile of the electron density as a function of :math:`\rho_{pol}`.
   set_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_bremsstrahlung_radiation
   - calc_P_rad_hydrogen_bremsstrahlung
@@ -432,13 +472,23 @@ electron_density_profile:
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
+electron_temp_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak electron temperature to the pedestal electron temperature.
+  set_by:
+  - calc_jch_pedestal_peaking
+  used_by: []
 electron_temp_profile:
   default_units: kiloelectron_volt
   description:
   - A 1D profile of the electron temperature as a function of :math:`\rho_{pol}`.
   set_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_bremsstrahlung_radiation
   - calc_P_rad_hydrogen_bremsstrahlung
@@ -581,8 +631,11 @@ fuel_ion_density_profile:
   description:
   - A 1D profile of the fuel ion density as a function of :math:`\rho_{pol}`.
   set_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_fusion_power
 fusion_reaction:
@@ -780,10 +833,14 @@ ion_density_peaking:
   - Ratio of the peak ion density to the volume-averaged ion density.
   set_by:
   - calc_ion_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_bootstrap_fraction
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
+  - calc_analytic_profiles
+  - calc_prf_profiles
 ion_density_peaking_offset:
   default_units: dimensionless
   description:
@@ -791,7 +848,15 @@ ion_density_peaking_offset:
   set_by: []
   used_by:
   - calc_ion_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+ion_density_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak fuel ion density to the pedestal fuel ion density.
+  set_by:
+  - calc_jch_pedestal_peaking
+  used_by: []
 ion_heat_diffusivity:
   default_units: meter ** 2 / second
   description:
@@ -800,13 +865,23 @@ ion_heat_diffusivity:
   set_by: []
   used_by:
   - calc_power_crossing_separatrix_in_ion_channel
+ion_temp_pedestal_peaking:
+  default_units: dimensionless
+  description:
+  - Ratio of the peak ion temperature to the pedestal ion temperature.
+  set_by:
+  - calc_jch_pedestal_peaking
+  used_by: []
 ion_temp_profile:
   default_units: kiloelectron_volt
   description:
   - A 1D profile of the ion temperature as a function of :math:`\rho_{pol}`.
   set_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_fusion_power
   - calc_neutron_flux_to_walls
@@ -973,7 +1048,8 @@ major_radius:
   - calc_q_star_from_plasma_current
   - calc_cylindrical_edge_safety_factor
   - calc_effective_collisionality
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   - calc_B_tor_omp
   - calc_parallel_heat_flux_density
   - calc_q_perp
@@ -1060,7 +1136,11 @@ n_points_for_confined_region_profiles:
   - The number of points to use for the confined region profiles.
   set_by: []
   used_by:
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
+  - define_radial_grid
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
 neoclassical_loop_resistivity:
   default_units: meter * ohm
   description:
@@ -1118,8 +1198,8 @@ normalized_inverse_temp_scale_length:
     profiles.
   set_by: []
   used_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_prf_profiles
+  - calc_peaking_and_prf_profiles
 nu_star:
   default_units: dimensionless
   description:
@@ -1318,7 +1398,8 @@ peak_electron_density:
   - Peak electron density
   set_by:
   - calc_electron_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_peak_pressure
 peak_electron_temp:
@@ -1326,7 +1407,9 @@ peak_electron_temp:
   description:
   - Peak electron temperature
   set_by:
-  - calc_peaked_profiles
+  - calc_peak_electron_temp
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
   used_by:
   - calc_peak_pressure
@@ -1337,7 +1420,8 @@ peak_fuel_ion_density:
     electron density).
   set_by:
   - calc_ion_density_peaking
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_triple_product
   - calc_peak_pressure
@@ -1346,7 +1430,9 @@ peak_ion_temp:
   description:
   - Peak ion temperature
   set_by:
-  - calc_peaked_profiles
+  - calc_peak_ion_temp
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
   used_by:
   - calc_triple_product
@@ -1358,6 +1444,14 @@ peak_pressure:
   set_by:
   - calc_peak_pressure
   used_by: []
+pedestal_width:
+  default_units: dimensionless
+  description:
+  - Width of the edge pedestal in rho space.
+  set_by: []
+  used_by:
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
 plasma_current:
   default_units: ampere
   description:
@@ -1577,6 +1671,15 @@ ratio_of_P_SOL_to_P_LI:
   set_by:
   - calc_ratio_P_LI
   used_by: []
+ratio_of_separatrix_to_pedestal_density:
+  default_units: dimensionless
+  description:
+  - Ratio of the separatrix electron density to the pedestal electron density :math:`n_{e,sep}
+    / n_{e,ped}`.
+  set_by: []
+  used_by:
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
 reattachment_time:
   default_units: second
   description:
@@ -1627,8 +1730,10 @@ rho:
   - The square-root of the normalized poloidal flux :math:`\rho_{pol}=\sqrt{\psi_N}`,
     used as a flux surface label.
   set_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - define_radial_grid
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   used_by:
   - calc_fusion_power
   - calc_bremsstrahlung_radiation
@@ -1641,6 +1746,8 @@ rho:
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
+  - calc_analytic_profiles
+  - calc_prf_profiles
 rho_star:
   default_units: dimensionless
   description:
@@ -1686,6 +1793,8 @@ separatrix_electron_temp:
   - calc_edge_impurity_concentration
   - calc_alpha_t
   - calc_edge_collisionality
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
   - calc_poloidal_sound_larmor_radius
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
@@ -1921,15 +2030,6 @@ target_q_parallel:
   - two_point_model_fixed_tet
   used_by:
   - two_point_model_fixed_qpart
-temp_profile_form:
-  default_units: null
-  description:
-  - A :class:`~cfspopcon.named_options.ProfileForm` indicating which sort of assumed
-    profile shape we should use for the temperature profiles.
-  set_by: []
-  used_by:
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
 temp_scale_length_ratio:
   default_units: dimensionless
   description:
@@ -1945,8 +2045,18 @@ temperature_peaking:
   set_by: []
   used_by:
   - calc_bootstrap_fraction
-  - calc_peaked_profiles
-  - calc_1D_plasma_profiles
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
+  - calc_analytic_profiles
+  - calc_prf_profiles
+  - calc_peak_electron_temp
+  - calc_peak_ion_temp
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
+  - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
 toroidal_flux_expansion:
   default_units: dimensionless
@@ -2071,5 +2181,6 @@ z_effective:
   - calc_neoclassical_loop_resistivity
   - calc_current_relaxation_time
   - calc_effective_collisionality
-  - calc_peaked_profiles
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
   - calc_power_crossing_separatrix_in_electron_channel
