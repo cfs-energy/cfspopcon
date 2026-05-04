@@ -16,7 +16,7 @@ from .setup_unit_handling import (
     ureg,
 )
 
-type Unitfull = Quantity | xr.DataArray
+Unitfull = Quantity | xr.DataArray
 
 __all__ = [
     "DimensionalityError",
