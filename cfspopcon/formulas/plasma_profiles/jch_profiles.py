@@ -1,13 +1,18 @@
+"""Implements the profile form developed by Jon Hillesheim, with separate pedestal and core profiles."""
+
 from bisect import bisect_left
 from collections.abc import Callable
 from typing import cast
 
 import numpy as np
 import xarray as xr
+from numpy.typing import NDArray
 from scipy.optimize import brentq
 
 from ...algorithm_class import Algorithm
-from ...unit_handling import ureg, magnitude_in_units
+from ...unit_handling import magnitude_in_units, ureg
+
+type FloatArray = NDArray[np.float64]
 
 
 @Algorithm.register_algorithm(
@@ -438,16 +443,18 @@ def _solve_jch_temperature_pedestal_peaking(
 
         maximum_peak_to_pedestal = float(
             brentq(
-                lambda peak_to_pedestal: _calc_jch_temperature_pedestal_temperature(
-                    volume_average=volume_average,
-                    peak_to_pedestal=peak_to_pedestal,
-                    rho_core=rho_core,
-                    rho_ped=rho_ped,
-                    edge_integral_1=edge_integral_1,
-                    edge_integral_2=edge_integral_2,
-                    separatrix_temperature=separatrix_temperature,
-                )
-                - separatrix_temperature,
+                lambda peak_to_pedestal: (
+                    _calc_jch_temperature_pedestal_temperature(
+                        volume_average=volume_average,
+                        peak_to_pedestal=peak_to_pedestal,
+                        rho_core=rho_core,
+                        rho_ped=rho_ped,
+                        edge_integral_1=edge_integral_1,
+                        edge_integral_2=edge_integral_2,
+                        separatrix_temperature=separatrix_temperature,
+                    )
+                    - separatrix_temperature
+                ),
                 lower_bound,
                 upper_bound,
             )
@@ -601,32 +608,3 @@ def _build_profile_grid(npoints: int, rho_ped: float | None = None) -> np.ndarra
     rho_core = np.linspace(0.0, rho_ped, num=core_points)
     rho_pedestal = np.linspace(rho_ped, 1.0 - edge_nudge, num=pedestal_points)
     return cast("FloatArray", np.concatenate((rho_core, rho_pedestal[1:])))
-
-
-# def _remap_profile_onto_grid(
-#     profile: np.ndarray,
-#     source_rho: np.ndarray,
-#     target_rho: np.ndarray,
-#     target_volume_average: float,
-# ) -> np.ndarray:
-#     """Interpolate a profile onto a new rho grid and renormalize its volume average.
-
-#     Mixed-form runs keep one public ``rho`` output even when different profile
-#     families need different construction grids internally. This helper is what
-#     lets PRF keep its own native construction grid and then move onto the common
-#     output grid without losing the requested volume average.
-#     """
-#     if np.allclose(source_rho, target_rho):
-#         return profile
-
-#     remapped_profile = cast("FloatArray", np.interp(target_rho, source_rho, profile))
-#     if np.isclose(target_volume_average, 0.0):
-#         return np.zeros_like(remapped_profile)
-
-#     # Renormalize with the same cylindrical-volume measure used elsewhere in
-#     # the profile code so the remapped profile still hits the requested average.
-#     remapped_volume_average = float(np.trapezoid(remapped_profile * 2.0 * target_rho, x=target_rho))
-#     if np.isclose(remapped_volume_average, 0.0):
-#         raise ValueError("Cannot renormalize a remapped profile with zero volume average.")
-
-#     return remapped_profile * (target_volume_average / remapped_volume_average)
