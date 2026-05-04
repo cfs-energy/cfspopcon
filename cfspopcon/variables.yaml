@@ -438,9 +438,9 @@ electron_density_peaking_offset:
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
 electron_density_pedestal_peaking:
-  default_units: null
+  default_units: dimensionless
   description:
-  - UNKNOWN. Please add a description and default units for this variable.
+  - Ratio of the peak electron density to the pedestal electron density.
   set_by:
   - calc_jch_pedestal_peaking
   used_by: []
@@ -466,9 +466,9 @@ electron_density_profile:
   - calc_intrinsic_radiated_power_from_core
   - calc_core_seeded_impurity_concentration
 electron_temp_pedestal_peaking:
-  default_units: null
+  default_units: dimensionless
   description:
-  - UNKNOWN. Please add a description and default units for this variable.
+  - Ratio of the peak electron temperature to the pedestal electron temperature.
   set_by:
   - calc_jch_pedestal_peaking
   used_by: []
@@ -830,9 +830,9 @@ ion_density_peaking_offset:
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
 ion_density_pedestal_peaking:
-  default_units: null
+  default_units: dimensionless
   description:
-  - UNKNOWN. Please add a description and default units for this variable.
+  - Ratio of the peak fuel ion density to the pedestal fuel ion density.
   set_by:
   - calc_jch_pedestal_peaking
   used_by: []
@@ -845,9 +845,9 @@ ion_heat_diffusivity:
   used_by:
   - calc_power_crossing_separatrix_in_ion_channel
 ion_temp_pedestal_peaking:
-  default_units: null
+  default_units: dimensionless
   description:
-  - UNKNOWN. Please add a description and default units for this variable.
+  - Ratio of the peak ion temperature to the pedestal ion temperature.
   set_by:
   - calc_jch_pedestal_peaking
   used_by: []
@@ -1116,14 +1116,6 @@ n_points_for_confined_region_profiles:
   - define_radial_grid
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-n_sep_ratio:
-  default_units: null
-  description:
-  - UNKNOWN. Please add a description and default units for this variable.
-  set_by: []
-  used_by:
-  - calc_jch_profiles
-  - calc_jch_pedestal_peaking
 neoclassical_loop_resistivity:
   default_units: meter * ohm
   description:
@@ -1419,9 +1411,9 @@ peak_pressure:
   - calc_peak_pressure
   used_by: []
 pedestal_width:
-  default_units: null
+  default_units: dimensionless
   description:
-  - UNKNOWN. Please add a description and default units for this variable.
+  - Width of the edge pedestal in rho space.
   set_by: []
   used_by:
   - calc_jch_profiles
@@ -1640,6 +1632,15 @@ ratio_of_P_SOL_to_P_LI:
   set_by:
   - calc_ratio_P_LI
   used_by: []
+ratio_of_separatrix_to_pedestal_density:
+  default_units: dimensionless
+  description:
+  - Ratio of the separatrix electron density to the pedestal electron density :math:`n_{e,sep}
+    / n_{e,ped}`.
+  set_by: []
+  used_by:
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
 reattachment_time:
   default_units: second
   description:
@@ -1753,6 +1754,8 @@ separatrix_electron_temp:
   - calc_edge_impurity_concentration
   - calc_alpha_t
   - calc_edge_collisionality
+  - calc_jch_profiles
+  - calc_jch_pedestal_peaking
   - calc_poloidal_sound_larmor_radius
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
@@ -1919,14 +1922,6 @@ sustainment_power_in_ion_channel:
   set_by:
   - calc_power_crossing_separatrix_in_ion_channel
   used_by: []
-t_sep:
-  default_units: null
-  description:
-  - UNKNOWN. Please add a description and default units for this variable.
-  set_by: []
-  used_by:
-  - calc_jch_profiles
-  - calc_jch_pedestal_peaking
 target_angle_of_incidence:
   default_units: degree
   description:
