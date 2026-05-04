@@ -2,15 +2,15 @@
 
 import warnings
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 from .algorithm_class import Algorithm, CompositeAlgorithm
 from .named_options import ProfileForm
 
 
 def handle_deprecated_arguments(
-    input_parameters: dict[str, Any], algorithm: Union[CompositeAlgorithm, Algorithm], points: dict[str, Any], plots: dict[str, Path]
-) -> tuple[dict[str, Any], Union[CompositeAlgorithm, Algorithm], dict[str, Any], dict[str, Path]]:
+    input_parameters: dict[str, Any], algorithm: CompositeAlgorithm | Algorithm, points: dict[str, Any], plots: dict[str, Path]
+) -> tuple[dict[str, Any], CompositeAlgorithm | Algorithm, dict[str, Any], dict[str, Path]]:
     """Updates popcon inputs from older versions to be compatible with the latest version."""
     # Handles new way of switching between profile forms
     if ("density_profile_form" in input_parameters) or ("temp_profile_form" in input_parameters):
