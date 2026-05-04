@@ -47,7 +47,7 @@ def test_wraps_with_too_many_output_units():
     def in_and_out(a):
         return a
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         in_and_out(ureg.Quantity(1.2, ureg.m))
 
 
@@ -95,7 +95,6 @@ def test_multiple_return():
     @wraps_ufunc(
         return_units=dict(b=ureg.m, a=ureg.m),
         input_units=dict(a=ureg.m, b=ureg.m),
-        output_core_dims=[(), ()],
     )
     def swap(a, b):
         return b, a

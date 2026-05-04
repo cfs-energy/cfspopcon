@@ -140,7 +140,6 @@ class DDFusionBoschHale(FusionReaction):
     @wraps_ufunc(
         input_units=dict(ion_temp=ureg.keV),
         return_units=dict(sigmav_combined=ureg.cm**3 / ureg.s, sigmav_DD_to_pT=ureg.cm**3 / ureg.s, sigmav_DD_to_nHe3=ureg.cm**3 / ureg.s),
-        output_core_dims=[(), (), ()],
     )
     def calc_rate_coefficient(ion_temp: float) -> tuple[float, float, float]:
         r"""Calculate :math:`\\langle \\sigma v \rangle` for a given ion temperature.
@@ -269,7 +268,6 @@ class DDFusionHively(DDFusionBoschHale):
     @wraps_ufunc(
         input_units=dict(ion_temp=ureg.keV),
         return_units=dict(sigmav_combined=ureg.cm**3 / ureg.s, sigmav_DD_to_pT=ureg.cm**3 / ureg.s, sigmav_DD_to_nHe3=ureg.cm**3 / ureg.s),
-        output_core_dims=[(), (), ()],
     )
     def calc_rate_coefficient(ion_temp: float) -> tuple[float, float, float]:
         r"""Calculate :math:`\\langle \\sigma v \rangle` for a given ion temperature.

@@ -26,7 +26,6 @@ from .read_energy_confinement_scalings import _get_confinement_scaling
         q_star=ureg.dimensionless,
         energy_confinement_scaling=None,
     ),
-    output_core_dims=2 * [(),]
 )
 def solve_energy_confinement_scaling_for_input_power(
     confinement_time_scalar: float,
