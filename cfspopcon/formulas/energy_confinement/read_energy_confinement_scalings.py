@@ -50,6 +50,7 @@ def read_confinement_scalings() -> None:
     for scaling_name, scaling_data in data.items():
         ConfinementScaling(scaling_name, scaling_data)
 
+
 def _get_confinement_scaling(name: str) -> ConfinementScaling:
     """Return a confinement scaling, loading the shared table on first use.
 

@@ -23,8 +23,11 @@ def calc_auxiliary_power(P_in: Unitfull, P_alpha: Unitfull, P_ohmic: Unitfull, f
 
     return P_external, P_auxiliary_absorbed, P_auxiliary_launched
 
+
 @Algorithm.register_algorithm(return_keys=["P_in", "P_auxiliary_absorbed", "P_external"])
-def calc_input_power_for_fixed_auxiliary_power(P_auxiliary_launched: Unitfull, P_alpha: Unitfull, P_ohmic: Unitfull, fraction_of_external_power_coupled: Unitfull) -> Unitfull:
+def calc_input_power_for_fixed_auxiliary_power(
+    P_auxiliary_launched: Unitfull, P_alpha: Unitfull, P_ohmic: Unitfull, fraction_of_external_power_coupled: Unitfull
+) -> Unitfull:
     """Calculate the total input power for fixed launched auxiliary power.
 
     Args:
