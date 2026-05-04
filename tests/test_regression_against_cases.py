@@ -14,7 +14,18 @@ from cfspopcon.file_io import read_dataset_from_netcdf, write_dataset_to_netcdf
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.deprecation_handler import handle_deprecated_arguments
 
-ignored_variables = ["radas_version"]
+ignored_variables = [
+    "radas_version",
+]
+
+
+def assert_regression_datasets_allclose(dataset: xr.Dataset, reference_dataset: xr.Dataset) -> None:
+    """Compare regression datasets while accepting NaNs in matching locations."""
+    ordered_dims = [dim for dim in reference_dataset.dims]
+    assert_allclose(
+        dataset.transpose(*ordered_dims),
+        reference_dataset.transpose(*ordered_dims),
+    )
 
 
 @pytest.mark.regression
@@ -40,8 +51,7 @@ def test_regression_against_case(case: Path):
         .drop_vars(ignored_variables, errors="ignore")
     )
 
-    ordered_dims = [dim for dim in reference_dataset.dims]
-    assert_allclose(dataset.transpose(*ordered_dims), reference_dataset.transpose(*ordered_dims))
+    assert_regression_datasets_allclose(dataset, reference_dataset)
 
 
 @pytest.mark.regression
@@ -68,8 +78,7 @@ def test_regression_against_case_with_update(case: Path):
         .drop_vars(ignored_variables, errors="ignore")
     )
 
-    ordered_dims = [dim for dim in reference_dataset.dims]
-    assert_allclose(dataset.transpose(*ordered_dims), reference_dataset.transpose(*ordered_dims))
+    assert_regression_datasets_allclose(dataset, reference_dataset)
 
 
 @pytest.mark.regression
@@ -97,8 +106,4 @@ def test_regression_against_case_with_repeated_update():
     # The ordering of the dimensions changes between the runs, and for some reason the automatic
     # xarray broadcasting isn't handling this. Because of this, we manually ensure that the
     # dimension ordering matches.
-    ordered_dims = [dim for dim in first_run.dims]
-    assert_allclose(
-        first_run.transpose(*ordered_dims),
-        second_run.transpose(*ordered_dims),
-    )
+    assert_regression_datasets_allclose(first_run, second_run)
