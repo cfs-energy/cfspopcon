@@ -23,8 +23,8 @@ def test_calc_1d_plasma_profiles_jch_respects_requested_peaking():
         temperature_peaking=2.0,
         dilution=0.8,
         pedestal_width=0.05,
-        t_sep=0.2 * ureg.keV,
-        n_sep_ratio=0.5,
+        separatrix_electron_temp=0.2 * ureg.keV,
+        ratio_of_separatrix_to_pedestal_density=0.5,
     )
 
     rho_mag = magnitude_in_units(rho, ureg.dimensionless)
@@ -61,8 +61,8 @@ def test_calc_1d_plasma_profiles_jch_uses_four_pedestal_points_without_growing_g
         temperature_peaking=2.0,
         dilution=0.8,
         pedestal_width=0.05,
-        t_sep=0.2 * ureg.keV,
-        n_sep_ratio=0.5,
+        separatrix_electron_temp=0.2 * ureg.keV,
+        ratio_of_separatrix_to_pedestal_density=0.5,
     )
 
     rho_mag = np.asarray(magnitude_in_units(rho, ureg.dimensionless))
@@ -99,8 +99,8 @@ def test_calc_1d_plasma_profiles_jch_small_pedestal_keeps_four_edge_points():
         temperature_peaking=2.0,
         dilution=0.8,
         pedestal_width=0.01,
-        t_sep=0.2 * ureg.keV,
-        n_sep_ratio=0.5,
+        separatrix_electron_temp=0.2 * ureg.keV,
+        ratio_of_separatrix_to_pedestal_density=0.5,
     )
 
     rho_mag = np.asarray(magnitude_in_units(rho, ureg.dimensionless))
@@ -160,8 +160,8 @@ def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
     dilution = 0.8 * ureg.dimensionless
     beta_toroidal = 0.02 * ureg.dimensionless
     pedestal_width = 0.05 * ureg.dimensionless
-    t_sep = 0.2 * ureg.keV
-    n_sep_ratio = 0.5 * ureg.dimensionless
+    separatrix_electron_temp = 0.2 * ureg.keV
+    ratio_of_separatrix_to_pedestal_density = 0.5 * ureg.dimensionless
     n_points_for_confined_region_profiles = 50
 
     effective_collisionality = calc_effective_collisionality(
@@ -195,8 +195,8 @@ def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
         temperature_peaking=temperature_peaking,
         dilution=dilution,
         pedestal_width=pedestal_width,
-        t_sep=t_sep,
-        n_sep_ratio=n_sep_ratio,
+        separatrix_electron_temp=separatrix_electron_temp,
+        ratio_of_separatrix_to_pedestal_density=ratio_of_separatrix_to_pedestal_density,
         n_points_for_confined_region_profiles=n_points_for_confined_region_profiles,
     )
 
@@ -212,8 +212,8 @@ def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
             temperature_peaking=temperature_peaking,
             n_points_for_confined_region_profiles=n_points_for_confined_region_profiles,
             pedestal_width=pedestal_width,
-            t_sep=t_sep,
-            n_sep_ratio=n_sep_ratio,
+            separatrix_electron_temp=separatrix_electron_temp,
+            ratio_of_separatrix_to_pedestal_density=ratio_of_separatrix_to_pedestal_density,
         )
     )
 

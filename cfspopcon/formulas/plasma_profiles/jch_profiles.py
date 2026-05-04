@@ -28,8 +28,8 @@ def calc_jch_profiles(
     dilution: float,
     n_points_for_confined_region_profiles: int = 50,
     pedestal_width: float = 0.05 * ureg.dimensionless,
-    t_sep: float = 0.2 * ureg.keV,
-    n_sep_ratio: float = 0.5 * ureg.dimensionless,
+    separatrix_electron_temp: float = 0.2 * ureg.keV,
+    ratio_of_separatrix_to_pedestal_density: float = 0.5 * ureg.dimensionless,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Estimate JCH profiles with an exponential core and linear pedestal handoff.
 
@@ -41,8 +41,8 @@ def calc_jch_profiles(
     """
     n_points = int(n_points_for_confined_region_profiles)
     pedestal_width = magnitude_in_units(pedestal_width, ureg.dimensionless)
-    separatrix_temperature = magnitude_in_units(t_sep, ureg.keV)
-    separatrix_to_pedestal_ratio = magnitude_in_units(n_sep_ratio, ureg.dimensionless)
+    separatrix_temperature = magnitude_in_units(separatrix_electron_temp, ureg.keV)
+    separatrix_to_pedestal_ratio = magnitude_in_units(ratio_of_separatrix_to_pedestal_density, ureg.dimensionless)
 
     if n_points < 3:
         raise ValueError("JCH profiles require at least three radial grid points.")
@@ -169,8 +169,8 @@ def calc_jch_pedestal_peaking(
     temperature_peaking: float,
     n_points_for_confined_region_profiles: int = 50,
     pedestal_width: float = 0.05 * ureg.dimensionless,
-    t_sep: float = 0.2 * ureg.keV,
-    n_sep_ratio: float = 0.5 * ureg.dimensionless,
+    separatrix_electron_temp: float = 0.2 * ureg.keV,
+    ratio_of_separatrix_to_pedestal_density: float = 0.5 * ureg.dimensionless,
 ) -> tuple[float, float, float, float]:
     """Convert volume peaking values into the JCH peak-to-pedestal ratios.
 
@@ -192,7 +192,7 @@ def calc_jch_pedestal_peaking(
         rho_ped=rho_ped,
         edge_integral_1=edge_integral_1,
         edge_integral_2=edge_integral_2,
-        separatrix_to_pedestal_ratio=magnitude_in_units(n_sep_ratio, ureg.dimensionless),
+        separatrix_to_pedestal_ratio=magnitude_in_units(ratio_of_separatrix_to_pedestal_density, ureg.dimensionless),
     )
     ion_density_pedestal_peaking = _solve_jch_density_pedestal_peaking(
         target_volume_peaking=magnitude_in_units(ion_density_peaking, ureg.dimensionless),
@@ -200,7 +200,7 @@ def calc_jch_pedestal_peaking(
         rho_ped=rho_ped,
         edge_integral_1=edge_integral_1,
         edge_integral_2=edge_integral_2,
-        separatrix_to_pedestal_ratio=magnitude_in_units(n_sep_ratio, ureg.dimensionless),
+        separatrix_to_pedestal_ratio=magnitude_in_units(ratio_of_separatrix_to_pedestal_density, ureg.dimensionless),
     )
     electron_temp_pedestal_peaking = _solve_jch_temperature_pedestal_peaking(
         target_volume_peaking=magnitude_in_units(temperature_peaking, ureg.dimensionless),
@@ -209,7 +209,7 @@ def calc_jch_pedestal_peaking(
         rho_ped=rho_ped,
         edge_integral_1=edge_integral_1,
         edge_integral_2=edge_integral_2,
-        separatrix_temperature=magnitude_in_units(t_sep, ureg.keV),
+        separatrix_temperature=magnitude_in_units(separatrix_electron_temp, ureg.keV),
     )
     ion_temp_pedestal_peaking = _solve_jch_temperature_pedestal_peaking(
         target_volume_peaking=magnitude_in_units(temperature_peaking, ureg.dimensionless),
@@ -218,7 +218,7 @@ def calc_jch_pedestal_peaking(
         rho_ped=rho_ped,
         edge_integral_1=edge_integral_1,
         edge_integral_2=edge_integral_2,
-        separatrix_temperature=magnitude_in_units(t_sep, ureg.keV),
+        separatrix_temperature=magnitude_in_units(separatrix_electron_temp, ureg.keV),
     )
 
     return (
