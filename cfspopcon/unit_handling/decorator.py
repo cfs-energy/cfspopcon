@@ -22,7 +22,7 @@ def wraps_ufunc(  # noqa: PLR0915
     pass_as_kwargs: tuple = (),
     #  kwargs for apply_ufunc
     input_core_dims: Sequence[Sequence] | None = None,
-    output_core_dims: Sequence[Sequence] | None = ((),),
+    output_core_dims: Sequence[Sequence] | None = None,
     exclude_dims: Set = frozenset(),
     vectorize: bool = True,
     join: str = "exact",
@@ -48,19 +48,6 @@ def wraps_ufunc(  # noqa: PLR0915
     input_units = _check_units(input_units)
     return_units = _check_units(return_units)
 
-    ufunc_kwargs: dict[str, Any] = dict(
-        input_core_dims=input_core_dims,
-        output_core_dims=output_core_dims,
-        exclude_dims=exclude_dims,
-        vectorize=vectorize,
-        join=join,
-        dataset_join=dataset_join,
-        keep_attrs=keep_attrs,
-        dask=dask,
-        output_dtypes=output_dtypes,
-        output_sizes=output_sizes,
-        dask_gufunc_kwargs=dask_gufunc_kwargs,
-    )
     input_keys = list(input_units.keys())
 
     if not isinstance(pass_as_kwargs, tuple):
@@ -79,6 +66,26 @@ def wraps_ufunc(  # noqa: PLR0915
             )
     else:
         input_core_dims = len(pass_as_positional_args) * [()]
+
+    if output_core_dims is None:
+        if len(return_units) >= 1:
+            output_core_dims = len(return_units) * [()]
+        else:
+            output_core_dims = ((),)
+
+    ufunc_kwargs: dict[str, Any] = dict(
+        input_core_dims=input_core_dims,
+        output_core_dims=output_core_dims,
+        exclude_dims=exclude_dims,
+        vectorize=vectorize,
+        join=join,
+        dataset_join=dataset_join,
+        keep_attrs=keep_attrs,
+        dask=dask,
+        output_dtypes=output_dtypes,
+        output_sizes=output_sizes,
+        dask_gufunc_kwargs=dask_gufunc_kwargs,
+    )
 
     def _wraps_ufunc(func: FunctionType) -> FunctionType:  # noqa: PLR0915
         func_signature = signature(func)
