@@ -180,6 +180,9 @@ Physics Glossary
   greenwald_fraction
     Ratio of the average electron density to the Greenwald density limit :math:`f_{G}=\bar n_e / n_G`.
 
+  H98y2
+    Ratio of energy confinement time to the ITER98y2 scaling
+
   heavier_fuel_species_fraction
     Fraction of fuel ions which are the heavier species. i.e. for DT fusion, this is :math:`f_T = n_T/(n_T+n_D)`.
 

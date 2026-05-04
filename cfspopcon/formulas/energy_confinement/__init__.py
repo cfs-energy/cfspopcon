@@ -1,5 +1,11 @@
 """Interface to different energy confinement scalings and routines to calculate the plasma stored energy."""
 
+from .energy_confinement_time import (
+    calc_energy_confinement_time_from_scaling,
+    calc_energy_confinement_time_from_stored_energy_and_input_power,
+    calc_H98y2,
+    calc_power_balance_from_input_P_aux,
+)
 from .plasma_stored_energy import calc_plasma_stored_energy
 from .read_energy_confinement_scalings import ConfinementScaling, read_confinement_scalings
 from .solve_for_input_power import solve_energy_confinement_scaling_for_input_power
@@ -10,7 +16,11 @@ from .switch_confinement_scaling_on_threshold import (
 
 __all__ = [
     "ConfinementScaling",
+    "calc_H98y2",
+    "calc_energy_confinement_time_from_scaling",
+    "calc_energy_confinement_time_from_stored_energy_and_input_power",
     "calc_plasma_stored_energy",
+    "calc_power_balance_from_input_P_aux",
     "read_confinement_scalings",
     "solve_energy_confinement_scaling_for_input_power",
     "switch_to_L_mode_confinement_below_threshold",
