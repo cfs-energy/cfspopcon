@@ -6,7 +6,7 @@ from cfspopcon.formulas.energy_confinement import (
     calc_energy_confinement_time_from_scaling,
     calc_energy_confinement_time_from_stored_energy_and_input_power,
     calc_H98y2,
-    calc_power_balance_from_input_P_aux
+    calc_power_balance_from_input_P_aux,
 )
 from cfspopcon.formulas.energy_confinement.solve_for_input_power import solve_energy_confinement_scaling_for_input_power
 from cfspopcon.unit_handling import magnitude_in_units, ureg
@@ -30,21 +30,22 @@ def kwargs():
         energy_confinement_scaling="ITER98y2",
     )
 
+
 def test_tau_e_forward_vs_inverse_calculation(kwargs):
 
     P_in = 140.0 * ureg.MW
 
-    tau_e, plasma_stored_energy = calc_energy_confinement_time_from_scaling(**kwargs, P_in = P_in)
+    tau_e, plasma_stored_energy = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
 
     assert tau_e > 0.0 * ureg.seconds
     assert plasma_stored_energy > 0.0 * ureg.MJ
 
-    tau_e_2, input_power_2 = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy = plasma_stored_energy)
+    tau_e_2, input_power_2 = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
 
     assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_2, ureg.s))
     assert np.isclose(magnitude_in_units(P_in, ureg.MW), magnitude_in_units(input_power_2, ureg.MW))
 
-    tau_e_3 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy = plasma_stored_energy, P_in = P_in)
+    tau_e_3 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy=plasma_stored_energy, P_in=P_in)
     assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_3, ureg.s))
 
 
@@ -52,9 +53,9 @@ def test_tau_e_inverse_vs_forward_calculation(kwargs):
 
     plasma_stored_energy = 14.0 * ureg.MJ
 
-    tau_e, P_in = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy = plasma_stored_energy)
+    tau_e, P_in = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
 
-    tau_e_2, plasma_stored_energy_2 = calc_energy_confinement_time_from_scaling(**kwargs, P_in = P_in)
+    tau_e_2, plasma_stored_energy_2 = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
 
     assert tau_e > 0.0 * ureg.seconds
     assert P_in > 0.0 * ureg.MW
@@ -62,8 +63,9 @@ def test_tau_e_inverse_vs_forward_calculation(kwargs):
     assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_2, ureg.s))
     assert np.isclose(magnitude_in_units(plasma_stored_energy, ureg.MJ), magnitude_in_units(plasma_stored_energy_2, ureg.MJ))
 
-    tau_e_3 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy = plasma_stored_energy, P_in = P_in)
+    tau_e_3 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy=plasma_stored_energy, P_in=P_in)
     assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_3, ureg.s))
+
 
 def test_solve_energy_confinement_scaling_reports_required_h98(kwargs):
 
@@ -75,16 +77,13 @@ def test_solve_energy_confinement_scaling_reports_required_h98(kwargs):
     del kwargs_copy["energy_confinement_scaling"]
 
     energy_confinement_time, P_in = solve_energy_confinement_scaling_for_input_power(
-        **kwargs_copy,
-        confinement_time_scalar=test_val,
-        plasma_stored_energy = plasma_stored_energy,
-        energy_confinement_scaling = "ITER98y2"
+        **kwargs_copy, confinement_time_scalar=test_val, plasma_stored_energy=plasma_stored_energy, energy_confinement_scaling="ITER98y2"
     )
 
     H98y2 = calc_H98y2(
         **kwargs_copy,
-        energy_confinement_time = energy_confinement_time,
-        P_in = P_in,
+        energy_confinement_time=energy_confinement_time,
+        P_in=P_in,
     )
 
     assert magnitude_in_units(energy_confinement_time, ureg.s) > 0.0
@@ -94,7 +93,7 @@ def test_solve_energy_confinement_scaling_reports_required_h98(kwargs):
 
 def test_calc_power_balance_from_input_p_aux_uses_explicit_alpha_power():
     ds = xr.Dataset(
-        data_vars = dict(
+        data_vars=dict(
             plasma_stored_energy=20.0 * ureg.MJ,
             P_ohmic=1.5 * ureg.MW,
             P_alpha=31.0 * ureg.MW,
@@ -111,7 +110,8 @@ def test_calc_power_balance_from_input_p_aux_uses_explicit_alpha_power():
             q_star=3.29,
             P_auxiliary_launched=28.0 * ureg.MW,
             fraction_of_external_power_coupled=0.8,
-    ))
+        )
+    )
 
     ds = calc_power_balance_from_input_P_aux.update_dataset(ds)
 

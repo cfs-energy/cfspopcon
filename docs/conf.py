@@ -56,6 +56,7 @@ linkcheck_ignore = [
     r"https://doi.org/10.1103/PhysRevLett.121.055001",
     r"https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.121.055001",
     r"https://doi.org/10.1201/9780367801489",
+    r"https://scientific-publications.ukaea.uk/wp-content/uploads/Published/Miss1.pdf",
 ]
 linkcheck_retries = 5
 linkcheck_timeout = 120

@@ -89,11 +89,9 @@ def calc_energy_confinement_time_from_scaling(
 
     return tau_e, plasma_stored_energy
 
+
 @Algorithm.register_algorithm(return_keys=["energy_confinement_time"])
-def calc_energy_confinement_time_from_stored_energy_and_input_power(
-    plasma_stored_energy: Unitfull,
-    P_in: Unitfull
-) -> Unitfull:
+def calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy: Unitfull, P_in: Unitfull) -> Unitfull:
     """Calculate the energy confinement time according to the definition, given a known input power and stored energy.
 
     Args:
@@ -105,6 +103,7 @@ def calc_energy_confinement_time_from_stored_energy_and_input_power(
     """
     energy_confinement_time = plasma_stored_energy / np.maximum(P_in, 1e-3 * ureg.MW)
     return energy_confinement_time
+
 
 @Algorithm.register_algorithm(return_keys=["H98y2"])
 def calc_H98y2(
@@ -143,25 +142,24 @@ def calc_H98y2(
         :term:`H98y2` [~]
     """
     tau_e_98y2, _ = calc_energy_confinement_time_from_scaling(
-        confinement_time_scalar    = 1.0,
-        plasma_current             = plasma_current,
-        magnetic_field_on_axis     = magnetic_field_on_axis,
-        average_electron_density   = average_electron_density,
-        major_radius               = major_radius,
-        areal_elongation           = areal_elongation,
-        separatrix_elongation      = separatrix_elongation,
-        inverse_aspect_ratio       = inverse_aspect_ratio,
-        average_ion_mass           = average_ion_mass,
-        triangularity_psi95        = triangularity_psi95,
-        separatrix_triangularity   = separatrix_triangularity,
-        P_in                       = P_in,
-        q_star                     = q_star,
-        energy_confinement_scaling = "ITER98y2",
+        confinement_time_scalar=1.0,
+        plasma_current=plasma_current,
+        magnetic_field_on_axis=magnetic_field_on_axis,
+        average_electron_density=average_electron_density,
+        major_radius=major_radius,
+        areal_elongation=areal_elongation,
+        separatrix_elongation=separatrix_elongation,
+        inverse_aspect_ratio=inverse_aspect_ratio,
+        average_ion_mass=average_ion_mass,
+        triangularity_psi95=triangularity_psi95,
+        separatrix_triangularity=separatrix_triangularity,
+        P_in=P_in,
+        q_star=q_star,
+        energy_confinement_scaling="ITER98y2",
     )
     return energy_confinement_time / tau_e_98y2
 
-calc_power_balance_from_input_P_aux = CompositeAlgorithm.from_list([
-    "calc_input_power_for_fixed_auxiliary_power",
-    "calc_energy_confinement_time_from_stored_energy_and_input_power",
-    "calc_H98y2"
-])
+
+calc_power_balance_from_input_P_aux = CompositeAlgorithm.from_list(
+    ["calc_input_power_for_fixed_auxiliary_power", "calc_energy_confinement_time_from_stored_energy_and_input_power", "calc_H98y2"]
+)
