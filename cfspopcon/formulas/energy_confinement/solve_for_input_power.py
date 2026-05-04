@@ -4,7 +4,7 @@ import numpy as np
 
 from ...algorithm_class import Algorithm
 from ...unit_handling import ureg, wraps_ufunc
-from .read_energy_confinement_scalings import ConfinementScaling
+from .read_energy_confinement_scalings import _get_confinement_scaling
 
 
 @Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
@@ -26,7 +26,6 @@ from .read_energy_confinement_scalings import ConfinementScaling
         q_star=ureg.dimensionless,
         energy_confinement_scaling=None,
     ),
-    output_core_dims=[(), ()],
 )
 def solve_energy_confinement_scaling_for_input_power(
     confinement_time_scalar: float,
@@ -116,7 +115,7 @@ def solve_energy_confinement_scaling_for_input_power(
     Returns:
         :term:`energy_confinement_time` [s], :term:`P_in` [MW]
     """
-    scaling = ConfinementScaling.instances[energy_confinement_scaling]
+    scaling = _get_confinement_scaling(energy_confinement_scaling)
 
     gamma = (
         confinement_time_scalar
@@ -134,10 +133,10 @@ def solve_energy_confinement_scaling_for_input_power(
     )
 
     if gamma > 0.0:
-        P_tau = (plasma_stored_energy / gamma) ** (1.0 / (1.0 + scaling.input_power_alpha))
+        P_in = (plasma_stored_energy / gamma) ** (1.0 / (1.0 + scaling.input_power_alpha))
     else:
-        P_tau = np.inf
+        P_in = np.inf
 
-    tau_E = plasma_stored_energy / P_tau
+    tau_E = plasma_stored_energy / P_in
 
-    return tau_E, P_tau
+    return tau_E, P_in

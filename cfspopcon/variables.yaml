@@ -18,6 +18,8 @@ areal_elongation:
   set_by:
   - calc_areal_elongation_from_elongation_at_psi95
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -56,6 +58,8 @@ average_electron_density:
   set_by:
   - calc_average_electron_density_from_greenwald_fraction
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - calc_plasma_stored_energy
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
@@ -114,6 +118,8 @@ average_ion_mass:
   set_by:
   - calc_average_ion_mass
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -263,6 +269,7 @@ confinement_time_scalar:
     from a scaling such that :math:`\tau_e = H \tau_{e,scaling}`.
   set_by: []
   used_by:
+  - calc_energy_confinement_time_from_scaling
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -477,6 +484,7 @@ energy_confinement_scaling:
     confinement scaling in `cfspopcon.formulas.energy_confinement::energy_confinement_scalings.yaml`.
   set_by: []
   used_by:
+  - calc_energy_confinement_time_from_scaling
   - solve_energy_confinement_scaling_for_input_power
 energy_confinement_scaling_for_L_mode:
   default_units: null
@@ -492,10 +500,13 @@ energy_confinement_time:
   - A characteristic time which gives the rate at which the plasma loses energy. In
     steady-state, :math:`\tau_e=W_p / P_in`.
   set_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_energy_confinement_time_from_stored_energy_and_input_power
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   used_by:
+  - calc_H98y2
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_triple_product
@@ -556,6 +567,7 @@ fraction_of_external_power_coupled:
   set_by: []
   used_by:
   - calc_auxiliary_power
+  - calc_input_power_for_fixed_auxiliary_power
 fraction_of_P_SOL_to_divertor:
   default_units: dimensionless
   description:
@@ -610,6 +622,13 @@ greenwald_fraction:
   - calc_greenwald_fraction
   used_by:
   - calc_average_electron_density_from_greenwald_fraction
+H98y2:
+  default_units: dimensionless
+  description:
+  - Ratio of energy confinement time to the ITER98y2 scaling
+  set_by:
+  - calc_H98y2
+  used_by: []
 heavier_fuel_species_fraction:
   default_units: dimensionless
   description:
@@ -724,6 +743,8 @@ inverse_aspect_ratio:
   set_by:
   - calc_inverse_aspect_ratio
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -893,6 +914,8 @@ magnetic_field_on_axis:
   - Magnetic field at the geometric magnetic axis :math:`B_0 = BR / R0`.
   set_by: []
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -921,6 +944,8 @@ major_radius:
   - The major radius of the geometric magnetic axis.
   set_by: []
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -1110,12 +1135,14 @@ P_alpha:
   - calc_fusion_power
   used_by:
   - calc_auxiliary_power
+  - calc_input_power_for_fixed_auxiliary_power
 P_auxiliary_absorbed:
   default_units: megawatt
   description:
   - auxiliary heating absorbed by the plasma integrated over the plasma volume.
   set_by:
   - calc_auxiliary_power
+  - calc_input_power_for_fixed_auxiliary_power
   used_by: []
 P_auxiliary_launched:
   default_units: megawatt
@@ -1125,6 +1152,7 @@ P_auxiliary_launched:
   set_by:
   - calc_auxiliary_power
   used_by:
+  - calc_input_power_for_fixed_auxiliary_power
   - calc_fusion_gain
 P_external:
   default_units: megawatt
@@ -1133,6 +1161,7 @@ P_external:
     the plasma volume.
   set_by:
   - calc_auxiliary_power
+  - calc_input_power_for_fixed_auxiliary_power
   used_by: []
 P_fusion:
   default_units: megawatt
@@ -1148,11 +1177,15 @@ P_in:
   description:
   - Total input power to the plasma. Sum of ohmic, auxiliary and alpha power.
   set_by:
+  - calc_input_power_for_fixed_auxiliary_power
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   used_by:
   - calc_auxiliary_power
+  - calc_energy_confinement_time_from_scaling
+  - calc_energy_confinement_time_from_stored_energy_and_input_power
+  - calc_H98y2
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
   - calc_f_rad_core
@@ -1193,6 +1226,7 @@ P_ohmic:
   - calc_ohmic_power
   used_by:
   - calc_auxiliary_power
+  - calc_input_power_for_fixed_auxiliary_power
   - calc_fusion_gain
 P_rad_bremsstrahlung:
   default_units: megawatt
@@ -1331,6 +1365,8 @@ plasma_current:
   set_by:
   - calc_plasma_current_from_qstar
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -1356,6 +1392,7 @@ plasma_stored_energy:
   set_by:
   - calc_plasma_stored_energy
   used_by:
+  - calc_energy_confinement_time_from_stored_energy_and_input_power
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -1465,6 +1502,8 @@ q_star:
   set_by:
   - calc_q_star_from_plasma_current
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -1661,6 +1700,8 @@ separatrix_elongation:
   set_by:
   - calc_separatrix_elongation_from_areal_elongation
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -1681,6 +1722,8 @@ separatrix_triangularity:
   set_by:
   - calc_separatrix_triangularity_from_triangularity95
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
@@ -1938,6 +1981,8 @@ triangularity_psi95:
     at the :math:`\psi_N=0.95` surface.
   set_by: []
   used_by:
+  - calc_energy_confinement_time_from_scaling
+  - calc_H98y2
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
