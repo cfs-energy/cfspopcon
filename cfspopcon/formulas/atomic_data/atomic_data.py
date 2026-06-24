@@ -19,12 +19,11 @@ V = TypeVar("V")
 
 
 class _LazyValueDict(dict[K, V]):
-    """Dictionary that memoizes values loaded on first access.
+    """Dictionary that computes and caches each value on first access.
 
-    AtomicData uses this for datasets, ``ne_tau`` grids, and interpolators so
-    object construction only indexes the RADAS files. The heavier xarray loads
-    and interpolator construction stay deferred until a specific species or
-    charge-state table is actually requested.
+    A missing key is populated by calling the loader supplied at construction,
+    so a value is produced only when it is first requested and reused
+    thereafter.
     """
 
     def __init__(self, loader: Callable[[K], V]) -> None:
@@ -39,25 +38,35 @@ class _LazyValueDict(dict[K, V]):
 
 
 class AtomicData:
-    """Manage RADAS datasets and interpolators for the available species.
+    """Manage atomic data for the available species, exposing datasets directly or as interpolators (radiated-power and mean-charge-state curves).
 
-    The object records which netCDF files are present up front, but it opens
-    each dataset and builds each interpolator lazily. That keeps startup cheap
-    for workflows that only touch a small subset of species or ``ne_tau``
-    slices while preserving the same public access patterns as the eager
-    implementation.
+    Datasets are opened when the object is constructed; interpolators are built
+    on first use.
+
+    Attributes:
+        atomic_data_directory: Directory containing the RADAS output files.
+        datasets: Per-species RADAS datasets, opened at construction.
+        available_species: Species for which atomic data is available.
+        coronal_Lz_interpolators: Coronal radiated-power interpolators, built on first use.
+        coronal_Z_interpolators: Coronal mean-charge-state interpolators, built on first use.
+        noncoronal_Lz_interpolators: Non-coronal radiated-power interpolators, keyed by (species, ne_tau), built on first use.
+        noncoronal_Z_interpolators: Non-coronal mean-charge-state interpolators, keyed by (species, ne_tau), built on first use.
+        species_ne_tau: Supported ``ne_tau`` grid per species.
+        radas_version: RADAS version validated across the available datasets.
     """
 
     def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:
-        """Index the RADAS output directory and initialize the lazy caches.
+        """Index the RADAS output directory, open the datasets, and set up lazy interpolator caches.
+
+        Each available dataset is opened to validate a single consistent RADAS
+        version; interpolators are constructed on first use.
 
         Args:
             atomic_data_directory: Path to the directory containing RADAS
                 output files.
         """
         self.atomic_data_directory = atomic_data_directory
-        # Keep an index of files up front, then load each dataset/interpolator
-        # only when it is requested by a downstream formula.
+        # Index the available files and set up the lazy caches.
         self.atomic_data_files = self.find_atomic_data_files(atomic_data_directory)
         self.datasets: dict[AtomicSpecies, xr.Dataset] = _LazyValueDict(self._load_dataset)
         self.available_species = list(self.atomic_data_files.keys())
@@ -78,16 +87,14 @@ class AtomicData:
         self._radas_version: str = ""
         self._radas_version_checked_species: set[AtomicSpecies] = set()
 
+        # Open every dataset now to validate a single, consistent RADAS version
+        # (cheap — xarray reads lazily). Interpolators stay lazy, built on first use.
+        for species in self.available_species:
+            _ = self.datasets[species]
+
     @property
     def radas_version(self) -> str:
-        """Return the aggregate RADAS version string after checking all datasets.
-
-        RADAS stores the version metadata per netCDF file, so this property
-        forces each available species dataset through the lazy loader before it
-        exposes the aggregate version summary.
-        """
-        for species in self.available_species:
-            _ = self[species]
+        """The RADAS version shared by the available datasets."""
         return self._radas_version
 
     def _load_dataset(self, species: AtomicSpecies) -> xr.Dataset:
