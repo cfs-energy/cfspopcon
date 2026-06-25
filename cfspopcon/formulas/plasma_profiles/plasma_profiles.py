@@ -199,6 +199,38 @@ def calc_1D_plasma_profiles(
     )
 
 
+def _calc_profile_grid_edge_nudge(npoints: int) -> float:
+    """Return the resolution-dependent LCFS offset used to regularize the grid.
+
+    Hollow analytic profiles are singular exactly at ``rho = 1``. Rather than
+    using one fixed epsilon, the nudge is scaled to the grid spacing so the last
+    trapezoid stays well behaved across different resolutions.
+    """
+    if npoints <= 1:
+        return 0.0
+
+    # Choose the endpoint offset so it is one tenth of the induced grid
+    # spacing: nudge = 0.1 * drho, drho = (1 - nudge) / (npoints - 1).
+    return 0.1 / (npoints - 1 + 0.1)
+
+
+def build_rho_grid(npoints: int = 50) -> np.ndarray:
+    """Build the radial rho grid used to construct the 1D profiles.
+
+    The grid stops about one tenth of a grid spacing inside the LCFS so the
+    analytic hollow-profile form stays finite at the edge, while still
+    extending essentially to ``rho = 1`` for the volume integral.
+
+    Args:
+        npoints: number of points in the grid
+
+    Returns:
+        rho [~] :term:`glossary link<rho>`
+    """
+    edge_nudge = _calc_profile_grid_edge_nudge(npoints)
+    return np.linspace(0.0, 1.0 - edge_nudge, num=npoints)
+
+
 def calc_analytic_profiles(
     average_electron_density: float,
     average_electron_temp: float,
@@ -224,7 +256,7 @@ def calc_analytic_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho = np.linspace(0, 1, num=npoints, endpoint=True)
+    rho = build_rho_grid(npoints)
 
     electron_density_profile = average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
     fuel_ion_density_profile = (
@@ -263,7 +295,7 @@ def calc_prf_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho: np.ndarray = np.linspace(0.0, 1.0, num=npoints, endpoint=True)
+    rho: np.ndarray = build_rho_grid(npoints)
 
     rho, electron_temp_profile, electron_density_profile = evaluate_density_and_temperature_profile_fits(
         average_electron_temp,
