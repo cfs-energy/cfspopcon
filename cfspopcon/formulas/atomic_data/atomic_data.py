@@ -52,7 +52,6 @@ class AtomicData:
         noncoronal_Lz_interpolators: Non-coronal radiated-power interpolators, keyed by (species, ne_tau), built on first use.
         noncoronal_Z_interpolators: Non-coronal mean-charge-state interpolators, keyed by (species, ne_tau), built on first use.
         species_ne_tau: Supported ``ne_tau`` grid per species.
-        radas_version: RADAS version validated across the available datasets.
     """
 
     def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:

@@ -169,6 +169,11 @@ def resolve(app, env, node, contnode):
         # as a :py:attr:. We just use the general :py:obj: here which should be
         # fine as long as there aren't any name collisions in numpy
         if "numpy" in node["reftarget"]:
+            # numpy >= 2.x stringifies ``numpy.typing.NDArray`` annotations to the
+            # private path ``numpy._typing._array_like.NDArray``, which isn't in the
+            # numpy intersphinx inventory. Remap it to the documented public alias.
+            if node["reftarget"] == "numpy._typing._array_like.NDArray":
+                node["reftarget"] = "numpy.typing.NDArray"
             node["reftype"] = "obj"
             ret_node = missing_reference(app, env, node, contnode)
 
