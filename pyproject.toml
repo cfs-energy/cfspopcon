@@ -76,6 +76,8 @@ filterwarnings = [
   "error",
   "default::FutureWarning",
   "ignore:numpy.ndarray size changed:RuntimeWarning",
+  # netCDF4 1.7.4 sets `.shape` on arrays internally, which NumPy 2.5 deprecated.
+  "ignore:Setting the shape on a NumPy array has been deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]
