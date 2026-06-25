@@ -132,6 +132,13 @@ class CoeffInterpolator(RectBivariateSpline):
 
         values = super().__call__(np.log10(electron_temp), np.log10(electron_density), grid=grid_from_inputs)
 
+        if not grid_from_inputs:
+            # SciPy >= 1.18 returns a 1D array from a grid=False evaluation even when the inputs are
+            # scalars, whereas earlier versions returned a 0D array. The vectorized eval/vector_eval
+            # paths (via np.vectorize inside xr.apply_ufunc) feed scalar elements and require a scalar
+            # result, so reshape to the broadcast shape of the inputs to stay independent of the SciPy version.
+            values = np.reshape(values, np.broadcast_shapes(np.shape(electron_temp), np.shape(electron_density)))
+
         if self.coeff_is_zero:
             return values
         else:

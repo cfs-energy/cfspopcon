@@ -47,7 +47,7 @@ pytest-cov = "^7.1.0"
 coverage = "^7.13.5"
 types-pyyaml = "^6.0.12.2"
 pandas-stubs = "^3.0.0.260204"
-mypy = "^1.15"
+mypy = "^2.1.0"
 scipy-stubs = "^1.15.3.0"
 ipdb = "^0.13.13"
 nbmake = "^1.5"
@@ -76,6 +76,8 @@ filterwarnings = [
   "error",
   "default::FutureWarning",
   "ignore:numpy.ndarray size changed:RuntimeWarning",
+  # netCDF4 1.7.4 sets `.shape` on arrays internally, which NumPy 2.5 deprecated.
+  "ignore:Setting the shape on a NumPy array has been deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

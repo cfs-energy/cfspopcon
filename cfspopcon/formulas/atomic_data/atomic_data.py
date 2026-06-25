@@ -1,7 +1,9 @@
 """Module defining the AtomicData class, used for interfacing with radas files."""
 
 import warnings
+from collections.abc import Callable
 from pathlib import Path
+from typing import TypeVar, cast
 
 import numpy as np
 import xarray as xr
@@ -12,77 +14,179 @@ from ...named_options import AtomicSpecies
 from ...unit_handling import Quantity, magnitude_in_units, ureg
 from .coeff_interpolator import CoeffInterpolator
 
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class _LazyValueDict(dict[K, V]):
+    """Dictionary that computes and caches each value on first access.
+
+    A missing key is populated by calling the loader supplied at construction,
+    so a value is produced only when it is first requested and reused
+    thereafter.
+    """
+
+    def __init__(self, loader: Callable[[K], V]) -> None:
+        super().__init__()
+        self._loader = loader
+
+    def __missing__(self, key: K) -> V:
+        """Populate and cache a missing value via the configured loader."""
+        value = self._loader(key)
+        self[key] = value
+        return value
+
 
 class AtomicData:
-    """A class to manage atomic data for various species, providing facilities for accessing datasets directly or by constructing interpolators for different datasets (i.e. radiated power curves).
+    """Manage atomic data for the available species, exposing datasets directly or as interpolators (radiated-power and mean-charge-state curves).
+
+    Datasets are opened when the object is constructed; interpolators are built
+    on first use.
 
     Attributes:
-    - atomic_data_directory (Path): Path to the directory containing atomic data files.
-    - datasets (dict): A dictionary storing the atomic data for different species.
-    - available_species (list): A list of species for which atomic data is available.
-    - coronal_Lz_interpolators (dict): A dictionary of interpolators for coronal Lz values.
-    - coronal_Z_interpolators (dict): A dictionary of interpolators for coronal Z values.
-    - noncoronal_Lz_interpolators (dict): A dictionary of interpolators for non-coronal Lz values.
-    - noncoronal_Z_interpolators (dict): A dictionary of interpolators for non-coronal Z values.
+        atomic_data_directory: Directory containing the RADAS output files.
+        datasets: Per-species RADAS datasets, opened at construction.
+        available_species: Species for which atomic data is available.
+        coronal_Lz_interpolators: Coronal radiated-power interpolators, built on first use.
+        coronal_Z_interpolators: Coronal mean-charge-state interpolators, built on first use.
+        noncoronal_Lz_interpolators: Non-coronal radiated-power interpolators, keyed by (species, ne_tau), built on first use.
+        noncoronal_Z_interpolators: Non-coronal mean-charge-state interpolators, keyed by (species, ne_tau), built on first use.
+        species_ne_tau: Supported ``ne_tau`` grid per species.
     """
 
     def __init__(self, atomic_data_directory: Path = Path() / "radas_dir") -> None:
-        """Initializes the AtomicData object by loading atomic data from the specified directory.
+        """Index the RADAS output directory, open the datasets, and set up lazy interpolator caches.
 
-        Parameters:
-        - atomic_data_directory (Path): The path to the directory containing atomic data files.
+        Each available dataset is opened to validate a single consistent RADAS
+        version; interpolators are constructed on first use.
+
+        Args:
+            atomic_data_directory: Path to the directory containing RADAS
+                output files.
         """
         self.atomic_data_directory = atomic_data_directory
-        self.datasets = self.read_atomic_data(atomic_data_directory)  # Load atomic data into the datasets attribute
-        self.available_species = list(self.datasets.keys())  # List available species based on the loaded datasets
+        # Index the available files and set up the lazy caches.
+        self.atomic_data_files = self.find_atomic_data_files(atomic_data_directory)
+        self.datasets: dict[AtomicSpecies, xr.Dataset] = _LazyValueDict(self._load_dataset)
+        self.available_species = list(self.atomic_data_files.keys())
 
-        # Initialize dictionaries to hold interpolators for different data types and conditions
-        self.coronal_Lz_interpolators: dict[AtomicSpecies, CoeffInterpolator] = dict()
-        self.coronal_Z_interpolators: dict[AtomicSpecies, CoeffInterpolator] = dict()
-        self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], CoeffInterpolator] = dict()
-        self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], CoeffInterpolator] = dict()
+        # Build interpolators only when a particular species/table is requested.
+        self.coronal_Lz_interpolators: dict[AtomicSpecies, CoeffInterpolator] = _LazyValueDict(self._load_coronal_Lz_interpolator)
+        self.coronal_Z_interpolators: dict[AtomicSpecies, CoeffInterpolator] = _LazyValueDict(self._load_coronal_Z_interpolator)
+        self.noncoronal_Lz_interpolators: dict[tuple[AtomicSpecies, float], CoeffInterpolator] = _LazyValueDict(
+            self._load_noncoronal_Lz_interpolator
+        )
+        self.noncoronal_Z_interpolators: dict[tuple[AtomicSpecies, float], CoeffInterpolator] = _LazyValueDict(
+            self._load_noncoronal_Z_interpolator
+        )
 
-        self.species_ne_tau: dict[AtomicSpecies, xr.DataArray] = dict()
+        self.species_ne_tau: dict[AtomicSpecies, xr.DataArray] = _LazyValueDict(self._load_species_ne_tau)
         self.ne_tau_units = ureg.m**-3 * ureg.s
 
-        self.radas_version: str = ""
+        self._radas_version: str = ""
+        self._radas_version_checked_species: set[AtomicSpecies] = set()
 
+        # Open every dataset now to validate a single, consistent RADAS version
+        # (cheap — xarray reads lazily). Interpolators stay lazy, built on first use.
         for species in self.available_species:
-            dataset = self[species]
+            _ = self.datasets[species]
 
-            ref = dict(
-                reference_electron_density=dataset.reference_electron_density,
-                reference_electron_temp=dataset.reference_electron_temp,
-            )
+    @property
+    def radas_version(self) -> str:
+        """The RADAS version shared by the available datasets."""
+        return self._radas_version
 
-            self.coronal_Lz_interpolators[species] = CoeffInterpolator(dataset.coronal_Lz, **ref)
-            self.coronal_Z_interpolators[species] = CoeffInterpolator(dataset.coronal_mean_charge_state, **ref)
+    def _load_dataset(self, species: AtomicSpecies) -> xr.Dataset:
+        """Open, quantify, and version-check the dataset for one species."""
+        dataset = cast("xr.Dataset", xr.open_dataset(self.atomic_data_files[species]).pint.quantify())
+        if species not in self._radas_version_checked_species:
+            self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
+            self._radas_version_checked_species.add(species)
+        return dataset
 
-            self.species_ne_tau[species] = dataset["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify()
+    def _get_reference_values(self, species: AtomicSpecies) -> dict[str, Quantity]:
+        """Return the shared normalization references used by interpolators."""
+        dataset = self[species]
+        return dict(
+            reference_electron_density=dataset.reference_electron_density,
+            reference_electron_temp=dataset.reference_electron_temp,
+        )
 
-            for ne_tau, dataset_at_single_ne_tau in dataset.groupby("dim_ne_tau"):
-                subds = dataset_at_single_ne_tau.squeeze(dim="dim_ne_tau")
-                self.noncoronal_Lz_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_Lz, **ref)
-                self.noncoronal_Z_interpolators[(species, ne_tau)] = CoeffInterpolator(subds.equilibrium_mean_charge_state, **ref)
+    def _load_coronal_Lz_interpolator(self, species: AtomicSpecies) -> CoeffInterpolator:
+        """Build the coronal radiated-power interpolator for one species."""
+        dataset = self[species]
+        return CoeffInterpolator(dataset.coronal_Lz, **self._get_reference_values(species))
 
-                self._check_radas_version(getattr(dataset, "radas_version", "UNDEFINED"))
+    def _load_coronal_Z_interpolator(self, species: AtomicSpecies) -> CoeffInterpolator:
+        """Build the coronal mean-charge-state interpolator for one species."""
+        dataset = self[species]
+        return CoeffInterpolator(dataset.coronal_mean_charge_state, **self._get_reference_values(species))
+
+    def _load_species_ne_tau(self, species: AtomicSpecies) -> xr.DataArray:
+        """Extract the supported ``ne_tau`` grid for one species."""
+        return cast("xr.DataArray", self[species]["ne_tau"].pint.to(self.ne_tau_units).pint.dequantify())
+
+    def _load_noncoronal_Lz_interpolator(self, key: tuple[AtomicSpecies, float]) -> CoeffInterpolator:
+        """Build the non-coronal radiated-power interpolator for one species and ``ne_tau``."""
+        species, ne_tau = key
+        dataset = self[species].sel(dim_ne_tau=ne_tau)
+        # ``sel`` can keep a length-1 dimension depending on xarray indexing;
+        # strip it so the interpolator always sees a pure 2D coefficient table.
+        if "dim_ne_tau" in dataset.dims:
+            dataset = dataset.squeeze(dim="dim_ne_tau")
+        return CoeffInterpolator(dataset.equilibrium_Lz, **self._get_reference_values(species))
+
+    def _load_noncoronal_Z_interpolator(self, key: tuple[AtomicSpecies, float]) -> CoeffInterpolator:
+        """Build the non-coronal mean-charge-state interpolator for one species and ``ne_tau``."""
+        species, ne_tau = key
+        dataset = self[species].sel(dim_ne_tau=ne_tau)
+        if "dim_ne_tau" in dataset.dims:
+            dataset = dataset.squeeze(dim="dim_ne_tau")
+        return CoeffInterpolator(dataset.equilibrium_mean_charge_state, **self._get_reference_values(species))
 
     def _check_radas_version(self, test_version: str) -> None:
-        """Checks that the provided test_version matches radas_version (if set).
+        """Fold one dataset's RADAS version into the aggregate version summary.
 
-        If radas_version is not set, sets radas_version = test_version.
-        If a mismatch is found, sets radas_version = UNDEFINED.
+        The first observed version becomes the summary value. Later mismatches
+        raise a warning so callers know the summary is no longer uniform across
+        the loaded files.
         """
-        if self.radas_version == "":
-            self.radas_version = test_version
-        elif self.radas_version != test_version:
+        if self._radas_version == "":
+            self._radas_version = test_version
+        elif self._radas_version != test_version:
             warnings.warn(
-                f"Found multiple radas radas versions ({self.radas_version} != {test_version}) in the requested atomic data. Will set radas_version = UNDEFINED.",
+                f"Found multiple RADAS versions ({self._radas_version} != {test_version}) in the requested atomic data. Retaining the first observed version.",
                 stacklevel=2,
             )
 
     @staticmethod
-    def read_atomic_data(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
+    def find_atomic_data_files(atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, Path]:
+        """Return the available RADAS netCDF files indexed by species.
+
+        This helper only scans the directory structure; it does not open any of
+        the datasets.
+        """
+        if not atomic_data_directory.exists():
+            raise FileNotFoundError(f"atomic_data_directory ({atomic_data_directory.absolute()}) does not exist.")
+
+        if not (atomic_data_directory / "output").exists():
+            raise FileNotFoundError(
+                f"atomic_data_directory ({atomic_data_directory}) does not contain a subfolder called 'output'. Make sure you have executed `poetry run radas` before calling this function."
+            )
+
+        atomic_data_files: dict[AtomicSpecies, Path] = dict()
+        for file in (atomic_data_directory / "output").iterdir():
+            if file.suffix == ".nc":
+                species = file.stem
+                try:
+                    atomic_data_files[AtomicSpecies[species.capitalize()]] = file
+                except KeyError:
+                    print(f"No AtomicSpecies found corresponding to {species}")
+
+        return atomic_data_files
+
+    @classmethod
+    def read_atomic_data(cls, atomic_data_directory: Path = Path() / "radas_dir") -> dict[AtomicSpecies, xr.Dataset]:
         """Reads atomic data from netCDF files located in the specified directory.
 
         This function scans a directory for netCDF files (.nc), each representing atomic data for a different species.
@@ -98,30 +202,9 @@ class AtomicData:
         Raises:
         - FileNotFoundError: If the atomic_data_directory or its 'output' subdirectory does not exist.
         """
-        # Ensure the atomic data directory and its 'output' subdirectory exist
-        if not atomic_data_directory.exists():
-            raise FileNotFoundError(f"atomic_data_directory ({atomic_data_directory.absolute()}) does not exist.")
-
-        if not (atomic_data_directory / "output").exists():
-            raise FileNotFoundError(
-                f"atomic_data_directory ({atomic_data_directory}) does not contain a subfolder called 'output'. Make sure you have executed `poetry run radas` before calling this function."
-            )
-
-        atomic_data = dict()
-        # Iterate through each netCDF file in the 'output' directory
-        for file in (atomic_data_directory / "output").iterdir():
-            if file.suffix == ".nc":  # Check if the file is a netCDF file
-                species = file.stem  # Extract the species name from the file name
-                try:
-                    # Attempt to map the file name to an AtomicSpecies enum
-                    species_enum = AtomicSpecies[species.capitalize()]
-                    # Read the netCDF file into an xarray Dataset and quantify it with pint
-                    atomic_data[species_enum] = xr.open_dataset(file).pint.quantify()
-                except KeyError:
-                    # If no matching AtomicSpecies enum is found, print a warning
-                    print(f"No AtomicSpecies found corresponding to {species}")
-
-        return atomic_data
+        return {
+            species: xr.open_dataset(file).pint.quantify() for species, file in cls.find_atomic_data_files(atomic_data_directory).items()
+        }
 
     @staticmethod
     def key_to_enum(species: str | AtomicSpecies) -> AtomicSpecies:
@@ -209,6 +292,6 @@ class AtomicData:
 
 @Algorithm.register_algorithm(return_keys=["atomic_data", "radas_version"])
 def read_atomic_data(radas_dir: Path) -> tuple[AtomicData, str]:
-    """Construct an AtomicData interface using the atomic data in the specified directory."""
+    """Construct an AtomicData interface and report the checked RADAS version summary."""
     atomic_data = AtomicData(get_item(radas_dir))
     return atomic_data, atomic_data.radas_version
