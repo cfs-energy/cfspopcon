@@ -224,7 +224,7 @@ def calc_analytic_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho = np.linspace(0, 1, num=npoints, endpoint=False)
+    rho = np.linspace(0, 1, num=npoints, endpoint=True)
 
     electron_density_profile = average_electron_density * electron_density_peaking * ((1.0 - rho**2.0) ** (electron_density_peaking - 1.0))
     fuel_ion_density_profile = (
@@ -263,7 +263,7 @@ def calc_prf_profiles(
     Returns:
         :term:`rho` [~], :term:`electron_density_profile` [1e19 m^-3], fuel_ion_density_profile [1e19 m^-3], :term:`electron_temp_profile` [keV], :term:`ion_temp_profile` [keV]
     """
-    rho: np.ndarray = np.linspace(0.0, 1.0, num=npoints, endpoint=False)
+    rho: np.ndarray = np.linspace(0.0, 1.0, num=npoints, endpoint=True)
 
     rho, electron_temp_profile, electron_density_profile = evaluate_density_and_temperature_profile_fits(
         average_electron_temp,
