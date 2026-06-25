@@ -8,6 +8,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      force_radas_rebuild:
+        description: "Regenerate radas_dir and overwrite the cached data (use when a dependency bump changed radas output and regression tests fail)"
+        type: boolean
+        default: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -21,6 +26,11 @@ jobs:
   radas:
     name: Generate Radas Data
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write  # allow deleting the cache entry on a forced rebuild
+    outputs:
+      cache-key: ${{ steps.radas-key.outputs.key }}
     steps:
       - uses: actions/checkout@v6
 
@@ -32,21 +42,44 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'poetry'
-      
+
       - name: Install dependencies
         run: poetry install
+
+      # The radas output depends on the radas package version and
+      # radas_config.yaml, so key the cache on those rather than the whole
+      # poetry.lock (which busts on every unrelated dependency bump).
+      # N.b. it is possible that bumping some dependencies could change the
+      # radas result enough to affect the regression result. You might need
+      # manually regenerate the radas_dir in this case.
+      - name: Compute radas cache key
+        id: radas-key
+        run: |
+          radas_version=$(grep -A1 '^name = "radas"$' poetry.lock | grep '^version' | sed -E 's/.*"(.*)".*/\1/')
+          echo "key=radas-v${radas_version//!/-}-${{ hashFiles('radas_config.yaml') }}" >> "$GITHUB_OUTPUT"
+
+      # On a manual run with force_radas_rebuild, delete any existing cache
+      # entry for this key so the freshly generated data is saved in its place
+      # (actions/cache will not overwrite an existing key otherwise).
+      - name: Delete existing radas cache
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.force_radas_rebuild }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh cache delete "${{ steps.radas-key.outputs.key }}" --repo "${{ github.repository }}" \
+            || echo "No existing cache for this key; fresh data will be generated."
 
       - name: Cache radas results
         id: radas-cache
         uses: actions/cache@v5
         with:
           path: ./radas_dir
-          key: radas-${{ hashFiles('poetry.lock') }}
-      
+          key: ${{ steps.radas-key.outputs.key }}
+
       - name: Make radas data
         if: steps.radas-cache.outputs.cache-hit != 'true'
         run: poetry run radas -c radas_config.yaml
-      
+
       - name: Upload radas artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -54,8 +87,10 @@ jobs:
           path: ./radas_dir
           retention-days: 30
 
-  # --- JOB 2: TEST & LINT ---
-  build:
+  # --- JOB 2: TEST ---
+  # The heavy work: unit tests, regression tests and the packaged smoke test,
+  # run across the supported Python versions. Needs the radas data.
+  test:
     name: Test (Python ${{ matrix.python-version }})
     needs: radas
     runs-on: ubuntu-latest
@@ -66,11 +101,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
 
       - name: Install Poetry
         run: pipx install "poetry>=2,<3"
@@ -89,7 +119,7 @@ jobs:
         id: radas-restore
         with:
           path: ./radas_dir
-          key: radas-${{ hashFiles('poetry.lock') }}
+          key: ${{ needs.radas.outputs.cache-key }}
 
       - name: Verify Cache
         if: steps.radas-restore.outputs.cache-hit != 'true'
@@ -106,7 +136,7 @@ jobs:
         run: |
           poetry run python tests/utils/regression_results.py
           poetry run pytest --no-cov tests/test_regression_against_cases.py
-      
+
       - name: Upload regression results on failure
         uses: actions/upload-artifact@v7
         if: failure()
@@ -125,8 +155,56 @@ jobs:
           mkdir tmp_dir && cd tmp_dir
           popcon ../example_cases/SPARC_PRD -d radas_dir WORKING_DIR/../radas_dir
 
+  # --- JOB 3: LINT ---
+  # pre-commit (ruff, mypy, variable-consistency check). Independent of the
+  # radas data, so it runs in parallel with everything else for fast feedback.
+  lint:
+    name: Lint (pre-commit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Poetry
+        run: pipx install "poetry>=2,<3"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
       - name: Pre-commit checks
         run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files
+
+  # --- JOB 4: DOCUMENTATION ---
+  # Sphinx build (warnings as errors), doctests and linkcheck. Notebooks are
+  # not executed (nbsphinx_execute = "never"), so this is independent of the
+  # radas data and runs in parallel with everything else.
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Install Poetry
+        run: pipx install "poetry>=2,<3"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
 
       - name: Documentation tests
         run: |
@@ -135,11 +213,11 @@ jobs:
           poetry run make doctest
           poetry run make linkcheck
 
-  # --- JOB 3: PREPARE RELEASE ---
+  # --- JOB 5: PREPARE RELEASE ---
   build_release:
     name: Build Release
     if: startsWith(github.ref, 'refs/tags')
-    needs: build
+    needs: [test, lint, docs]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -157,7 +235,7 @@ jobs:
           path: ./dist
           retention-days: 1
 
-  # --- JOB 4: PUBLISH ---
+  # --- JOB 6: PUBLISH ---
   publish:
     name: Publish to PyPI
     if: startsWith(github.ref, 'refs/tags')

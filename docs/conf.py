@@ -42,6 +42,7 @@ linkcheck_ignore = [
     r"https://doi.org/10.13182/FST43-67",
     r"https://www.tandfonline.com/doi/full/10.13182/FST43-67",
     r"https://www-internal.psfc.mit.edu/research/alcator/data/fst_cmod.pdf",
+    r"https://scientific-publications.ukaea.uk/wp-content/uploads/Published/Miss1.pdf",
     # these links in the time_independent_inductances_and_fluxes notebook are on private servers that are sometimes down
     r"https://fire.pppl.gov/iaea06_ftp7_5_matsukawa.pdf",
     r"https://escholarship.org/content/qt78k0v04v/qt78k0v04v_noSplash_c44c701847deffab65024dd9ceff9c59.pdf?t=p15pc5",
