@@ -54,6 +54,7 @@ linkcheck_ignore = [
     # These bib resources fail due to "403 Client Error: Forbidden for url"
     r"https://doi.org/10.1103/PhysRevLett.121.055001",
     r"https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.121.055001",
+    r"https://doi.org/10.1201/9780367801489",
 ]
 linkcheck_retries = 5
 linkcheck_timeout = 120
