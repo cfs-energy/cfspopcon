@@ -6,7 +6,7 @@ __version__ = metadata(__package__)["Version"]
 __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
-from ._discovery import discover_algorithms_in_package, ensure_discovered
+from ._discovery import discover_algorithms_in_package, discover_builtin_algorithms
 from .algorithm_class import Algorithm, CompositeAlgorithm, algorithms
 from .formulas.atomic_data import AtomicData
 from .input_file_handling import process_input_dictionary, read_case
@@ -18,10 +18,6 @@ from .unit_handling import (
     set_default_units,
 )
 
-# Populate the algorithm registry eagerly so `import cfspopcon` behaves as before (algorithms are
-# also discovered lazily on first registry query, so direct-submodule use works without this).
-ensure_discovered()
-
 # export main classes users should need as well as the option enums
 __all__ = [
     "Algorithm",
@@ -31,6 +27,7 @@ __all__ = [
     "convert_to_default_units",
     "convert_units",
     "discover_algorithms_in_package",
+    "discover_builtin_algorithms",
     "file_io",
     "formulas",
     "magnitude_in_default_units",

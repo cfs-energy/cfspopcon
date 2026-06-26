@@ -12,11 +12,12 @@ from cfspopcon.algorithm_class import Algorithm
 
 
 def test_discovery_is_idempotent_and_populates_registry():
-    # Importing cfspopcon already ran discovery; running it again must be a cheap no-op.
-    before = dict(Algorithm.instances)
+    # The first call populates the registry; a second call must be a no-op.
     _discovery.ensure_discovered()
-    assert Algorithm.instances == before
-    assert len(Algorithm.instances) > 100
+    populated = dict(Algorithm.instances)
+    assert len(populated) > 100
+    _discovery.ensure_discovered()
+    assert Algorithm.instances == populated
 
 
 def test_drop_in_module_is_discovered_without_editing_init():
