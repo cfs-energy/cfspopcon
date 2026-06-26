@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from functools import wraps
 from pathlib import Path  # noqa: TC003
 from typing import Any, ClassVar
@@ -24,7 +24,12 @@ class Algorithm:
     instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
-        self, function: LabelledReturnFunctionType, return_keys: list[str], name: str | None = None, skip_registration: bool = False
+        self,
+        function: LabelledReturnFunctionType,
+        return_keys: list[str],
+        name: str | None = None,
+        skip_registration: bool = False,
+        override: bool = False,
     ):
         """Initialise an Algorithm.
 
@@ -32,15 +37,24 @@ class Algorithm:
             function: a callable function
             return_keys: the arguments which are returned from the function
             name: Descriptive name for algorithm
-            skip_registration: flag to skip adding the Algorithm to 'instances' (useful for testing)
+            skip_registration: construct the Algorithm without adding it to 'instances' (useful for
+                testing, or for a coexisting variant of an already-registered algorithm)
+            override: if the name is already registered, replace the existing entry instead of raising.
+                Ignored when skip_registration is True.
         """
         self._function = function
         self._name = self._function.__name__ if name is None else name
 
-        if self._name in self.instances:
-            raise RuntimeError(f"Algorithm {self._name} has been defined multiple times.")
-        if not skip_registration:
-            self.instances[self._name] = self
+        if skip_registration:
+            pass  # never touch the registry (testing / coexisting variants)
+        elif self._name in self.instances and not override:
+            raise RuntimeError(
+                f"Algorithm '{self._name}' is already registered. "
+                "Pass override=True to replace it, or skip_registration=True "
+                "to construct it without registering (e.g. a coexisting variant)."
+            )
+        else:
+            self.instances[self._name] = self  # registers, or replaces the existing entry if override=True
 
         self._signature = inspect.signature(function)
         for p in self._signature.parameters.values():
@@ -120,6 +134,10 @@ class Algorithm:
         result = self._function(**input_values)
         return xr.Dataset(result).merge(dataset, join="left", compat=("override" if allow_overwrite else "no_conflicts"))
 
+    def __call__(self, dataset: xr.Dataset, allow_overwrite: bool = True) -> xr.Dataset:
+        """Call the algorithm on a dataset; equivalent to ``alg.update_dataset(ds)``."""
+        return self.update_dataset(dataset, allow_overwrite=allow_overwrite)
+
     def __add__(self, other: Algorithm | CompositeAlgorithm) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this Algorithm and another Algorithm or CompositeAlgorithm."""
         if isinstance(other, CompositeAlgorithm):
@@ -135,6 +153,7 @@ class Algorithm:
         name: str | None = None,
         skip_unit_conversion: bool = False,
         skip_registration: bool = False,
+        override: bool = False,
     ) -> Algorithm:
         """Build an Algorithm which wraps a single function."""
         if not isinstance(return_keys, list):
@@ -158,15 +177,27 @@ class Algorithm:
 
             return result_dict
 
-        return cls(wrapped_function, return_keys, name=name if name is not None else func.__name__, skip_registration=skip_registration)
+        return cls(
+            wrapped_function,
+            return_keys,
+            name=name if name is not None else func.__name__,
+            skip_registration=skip_registration,
+            override=override,
+        )
 
     @classmethod
-    def register_algorithm(cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False) -> GenericFunctionType:
+    def register_algorithm(
+        cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
+    ) -> GenericFunctionType:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""
 
         def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
             Algorithm.from_single_function(
-                func, return_keys=return_keys, name=name if name is not None else func.__name__, skip_unit_conversion=skip_unit_conversion
+                func,
+                return_keys=return_keys,
+                name=name if name is not None else func.__name__,
+                skip_unit_conversion=skip_unit_conversion,
+                override=override,
             )
             return func
 
@@ -189,6 +220,9 @@ class Algorithm:
     @classmethod
     def write_yaml(cls, filepath: Path) -> None:
         """Writes a file 'algorithms.yaml' documenting the available algorithms."""
+        from ._discovery import ensure_discovered
+
+        ensure_discovered()
         data = dict()
 
         for name, alg in cls.instances.items():
@@ -208,6 +242,9 @@ class Algorithm:
     @classmethod
     def algorithms(cls) -> list[str]:
         """Make a list of the available algorithms."""
+        from ._discovery import ensure_discovered
+
+        ensure_discovered()  # lazy: populate the registry on first query (get_algorithm routes through here)
         return list(cls.instances.keys())
 
     @classmethod
@@ -389,6 +426,10 @@ class CompositeAlgorithm:
 
         return dataset
 
+    def __call__(self, dataset: xr.Dataset, allow_overwrite: bool = True) -> xr.Dataset:
+        """Call the composite on a dataset; equivalent to ``composite.update_dataset(ds)``."""
+        return self.update_dataset(dataset, allow_overwrite=allow_overwrite)
+
     def __add__(self, other: Algorithm | CompositeAlgorithm) -> CompositeAlgorithm:
         """Build a CompositeAlgorithm composed of this CompositeAlgorithm and another Algorithm or CompositeAlgorithm."""
         if isinstance(other, Algorithm):
@@ -496,3 +537,28 @@ def _validate_inputs(
     if not quiet:
         warn(message, stacklevel=3)
     return False
+
+
+class _AlgorithmRegistry:
+    """Provides indexed access to the algorithm registry.
+
+    ``algorithms["name"]`` returns the named :class:`Algorithm`; ``algorithms[["a", "b"]]`` returns a
+    :class:`CompositeAlgorithm` built from those names, delegating to ``Algorithm.get_algorithm`` and
+    ``CompositeAlgorithm.from_list``. A composite executes its algorithms in the order the names are given.
+    """
+
+    def __getitem__(self, key: str | list[str] | tuple[str, ...]) -> Algorithm | CompositeAlgorithm:
+        """Look up an Algorithm by name, or build a CompositeAlgorithm from a list/tuple of names."""
+        if isinstance(key, str):
+            return Algorithm.get_algorithm(key)
+        if isinstance(key, (list, tuple)):
+            return CompositeAlgorithm.from_list(list(key))
+        raise TypeError("Index the algorithm registry with a name (str) or a list/tuple of names.")
+
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over the registered algorithm names (also powers ``"name" in algorithms``)."""
+        return iter(Algorithm.algorithms())
+
+
+algorithms = _AlgorithmRegistry()
+"""Registry accessor: ``algorithms["name"]`` -> Algorithm, ``algorithms[["a", "b"]]`` -> CompositeAlgorithm."""
