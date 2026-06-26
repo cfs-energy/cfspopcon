@@ -108,13 +108,13 @@ class VariableConsistencyChecker:
         character-by-character.
         """
         if isinstance(description, str):
-            return description.splitlines() or [description]
+            description = [description]
 
-        normalized_description: list[str] = []
+        result = []
         for line in description:
-            normalized_description.extend(line.splitlines() or [line])
-
-        return normalized_description
+            split = line.splitlines()
+            result.extend(split if split else [line])
+        return result
 
     def run(self, apply_changes: bool = True) -> None:  # noqa: PLR0912, PLR0915
         """Check the files and, if apply_changes = True, modify the files in place."""
