@@ -70,6 +70,8 @@ instance/
 
 # Sphinx documentation
 docs/_*
+# autosummary-generated API stub pages (regenerated on every build)
+docs/doc_sources/_autosummary/
 
 # PyBuilder
 target/

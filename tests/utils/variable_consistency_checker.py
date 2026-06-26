@@ -9,7 +9,7 @@ from typing import Any
 import click
 import yaml
 
-from cfspopcon import Algorithm
+from cfspopcon import Algorithm, discover_builtin_algorithms
 from cfspopcon.unit_handling import Quantity
 
 
@@ -83,6 +83,12 @@ class VariableConsistencyChecker:
 
     def read_algorithm_keys(self) -> set[str]:
         """Read the algorithm keys."""
+        # Algorithm discovery is lazy (see cfspopcon._discovery): the registry is only
+        # populated on first query. Force discovery of the built-in algorithms before reading
+        # Algorithm.instances directly, otherwise the registry appears almost empty and every
+        # variable looks unused.
+        discover_builtin_algorithms()
+
         algorithm_keys: set[str] = set()
         for alg in Algorithm.instances.values():
             algorithm_keys.update(alg.input_keys)

@@ -92,6 +92,7 @@ python_maximum_signature_line_length = 90
 extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     # linkcode to point to github would be nicer
@@ -106,8 +107,16 @@ extensions = [
 nitpick_ignore = [("py:class", "Ellipsis")]
 
 # -- nbsphinx
-exclude_patterns = ["_build", "static"]
+exclude_patterns = ["_build", "static", "sphinx_templates"]
 nbsphinx_execute = "never"
+
+# -- autosummary
+# Recursively generate API stub pages from the package tree (see api.rst and the
+# custom sphinx_templates/autosummary/module.rst template). This documents every
+# submodule's members, which a package-level ``.. automodule::`` no longer does now
+# that the formulas subpackages only re-export their submodules.
+autosummary_generate = True
+templates_path = ["sphinx_templates"]
 
 # -- autodoc
 autodoc_default_options = {

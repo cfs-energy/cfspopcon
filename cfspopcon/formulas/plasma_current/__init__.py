@@ -1,62 +1,10 @@
 """Routines to calculate the plasma current, safety factor and ohmic heating."""
 
-from .bootstrap_fraction import calc_bootstrap_fraction, calc_inductive_plasma_current
-from .flux_consumption import (
-    calc_breakdown_flux_consumption,
-    calc_external_flux,
-    calc_external_inductance,
-    calc_flux_needed_from_solenoid_over_rampup,
-    calc_internal_flux,
-    calc_internal_inductance_for_cylindrical,
-    calc_internal_inductance_for_noncylindrical,
-    calc_internal_inductivity,
-    calc_invmu_0_dLedR,
-    calc_max_flattop_duration,
-    calc_poloidal_field_flux,
-    calc_resistive_flux,
-    calc_vertical_field_mutual_inductance,
-    calc_vertical_magnetic_field,
-)
-from .resistive_heating import (
-    calc_current_relaxation_time,
-    calc_loop_voltage,
-    calc_neoclassical_loop_resistivity,
-    calc_ohmic_power,
-    calc_resistivity_trapped_enhancement,
-    calc_Spitzer_loop_resistivity,
-)
-from .safety_factor import (
-    calc_cylindrical_edge_safety_factor,
-    calc_f_shaping_for_qstar,
-    calc_plasma_current_from_qstar,
-    calc_q_star_from_plasma_current,
-)
+from . import bootstrap_fraction, flux_consumption, resistive_heating, safety_factor
 
 __all__ = [
-    "calc_Spitzer_loop_resistivity",
-    "calc_bootstrap_fraction",
-    "calc_breakdown_flux_consumption",
-    "calc_current_relaxation_time",
-    "calc_cylindrical_edge_safety_factor",
-    "calc_external_flux",
-    "calc_external_inductance",
-    "calc_f_shaping_for_qstar",
-    "calc_flux_needed_from_solenoid_over_rampup",
-    "calc_inductive_plasma_current",
-    "calc_internal_flux",
-    "calc_internal_inductance_for_cylindrical",
-    "calc_internal_inductance_for_noncylindrical",
-    "calc_internal_inductivity",
-    "calc_invmu_0_dLedR",
-    "calc_loop_voltage",
-    "calc_max_flattop_duration",
-    "calc_neoclassical_loop_resistivity",
-    "calc_ohmic_power",
-    "calc_plasma_current_from_qstar",
-    "calc_poloidal_field_flux",
-    "calc_q_star_from_plasma_current",
-    "calc_resistive_flux",
-    "calc_resistivity_trapped_enhancement",
-    "calc_vertical_field_mutual_inductance",
-    "calc_vertical_magnetic_field",
+    "bootstrap_fraction",
+    "flux_consumption",
+    "resistive_heating",
+    "safety_factor",
 ]

@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithms
 from cfspopcon.unit_handling import ureg
 
 
@@ -280,3 +280,45 @@ def test_blank_algorithm():
     updated_ds = algorithm.update_dataset(test_ds)
 
     xr.testing.assert_allclose(test_ds, updated_ds)
+
+
+def test_registration_semantics_skip_override_and_collision():
+    """skip_registration avoids the duplicate-name collision; override replaces; a plain duplicate raises."""
+    name = "_coexistence_probe"
+    Algorithm.instances.pop(name, None)
+    try:
+        first = Algorithm(function=lambda: {}, return_keys=[], name=name)
+        assert Algorithm.instances[name] is first
+
+        # skip_registration must not collide and must leave the registry untouched
+        Algorithm(function=lambda: {}, return_keys=[], name=name, skip_registration=True)
+        assert Algorithm.instances[name] is first
+
+        # override deliberately replaces the registered entry
+        third = Algorithm(function=lambda: {}, return_keys=[], name=name, override=True)
+        assert Algorithm.instances[name] is third
+
+        # a plain duplicate still raises, now with the actionable message
+        with pytest.raises(RuntimeError, match="already registered"):
+            Algorithm(function=lambda: {}, return_keys=[], name=name)
+    finally:
+        Algorithm.instances.pop(name, None)
+
+
+def test_registry_indexing_and_call(how_many_birds):
+    """algorithms[...] returns an Algorithm or CompositeAlgorithm, and alg(ds) runs update_dataset."""
+    name = next(iter(algorithms))
+    assert name in algorithms
+    assert isinstance(algorithms[name], (Algorithm, CompositeAlgorithm))
+    assert isinstance(algorithms[list(algorithms)[:2]], CompositeAlgorithm)
+
+    with pytest.raises(TypeError, match="name .str. or a list"):
+        algorithms[123]
+    with pytest.raises(KeyError):
+        algorithms["not_a_registered_algorithm_name"]
+
+    # alg(ds) is shorthand for alg.update_dataset(ds)
+    xr.testing.assert_equal(
+        how_many_birds(xr.Dataset(dict(things_that_quack=3))),
+        how_many_birds.update_dataset(xr.Dataset(dict(things_that_quack=3))),
+    )

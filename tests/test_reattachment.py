@@ -1,7 +1,10 @@
 import numpy as np
 import pytest
 
-from cfspopcon import formulas
+from cfspopcon.formulas.geometry import analytical
+from cfspopcon.formulas.plasma_current import safety_factor
+from cfspopcon.formulas.scrape_off_layer import heat_flux_density, reattachment_models
+from cfspopcon.formulas.scrape_off_layer.two_point_model import two_point_model_algorithms
 from cfspopcon.named_options import MomentumLossFunction
 from cfspopcon.unit_handling import Quantity, convert_units, ureg
 from cfspopcon.unit_handling import magnitude_in_units as umag
@@ -170,7 +173,7 @@ def plasma_volume(
     areal_elongation,
     inverse_aspect_ratio,
 ):
-    v = formulas.geometry.calc_plasma_volume(
+    v = analytical.calc_plasma_volume(
         major_radius=major_radius,
         areal_elongation=areal_elongation,
         inverse_aspect_ratio=inverse_aspect_ratio,
@@ -187,7 +190,7 @@ def cylindrical_safety_factor(
     elongation_psi95,
     triangularity_psi95,
 ):
-    q_cyl = formulas.plasma_current.safety_factor.calc_cylindrical_edge_safety_factor(
+    q_cyl = safety_factor.calc_cylindrical_edge_safety_factor(
         major_radius=major_radius,
         minor_radius=minor_radius,
         elongation_psi95=elongation_psi95,
@@ -207,7 +210,7 @@ def q_parallel(
     lambda_q,
     fieldline_pitch_at_omp,
 ):
-    q_par = formulas.scrape_off_layer.heat_flux_density.calc_parallel_heat_flux_density(
+    q_par = heat_flux_density.calc_parallel_heat_flux_density(
         power_crossing_separatrix=power_crossing_separatrix,
         fraction_of_P_SOL_to_divertor=fraction_of_P_SOL_to_divertor,
         major_radius=major_radius,
@@ -230,7 +233,7 @@ def two_point_model_fixed_tet(
     SOL_momentum_loss_function,
     sheath_heat_transmission_factor,
 ):
-    Te_tar = formulas.scrape_off_layer.two_point_model_fixed_tet(
+    Te_tar = two_point_model_algorithms.two_point_model_fixed_tet(
         target_electron_temp=target_electron_temp,
         q_parallel=q_parallel,
         parallel_connection_length=parallel_connection_length,
@@ -250,7 +253,7 @@ def neutral_flux_density_factor(
     ratio_of_molecular_to_ion_mass,
     wall_temperature,
 ):
-    factor = formulas.scrape_off_layer.calc_neutral_flux_density_factor(
+    factor = reattachment_models.calc_neutral_flux_density_factor(
         average_ion_mass=average_ion_mass,
         ratio_of_molecular_to_ion_mass=ratio_of_molecular_to_ion_mass,
         wall_temperature=wall_temperature,
@@ -276,7 +279,7 @@ def target_neutral_pressure(
     q_parallel,
     ratio_of_divertor_to_duct_pressure,
 ):
-    p_div, p_duct = formulas.scrape_off_layer.calc_neutral_pressure_kallenbach(
+    p_div, p_duct = reattachment_models.calc_neutral_pressure_kallenbach(
         average_ion_mass=average_ion_mass,
         kappa_e0=kappa_e0,
         kappa_ez=kappa_ez,
@@ -301,7 +304,7 @@ def target_neutral_pressure(
 def ionization_volume(
     plasma_volume,
 ):
-    ionization_volume = formulas.scrape_off_layer.calc_ionization_volume_from_AUG(plasma_volume=plasma_volume)
+    ionization_volume = reattachment_models.calc_ionization_volume_from_AUG(plasma_volume=plasma_volume)
     return ionization_volume
 
 
@@ -313,7 +316,7 @@ def test_calc_reattachment_time_henderson(
     ionization_volume_density_factor,
     ionization_volume,
 ):
-    reattachment_time = formulas.scrape_off_layer.calc_reattachment_time_henderson(
+    reattachment_time = reattachment_models.calc_reattachment_time_henderson(
         target_neutral_pressure=target_neutral_pressure,
         target_electron_density=target_electron_density,
         parallel_connection_length=parallel_connection_length,
