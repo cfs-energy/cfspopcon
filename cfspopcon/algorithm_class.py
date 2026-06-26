@@ -561,4 +561,4 @@ class _AlgorithmRegistry:
 
 
 algorithms = _AlgorithmRegistry()
-"""Registry accessor: ``algorithms["name"]`` -> Algorithm, ``algorithms[["a", "b"]]`` -> CompositeAlgorithm."""
+"""Indexed access to the algorithm registry; ``algorithms["name"]`` returns an Algorithm and ``algorithms[["a", "b"]]`` returns a CompositeAlgorithm."""

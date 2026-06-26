@@ -5,9 +5,9 @@ alpha_t:
   set_by:
   - calc_alpha_t
   used_by:
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
+  - calc_SepOS_L_mode_density_limit
   - calc_power_crossing_separatrix_in_ion_channel
   - calc_power_crossing_separatrix_in_electron_channel
 areal_elongation:
@@ -126,8 +126,8 @@ average_ion_mass:
   - calc_neutral_pressure_kallenbach
   - calc_neutral_flux_density_factor
   - calc_poloidal_sound_larmor_radius
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
+  - calc_SepOS_L_mode_density_limit
   - calc_LH_transition_threshold_power
 average_ion_temp:
   default_units: kiloelectron_volt
@@ -289,9 +289,9 @@ critical_alpha_MHD:
   set_by:
   - calc_critical_alpha_MHD
   used_by:
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
+  - calc_SepOS_L_mode_density_limit
 current_relaxation_time:
   default_units: second
   description:
@@ -910,9 +910,9 @@ magnetic_field_on_axis:
   - calc_B_tor_omp
   - calc_lambda_q
   - calc_lambda_q_with_eich_regression_9
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
+  - calc_SepOS_L_mode_density_limit
   - calc_LH_transition_threshold_power
   - calc_LI_transition_threshold_power
 major_radius:
@@ -954,9 +954,9 @@ major_radius:
   - calc_q_perp
   - calc_lambda_q
   - calc_lambda_q_with_eich_regression_15
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
+  - calc_SepOS_L_mode_density_limit
   - calc_power_crossing_separatrix_in_electron_channel
   - calc_LH_transition_threshold_power
 max_flattop_duration:
@@ -1629,9 +1629,9 @@ separatrix_electron_density:
   - calc_edge_collisionality
   - two_point_model_fixed_tet
   - calc_neutral_pressure_kallenbach
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
+  - calc_SepOS_L_mode_density_limit
   - calc_power_crossing_separatrix_in_ion_channel
 separatrix_electron_temp:
   default_units: electron_volt
@@ -1648,9 +1648,9 @@ separatrix_electron_temp:
   - calc_alpha_t
   - calc_edge_collisionality
   - calc_poloidal_sound_larmor_radius
-  - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_SepOS_ideal_MHD_limit
+  - calc_SepOS_L_mode_density_limit
   - calc_power_crossing_separatrix_in_ion_channel
   - calc_power_crossing_separatrix_in_electron_channel
 separatrix_elongation:
