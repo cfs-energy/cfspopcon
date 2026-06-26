@@ -180,9 +180,10 @@ jobs:
         run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files
 
   # --- JOB 4: DOCUMENTATION ---
-  # Sphinx build (warnings as errors), doctests and linkcheck. Notebooks are
-  # not executed (nbsphinx_execute = "never"), so this is independent of the
-  # radas data and runs in parallel with everything else.
+  # Sphinx build (warnings as errors) and doctests. Notebooks are not executed
+  # (nbsphinx_execute = "never"), so this is independent of the radas data and
+  # runs in parallel with everything else. Link checking runs separately on a
+  # schedule (see linkcheck.yml) so flaky external links can't block a PR.
   docs:
     name: Documentation
     runs-on: ubuntu-latest
@@ -211,7 +212,6 @@ jobs:
           cd docs
           poetry run sphinx-build --keep-going -Wnb html . _build/
           poetry run make doctest
-          poetry run make linkcheck
 
   # --- JOB 5: PREPARE RELEASE ---
   build_release:

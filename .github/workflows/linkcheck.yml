@@ -1,0 +1,39 @@
+name: Docs Link Check
+
+# Link rot depends on third-party servers being up, not on anything we change,
+# so we check links on a timer instead of gating every PR and release on them.
+# A broken link fails this run, which surfaces in the Actions tab.
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linkcheck:
+    name: Link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Install Poetry
+        run: pipx install "poetry>=2,<3"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Check documentation links
+        run: cd docs && poetry run make linkcheck
