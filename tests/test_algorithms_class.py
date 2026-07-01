@@ -280,3 +280,23 @@ def test_blank_algorithm():
     updated_ds = algorithm.update_dataset(test_ds)
 
     xr.testing.assert_allclose(test_ds, updated_ds)
+
+
+def test_call_returns_values_in_return_keys_order(how_many_birds):
+    assert how_many_birds(things_that_quack=3) == (3, 2, 5)
+
+
+def test_call_with_return_labelled_dictionary(how_many_birds):
+    assert how_many_birds(things_that_quack=3, return_labelled_dictionary=True) == {
+        "ducks": 3,
+        "chooks": 2,
+        "all_birds": 5,
+    }
+
+
+def test_call_single_output_is_unwrapped():
+    def add_one(x: int) -> dict[str, int]:
+        return {"y": x + 1}
+
+    alg = Algorithm(function=add_one, return_keys=["y"], skip_registration=True)
+    assert alg(x=4) == 5

@@ -157,9 +157,11 @@ class VariableConsistencyChecker:
         algs_using_variable: dict[str, list[str]] = {key: [] for key in all_keys}
         algs_setting_variable: dict[str, list[str]] = {key: [] for key in all_keys}
         for alg in Algorithm.instances.values():
-            for key in alg.input_keys:
+            # A composite can reach a variable through several of its members;
+            # dedupe so each algorithm is listed once per variable.
+            for key in set(alg.input_keys):
                 algs_using_variable[key].append(alg._name)  # type:ignore[arg-type]
-            for key in alg.return_keys:
+            for key in set(alg.return_keys):
                 algs_setting_variable[key].append(alg._name)  # type:ignore[arg-type]
 
         new_variables_dict = dict()
