@@ -9,7 +9,7 @@ from .read_energy_confinement_scalings import _get_confinement_scaling
 
 @Algorithm.register_algorithm(return_keys=["energy_confinement_time"])
 @wraps_ufunc(
-    return_units=dict(tau_e=ureg.s, plasma_stored_energy=ureg.MJ),
+    return_units=dict(tau_e=ureg.s),
     input_units=dict(
         confinement_time_scalar=ureg.dimensionless,
         plasma_current=ureg.MA,
@@ -42,7 +42,7 @@ def calc_energy_confinement_time_from_scaling(
     P_in: float,
     q_star: float,
     energy_confinement_scaling: str,
-) -> tuple[float, float]:
+) -> float:
     """Calculate the energy confinement time from a scaling, given a known input power.
 
     Args:
@@ -62,7 +62,7 @@ def calc_energy_confinement_time_from_scaling(
         energy_confinement_scaling: [] :term:`glossary link<energy_confinement_scaling>`
 
     Returns:
-        :term:`energy_confinement_time` [s], :term:`plasma_stored_energy` [MJ]
+        :term:`energy_confinement_time` [s]
     """
     scaling = _get_confinement_scaling(energy_confinement_scaling)
 
@@ -85,9 +85,7 @@ def calc_energy_confinement_time_from_scaling(
         * clipped_input_power**scaling.input_power_alpha
     )
 
-    plasma_stored_energy = clipped_input_power * tau_e
-
-    return tau_e, plasma_stored_energy
+    return tau_e
 
 
 @Algorithm.register_algorithm(return_keys=["energy_confinement_time"])
@@ -141,7 +139,7 @@ def calc_H98y2(
     Returns:
         :term:`H98y2` [~]
     """
-    tau_e_98y2, _ = calc_energy_confinement_time_from_scaling(
+    tau_e_98y2 = calc_energy_confinement_time_from_scaling(
         confinement_time_scalar=1.0,
         plasma_current=plasma_current,
         magnetic_field_on_axis=magnetic_field_on_axis,

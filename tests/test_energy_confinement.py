@@ -35,7 +35,8 @@ def test_tau_e_forward_vs_inverse_calculation(kwargs):
 
     P_in = 140.0 * ureg.MW
 
-    tau_e, plasma_stored_energy = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
+    tau_e = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
+    plasma_stored_energy = P_in * tau_e
 
     assert tau_e > 0.0 * ureg.seconds
     assert plasma_stored_energy > 0.0 * ureg.MJ
@@ -55,7 +56,8 @@ def test_tau_e_inverse_vs_forward_calculation(kwargs):
 
     tau_e, P_in = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
 
-    tau_e_2, plasma_stored_energy_2 = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
+    tau_e_2 = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
+    plasma_stored_energy_2 = P_in * tau_e_2
 
     assert tau_e > 0.0 * ureg.seconds
     assert P_in > 0.0 * ureg.MW
