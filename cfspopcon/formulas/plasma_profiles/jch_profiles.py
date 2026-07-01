@@ -1,6 +1,5 @@
 """Implements the profile form developed by Jon Hillesheim, with separate pedestal and core profiles."""
 
-from bisect import bisect_left
 from collections.abc import Callable
 from typing import cast
 
@@ -537,36 +536,6 @@ def _build_jch_temperature_profile(
         profile[rho >= rho_ped] = pedestal_temperature * edge_basis_1 + separatrix_temperature * edge_basis_2
 
     return profile
-
-
-def _find_nearest_grid_index(values: np.ndarray, target: float) -> int:
-    """Find the nearest point in a sorted grid using a bisection search.
-
-    This is used when an externally supplied grid needs to be snapped to the
-    exact JCH pedestal knee without scanning the whole array.
-    """
-    insertion_index = bisect_left(values.tolist(), target)
-
-    if insertion_index == 0:
-        return 0
-    if insertion_index == len(values):
-        return len(values) - 1
-    if (values[insertion_index] - target) < (target - values[insertion_index - 1]):
-        return insertion_index
-
-    return insertion_index - 1
-
-
-def _find_nearest_interior_grid_index(values: np.ndarray, target: float) -> int:
-    """Find the nearest interior point in a sorted grid.
-
-    JCH profile construction reserves the axis and edge points, so the pedestal
-    knee must be snapped onto an interior point only.
-    """
-    if len(values) < 3:
-        raise ValueError("JCH profiles require at least three radial grid points to preserve both the axis and separatrix.")
-
-    return 1 + _find_nearest_grid_index(values[1:-1], target)
 
 
 def _calc_profile_grid_edge_nudge(npoints: int) -> float:
