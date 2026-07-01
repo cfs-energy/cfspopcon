@@ -78,7 +78,17 @@ class Algorithm:
         return f"Algorithm: {self._name}"
 
     def __call__(self, *args: Any, return_labelled_dictionary: bool = False, **kwargs: Any) -> Any:
-        """Allows the instance to be called like a function, delegating to self.run."""
+        """Call the algorithm like a function, returning its outputs directly.
+
+        By default, returns the value(s) in ``return_keys`` order: one value, or
+        a tuple for several outputs.
+        With ``return_labelled_dictionary=True``, returns the ``{return_key: value}`` mapping.
+
+        Example::
+
+            algorithm = Algorithm.get_algorithm("algorithm_name")
+            outputs = algorithm(input_a=..., input_b=...)
+        """
         result_dict = self._function(*args, **kwargs)
         if return_labelled_dictionary:
             return result_dict
