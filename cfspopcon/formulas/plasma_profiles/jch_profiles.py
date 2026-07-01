@@ -30,13 +30,13 @@ def calc_jch_profiles(
     separatrix_electron_temp: float = 0.2 * ureg.keV,
     ratio_of_separatrix_to_pedestal_density: float = 0.5 * ureg.dimensionless,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Estimate JCH profiles with an exponential core and linear pedestal handoff.
+    """Estimate JCH density and temperature profiles.
 
-    The public peaking inputs remain center-to-volume-average ratios. This
-    helper converts them to the peak-to-pedestal ratios required by the JCH
-    profile parameterization. Density and temperature branches can be requested
-    independently; the unused branch returns ``None`` so the caller can splice
-    together mixed-form runs.
+    The profiles have an exponential core and a linear pedestal anchored to a
+    separatrix value.
+
+    Returns the radial grid and the electron-density, fuel-ion-density,
+    electron-temperature, and ion-temperature profiles on it.
     """
     n_points = int(n_points_for_confined_region_profiles)
     pedestal_width = magnitude_in_units(pedestal_width, ureg.dimensionless)
