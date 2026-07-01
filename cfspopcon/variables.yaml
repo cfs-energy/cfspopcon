@@ -75,12 +75,6 @@ average_electron_density:
   - calc_analytic_profiles
   - calc_prf_profiles
   - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
-  - calc_peaking_and_prf_profiles
-  - calc_peaking_and_prf_profiles
   - calc_peaking_and_prf_profiles
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
@@ -110,10 +104,6 @@ average_electron_temp:
   - calc_prf_profiles
   - calc_peak_electron_temp
   - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
-  - calc_peaking_and_prf_profiles
   - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
 average_ion_density:
@@ -166,8 +156,6 @@ average_ion_temp:
   - calc_prf_profiles
   - calc_peak_ion_temp
   - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
   - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
 average_total_pressure:
@@ -225,8 +213,6 @@ beta_toroidal:
   - calc_ion_density_peaking
   - calc_electron_density_peaking
   - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
   - calc_peaking_and_prf_profiles
 beta_total:
   default_units: dimensionless
@@ -352,8 +338,6 @@ dilution:
   - calc_analytic_profiles
   - calc_prf_profiles
   - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
   - calc_peaking_and_prf_profiles
 edge_collisionality:
   default_units: dimensionless
@@ -2009,10 +1993,6 @@ temperature_peaking:
   - calc_peak_electron_temp
   - calc_peak_ion_temp
   - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
-  - calc_peaking_and_prf_profiles
   - calc_peaking_and_prf_profiles
   - calc_temperature_peaking
 toroidal_flux_expansion:
