@@ -17,6 +17,8 @@ release because of the breaking changes listed below. (#147)
 - **`cfspopcon.algorithms` entry-point group** — an installed distribution can contribute algorithms with no cfspopcon-side import. The entry-point target may be a module (imported for its registration side effects) or a callable (invoked to register). (#147)
 - **`algorithms` registry accessor** — `algorithms["name"]` returns an `Algorithm`, `algorithms[["a", "b"]]` builds a `CompositeAlgorithm`, and `"name" in algorithms` / iteration list the registered names. (#147)
 - **`override` flag** on `Algorithm(...)`, `Algorithm.from_single_function` and `@Algorithm.register_algorithm` — deliberately replace an already-registered algorithm of the same name instead of raising. (#147)
+- **`CompositeAlgorithm.register_from_list(keys, name)`** — declare a composite without looking its components up, so a module can declare one whichever order discovery imports it in. The declarations are built after the walk, repeating until composites built from other composites are satisfied; anything that can never be built raises a `RuntimeError` naming the missing components. (#147)
+- **`calc_power_balance_from_input_P_aux` is now a registered algorithm**, so it can be listed in an `input.yaml` and appears in `algorithms.yaml`. It was previously reachable only as a module attribute. (#147)
 - **JCH profile algorithms** — `calc_jch_profiles`, `calc_jch_pedestal_peaking`. (#139)
 - **Profile-selection composite algorithms** — `calc_peaking_and_analytic_profiles`, `calc_peaking_and_prf_profiles`. (#139)
 - **Radial-grid algorithm** — `define_radial_grid`, which provides `rho`. (#139)
@@ -26,7 +28,8 @@ release because of the breaking changes listed below. (#147)
 
 ### Changed
 
-- **The algorithm registry is populated lazily** — discovery runs once, on the first query through `Algorithm.algorithms()`, `Algorithm.get_algorithm()`, `Algorithm.write_yaml()` or the `algorithms` accessor. Code which reads `Algorithm.instances` directly must call `discover_builtin_algorithms()` first. A lookup made while discovery is still in progress (for example from a module which builds a `CompositeAlgorithm` at import time) sees only the algorithms registered up to that point. (#147)
+- **The algorithm registry is populated lazily** — discovery runs once, on the first query through `Algorithm.algorithms()`, `Algorithm.get_algorithm()`, `Algorithm.write_yaml()` or the `algorithms` accessor. Code which reads `Algorithm.instances` directly must call `discover_builtin_algorithms()` first. (#147)
+- **Composite algorithms are no longer module-level variables** — `calc_peaking_and_analytic_profiles`, `calc_peaking_and_prf_profiles` and `calc_power_balance_from_input_P_aux` are declared rather than built at import time, so they are reached through the registry (`algorithms["name"]`) instead of imported from their defining module. (#147)
 - **`cfspopcon.formulas` submodules are imported on first attribute access** rather than eagerly, so `cfspopcon.formulas.geometry` keeps working without a hand-maintained import list. (#147)
 - **`skip_registration=True` no longer raises on a duplicate name** — it is honoured before the duplicate-name check, so a variant of an already-registered algorithm can be constructed without touching the registry. (#147)
 - **The duplicate-registration and unknown-algorithm error messages** now describe discovery instead of telling you to add an import to `cfspopcon/__init__.py`. (#147)

@@ -17,6 +17,10 @@ from .unit_handling import Quantity, convert_to_default_units, ureg
 LabelledReturnFunctionType = Callable[..., dict[str, Any]]
 GenericFunctionType = Callable[..., Any]
 
+#: Composites declared by :meth:`CompositeAlgorithm.register_from_list` but not yet built, as
+#: (name, component names). Drained by :func:`build_pending_composites`.
+_pending_composites: list[tuple[str, list[str]]] = []
+
 
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
@@ -273,9 +277,8 @@ class Algorithm:
                 f"algorithm '{key}' not found. "
                 "cfspopcon's own algorithms are registered by walking cfspopcon.formulas, so a module "
                 "under that package is enough; an algorithm defined elsewhere needs a cfspopcon.algorithms "
-                "entry point, or an explicit discover_algorithms_in_package call. Note that a lookup made "
-                "while discovery is still running only sees the algorithms registered so far. Successfully "
-                "registered algorithms appear in the algorithms.yaml file."
+                "entry point, or an explicit discover_algorithms_in_package call. Successfully registered "
+                "algorithms appear in the algorithms.yaml file."
             )
             raise KeyError(error_message)
 
@@ -376,9 +379,23 @@ class CompositeAlgorithm:
 
     @classmethod
     def from_list(cls, keys: list[str], name: str | None = None, register: bool = False) -> CompositeAlgorithm:
-        """Build a CompositeAlgorithm from a list of Algorithm names."""
+        """Build a CompositeAlgorithm from a list of Algorithm names.
+
+        The named algorithms must already be registered. A module which is imported by algorithm
+        discovery cannot rely on that, so it should use :meth:`register_from_list` instead.
+        """
         algorithms = [Algorithm.get_algorithm(key) for key in keys]
         return CompositeAlgorithm(algorithms=algorithms, name=name, register=register)
+
+    @classmethod
+    def register_from_list(cls, keys: list[str], name: str) -> None:
+        """Declare a named CompositeAlgorithm, to be built once its components are registered.
+
+        Nothing is looked up here, so a module can declare a composite whichever order discovery
+        happens to import it in. :func:`build_pending_composites` builds the declarations, and is
+        called for you at the end of discovery.
+        """
+        _pending_composites.append((name, list(keys)))
 
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
@@ -552,6 +569,33 @@ def _validate_inputs(
     if not quiet:
         warn(message, stacklevel=3)
     return False
+
+
+def build_pending_composites() -> None:
+    """Build every composite declared by :meth:`CompositeAlgorithm.register_from_list`.
+
+    A composite may be built from other composites, so this repeats until every declaration has
+    been built. Each pass builds whichever declarations have all of their components registered by
+    now and defers the rest; if a pass builds nothing, the remaining declarations can never be
+    satisfied and a RuntimeError names them along with the components they are missing.
+    """
+    while _pending_composites:
+        deferred: list[tuple[str, list[str]]] = []
+        for name, keys in _pending_composites:
+            if all(key in Algorithm.instances for key in keys):
+                # Read the registry directly: get_algorithm would re-enter discovery from here.
+                CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
+            else:
+                deferred.append((name, keys))
+
+        if len(deferred) == len(_pending_composites):
+            unresolved = "; ".join(
+                f"'{name}' is missing [{', '.join(k for k in keys if k not in Algorithm.instances)}]" for name, keys in deferred
+            )
+            _pending_composites.clear()
+            raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
+
+        _pending_composites[:] = deferred
 
 
 class _AlgorithmRegistry:

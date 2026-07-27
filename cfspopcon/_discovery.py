@@ -13,12 +13,11 @@ Both run lazily and exactly once, the first time the registry is queried (see
 :meth:`cfspopcon.algorithm_class.Algorithm.algorithms`). The ``@Algorithm.register_algorithm``
 decorator is unchanged; discovery only automates *which modules get imported*.
 
-The walk visits modules in ``pkgutil`` order (alphabetical within each package), and a re-entrant
-registry query made while the walk is in progress sees only the algorithms registered so far. A
-module that builds a :class:`~cfspopcon.algorithm_class.CompositeAlgorithm` at import time therefore
-has to be visited after the modules registering that composite's components; otherwise the lookup
-raises ``KeyError``. Build such a composite inside the module that defines its last component, or
-in a module sorting after it.
+Discovery runs in two phases, so the order the walk happens to visit modules in does not matter.
+The walk itself only registers algorithms and *declares* composites (see
+:meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`); the declarations are
+built afterwards, once every component is registered. Because a composite may be built from other
+composites, that build repeats until all declarations are satisfied.
 """
 
 from __future__ import annotations
@@ -40,25 +39,34 @@ _discovered = False
 _discovering = False
 
 
-def discover_algorithms_in_package(package: ModuleType | str) -> None:
+def discover_algorithms_in_package(package: ModuleType | str, build_composites: bool = True) -> None:
     """Import every submodule of ``package`` so its ``@Algorithm.register_algorithm`` decorators run.
 
     ``package`` is an imported package or its dotted name. Walking the package registers every
     algorithm defined anywhere beneath it, so a package (cfspopcon or one that builds on it) can
     register all of its algorithms without importing each module by hand.
+
+    Composites declared with :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`
+    are built afterwards. Pass ``build_composites=False`` to leave them pending, when a later
+    discovery step still has to register the algorithms they are built from.
     """
+    from .algorithm_class import build_pending_composites
+
     if isinstance(package, str):
         package = importlib.import_module(package)
 
     for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
         importlib.import_module(info.name)
 
+    if build_composites:
+        build_pending_composites()
 
-def discover_builtin_algorithms() -> None:
+
+def discover_builtin_algorithms(build_composites: bool = True) -> None:
     """Register cfspopcon's own algorithms by walking the :mod:`cfspopcon.formulas` package."""
     from . import formulas
 
-    discover_algorithms_in_package(formulas)
+    discover_algorithms_in_package(formulas, build_composites=build_composites)
 
 
 def load_entry_point_algorithms(group: str = ENTRY_POINT_GROUP) -> None:
@@ -72,17 +80,24 @@ def load_entry_point_algorithms(group: str = ENTRY_POINT_GROUP) -> None:
 def ensure_discovered() -> None:
     """Run built-in + entry-point discovery exactly once (idempotent).
 
+    Composites are built only once both the built-in walk and the entry points have registered
+    their algorithms, so a downstream composite may be built from cfspopcon's algorithms and vice
+    versa.
+
     A registry query made from a module being imported by the walk re-enters this function; that
     re-entrant call returns immediately rather than restarting the walk. A walk which raises leaves
     the flag clear, so the next query retries instead of being stuck with a half-filled registry.
     """
+    from .algorithm_class import build_pending_composites
+
     global _discovered, _discovering  # noqa: PLW0603
     if _discovered or _discovering:
         return
     _discovering = True
     try:
-        discover_builtin_algorithms()
+        discover_builtin_algorithms(build_composites=False)
         load_entry_point_algorithms()
+        build_pending_composites()
     finally:
         _discovering = False
     _discovered = True

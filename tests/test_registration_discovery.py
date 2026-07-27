@@ -10,7 +10,17 @@ from pathlib import Path
 import pytest
 
 from cfspopcon import _discovery
-from cfspopcon.algorithm_class import Algorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, _pending_composites, build_pending_composites
+
+
+@pytest.fixture()
+def clean_composites():
+    """Drop any composites (and their component stubs) a test declares."""
+    declared: list[str] = []
+    yield declared
+    _pending_composites.clear()
+    for name in declared:
+        Algorithm.instances.pop(name, None)
 
 
 def test_discovery_is_idempotent_and_populates_registry():
@@ -27,7 +37,7 @@ def test_failed_discovery_is_retried(monkeypatch):
     monkeypatch.setattr(_discovery, "_discovered", False)
     monkeypatch.setattr(_discovery, "_discovering", False)
 
-    def boom():
+    def boom(build_composites=True):
         raise ImportError("a formulas module failed to import")
 
     monkeypatch.setattr(_discovery, "discover_builtin_algorithms", boom)
@@ -46,7 +56,7 @@ def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch):
     monkeypatch.setattr(_discovery, "_discovering", False)
     calls = []
 
-    def walk():
+    def walk(build_composites=True):
         calls.append(True)
         _discovery.ensure_discovered()  # re-entrant, as an import-time get_algorithm would be
 
@@ -122,3 +132,31 @@ def test_formulas_subpackages_are_importable_as_attributes():
     assert formulas.geometry.analytical.calc_plasma_volume is not None
     with pytest.raises(AttributeError):
         formulas.not_a_subpackage
+
+
+def test_composites_build_regardless_of_declaration_order(clean_composites):
+    """A composite may be declared before the algorithms and composites it is built from."""
+    declared = clean_composites
+    declared += ["_probe_base", "_probe_composite", "_probe_of_composite"]
+
+    # Declared first, but depends on a composite which is itself declared after its own component.
+    CompositeAlgorithm.register_from_list(keys=["_probe_composite"], name="_probe_of_composite")
+    CompositeAlgorithm.register_from_list(keys=["_probe_base"], name="_probe_composite")
+    Algorithm.from_single_function(lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_base", skip_unit_conversion=True)
+
+    build_pending_composites()
+
+    assert not _pending_composites
+    assert isinstance(Algorithm.get_algorithm("_probe_composite"), CompositeAlgorithm)
+    assert isinstance(Algorithm.get_algorithm("_probe_of_composite"), CompositeAlgorithm)
+
+
+def test_unsatisfiable_composite_names_its_missing_components(clean_composites):
+    """A composite which can never be built is reported, rather than silently left unbuilt."""
+    CompositeAlgorithm.register_from_list(keys=["_probe_never_registered"], name="_probe_doomed")
+
+    with pytest.raises(RuntimeError, match=r"_probe_doomed.*_probe_never_registered"):
+        build_pending_composites()
+
+    # The pending list is drained, so an unrelated later build is not tripped up by this one.
+    assert not _pending_composites
