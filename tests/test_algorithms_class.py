@@ -327,10 +327,12 @@ def test_registration_semantics_skip_override_and_collision():
 
 def test_registry_indexing():
     """algorithms[...] returns an Algorithm or CompositeAlgorithm."""
-    name = next(iter(algorithms))
-    assert name in algorithms
-    assert isinstance(algorithms[name], (Algorithm, CompositeAlgorithm))
-    assert isinstance(algorithms[list(algorithms)[:2]], CompositeAlgorithm)
+    names = ["calc_plasma_volume", "calc_plasma_surface_area"]
+    for name in names:
+        assert name in algorithms
+        assert isinstance(algorithms[name], Algorithm)
+    assert isinstance(algorithms[names], CompositeAlgorithm)
+    assert isinstance(algorithms[tuple(names)], CompositeAlgorithm)
 
     with pytest.raises(TypeError, match="name .str. or a list"):
         algorithms[123]

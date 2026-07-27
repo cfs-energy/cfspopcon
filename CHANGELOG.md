@@ -6,8 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+This will be released as **v9.0.0**; the version in `pyproject.toml` has been bumped ahead of the
+release because of the breaking changes listed below. (#147)
+
 ### Added
 
+- **Automatic algorithm discovery** — `cfspopcon.formulas` is walked with `pkgutil` on first use, so adding a `formulas/...` module registers its algorithms with no `__init__.py` edit. (#147)
+- **`discover_algorithms_in_package(package)`** — walk any package to register the algorithms defined beneath it, for codes which build on cfspopcon. (#147)
+- **`discover_builtin_algorithms()`** — register cfspopcon's own algorithms explicitly, for callers that read `Algorithm.instances` directly instead of going through the registry accessors. (#147)
+- **`cfspopcon.algorithms` entry-point group** — an installed distribution can contribute algorithms with no cfspopcon-side import. The entry-point target may be a module (imported for its registration side effects) or a callable (invoked to register). (#147)
+- **`algorithms` registry accessor** — `algorithms["name"]` returns an `Algorithm`, `algorithms[["a", "b"]]` builds a `CompositeAlgorithm`, and `"name" in algorithms` / iteration list the registered names. (#147)
+- **`override` flag** on `Algorithm(...)`, `Algorithm.from_single_function` and `@Algorithm.register_algorithm` — deliberately replace an already-registered algorithm of the same name instead of raising. (#147)
 - **JCH profile algorithms** — `calc_jch_profiles`, `calc_jch_pedestal_peaking`. (#139)
 - **Profile-selection composite algorithms** — `calc_peaking_and_analytic_profiles`, `calc_peaking_and_prf_profiles`. (#139)
 - **Radial-grid algorithm** — `define_radial_grid`, which provides `rho`. (#139)
@@ -17,11 +26,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **The algorithm registry is populated lazily** — discovery runs once, on the first query through `Algorithm.algorithms()`, `Algorithm.get_algorithm()`, `Algorithm.write_yaml()` or the `algorithms` accessor. Code which reads `Algorithm.instances` directly must call `discover_builtin_algorithms()` first. A lookup made while discovery is still in progress (for example from a module which builds a `CompositeAlgorithm` at import time) sees only the algorithms registered up to that point. (#147)
+- **`cfspopcon.formulas` submodules are imported on first attribute access** rather than eagerly, so `cfspopcon.formulas.geometry` keeps working without a hand-maintained import list. (#147)
+- **`skip_registration=True` no longer raises on a duplicate name** — it is honoured before the duplicate-name check, so a variant of an already-registered algorithm can be constructed without touching the registry. (#147)
+- **The duplicate-registration and unknown-algorithm error messages** now describe discovery instead of telling you to add an import to `cfspopcon/__init__.py`. (#147)
 - **Profile form is selected by algorithm** — list a `calc_peaking_and_*_profiles` composite instead of setting the `density_profile_form` / `temp_profile_form` inputs. (#139)
 - **`calc_analytic_profiles`, `calc_prf_profiles` algorithms** now take `rho` as an input and no longer return it; the `npoints` argument is removed. (#139)
 - **`wraps_ufunc`** infers `output_core_dims` from the number of return units, so multi-return functions no longer need to pass it explicitly. (#141)
 
 ### Removed
 
+- **`cfspopcon.formulas.__all__`** — the hand-maintained submodule list is gone, so `from cfspopcon.formulas import *` no longer pulls in the subpackages. Import them by name, or use `dir(cfspopcon.formulas)` to list them. (#147)
 - **`calc_peaked_profiles`, `calc_1D_plasma_profiles` algorithms** — replaced by `calc_peaking_and_analytic_profiles` / `calc_peaking_and_prf_profiles`. (#139)
 - **`density_profile_form`, `temp_profile_form` inputs** — and with them, mixed density/temperature profile forms. (#139)

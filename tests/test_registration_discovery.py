@@ -7,6 +7,8 @@ the "registered-but-not-importable" gap it guarded against can no longer occur.
 import sys
 from pathlib import Path
 
+import pytest
+
 from cfspopcon import _discovery
 from cfspopcon.algorithm_class import Algorithm
 
@@ -18,6 +20,39 @@ def test_discovery_is_idempotent_and_populates_registry():
     assert len(populated) > 100
     _discovery.ensure_discovered()
     assert Algorithm.instances == populated
+
+
+def test_failed_discovery_is_retried(monkeypatch):
+    """A discovery walk which raises must not leave the registry permanently half-filled."""
+    monkeypatch.setattr(_discovery, "_discovered", False)
+    monkeypatch.setattr(_discovery, "_discovering", False)
+
+    def boom():
+        raise ImportError("a formulas module failed to import")
+
+    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", boom)
+    with pytest.raises(ImportError):
+        _discovery.ensure_discovered()
+    assert not _discovery._discovered
+
+    monkeypatch.undo()
+    # The next query must run the walk rather than trusting the failed attempt.
+    assert len(Algorithm.algorithms()) > 100
+
+
+def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch):
+    """A registry query from a module being imported by the walk must not recurse."""
+    monkeypatch.setattr(_discovery, "_discovered", False)
+    monkeypatch.setattr(_discovery, "_discovering", False)
+    calls = []
+
+    def walk():
+        calls.append(True)
+        _discovery.ensure_discovered()  # re-entrant, as an import-time get_algorithm would be
+
+    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", walk)
+    _discovery.ensure_discovered()
+    assert calls == [True]
 
 
 def test_drop_in_module_is_discovered_without_editing_init():
@@ -77,3 +112,13 @@ def test_entry_point_callable_is_invoked(monkeypatch):
     monkeypatch.setattr(_discovery, "entry_points", lambda group: [_FakeEntryPoint()])
     _discovery.load_entry_point_algorithms()
     assert called == [True]
+
+
+def test_formulas_subpackages_are_importable_as_attributes():
+    """cfspopcon.formulas.<subpackage> resolves without the registry having been queried first."""
+    from cfspopcon import formulas
+
+    assert "geometry" in dir(formulas)
+    assert formulas.geometry.analytical.calc_plasma_volume is not None
+    with pytest.raises(AttributeError):
+        formulas.not_a_subpackage

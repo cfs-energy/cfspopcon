@@ -271,10 +271,11 @@ class Algorithm:
         if key not in cls.algorithms():
             error_message = (
                 f"algorithm '{key}' not found. "
-                "If you have constructed or registered an Algorithm of this name, "
-                "make sure that it is imported in the top-level cfspopcon __init__.py. "
-                "Algorithms which have been successfully registered and imported will "
-                "appear in the algorithms.yaml file."
+                "cfspopcon's own algorithms are registered by walking cfspopcon.formulas, so a module "
+                "under that package is enough; an algorithm defined elsewhere needs a cfspopcon.algorithms "
+                "entry point, or an explicit discover_algorithms_in_package call. Note that a lookup made "
+                "while discovery is still running only sees the algorithms registered so far. Successfully "
+                "registered algorithms appear in the algorithms.yaml file."
             )
             raise KeyError(error_message)
 
