@@ -9,6 +9,7 @@ Configuration Enums
 
 Formulas
 ========================
+.. automodule:: cfspopcon.formulas
 
 Auxiliary Power
 ----------------
@@ -65,6 +66,8 @@ Atomic Data
 Algorithms
 =====================
 .. automodule:: cfspopcon.algorithm_class
+
+.. automodule:: cfspopcon._discovery
 
 
 Internals
