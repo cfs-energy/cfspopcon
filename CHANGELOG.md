@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Forward energy-confinement algorithms** — `calc_energy_confinement_time_from_scaling` and `calc_energy_confinement_time_from_stored_energy_and_input_power`, giving `energy_confinement_time` from a known input power. (#141)
 - **`calc_H98y2`** — energy confinement time relative to the ITER98y2 scaling; adds the `H98y2` output. (#141)
 - **Fixed-auxiliary-power balance** — `calc_input_power_for_fixed_auxiliary_power` and the `calc_power_balance_from_input_P_aux` composite. (#141)
+- **`register_plugin()`** — register an external plugin package, which registers its own algorithms, variables and units, with clash detection, rollback and a report of what was added. (#148)
 - **`extend_default_units_map` is exported from `cfspopcon.unit_handling`** — the supported way for a downstream package to declare default units for variables of its own, since `read_default_units_from_file()` reads only cfspopcon's `variables.yaml` and takes no path argument. It was previously reachable only from `cfspopcon.unit_handling.default_units`.
 
 ### Changed

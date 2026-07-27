@@ -57,6 +57,15 @@ def extend_default_units_map(units_dictionary: dict[str, str]) -> None:
     _DEFAULT_UNITS |= units_dictionary
 
 
+def default_units_map() -> dict[str, str]:
+    """Return a copy of the registered default units map.
+
+    Returns:
+        Mapping from variable name to the name of its default unit.
+    """
+    return dict(_DEFAULT_UNITS)
+
+
 def reset_default_units() -> None:
     """Reset the default units to an empty dictionary."""
     global _DEFAULT_UNITS  # noqa: PLW0603

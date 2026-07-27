@@ -16,6 +16,7 @@ from .algorithm_class import (
 from .deprecation_handler import handle_deprecated_arguments
 from .input_file_handling import process_input_dictionary, read_case
 from .plotting import read_plot_style
+from .plugins import PluginClashError, PluginReport, register_plugin
 from .unit_handling import (
     convert_to_default_units,
     convert_units,
@@ -27,6 +28,8 @@ from .unit_handling import (
 __all__ = [
     "Algorithm",
     "CompositeAlgorithm",
+    "PluginClashError",
+    "PluginReport",
     "convert_to_default_units",
     "convert_units",
     "discover_algorithms_in_package",
@@ -39,6 +42,7 @@ __all__ = [
     "process_input_dictionary",
     "read_case",
     "read_plot_style",
+    "register_plugin",
     "registry",
     "set_default_units",
     "shaping_and_selection",
