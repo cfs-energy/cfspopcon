@@ -378,14 +378,14 @@ class CompositeAlgorithm:
         self.__doc__ = self._make_docstring()
 
     @classmethod
-    def from_list(cls, keys: list[str], name: str | None = None, register: bool = False) -> CompositeAlgorithm:
-        """Build a CompositeAlgorithm from a list of Algorithm names.
+    def _build_from_list(cls, keys: list[str]) -> CompositeAlgorithm:
+        """Build an unnamed, unregistered CompositeAlgorithm from a list of Algorithm names.
 
         The named algorithms must already be registered. A module which is imported by algorithm
-        discovery cannot rely on that, so it should use :meth:`register_from_list` instead.
+        discovery cannot rely on that, so it should use :meth:`register_from_list` instead. To build
+        a composite at runtime, index the registry: ``algorithms[["a", "b"]]``.
         """
-        algorithms = [Algorithm.get_algorithm(key) for key in keys]
-        return CompositeAlgorithm(algorithms=algorithms, name=name, register=register)
+        return CompositeAlgorithm([Algorithm.get_algorithm(key) for key in keys])
 
     @classmethod
     def register_from_list(cls, keys: list[str], name: str) -> None:
@@ -603,7 +603,7 @@ class _AlgorithmRegistry:
 
     ``algorithms["name"]`` returns the named :class:`Algorithm`; ``algorithms[["a", "b"]]`` returns a
     :class:`CompositeAlgorithm` built from those names, delegating to ``Algorithm.get_algorithm`` and
-    ``CompositeAlgorithm.from_list``. A composite executes its algorithms in the order the names are given.
+    ``CompositeAlgorithm._build_from_list``. A composite executes its algorithms in the order the names are given.
     """
 
     def __getitem__(self, key: str | list[str] | tuple[str, ...]) -> Algorithm | CompositeAlgorithm:
@@ -611,7 +611,7 @@ class _AlgorithmRegistry:
         if isinstance(key, str):
             return Algorithm.get_algorithm(key)
         if isinstance(key, (list, tuple)):
-            return CompositeAlgorithm.from_list(list(key))
+            return CompositeAlgorithm._build_from_list(list(key))
         raise TypeError("Index the algorithm registry with a name (str) or a list/tuple of names.")
 
     def __iter__(self) -> Iterator[str]:

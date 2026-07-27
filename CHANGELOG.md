@@ -39,6 +39,7 @@ release because of the breaking changes listed below. (#147)
 
 ### Removed
 
+- **`CompositeAlgorithm.from_list`** — renamed to `CompositeAlgorithm._build_from_list`. To build a composite from a list of names, index the registry instead: `algorithms[["a", "b"]]`. (#147)
 - **`cfspopcon.formulas.__all__`** — the hand-maintained submodule list is gone, so `from cfspopcon.formulas import *` no longer pulls in the subpackages. Import them by name, or use `dir(cfspopcon.formulas)` to list them. (#147)
 - **`calc_peaked_profiles`, `calc_1D_plasma_profiles` algorithms** — replaced by `calc_peaking_and_analytic_profiles` / `calc_peaking_and_prf_profiles`. (#139)
 - **`density_profile_form`, `temp_profile_form` inputs** — and with them, mixed density/temperature profile forms. (#139)
