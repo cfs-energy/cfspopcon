@@ -7,7 +7,7 @@ from ...algorithm_class import Algorithm
 from ...helpers import get_item
 from ...unit_handling import Unitfull
 from .bremsstrahlung import calc_bremsstrahlung_radiation
-from .impurity_radiated_power import calc_impurity_radiated_power
+from .impurity_radiated_power.radiated_power import calc_impurity_radiated_power
 from .synchrotron import calc_synchrotron_radiation
 
 
