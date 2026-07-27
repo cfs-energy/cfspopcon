@@ -50,13 +50,24 @@ def discover_algorithms_in_package(package: ModuleType | str, build_composites: 
     are built afterwards. Pass ``build_composites=False`` to leave them pending, when a later
     discovery step still has to register the algorithms they are built from.
     """
-    from .algorithm_class import build_pending_composites
+    from .algorithm_class import Algorithm, _pending_composites, build_pending_composites
 
     if isinstance(package, str):
         package = importlib.import_module(package)
 
     for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
-        importlib.import_module(info.name)
+        # Python drops a module which raises partway from sys.modules, so a later attempt at
+        # discovery re-runs its body from the top. Undo whatever it registered before it raised,
+        # otherwise that re-run collides with its own leftovers and discovery can never succeed.
+        registered = set(Algorithm.instances)
+        declared = len(_pending_composites)
+        try:
+            importlib.import_module(info.name)
+        except BaseException:
+            for key in set(Algorithm.instances) - registered:
+                del Algorithm.instances[key]
+            del _pending_composites[declared:]
+            raise
 
     if build_composites:
         build_pending_composites()

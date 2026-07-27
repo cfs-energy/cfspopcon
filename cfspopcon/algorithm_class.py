@@ -289,7 +289,11 @@ class CompositeAlgorithm:
     """A class which combined multiple Algorithms into a single object which behaves like an Algorithm."""
 
     def __init__(  # noqa: PLR0912
-        self, algorithms: Sequence[Algorithm | CompositeAlgorithm], name: str | None = None, register: bool = False
+        self,
+        algorithms: Sequence[Algorithm | CompositeAlgorithm],
+        name: str | None = None,
+        register: bool = False,
+        override: bool = False,
     ):
         """Initialise a CompositeAlgorithm, combining several other Algorithms.
 
@@ -297,6 +301,7 @@ class CompositeAlgorithm:
             algorithms: a list of Algorithms, in the order that they should be executed.
             name: a name used to refer to the composite algorithm.
             register: flag register a named CompositeAlgorithm to 'Algorithm.instances' (ignored if name = None)
+            override: if the name is already registered, replace the existing entry instead of raising.
         """
         if not (isinstance(algorithms, Sequence) and all(isinstance(alg, Algorithm | CompositeAlgorithm) for alg in algorithms)):
             raise TypeError("Should pass a list of algorithms or composites to CompositeAlgorithm.")
@@ -304,8 +309,12 @@ class CompositeAlgorithm:
         self.algorithms: list[Algorithm] = []
 
         if (name is not None) and (register):
-            if name in Algorithm.instances:
-                raise RuntimeError(f"Algorithm {name} has been defined multiple times.")
+            if name in Algorithm.instances and not override:
+                raise RuntimeError(
+                    f"Algorithm '{name}' is already registered. "
+                    "Pass override=True to replace it, or register=False "
+                    "to construct it without registering."
+                )
             Algorithm.instances[name] = self
 
         # flattens composite algorithms into their respective list of plain Algorithms

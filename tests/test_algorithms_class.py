@@ -338,3 +338,25 @@ def test_registry_indexing():
         algorithms[123]
     with pytest.raises(KeyError):
         algorithms["not_a_registered_algorithm_name"]
+
+
+def test_composite_registration_collision_and_override():
+    """A named, registered CompositeAlgorithm follows the same collision rules as an Algorithm."""
+    name = "_composite_coexistence_probe"
+    component = Algorithm.get_algorithm("calc_plasma_volume")
+    Algorithm.instances.pop(name, None)
+    try:
+        first = CompositeAlgorithm([component], name=name, register=True)
+        assert Algorithm.instances[name] is first
+
+        # register=False must not collide, and must leave the registry untouched
+        CompositeAlgorithm([component], name=name, register=False)
+        assert Algorithm.instances[name] is first
+
+        with pytest.raises(RuntimeError, match="already registered"):
+            CompositeAlgorithm([component], name=name, register=True)
+
+        third = CompositeAlgorithm([component], name=name, register=True, override=True)
+        assert Algorithm.instances[name] is third
+    finally:
+        Algorithm.instances.pop(name, None)

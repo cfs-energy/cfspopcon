@@ -160,3 +160,38 @@ def test_unsatisfiable_composite_names_its_missing_components(clean_composites):
 
     # The pending list is drained, so an unrelated later build is not tripped up by this one.
     assert not _pending_composites
+
+
+def test_partially_executed_module_is_rolled_back_so_discovery_can_retry(tmp_path, monkeypatch):
+    """A module which registers and then raises must not poison the retry with its own leftovers."""
+    pkg = tmp_path / "_flaky_probe_pkg"
+    pkg.mkdir()
+    (pkg / "__init__.py").write_text("")
+    (pkg / "flaky.py").write_text(
+        "import os\n\n"
+        "from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm\n\n\n"
+        "@Algorithm.register_algorithm(return_keys=['_flaky_out'], skip_unit_conversion=True)\n"
+        "def calc_flaky_probe(_flaky_in):\n"
+        '    """Throwaway probe algorithm."""\n'
+        "    return _flaky_in\n\n\n"
+        "CompositeAlgorithm.register_from_list(keys=['calc_flaky_probe'], name='_flaky_composite')\n\n"
+        "if not os.environ.get('FLAKY_PROBE_OK'):\n"
+        "    raise ImportError('transient failure after registering')\n"
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(ImportError):
+            _discovery.discover_algorithms_in_package("_flaky_probe_pkg")
+
+        # Python re-runs the module body on the next attempt, so nothing may be left behind.
+        assert "calc_flaky_probe" not in Algorithm.instances
+        assert "_flaky_composite" not in [name for name, _ in _pending_composites]
+
+        monkeypatch.setenv("FLAKY_PROBE_OK", "1")
+        _discovery.discover_algorithms_in_package("_flaky_probe_pkg")
+        assert isinstance(Algorithm.get_algorithm("_flaky_composite"), CompositeAlgorithm)
+    finally:
+        for name in ("calc_flaky_probe", "_flaky_composite"):
+            Algorithm.instances.pop(name, None)
+        for name in [m for m in sys.modules if m == "_flaky_probe_pkg" or m.startswith("_flaky_probe_pkg.")]:
+            sys.modules.pop(name, None)

@@ -24,5 +24,5 @@ def __getattr__(name: str) -> ModuleType:
 
 
 def __dir__() -> list[str]:
-    """List the submodules, so they are discoverable without importing them all."""
-    return list(_SUBMODULES)
+    """List the submodules alongside the usual module attributes, without importing them all."""
+    return sorted(set(_SUBMODULES) | set(globals()))
