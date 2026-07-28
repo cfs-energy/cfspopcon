@@ -25,7 +25,7 @@ from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from types import ModuleType
+    from types import ModuleType, TracebackType
 
 #: Entry-point group downstream packages declare to contribute algorithms. The target may be a
 #: module (imported for its ``@register`` side effects) or a callable taking no arguments (invoked
@@ -37,6 +37,7 @@ ENTRY_POINT_GROUP = "cfspopcon.algorithms"
 _discovered = False
 _discovering = False
 _failure: Exception | None = None
+_failure_traceback: TracebackType | None = None
 
 
 def discover_algorithms_in_package(package: ModuleType | str) -> None:
@@ -53,7 +54,7 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
     """
     from .algorithm_class import build_pending_composites
 
-    global _discovering, _failure  # noqa: PLW0603
+    global _discovering, _failure, _failure_traceback  # noqa: PLW0603
 
     ensure_discovered()  # whatever the walk imports may refer to cfspopcon's own algorithms
 
@@ -68,7 +69,8 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
         if outermost:
             build_pending_composites()
     except Exception as exc:
-        _failure = exc  # a half-walked package poisons the registry; say so on every later query
+        # A half-walked package poisons the registry; say so on every later query.
+        _failure, _failure_traceback = exc, exc.__traceback__
         raise
     finally:
         _discovering = not outermost
@@ -107,9 +109,11 @@ def ensure_discovered() -> None:
     """
     from .algorithm_class import build_pending_composites
 
-    global _discovered, _discovering, _failure  # noqa: PLW0603
+    global _discovered, _discovering, _failure, _failure_traceback  # noqa: PLW0603
     if _failure is not None:
-        raise _failure
+        # Restore the traceback it failed with: re-raising the object as-is would grow its
+        # traceback by a frame on every registry query for the rest of the process.
+        raise _failure.with_traceback(_failure_traceback)
     if _discovered or _discovering:
         return
     _discovering = True
@@ -118,7 +122,7 @@ def ensure_discovered() -> None:
         load_entry_point_algorithms()
         build_pending_composites()
     except Exception as exc:
-        _failure = exc
+        _failure, _failure_traceback = exc, exc.__traceback__
         raise
     finally:
         _discovering = False

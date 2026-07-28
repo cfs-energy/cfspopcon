@@ -7,6 +7,7 @@ the "registered-but-not-importable" gap it guarded against can no longer occur.
 import os
 import subprocess
 import sys
+import traceback
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -106,6 +107,15 @@ def test_a_failed_discovery_keeps_failing_the_same_way(monkeypatch, fresh_discov
     with pytest.raises(ImportError) as second:
         Algorithm.algorithms()
     assert second.value is first.value
+
+    # Re-raising the stored object would append a frame to its traceback every time, so a
+    # long-lived process querying a poisoned registry would grow one without bound.
+    def depth():
+        with pytest.raises(ImportError) as raised:
+            Algorithm.algorithms()
+        return len(traceback.format_exception(raised.value))
+
+    assert depth() == depth()
 
 
 def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch, fresh_discovery):
