@@ -9,8 +9,7 @@ import click
 import matplotlib.pyplot as plt
 import xarray as xr
 
-from cfspopcon import file_io
-from cfspopcon._discovery import discover_builtin_algorithms
+from cfspopcon import discover_builtin_algorithms, file_io
 from cfspopcon.deprecation_handler import handle_deprecated_arguments
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.plotting import make_plot, read_plot_style

@@ -7,9 +7,6 @@ discover_builtin_algorithms.
 """
 
 import importlib
-import subprocess
-import sys
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -21,6 +18,10 @@ from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
 from cfspopcon.unit_handling import Quantity, ureg
 
 PACKAGE = "_ds_probe_pkg"
+
+#: A builtin composite, named rather than picked out of the registry, so which one is under test does
+#: not depend on the order the walk happened to register them in.
+BUILTIN_COMPOSITE = "calc_peaking_and_analytic_profiles"
 
 #: The composites the package declares, from a single algorithm through to one nested three deep.
 #: Declaring them all in a module the walk reaches *before* the one defining the algorithm also
@@ -34,7 +35,7 @@ assert "calc_ds_metric" not in Algorithm.instances
 CompositeAlgorithm.register_from_list(["calc_ds_metric"], name="_ds_own")
 CompositeAlgorithm.register_from_list(["calc_plasma_volume", "calc_cylindrical_edge_safety_factor"], name="_ds_builtins")
 CompositeAlgorithm.register_from_list(["calc_plasma_volume", "calc_ds_metric"], name="_ds_mixed")
-CompositeAlgorithm.register_from_list(["{builtin_composite}", "_ds_own"], name="_ds_of_builtin_composite")
+CompositeAlgorithm.register_from_list(["{BUILTIN_COMPOSITE}", "_ds_own"], name="_ds_of_builtin_composite")
 CompositeAlgorithm.register_from_list(["_ds_of_builtin_composite", "_ds_mixed"], name="_ds_deep")
 """
 
@@ -68,18 +69,18 @@ def downstream_package(tmp_path, monkeypatch, clean_composites):
 
     Only writes it: each test chooses how the package gets loaded.
     """
-    builtin_composite = next(name for name, alg in Algorithm.instances.items() if isinstance(alg, CompositeAlgorithm))
+    assert isinstance(Algorithm.get_algorithm(BUILTIN_COMPOSITE), CompositeAlgorithm)
     write_package(
         tmp_path,
         PACKAGE,
         {
-            "a_declarations": DECLARATIONS.format(builtin_composite=builtin_composite),
+            "a_declarations": DECLARATIONS.format(BUILTIN_COMPOSITE=BUILTIN_COMPOSITE),
             "z_algorithms": ALGORITHMS,
         },
     )
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
-        yield builtin_composite
+        yield tmp_path
     finally:
         forget_packages(PACKAGE)
 
@@ -97,7 +98,7 @@ def test_a_walk_extends_the_builtin_registry(downstream_package):
     member_names = [alg._name for alg in deep.algorithms]
     assert "calc_ds_metric" in member_names
     assert "calc_plasma_volume" in member_names
-    builtin_members = [alg._name for alg in Algorithm.get_algorithm(downstream_package).algorithms]
+    builtin_members = [alg._name for alg in Algorithm.get_algorithm(BUILTIN_COMPOSITE).algorithms]
     assert set(builtin_members) <= set(member_names)
 
 
@@ -129,14 +130,18 @@ def test_an_entry_point_provider_extends_the_registry(downstream_package, target
     monkeypatch.setattr(cfspopcon._discovery, "entry_points", lambda group: [SimpleNamespace(load=load)])
     assert "calc_ds_metric" not in Algorithm.instances, "the entry point must not have been loaded yet"
 
-    cfspopcon.discover_builtin_algorithms()
+    try:
+        cfspopcon.discover_builtin_algorithms()
 
-    for name in DECLARED_COMPOSITES:
-        assert isinstance(Algorithm.get_algorithm(name), CompositeAlgorithm), name
-    forget_packages("_ds_entry_pkg")
+        for name in DECLARED_COMPOSITES:
+            assert isinstance(Algorithm.get_algorithm(name), CompositeAlgorithm), name
+    finally:
+        # Must happen even if an assertion fails, or the module stays in sys.modules and the next
+        # test to write over that name imports this one's copy.
+        forget_packages("_ds_entry_pkg")
 
 
-def test_walking_before_the_builtins_are_discovered_says_what_is_missing(downstream_package):
+def test_walking_before_the_builtins_are_discovered_says_what_is_missing(downstream_package, run_script):
     """The composites name builtin algorithms, so discovery order matters and must be explained.
 
     Run in a subprocess: the suite has already discovered the builtins in this process.
@@ -149,10 +154,11 @@ def test_walking_before_the_builtins_are_discovered_says_what_is_missing(downstr
         "else:\n"
         "    raise AssertionError('should have failed without the builtins')\n"
     )
-    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(sys.path[0]))
+    # Run from where the package was written, so the subprocess can import it.
+    run_script(script, cwd=downstream_package)
 
 
-def test_the_machinery_works_without_the_builtin_algorithms(tmp_path):
+def test_the_machinery_works_without_the_builtin_algorithms(run_script):
     """A package may use Algorithm/CompositeAlgorithm without ever discovering cfspopcon's own.
 
     Covers both unit paths -- skip_unit_conversion, and a variable given units of its own -- and
@@ -189,4 +195,4 @@ result = composite.update_dataset(inputs)
 assert result["_solo_area"] == Quantity(6.0, ureg.m**2)
 assert result["_solo_label"] == "big"
 """
-    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
+    run_script(script)

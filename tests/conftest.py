@@ -1,13 +1,19 @@
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 import xarray as xr
 import yaml
+
+import cfspopcon
 from cfspopcon import _discovery, discover_builtin_algorithms
 from cfspopcon.algorithm_class import Algorithm, _pending_composites, build_pending_composites
 
 xr.set_options(display_width=300)
+
+REPOSITORY_ROOT = Path(cfspopcon.__file__).parents[1]
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -39,6 +45,21 @@ def clean_composites():
         # Set aside while something else built the real declarations, so nothing will build these
         # now. Do it here, or they stay pending for the rest of the session.
         build_pending_composites()
+
+
+@pytest.fixture()
+def run_script():
+    """Run a snippet in a fresh interpreter, so process-wide registry state can be asserted on.
+
+    Defaults to running from the repository root, and reports the child's own output on failure
+    rather than just its exit status.
+    """
+
+    def run(script: str, cwd: Path = REPOSITORY_ROOT) -> None:
+        result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, cwd=cwd, check=False)
+        assert result.returncode == 0, f"{result.stdout}\n{result.stderr}"
+
+    return run
 
 
 @pytest.fixture()

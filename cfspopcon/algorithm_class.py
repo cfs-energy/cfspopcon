@@ -275,8 +275,7 @@ class Algorithm:
         """Writes a file 'algorithms.yaml' documenting the available algorithms."""
         data = dict()
 
-        for name in cls.algorithms():
-            alg = cls.instances[name]
+        for name, alg in cls.instances.items():
             alg_data = dict()
             alg_data["inputs"] = alg.required_input_keys
             alg_data["optionals"] = alg.default_keys
@@ -298,7 +297,7 @@ class Algorithm:
     @classmethod
     def get_algorithm(cls, key: str) -> Algorithm | CompositeAlgorithm:
         """Retrieves an algorithm by name."""
-        if key not in cls.algorithms():
+        if key not in cls.instances:
             raise KeyError(_not_found_message(key))
 
         return cls.instances[key]

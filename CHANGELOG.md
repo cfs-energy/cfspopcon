@@ -41,6 +41,10 @@ release because of the breaking changes listed below. (#147)
 - **`calc_analytic_profiles`, `calc_prf_profiles` algorithms** now take `rho` as an input and no longer return it; the `npoints` argument is removed. (#139)
 - **`wraps_ufunc`** infers `output_core_dims` from the number of return units, so multi-return functions no longer need to pass it explicitly. (#141)
 
+### Fixed
+
+- **A named `CompositeAlgorithm`'s docstring** listed only its name. Operator precedence between the conditional expression and the implicitly concatenated strings meant the components, inputs and outputs were built only for an unnamed composite; since every registered composite is named, they were missing everywhere they were used. (#147)
+
 ### Removed
 
 - **`cfspopcon.AtomicData`** — import it from `cfspopcon.formulas.atomic_data` instead. Importing it at the top level was the one thing that registered an algorithm merely by importing cfspopcon, which made an un-discovered registry look like a populated one holding a single algorithm. (#147)

@@ -5,14 +5,12 @@ the "registered-but-not-importable" gap it guarded against can no longer occur.
 """
 
 import os
-import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 from utils.throwaway_packages import forget_packages, write_package
 
-import cfspopcon
 from cfspopcon import _discovery
 from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, _pending_composites, build_pending_composites
 
@@ -22,7 +20,7 @@ def register_probe(name):
     return Algorithm.from_single_function(lambda _probe_in: _probe_in, return_keys=["_probe_out"], name=name, skip_unit_conversion=True)
 
 
-def test_the_registry_is_empty_until_discovery_runs():
+def test_the_registry_is_empty_until_discovery_runs(run_script):
     """Importing cfspopcon must register nothing, so a lookup says discovery has not run.
 
     Run in a subprocess: the suite discovers once at session start, so this is unobservable here.
@@ -44,7 +42,7 @@ def test_the_registry_is_empty_until_discovery_runs():
         "cfspopcon.discover_builtin_algorithms()\n"
         "assert len(Algorithm.instances) > 100\n"
     )
-    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
+    run_script(script)
 
 
 def test_repeated_discovery_changes_nothing():
@@ -56,7 +54,7 @@ def test_repeated_discovery_changes_nothing():
     assert Algorithm.instances == populated
 
 
-def test_formulas_submodule_resolves_without_discovery():
+def test_formulas_submodule_resolves_without_discovery(run_script):
     """cfspopcon.formulas.geometry must work on a bare import, with no discovery having run.
 
     Run in a subprocess: discovery imports every submodule and binds it as a real attribute, so
@@ -70,7 +68,7 @@ def test_formulas_submodule_resolves_without_discovery():
         # Importing that submodule runs its own decorators, but must not pull in the whole package.
         "assert len(Algorithm.instances) < 100, len(Algorithm.instances)\n"
     )
-    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
+    run_script(script)
 
 
 def test_a_nested_walk_leaves_the_composite_build_to_the_outermost_one(tmp_path, monkeypatch, clean_composites):
@@ -214,7 +212,7 @@ def test_pending_composite_builds_once_a_later_step_registers_its_component(clea
 
 
 def test_a_broken_entry_point_fails_discovery_loudly(fake_entry_points):
-    """An unloadable provider must not be papered over: discovery says so."""
+    """A provider whose target raises must not be papered over: discovery propagates it."""
 
     def broken():
         raise ImportError("this distribution is broken")
@@ -262,6 +260,10 @@ def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatc
     try:
         with pytest.raises(ImportError, match="optional dependency"):
             _discovery.discover_algorithms_in_package("_probe_broken_pkg")
+
+        # The guard must be cleared on the way out, or every later walk looks nested and so never
+        # builds the composites it declares.
+        assert not _discovery._walking
 
         # An unrelated walk is unaffected: a failed walk does not poison discovery process-wide.
         _discovery.discover_algorithms_in_package("_probe_innocent_pkg")
@@ -317,7 +319,7 @@ def test_looking_up_a_declared_but_unbuilt_composite_says_so(clean_composites):
         Algorithm.get_algorithm("_probe_not_yet_built")
 
 
-def test_the_cli_discovers_before_resolving_algorithm_names(tmp_path):
+def test_the_cli_discovers_before_resolving_algorithm_names(tmp_path, run_script):
     """popcon_algorithms must discover for itself, rather than writing a near-empty file.
 
     Run in a subprocess: in-process the suite has already discovered, so this would pass whether
@@ -328,8 +330,9 @@ def test_the_cli_discovers_before_resolving_algorithm_names(tmp_path):
         "from click.testing import CliRunner\n"
         "from cfspopcon.cli import write_algorithms_yaml\n"
         f"result = CliRunner().invoke(write_algorithms_yaml, ['--output', {str(output)!r}])\n"
-        "assert result.exit_code == 0, result.output\n"
+        # CliRunner captures whatever the command raised rather than letting it out.
+        "assert result.exit_code == 0, result.exception or result.output\n"
     )
-    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
+    run_script(script)
     entries = [line for line in output.read_text().splitlines() if line and not line.startswith((" ", "#"))]
     assert len(entries) > 100, entries
