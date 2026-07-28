@@ -334,6 +334,23 @@ def test_looking_up_a_declared_but_unbuilt_composite_says_so(clean_composites):
         Algorithm.get_algorithm("_probe_not_yet_built")
 
 
+def test_the_popcon_command_discovers_before_reading_the_case(run_script):
+    """popcon must discover for itself: read_case resolves the input file's algorithm names.
+
+    Stops at read_case rather than running the case, since only the ordering is under test. Run in a
+    subprocess for the same reason as the test below.
+    """
+    script = (
+        "import cfspopcon.cli as cli\n"
+        "from cfspopcon import Algorithm\n"
+        "def stop_at_read_case(*args, **kwargs):\n"
+        "    raise SystemExit(0 if len(Algorithm.instances) > 100 else 'registry not populated before read_case')\n"
+        "cli.read_case = stop_at_read_case\n"
+        "cli.run_popcon('example_cases/SPARC_PRD', False, {})\n"
+    )
+    run_script(script)
+
+
 def test_the_cli_discovers_before_resolving_algorithm_names(tmp_path, run_script):
     """popcon_algorithms must discover for itself, rather than writing a near-empty file.
 

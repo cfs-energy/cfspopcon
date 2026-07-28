@@ -63,8 +63,8 @@ def _register(name: str, algorithm: Algorithm | CompositeAlgorithm, override: bo
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    #: The registered algorithms, keyed by name. Empty until
-    #: :func:`~cfspopcon._discovery.discover_builtin_algorithms` has run.
+    #: The registered algorithms, keyed by name. Empty until discovery has run; see
+    #: :mod:`cfspopcon._discovery`.
     instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
