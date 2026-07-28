@@ -7,7 +7,6 @@ the "registered-but-not-importable" gap it guarded against can no longer occur.
 import os
 import subprocess
 import sys
-import traceback
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -27,7 +26,6 @@ def clean_composites():
     aside for the duration rather than building or discarding those declarations, and undo whatever
     the test registers so it cannot depend on, or leak into, another test.
     """
-    Algorithm.algorithms()  # settle discovery first, so the snapshot below is of a full registry
     saved = _pending_composites[:]
     registered = set(Algorithm.instances)
     _pending_composites.clear()
@@ -37,9 +35,9 @@ def clean_composites():
     for name in set(Algorithm.instances) - registered:
         del Algorithm.instances[name]
     _pending_composites[:] = saved
-    if saved and _discovery._discovered:
-        # Discovery completed while the real declarations were set aside, so nothing else will
-        # build them now. Do it here, or they stay pending for the rest of the session.
+    if saved:
+        # Set aside while something else built the real declarations, so nothing will build these
+        # now. Do it here, or they stay pending for the rest of the session.
         build_pending_composites()
 
 
@@ -54,85 +52,87 @@ def fake_entry_points(monkeypatch):
     return install
 
 
-@pytest.fixture()
-def fresh_discovery(monkeypatch):
-    """Rewind discovery so a test can drive it from the start, and restore it afterwards."""
-    for flag, value in (("_discovered", False), ("_discovering", False), ("_failure", None)):
-        monkeypatch.setattr(_discovery, flag, value)
+def test_the_registry_is_empty_until_discovery_runs():
+    """Importing cfspopcon must register nothing, so a lookup says discovery has not run.
 
-
-def test_discovery_is_idempotent_and_populates_registry(monkeypatch):
-    # The first call populates the registry; a second call must be a no-op.
-    _discovery.ensure_discovered()
-    populated = dict(Algorithm.instances)
-    assert len(populated) > 100
-    _discovery.ensure_discovered()
-    assert Algorithm.instances == populated
-
-    # Comparing contents is not enough: sys.modules would hide a repeated walk. The latch has to
-    # stop the work happening at all, or every registry query re-walks the package.
-    walks = []
-    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", lambda: walks.append(True))
-    _discovery.ensure_discovered()
-    Algorithm.algorithms()
-    assert walks == []
-
-
-def test_formulas_submodule_resolves_before_the_registry_is_queried():
-    """cfspopcon.formulas.geometry must work on a bare import, with no discovery having run.
-
-    Run in a subprocess: any earlier test in this session triggers discovery, which imports every
-    submodule and binds it as a real attribute, so __getattr__ would never be consulted here.
+    Run in a subprocess: the suite discovers once at session start, so this is unobservable here.
+    An empty registry reads as "nothing discovered yet"; a registry holding whatever happened to be
+    imported would look like a real one that is missing algorithms.
     """
     script = (
         "import cfspopcon\n"
-        "from cfspopcon import _discovery, formulas\n"
-        "assert not _discovery._discovered, 'discovery should not have run on a bare import'\n"
-        "assert 'geometry' in dir(formulas) and '__name__' in dir(formulas)\n"
-        "assert formulas.geometry.analytical.calc_plasma_volume is not None\n"
-        "assert not _discovery._discovered, 'attribute access must not trigger discovery'\n"
+        "from cfspopcon import Algorithm\n"
+        "assert Algorithm.instances == {}, Algorithm.instances\n"
+        "assert Algorithm.algorithms() == []\n"
+        "assert not hasattr(cfspopcon, 'AtomicData'), 'importing AtomicData would register read_atomic_data'\n"
+        "try:\n"
+        "    cfspopcon.registry['calc_plasma_volume']\n"
+        "except KeyError as exc:\n"
+        "    assert 'discovery has not run' in str(exc), exc\n"
+        "else:\n"
+        "    raise AssertionError('lookup should have failed')\n"
+        "cfspopcon.discover_builtin_algorithms()\n"
+        "assert len(Algorithm.instances) > 100\n"
     )
     subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
 
 
-def test_a_failed_discovery_keeps_failing_the_same_way(monkeypatch, fresh_discovery):
-    """Discovery is all-or-nothing: the failure is remembered, not quietly half-applied."""
-
-    def boom():
-        raise ImportError("a formulas module failed to import")
-
-    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", boom)
-    with pytest.raises(ImportError, match="failed to import") as first:
-        _discovery.ensure_discovered()
-
-    # Even once the cause is gone, the original error surfaces again rather than a registry which
-    # looks complete but is missing whatever the failed attempt never got to.
-    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", lambda: None)
-    with pytest.raises(ImportError) as second:
-        Algorithm.algorithms()
-    assert second.value is first.value
-
-    # Re-raising the stored object would append a frame to its traceback every time, so a
-    # long-lived process querying a poisoned registry would grow one without bound.
-    def depth():
-        with pytest.raises(ImportError) as raised:
-            Algorithm.algorithms()
-        return len(traceback.format_exception(raised.value))
-
-    assert depth() == depth()
+def test_repeated_discovery_changes_nothing():
+    """Calling discovery again must not trip the already-registered guard."""
+    _discovery.discover_builtin_algorithms()
+    populated = dict(Algorithm.instances)
+    assert len(populated) > 100
+    _discovery.discover_builtin_algorithms()
+    assert Algorithm.instances == populated
 
 
-def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch, fresh_discovery):
-    """A registry query from a module being imported by the walk must not recurse."""
-    calls = []
+def test_formulas_submodule_resolves_without_discovery():
+    """cfspopcon.formulas.geometry must work on a bare import, with no discovery having run.
 
-    def walk():
-        calls.append(True)
-        _discovery.ensure_discovered()  # re-entrant, as an import-time get_algorithm would be
+    Run in a subprocess: discovery imports every submodule and binds it as a real attribute, so
+    __getattr__ would never be consulted once the suite's session fixture has run.
+    """
+    script = (
+        "import cfspopcon\n"
+        "from cfspopcon import Algorithm, formulas\n"
+        "assert 'geometry' in dir(formulas) and '__name__' in dir(formulas)\n"
+        "assert formulas.geometry.analytical.calc_plasma_volume is not None\n"
+        # Importing that submodule runs its own decorators, but must not pull in the whole package.
+        "assert len(Algorithm.instances) < 100, len(Algorithm.instances)\n"
+    )
+    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
 
-    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", walk)
-    _discovery.ensure_discovered()
-    assert calls == [True]
+
+def test_a_nested_walk_leaves_the_composite_build_to_the_outermost_one(tmp_path, monkeypatch, clean_composites):
+    """A provider which walks its own package may declare a composite spanning both walks.
+
+    The inner walk must not build, or it would fail on a component the outer walk has not reached.
+    """
+    _write_package(
+        tmp_path,
+        "_probe_inner_pkg",
+        {
+            "m": "from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm\n"
+            "Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_inner', skip_unit_conversion=True)\n"
+            "CompositeAlgorithm.register_from_list(['_probe_inner', '_probe_outer'], name='_probe_spanning')\n"
+        },
+    )
+    _write_package(
+        tmp_path,
+        "_probe_outer_pkg",
+        {
+            "m": "from cfspopcon.algorithm_class import Algorithm\n"
+            "from cfspopcon import discover_algorithms_in_package\n"
+            "discover_algorithms_in_package('_probe_inner_pkg')\n"
+            "Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_outer', skip_unit_conversion=True)\n"
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        _discovery.discover_algorithms_in_package("_probe_outer_pkg")
+        assert isinstance(Algorithm.get_algorithm("_probe_spanning"), CompositeAlgorithm)
+    finally:
+        _forget("_probe_inner_pkg", "_probe_outer_pkg")
 
 
 def test_drop_in_module_is_discovered_without_editing_init():
@@ -246,15 +246,15 @@ def test_pending_composite_builds_once_a_later_step_registers_its_component(clea
     assert not _pending_composites
 
 
-def test_a_broken_entry_point_fails_the_query_loudly(fake_entry_points, fresh_discovery):
-    """An unloadable provider must not be papered over: the registry query says so."""
+def test_a_broken_entry_point_fails_discovery_loudly(fake_entry_points):
+    """An unloadable provider must not be papered over: discovery says so."""
 
     def broken():
         raise ImportError("this distribution is broken")
 
     fake_entry_points(broken)
     with pytest.raises(ImportError, match="this distribution is broken"):
-        _discovery.ensure_discovered()
+        _discovery.discover_builtin_algorithms()
 
 
 def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_composites):
@@ -289,16 +289,20 @@ def _forget(*package_names):
         sys.modules.pop(name, None)
 
 
-def test_a_package_which_fails_to_import_is_blamed_rather_than_the_next_caller(tmp_path, monkeypatch, fresh_discovery):
-    """A half-walked package poisons the registry, and later callers are told why, not blamed."""
+def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatch, clean_composites):
+    """The failure names the module that broke, and does not poison discovery process-wide.
+
+    Retrying the same walk in the same process is not supported: whatever the abandoned attempt
+    registered is still registered, so the retry trips the already-registered guard instead of
+    reporting the original cause. Fix the cause and start a new process.
+    """
     _write_package(
         tmp_path,
         "_probe_broken_pkg",
         {
             "__init__": (
-                "from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm\n"
+                "from cfspopcon.algorithm_class import Algorithm\n"
                 "Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_half', skip_unit_conversion=True)\n"
-                "CompositeAlgorithm.register_from_list(['_probe_half'], name='_probe_orphan')\n"
                 "raise ImportError('an optional dependency is missing')\n"
             )
         },
@@ -309,20 +313,15 @@ def test_a_package_which_fails_to_import_is_blamed_rather_than_the_next_caller(t
         with pytest.raises(ImportError, match="optional dependency"):
             _discovery.discover_algorithms_in_package("_probe_broken_pkg")
 
-        # The innocent package's own walk is fine, so it must not be blamed for the orphan.
-        with pytest.raises(ImportError, match="optional dependency"):
-            _discovery.discover_algorithms_in_package("_probe_innocent_pkg")
+        # An unrelated walk is unaffected: a failed walk does not poison discovery process-wide.
+        _discovery.discover_algorithms_in_package("_probe_innocent_pkg")
+        assert isinstance(Algorithm.get_algorithm("_probe_half"), Algorithm)
     finally:
-        # _instances, not instances: reading the latter completes discovery, which re-raises the
-        # failure this test just latched.
-        for name in ("_probe_half", "_probe_orphan"):
-            Algorithm._instances.pop(name, None)
-        _pending_composites[:] = [entry for entry in _pending_composites if entry[0] != "_probe_orphan"]
         _forget("_probe_broken_pkg", "_probe_innocent_pkg")
 
 
-def test_a_package_name_which_does_not_resolve_leaves_the_registry_usable(fresh_discovery):
-    """A typo has run no code, so it must not poison discovery for the rest of the process."""
+def test_a_package_name_which_does_not_resolve_leaves_the_registry_usable():
+    """A typo has run no code, so it must not disturb what is already registered."""
     with pytest.raises(ModuleNotFoundError):
         _discovery.discover_algorithms_in_package("_probe_no_such_package")
     assert len(Algorithm.algorithms()) > 100
@@ -368,21 +367,19 @@ def test_looking_up_a_declared_but_unbuilt_composite_says_so(clean_composites):
         Algorithm.get_algorithm("_probe_not_yet_built")
 
 
-def test_reading_the_registry_directly_completes_discovery_first():
-    """Algorithm.instances must not hand back a partially-registered registry.
+def test_the_cli_discovers_before_resolving_algorithm_names(tmp_path):
+    """popcon_algorithms must discover for itself, rather than writing a near-empty file.
 
-    Run in a subprocess because discovery is process-wide and any earlier test has already run it.
-    Covers the access routes a dict subclass could not intercept, which is why this is a property
-    on the metaclass.
+    Run in a subprocess: in-process the suite has already discovered, so this would pass whether
+    the command populates the registry or not.
     """
+    output = tmp_path / "algorithms.yaml"
     script = (
-        "from cfspopcon import Algorithm\n"
-        "from cfspopcon import _discovery\n"
-        "assert not _discovery._discovered, 'discovery should not have run on a bare import'\n"
-        "assert len(Algorithm.instances) > 100, len(Algorithm.instances)\n"
-        "assert len(dict(Algorithm.instances)) > 100\n"
-        "assert len({**Algorithm.instances}) > 100\n"
-        "assert 'calc_plasma_volume' in Algorithm.instances\n"
-        "assert len(list(Algorithm.instances)) == len(Algorithm.instances.keys())\n"
+        "from click.testing import CliRunner\n"
+        "from cfspopcon.cli import write_algorithms_yaml\n"
+        f"result = CliRunner().invoke(write_algorithms_yaml, ['--output', {str(output)!r}])\n"
+        "assert result.exit_code == 0, result.output\n"
     )
     subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
+    entries = [line for line in output.read_text().splitlines() if line and not line.startswith((" ", "#"))]
+    assert len(entries) > 100, entries

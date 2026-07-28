@@ -32,6 +32,12 @@ def _not_found_message(key: str) -> str:
             "entry-point target. Declare yours with CompositeAlgorithm.register_from_list instead."
         )
 
+    if not Algorithm.instances:
+        return (
+            f"algorithm '{key}' not found: the registry is empty because discovery has not run. Call "
+            "cfspopcon.discover_builtin_algorithms() first."
+        )
+
     close_matches = get_close_matches(key, Algorithm.algorithms(), n=1)
     if close_matches:
         return f"algorithm '{key}' not found. Did you mean '{close_matches[0]}'?"
@@ -47,36 +53,20 @@ def _not_found_message(key: str) -> str:
 
 def _register(name: str, algorithm: Algorithm | CompositeAlgorithm, override: bool) -> None:
     """Add an algorithm to the registry, refusing to silently replace one of the same name."""
-    if name in Algorithm._instances and not override:
+    if name in Algorithm.instances and not override:
         raise RuntimeError(
             f"Algorithm '{name}' is already registered. Pass override=True to replace it, or build it "
             "without registering (skip_registration=True for an Algorithm, register=False for a composite)."
         )
-    Algorithm._instances[name] = algorithm
+    Algorithm.instances[name] = algorithm
 
 
-class _RegistryAccess(type):
-    """Makes reading ``Algorithm.instances`` complete discovery first.
-
-    The registry is populated lazily, so code which reads it directly -- rather than going through
-    ``Algorithm.get_algorithm`` or ``cfspopcon.registry`` -- would otherwise see however much of it
-    happened to be registered, with no indication that anything was missing. Registration and the
-    lookups discovery itself makes use ``_instances``, which does not re-enter discovery.
-    """
-
-    @property
-    def instances(cls) -> dict[str, Algorithm | CompositeAlgorithm]:
-        """The registered algorithms, keyed by name."""
-        from ._discovery import ensure_discovered
-
-        ensure_discovered()
-        return cls._instances  # type:ignore[attr-defined,no-any-return]
-
-
-class Algorithm(metaclass=_RegistryAccess):
+class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    _instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
+    #: The registered algorithms, keyed by name. Empty until
+    #: :func:`~cfspopcon._discovery.discover_builtin_algorithms` has run.
+    instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
         self,
@@ -286,8 +276,8 @@ class Algorithm(metaclass=_RegistryAccess):
         """Writes a file 'algorithms.yaml' documenting the available algorithms."""
         data = dict()
 
-        for name in cls.algorithms():  # routes through the lazy discovery hook
-            alg = cls._instances[name]
+        for name in cls.algorithms():
+            alg = cls.instances[name]
             alg_data = dict()
             alg_data["inputs"] = alg.required_input_keys
             alg_data["optionals"] = alg.default_keys
@@ -304,10 +294,7 @@ class Algorithm(metaclass=_RegistryAccess):
     @classmethod
     def algorithms(cls) -> list[str]:
         """Make a list of the available algorithms."""
-        from ._discovery import ensure_discovered
-
-        ensure_discovered()  # lazy: populate the registry on first query (get_algorithm routes through here)
-        return list(cls._instances.keys())
+        return list(cls.instances.keys())
 
     @classmethod
     def get_algorithm(cls, key: str) -> Algorithm | CompositeAlgorithm:
@@ -315,7 +302,7 @@ class Algorithm(metaclass=_RegistryAccess):
         if key not in cls.algorithms():
             raise KeyError(_not_found_message(key))
 
-        return cls._instances[key]
+        return cls.instances[key]
 
 
 class CompositeAlgorithm:
@@ -602,17 +589,16 @@ def build_pending_composites() -> None:
     pending on failure, so a later discovery step which registers them can still build them.
     """
     while _pending_composites:
-        # Read the registry directly: get_algorithm would re-enter discovery from here.
-        ready = [(name, keys) for name, keys in _pending_composites if all(key in Algorithm._instances for key in keys)]
+        ready = [(name, keys) for name, keys in _pending_composites if all(key in Algorithm.instances for key in keys)]
         if not ready:
             unresolved = "; ".join(
-                f"'{name}' is missing [{', '.join(k for k in keys if k not in Algorithm._instances)}]" for name, keys in _pending_composites
+                f"'{name}' is missing [{', '.join(k for k in keys if k not in Algorithm.instances)}]" for name, keys in _pending_composites
             )
             raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
 
         for entry in ready:
             name, keys = entry
-            CompositeAlgorithm([Algorithm._instances[key] for key in keys], name=name, register=True)
+            CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
             _pending_composites.remove(entry)  # drop it only once it has actually been built
 
 

@@ -3,8 +3,18 @@ from pathlib import Path
 import pytest
 import xarray as xr
 import yaml
+from cfspopcon import discover_builtin_algorithms
 
 xr.set_options(display_width=300)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def discovered_algorithms() -> None:
+    """Populate the algorithm registry once for the suite, since discovery is explicit.
+
+    Tests which need the registry as it is on a bare import assert that in a subprocess.
+    """
+    discover_builtin_algorithms()
 
 
 @pytest.fixture(scope="session")

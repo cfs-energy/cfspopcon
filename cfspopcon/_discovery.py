@@ -4,29 +4,28 @@ Replaces the "import every submodule in ``__init__.py`` to register" pattern wit
 walk of :mod:`cfspopcon.formulas` (so adding ``formulas/foo/bar.py`` is enough, though a new subfolder
 still needs an ``__init__.py`` -- a directory without one is not walked), plus an entry-point
 group (``cfspopcon.algorithms``) through which an installed distribution can contribute algorithms
-with no cfspopcon-side import. Both run lazily, once, on the first registry query; the
-``@Algorithm.register_algorithm`` decorator is unchanged.
+with no cfspopcon-side import. The ``@Algorithm.register_algorithm`` decorator is unchanged.
+
+Discovery is explicit: importing ``cfspopcon`` registers nothing, and
+:func:`discover_builtin_algorithms` populates the registry when a caller asks for it. Until then the
+registry is empty, so a lookup which fails says that discovery has not run rather than reporting an
+algorithm as missing.
 
 Discovery runs in two phases, so the order the walk visits modules in does not matter: the walk only
 registers algorithms and *declares* composites (see
 :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`), which are built
 afterwards, once every component is registered.
-
-Discovery is all-or-nothing: anything which goes wrong -- a module that will not import, a broken
-entry point, a composite naming an algorithm nobody registers -- fails the query that triggered it,
-and every later query re-raises that same error. Half a registry is not worth recovering.
 """
 
 from __future__ import annotations
 
 import importlib
-import importlib.util
 import pkgutil
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from types import ModuleType, TracebackType
+    from types import ModuleType
 
 #: Entry-point group downstream packages declare to contribute algorithms. The target may be a
 #: module (imported for its ``@register`` side effects) or a callable taking no arguments (invoked
@@ -35,68 +34,42 @@ if TYPE_CHECKING:
 #: entry-point target will not find it.
 ENTRY_POINT_GROUP = "cfspopcon.algorithms"
 
-_discovered = False
-_discovering = False
-_failure: BaseException | None = None
-_failure_traceback: TracebackType | None = None
+#: True while a walk is in progress, so that a walk nested inside another (an entry-point provider
+#: which walks its own package) leaves the composite build to the outermost one.
+_walking = False
+
+
+def _walk(package: ModuleType | str) -> None:
+    """Import every submodule of ``package``, so its registration decorators run."""
+    if isinstance(package, str):
+        package = importlib.import_module(package)
+    for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
+        importlib.import_module(info.name)
 
 
 def discover_algorithms_in_package(package: ModuleType | str) -> None:
     """Import every submodule of ``package`` so its ``@Algorithm.register_algorithm`` decorators run.
 
     ``package`` is an imported package or its dotted name. Walking the package registers every
-    algorithm defined anywhere beneath it, so a package (cfspopcon or one that builds on it) can
-    register all of its algorithms without importing each module by hand.
+    algorithm defined anywhere beneath it, so a package which builds on cfspopcon can register all
+    of its algorithms without importing each module by hand.
 
-    cfspopcon's own algorithms are registered first, so a composite declared by ``package`` may be
-    built from them. Composites declared with
-    :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list` are built once the
-    outermost walk finishes, since a registry query from a module being imported re-enters here.
-
-    A walk which raises has left the registry half-populated, so it is latched and re-raised by
-    every later query. A composite which could not be built is not: its declaration stays pending,
-    and walking the package which supplies the missing algorithm still completes it.
+    Composites declared with :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`
+    are built once the outermost walk finishes, so a walk nested inside another may declare
+    composites which combine its algorithms with the outer package's. A composite built from one of
+    cfspopcon's own algorithms therefore needs :func:`discover_builtin_algorithms` to have run first.
     """
     from .algorithm_class import build_pending_composites
 
-    global _discovering, _failure, _failure_traceback  # noqa: PLW0603
-
-    ensure_discovered()  # whatever the walk imports may refer to cfspopcon's own algorithms
-
-    name = package if isinstance(package, str) else None
-    if name is not None and importlib.util.find_spec(name) is None:
-        # A name which does not resolve has run no code, so it must not poison the registry.
-        raise ModuleNotFoundError(f"No module named {name!r}", name=name)
-
-    outermost = not _discovering
-    _discovering = True  # a registry query from a walked module must not build composites yet
+    global _walking  # noqa: PLW0603
+    outermost = not _walking
+    _walking = True
     try:
-        if name is not None:
-            package = importlib.import_module(name)
-        for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):  # type:ignore[union-attr]
-            importlib.import_module(info.name)
-    except BaseException as exc:
-        # A half-walked package poisons the registry; say so on every later query. BaseException,
-        # so that interrupting a slow first discovery does not leave usable-looking leftovers.
-        _failure, _failure_traceback = exc, exc.__traceback__
-        raise
+        _walk(package)
     finally:
-        _discovering = not outermost
-
+        _walking = not outermost
     if outermost:
         build_pending_composites()
-
-
-def discover_builtin_algorithms() -> None:
-    """Populate the registry now rather than on the first query, by walking :mod:`cfspopcon.formulas`.
-
-    Entry-point providers are loaded too, since this runs the same discovery the first query would.
-    Reading the registry already does this for you; call it to front-load the cost, to fail early on
-    a broken installation, or to pick up a module added since discovery last ran.
-    """
-    from . import formulas
-
-    discover_algorithms_in_package(formulas)
 
 
 def load_entry_point_algorithms() -> None:
@@ -107,34 +80,24 @@ def load_entry_point_algorithms() -> None:
             obj()  # a callable target registers explicitly (preferred; no import-time side effects)
 
 
-def ensure_discovered() -> None:
-    """Run built-in + entry-point discovery exactly once (idempotent).
+def discover_builtin_algorithms() -> None:
+    """Register every algorithm cfspopcon and its entry-point providers define.
 
-    Composites are built only once both the built-in walk and the entry points have registered
-    their algorithms, so a downstream composite may be built from cfspopcon's algorithms and vice
-    versa.
+    Call this before using the registry: ``import cfspopcon`` deliberately registers nothing.
+    Repeated calls are cheap and change nothing, since the modules walked are already imported.
 
-    A registry query made from a module being imported by the walk re-enters this function; that
-    re-entrant call returns immediately rather than restarting the walk. A failure is remembered
-    and re-raised, so a half-discovered registry is never handed back as if it were complete.
+    Composites are built only once both the built-in walk and the entry points have registered their
+    algorithms, so a downstream composite may be built from cfspopcon's algorithms and vice versa.
     """
     from .algorithm_class import build_pending_composites
 
-    global _discovered, _discovering, _failure, _failure_traceback  # noqa: PLW0603
-    if _failure is not None:
-        # Restore the traceback it failed with: re-raising the object as-is would grow its
-        # traceback by a frame on every registry query for the rest of the process.
-        raise _failure.with_traceback(_failure_traceback)
-    if _discovered or _discovering:
-        return
-    _discovering = True
+    global _walking  # noqa: PLW0603
+    _walking = True  # a provider's own walk must not build composites before every provider is loaded
     try:
-        discover_builtin_algorithms()
+        from . import formulas
+
+        _walk(formulas)
         load_entry_point_algorithms()
-        build_pending_composites()
-    except BaseException as exc:
-        _failure, _failure_traceback = exc, exc.__traceback__
-        raise
     finally:
-        _discovering = False
-    _discovered = True
+        _walking = False
+    build_pending_composites()
