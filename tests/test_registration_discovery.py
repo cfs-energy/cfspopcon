@@ -254,3 +254,22 @@ def test_a_broken_entry_point_fails_the_query_loudly(fake_entry_points, monkeypa
     fake_entry_points(_FakeEntryPoint("broken", "broken:register", lambda: broken))
     with pytest.raises(ImportError, match="this distribution is broken"):
         _discovery.ensure_discovered()
+
+
+def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_composites):
+    """A declaration is dropped from the pending list only once it has actually been built."""
+    declared = clean_composites
+    declared += ["_probe_component", "_probe_survivor"]
+    Algorithm.from_single_function(
+        lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_component", skip_unit_conversion=True
+    )
+    # The first collides with an already-registered name; the second is perfectly buildable.
+    CompositeAlgorithm.register_from_list(keys=["_probe_component"], name="calc_plasma_volume")
+    CompositeAlgorithm.register_from_list(keys=["_probe_component"], name="_probe_survivor")
+
+    with pytest.raises(RuntimeError, match="already registered"):
+        build_pending_composites()
+
+    assert "_probe_survivor" in [name for name, _ in _pending_composites]
+    with pytest.raises(RuntimeError, match="already registered"):
+        build_pending_composites()  # still fails the same way rather than quietly succeeding

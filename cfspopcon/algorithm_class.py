@@ -581,9 +581,10 @@ def build_pending_composites() -> None:
             )
             raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
 
-        _pending_composites[:] = [entry for entry in _pending_composites if entry not in ready]
-        for name, keys in ready:
+        for entry in ready:
+            name, keys = entry
             CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
+            _pending_composites.remove(entry)  # drop it only once it has actually been built
 
 
 class _AlgorithmRegistry:

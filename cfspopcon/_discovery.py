@@ -52,7 +52,7 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
     """
     from .algorithm_class import build_pending_composites
 
-    global _discovering  # noqa: PLW0603
+    global _discovering, _failure  # noqa: PLW0603
 
     ensure_discovered()  # whatever the walk imports may refer to cfspopcon's own algorithms
 
@@ -64,11 +64,13 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
     try:
         for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
             importlib.import_module(info.name)
+        if outermost:
+            build_pending_composites()
+    except Exception as exc:
+        _failure = exc  # a half-walked package poisons the registry; say so on every later query
+        raise
     finally:
         _discovering = not outermost
-
-    if outermost:
-        build_pending_composites()
 
 
 def discover_builtin_algorithms() -> None:
