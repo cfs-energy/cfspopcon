@@ -1,23 +1,15 @@
 """Automatic discovery of registered algorithms.
 
-Replaces the "import every submodule in ``__init__.py`` to register" pattern with:
+Replaces the "import every submodule in ``__init__.py`` to register" pattern with a ``pkgutil``
+walk of :mod:`cfspopcon.formulas` (so adding ``formulas/foo/bar.py`` is enough), plus an entry-point
+group (``cfspopcon.algorithms``) through which an installed distribution can contribute algorithms
+with no cfspopcon-side import. Both run lazily, once, on the first registry query; the
+``@Algorithm.register_algorithm`` decorator is unchanged.
 
-* **auto-discovery of cfspopcon's own algorithms** by walking the :mod:`cfspopcon.formulas`
-  package (so adding ``formulas/foo/bar.py`` is enough — no hand-maintained import list, no
-  "forgot to import it -> silently missing" failure mode), and
-* **discovery of downstream-provided algorithms via entry points** (group
-  ``cfspopcon.algorithms``), so an installed distribution can contribute algorithms without any
-  cfspopcon-side import.
-
-Both run lazily and exactly once, the first time the registry is queried (see
-:meth:`cfspopcon.algorithm_class.Algorithm.algorithms`). The ``@Algorithm.register_algorithm``
-decorator is unchanged; discovery only automates *which modules get imported*.
-
-Discovery runs in two phases, so the order the walk happens to visit modules in does not matter.
-The walk itself only registers algorithms and *declares* composites (see
-:meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`); the declarations are
-built afterwards, once every component is registered. Because a composite may be built from other
-composites, that build repeats until all declarations are satisfied.
+Discovery runs in two phases, so the order the walk visits modules in does not matter: the walk only
+registers algorithms and *declares* composites (see
+:meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`), which are built
+afterwards, once every component is registered.
 
 Discovery is all-or-nothing: anything which goes wrong -- a module that will not import, a broken
 entry point, a composite naming an algorithm nobody registers -- fails the query that triggered it,
