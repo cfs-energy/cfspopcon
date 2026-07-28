@@ -86,9 +86,9 @@ def discover_builtin_algorithms() -> None:
     discover_algorithms_in_package(formulas)
 
 
-def load_entry_point_algorithms(group: str = ENTRY_POINT_GROUP) -> None:
+def load_entry_point_algorithms() -> None:
     """Load algorithm providers declared by any installed distribution via entry points."""
-    for ep in entry_points(group=group):
+    for ep in entry_points(group=ENTRY_POINT_GROUP):
         obj = ep.load()  # importing the target already runs a module's side effects
         if callable(obj):
             obj()  # a callable target registers explicitly (preferred; no import-time side effects)

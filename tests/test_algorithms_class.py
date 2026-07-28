@@ -338,8 +338,6 @@ def test_registry_indexing():
     assert [alg._name for alg in registry[names].algorithms] == names
     assert [alg._name for alg in registry[names[::-1]].algorithms] == names[::-1]
 
-    assert len(registry) == len(list(registry))
-
     with pytest.raises(TypeError, match="name .str. or a list"):
         registry[123]
     with pytest.raises(KeyError):

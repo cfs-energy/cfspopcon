@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -37,24 +38,22 @@ def clean_composites():
         build_pending_composites()
 
 
-class _FakeEntryPoint:
-    """Stands in for an installed distribution's `cfspopcon.algorithms` entry point."""
+@pytest.fixture()
+def fake_entry_points(monkeypatch):
+    """Install fake entry points, each loading to one of the given targets."""
 
-    def __init__(self, name, value, loader):
-        self.name, self.value, self._loader = name, value, loader
+    def install(*targets):
+        eps = [SimpleNamespace(load=lambda target=target: target) for target in targets]
+        monkeypatch.setattr(_discovery, "entry_points", lambda group: eps)
 
-    def load(self):
-        return self._loader()
+    return install
 
 
 @pytest.fixture()
-def fake_entry_points(monkeypatch):
-    """Install fake entry points in place of any the environment really declares."""
-
-    def install(*entry_points):
-        monkeypatch.setattr(_discovery, "entry_points", lambda group: list(entry_points))
-
-    return install
+def fresh_discovery(monkeypatch):
+    """Rewind discovery so a test can drive it from the start, and restore it afterwards."""
+    for flag, value in (("_discovered", False), ("_discovering", False), ("_failure", None)):
+        monkeypatch.setattr(_discovery, flag, value)
 
 
 def test_discovery_is_idempotent_and_populates_registry(monkeypatch):
@@ -91,11 +90,8 @@ def test_formulas_submodule_resolves_before_the_registry_is_queried():
     subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
 
 
-def test_a_failed_discovery_keeps_failing_the_same_way(monkeypatch):
+def test_a_failed_discovery_keeps_failing_the_same_way(monkeypatch, fresh_discovery):
     """Discovery is all-or-nothing: the failure is remembered, not quietly half-applied."""
-    monkeypatch.setattr(_discovery, "_discovered", False)
-    monkeypatch.setattr(_discovery, "_discovering", False)
-    monkeypatch.setattr(_discovery, "_failure", None)
 
     def boom():
         raise ImportError("a formulas module failed to import")
@@ -112,10 +108,8 @@ def test_a_failed_discovery_keeps_failing_the_same_way(monkeypatch):
     assert second.value is first.value
 
 
-def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch):
+def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch, fresh_discovery):
     """A registry query from a module being imported by the walk must not recurse."""
-    monkeypatch.setattr(_discovery, "_discovered", False)
-    monkeypatch.setattr(_discovery, "_discovering", False)
     calls = []
 
     def walk():
@@ -181,7 +175,7 @@ def test_discover_algorithms_in_a_specified_package(tmp_path, monkeypatch):
 def test_entry_point_callable_is_invoked(fake_entry_points):
     """A downstream entry point whose target is a callable is invoked to register (no cfspopcon import)."""
     called = []
-    fake_entry_points(_FakeEntryPoint("probe", "probe:register", lambda: lambda: called.append(True)))
+    fake_entry_points(lambda: called.append(True))
     _discovery.load_entry_point_algorithms()
     assert called == [True]
 
@@ -242,16 +236,13 @@ def test_pending_composite_builds_once_a_later_step_registers_its_component(clea
     assert not _pending_composites
 
 
-def test_a_broken_entry_point_fails_the_query_loudly(fake_entry_points, monkeypatch):
+def test_a_broken_entry_point_fails_the_query_loudly(fake_entry_points, fresh_discovery):
     """An unloadable provider must not be papered over: the registry query says so."""
-    monkeypatch.setattr(_discovery, "_discovered", False)
-    monkeypatch.setattr(_discovery, "_discovering", False)
-    monkeypatch.setattr(_discovery, "_failure", None)
 
     def broken():
         raise ImportError("this distribution is broken")
 
-    fake_entry_points(_FakeEntryPoint("broken", "broken:register", lambda: broken))
+    fake_entry_points(broken)
     with pytest.raises(ImportError, match="this distribution is broken"):
         _discovery.ensure_discovered()
 

@@ -602,10 +602,6 @@ class _AlgorithmRegistry:
         """Iterate over the registered algorithm names (also powers ``"name" in algorithms``)."""
         return iter(Algorithm.algorithms())
 
-    def __len__(self) -> int:
-        """Count the registered algorithms."""
-        return len(Algorithm.algorithms())
-
 
 registry = _AlgorithmRegistry()
 """Registry accessor, where ``registry["name"]`` gives an Algorithm and ``registry[["a", "b"]]`` a CompositeAlgorithm."""
