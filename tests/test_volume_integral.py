@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.formulas.geometry import integrate_profile_over_volume
-from cfspopcon.formulas.plasma_profiles import build_rho_grid
+from cfspopcon.formulas.geometry.volume_integral import integrate_profile_over_volume
+from cfspopcon.formulas.plasma_profiles.plasma_profiles import build_rho_grid
 from cfspopcon.unit_handling import magnitude_in_units, ureg
 
 
