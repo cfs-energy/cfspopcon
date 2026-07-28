@@ -10,13 +10,14 @@ from .algorithm_class import (
     Algorithm,
     CompositeAlgorithm,
     discover_algorithms_in_package,
+    discover_algorithms_in_packages,
     discover_builtin_algorithms,
     registry,
 )
 from .deprecation_handler import handle_deprecated_arguments
 from .input_file_handling import process_input_dictionary, read_case
 from .plotting import read_plot_style
-from .plugins import PluginClashError, PluginReport, register_plugin
+from .plugins import PluginClashError, PluginReport, register_plugin, register_plugins
 from .unit_handling import (
     convert_to_default_units,
     convert_units,
@@ -33,6 +34,7 @@ __all__ = [
     "convert_to_default_units",
     "convert_units",
     "discover_algorithms_in_package",
+    "discover_algorithms_in_packages",
     "discover_builtin_algorithms",
     "file_io",
     "formulas",
@@ -43,6 +45,7 @@ __all__ = [
     "read_case",
     "read_plot_style",
     "register_plugin",
+    "register_plugins",
     "registry",
     "set_default_units",
     "shaping_and_selection",

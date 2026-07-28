@@ -1,11 +1,19 @@
-"""Explicit registration of external plugin modules."""
+"""Explicit registration of external plugin packages."""
 
 from __future__ import annotations
 
-import importlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-from .algorithm_class import Algorithm
+from .algorithm_class import (
+    Algorithm,
+    CompositeAlgorithm,
+    deferred_composite_build,
+    discover_algorithms_in_packages,
+    discover_builtin_algorithms,
+    pending_composites,
+    registered_algorithms,
+    restore_registry,
+)
 from .unit_handling import ureg
 from .unit_handling.default_units import default_units_map, extend_default_units_map, reset_default_units
 
@@ -15,9 +23,9 @@ class PluginReport:
     """A summary of the algorithms, variables and units a plugin registered."""
 
     plugin: str
-    algorithms: list[str] = field(default_factory=list)
-    variables: list[str] = field(default_factory=list)
-    units: list[str] = field(default_factory=list)
+    algorithms: tuple[str, ...] = ()
+    variables: tuple[str, ...] = ()
+    units: tuple[str, ...] = ()
 
     def __str__(self) -> str:
         """Return a human-readable summary of the registered items."""
@@ -36,86 +44,137 @@ class PluginClashError(RuntimeError):
 _successful_registrations: dict[str, PluginReport] = {}
 _failed_registrations: dict[str, PluginClashError] = {}
 
-
-def _restore_default_units(snapshot: dict[str, str]) -> None:
-    """Replace the default units map with the given snapshot."""
-    reset_default_units()
-    extend_default_units_map(snapshot)
+#: Marks a variable whose default units a plugin removed, which None cannot: None is a legitimate
+#: value, meaning "not a unitful quantity".
+_REMOVED = object()
 
 
-def _remove_algorithms(names: set[str]) -> None:
-    """Remove the given algorithm names from the Algorithm registry."""
-    for name in names:
-        Algorithm.instances.pop(name, None)
+@dataclass
+class _Snapshot:
+    """Everything a plugin can add to, captured so it can be put back."""
+
+    algorithms: dict[str, Algorithm | CompositeAlgorithm]
+    pending: list[tuple[str, list[str]]]
+    units: dict[str, str | None]
+    pint_units: set[str]
+
+    @classmethod
+    def take(cls) -> _Snapshot:
+        """Capture the current state of every registry a plugin writes to."""
+        return cls(registered_algorithms(), pending_composites(), default_units_map(), set(iter(ureg)))
+
+    def restore(self) -> None:
+        """Put the registries back as they were.
+
+        Unit *definitions* made with ``ureg.define`` are not undone -- pint has no un-define -- so a
+        rejected plugin's unit definitions linger. They are inert unless a later plugin names one.
+        """
+        restore_registry(self.algorithms, self.pending)
+        reset_default_units()
+        extend_default_units_map(self.units)
 
 
-def register_plugin(module_name: str) -> PluginReport:
-    """Import a plugin module and validate what it registers.
+def _report(plugin: str, start: _Snapshot, end: _Snapshot) -> PluginReport:
+    """Describe what one plugin's walk added, by diffing the snapshots taken either side of it.
 
-    A plugin module is an ordinary Python module which registers algorithms,
-    variables and units at import time, using the same interfaces as cfspopcon's
-    built-in formula modules: the `Algorithm.register_algorithm` decorator,
-    `extend_default_units_map` and `ureg.define`. This function imports the
-    module, checks that it only adds to the registries (never redefines existing
-    entries), and reports what was added.
+    Composites the plugin declared are counted as its algorithms even though they are built later,
+    once every plugin has been walked: a report is only ever returned if that build succeeded, so by
+    then every declaration has become a registered algorithm.
+    """
+    declared = {name for name, _ in end.pending} - {name for name, _ in start.pending}
+    return PluginReport(
+        plugin=plugin,
+        algorithms=tuple(sorted((set(end.algorithms) - set(start.algorithms)) | declared)),
+        variables=tuple(sorted(set(end.units) - set(start.units))),
+        units=tuple(sorted(end.pint_units - start.pint_units)),
+    )
 
-    Repeated calls with the same module name return the original report, or
-    re-raise the original error, without importing again. A module that was
-    already imported by other means registers nothing new during this call, so
-    its report is empty.
 
-    Example::
+def _clashes(before: _Snapshot, after: _Snapshot) -> list[str]:
+    """Describe everything the plugins redefined, rather than added."""
+    clashes = []
+    for key, old in before.units.items():
+        new = after.units.get(key, _REMOVED)
+        if new != old:
+            shown = "(removed)" if new is _REMOVED else repr(new)
+            clashes.append(f"variable '{key}' default units: {old!r} -> {shown}")
+    # Identity, not membership: an algorithm registered with override=True keeps its name, so
+    # comparing name sets alone would report a replaced builtin as an untouched one.
+    clashes += [
+        f"algorithm '{name}' was replaced" for name, algorithm in before.algorithms.items() if after.algorithms.get(name) is not algorithm
+    ]
+    return clashes
 
-        report = cfspopcon.register_plugin("my_popcon_plugin")
-        print(report)
+
+def register_plugins(*package_names: str) -> list[PluginReport]:
+    """Register several plugin packages as a single unit, and report what each one added.
+
+    Each package is walked, as :func:`~cfspopcon.algorithm_class.discover_algorithms_in_package` walks one, so a
+    plugin may be a package with its algorithms spread over submodules. All of the walks share one
+    :func:`~cfspopcon.algorithm_class.deferred_composite_build` block, so a composite declared in one
+    plugin may name an algorithm from another, in either direction.
+
+    cfspopcon's own algorithms are discovered first, so that a plugin may name them, and so that a
+    plugin algorithm colliding with a builtin is reported here rather than by some later walk.
+
+    Registration is all-or-nothing: if any package fails to import, or any of them redefines
+    something cfspopcon already defines, the whole set is rolled back and nothing stays registered. A
+    package already registered successfully is not walked again and its original report is returned;
+    one already rejected re-raises the original error.
 
     Args:
-        module_name: Importable name of the plugin module, e.g. "my_popcon_plugin".
-            This is the module's import name (underscores), which may differ from
-            the name of the distribution that provides it (often hyphenated).
+        package_names: importable names of the plugin packages, e.g. "my_popcon_plugin". This is the
+            import name (underscores), which may differ from the distribution name (often hyphenated).
 
     Returns:
-        A summary of the algorithms, variables and units the plugin registered.
+        One report per name given, in the order given.
 
     Raises:
-        PluginClashError: If the plugin changed the default units of an existing
-            variable. The plugin's registrations are rolled back before raising.
+        PluginClashError: if a plugin redefined an existing variable's default units or replaced a
+            registered algorithm. The whole set is rolled back before raising.
     """
-    if module_name in _successful_registrations:
-        return _successful_registrations[module_name]
-    if module_name in _failed_registrations:
-        raise _failed_registrations[module_name]
+    for name in package_names:
+        if name in _failed_registrations:
+            raise _failed_registrations[name]
 
-    units_before = default_units_map()
-    algorithms_before = set(Algorithm.instances)
-    pint_units_before = set(iter(ureg))
+    # A plugin may legitimately discover the builtins itself; doing it here first keeps them out of
+    # the snapshot diff, so a rollback cannot delete them.
+    discover_builtin_algorithms()
+
+    fresh = [name for name in package_names if name not in _successful_registrations]
+    before = _Snapshot.take()
+    reports: dict[str, PluginReport] = {}
 
     try:
-        importlib.import_module(module_name)
-    except Exception:
-        # A plugin that fails mid-import must leave no partial registrations behind.
-        _remove_algorithms(set(Algorithm.instances) - algorithms_before)
-        _restore_default_units(units_before)
+        # One block for the whole set, so each plugin's own walk defers the composite build to the
+        # end. The per-plugin diffs are for attribution only; rollback is all-or-nothing.
+        with deferred_composite_build():
+            for name in fresh:
+                start = _Snapshot.take()
+                discover_algorithms_in_packages(name)
+                reports[name] = _report(name, start, _Snapshot.take())
+
+        clashes = _clashes(before, _Snapshot.take())
+        if clashes:
+            listed = "\n".join(f"  {clash}" for clash in clashes)
+            plugins = ", ".join(f"'{name}'" for name in fresh)
+            raise PluginClashError(f"Plugin(s) {plugins} redefine what cfspopcon already defines (rolled back):\n{listed}")
+    except BaseException as error:
+        before.restore()
+        # A rejected plugin stays in sys.modules with its side effects undone, so a repeated call
+        # would register nothing and look like a success. Cache the error to keep repeats honest.
+        if isinstance(error, PluginClashError):
+            _failed_registrations.update(dict.fromkeys(fresh, error))
         raise
 
-    units_after = default_units_map()
-    clashes = {key: (units_before[key], units_after[key]) for key in units_before if units_after[key] != units_before[key]}
-    if clashes:
-        _remove_algorithms(set(Algorithm.instances) - algorithms_before)
-        _restore_default_units(units_before)
-        details = "\n".join(f"  {key}: '{old}' -> '{new}'" for key, (old, new) in clashes.items())
-        error = PluginClashError(f"Plugin '{module_name}' redefines the default units of existing variables (rolled back):\n{details}")
-        # The module stays cached in sys.modules with its side effects rolled back, so a
-        # repeated import would register nothing and look like a success. Cache the error
-        # to keep repeated calls consistent.
-        _failed_registrations[module_name] = error
-        raise error
+    _successful_registrations.update(reports)
+    return [_successful_registrations[name] for name in package_names]
 
-    report = PluginReport(
-        plugin=module_name,
-        algorithms=sorted(set(Algorithm.instances) - algorithms_before),
-        variables=sorted(set(units_after) - set(units_before)),
-        units=sorted(set(iter(ureg)) - pint_units_before),
-    )
-    _successful_registrations[module_name] = report
-    return report
+
+def register_plugin(package_name: str) -> PluginReport:
+    """Register a single plugin package and report what it added.
+
+    Single-plugin spelling of :func:`register_plugins`. Two plugins whose composites name each other
+    have to be registered together, in one :func:`register_plugins` call.
+    """
+    return register_plugins(package_name)[0]

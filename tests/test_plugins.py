@@ -1,12 +1,17 @@
-"""Tests for cfspopcon.plugins.register_plugin."""
+"""Tests for plugin registration, both from Python and from an input file's `plugins` section."""
 
 import sys
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
+import xarray as xr
+import yaml
+from utils.throwaway_packages import forget_packages, write_package
 
-from cfspopcon import Algorithm, PluginClashError, register_plugin
+import cfspopcon
+from cfspopcon import Algorithm, CompositeAlgorithm, PluginClashError, register_plugin, register_plugins
+from cfspopcon.algorithm_class import _pending_composites, pending_composites, restore_registry, registered_algorithms
 from cfspopcon.plugins import _failed_registrations, _successful_registrations
 from cfspopcon.unit_handling import ureg
 from cfspopcon.unit_handling.default_units import default_unit, default_units_map, extend_default_units_map, reset_default_units
@@ -53,25 +58,26 @@ BROKEN_PLUGIN = dedent(
 def restore_registries(monkeypatch, tmp_path):
     """Isolate the global registries and make tmp_path importable."""
     monkeypatch.syspath_prepend(str(tmp_path))
-    algorithms_before = set(Algorithm.instances)
+    algorithms_before = registered_algorithms()
+    pending_before = pending_composites()
     units_before = default_units_map()
     modules_before = set(sys.modules)
 
     yield
 
-    for name in set(Algorithm.instances) - algorithms_before:
-        del Algorithm.instances[name]
+    # Restore rather than diff-and-delete: a plugin may have replaced an entry as well as added one,
+    # and a declaration left pending would make the next build raise about a package that has gone.
+    restore_registry(algorithms_before, pending_before)
     reset_default_units()
     extend_default_units_map(units_before)
-    for name in set(sys.modules) - modules_before:
-        del sys.modules[name]
+    forget_packages(*{name.split(".")[0] for name in set(sys.modules) - modules_before})
     _successful_registrations.clear()
     _failed_registrations.clear()
 
 
-def write_plugin(tmp_path: Path, name: str, source: str) -> str:
-    """Write a plugin module into tmp_path and return its import name."""
-    (tmp_path / f"{name}.py").write_text(source)
+def write_plugin(tmp_path: Path, name: str, source: str, module: str = "algorithms") -> str:
+    """Write a single-module plugin package into tmp_path and return its import name."""
+    write_package(tmp_path, name, {module: source})
     return name
 
 
@@ -81,9 +87,9 @@ def test_register_plugin_reports_additions(tmp_path):
 
     report = register_plugin(name)
 
-    assert report.algorithms == ["calc_test_plugin_metric"]
-    assert report.variables == ["test_plugin_metric"]
-    assert report.units == []
+    assert report.algorithms == ("calc_test_plugin_metric",)
+    assert report.variables == ("test_plugin_metric",)
+    assert report.units == ()
     assert default_unit("test_plugin_metric") == "dimensionless"
     assert "calc_test_plugin_metric" in str(Algorithm.get_algorithm("calc_test_plugin_metric").__doc__)
 
@@ -135,3 +141,332 @@ def test_failed_import_is_rolled_back(tmp_path):
         register_plugin(name)
 
     assert "test_broken_plugin_metric" not in default_units_map()
+
+
+# --- The four fixes registration needed for the discovery model -----------------------------------
+
+DISCOVERS_THEN_FAILS = dedent(
+    """
+    import cfspopcon
+    cfspopcon.discover_builtin_algorithms()   # a plugin naming builtins in a composite would do this
+    raise ImportError("fails after discovering")
+    """
+)
+
+SUBMODULE_PLUGIN = dedent(
+    """
+    from cfspopcon.algorithm_class import Algorithm
+    from cfspopcon.unit_handling import Unitfull
+    from cfspopcon.unit_handling.default_units import extend_default_units_map
+
+    extend_default_units_map({"deep_plugin_metric": "meter"})
+
+    @Algorithm.register_algorithm(return_keys=["deep_plugin_metric"])
+    def calc_deep_plugin_metric(major_radius: Unitfull) -> Unitfull:
+        return major_radius
+    """
+)
+
+COMPOSITE_PLUGIN = dedent(
+    """
+    from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+    from cfspopcon.unit_handling import Unitfull
+    from cfspopcon.unit_handling.default_units import extend_default_units_map
+
+    extend_default_units_map({"composite_plugin_metric": "meter**3"})
+
+    @Algorithm.register_algorithm(return_keys=["composite_plugin_metric"])
+    def calc_composite_plugin_metric(plasma_volume: Unitfull) -> Unitfull:
+        return 2.0 * plasma_volume
+
+    CompositeAlgorithm.register_from_list(
+        ["calc_plasma_volume", "calc_composite_plugin_metric"], name="plugin_composite"
+    )
+    """
+)
+
+UNBUILDABLE_COMPOSITE_PLUGIN = dedent(
+    """
+    from cfspopcon.algorithm_class import CompositeAlgorithm
+
+    CompositeAlgorithm.register_from_list(["no_such_algorithm"], name="unbuildable_composite")
+    """
+)
+
+SHRINKING_PLUGIN = dedent(
+    """
+    from cfspopcon.unit_handling.default_units import extend_default_units_map, reset_default_units
+
+    # reset_default_units empties the map rather than restoring the builtins, so this loses every
+    # variable cfspopcon defines. Removing a variable's units is as damaging as changing them.
+    reset_default_units()
+    extend_default_units_map({"shrinking_plugin_metric": "meter"})
+    """
+)
+
+OVERRIDE_PLUGIN = dedent(
+    """
+    from cfspopcon.algorithm_class import Algorithm
+    from cfspopcon.unit_handling import Unitfull
+
+    @Algorithm.register_algorithm(return_keys=["plasma_volume"], name="calc_plasma_volume", override=True)
+    def sneaky_replacement(major_radius: Unitfull) -> Unitfull:
+        return major_radius
+    """
+)
+
+
+def test_a_plugin_which_discovers_the_builtins_does_not_take_them_down_with_it(tmp_path, run_script):
+    """Rollback must not delete the builtins, which it would if they landed inside the diff.
+
+    Registration has to discover them before snapshotting. Run in a subprocess with an un-discovered
+    registry: in-process the suite has already discovered, so the builtins are inside the snapshot
+    whether registration puts them there or not, and this would pass either way. The failure is also
+    unrecoverable -- the walk only imports, and the modules are already imported -- so a later
+    discover_builtin_algorithms() cannot put them back.
+    """
+    name = write_plugin(tmp_path, "popcon_test_plugin_discovers", DISCOVERS_THEN_FAILS)
+    script = (
+        "import sys\n"
+        f"sys.path.insert(0, {str(tmp_path)!r})\n"
+        "import cfspopcon\n"
+        "from cfspopcon import Algorithm\n"
+        "assert Algorithm.instances == {}, 'expected an un-discovered registry'\n"
+        "try:\n"
+        f"    cfspopcon.register_plugin({name!r})\n"
+        "except ImportError:\n"
+        "    pass\n"
+        "else:\n"
+        "    raise AssertionError('the plugin should have failed to import')\n"
+        "cfspopcon.discover_builtin_algorithms()   # cannot help: the modules are already imported\n"
+        "assert len(Algorithm.instances) > 100, len(Algorithm.instances)\n"
+    )
+    run_script(script)
+
+
+def test_a_plugin_package_is_walked_not_merely_imported(tmp_path):
+    """An algorithm in a plugin submodule is registered, so a plugin may be more than one module."""
+    write_package(tmp_path, "popcon_test_plugin_deep", {"models/detachment": SUBMODULE_PLUGIN})
+
+    report = register_plugin("popcon_test_plugin_deep")
+
+    assert report.algorithms == ("calc_deep_plugin_metric",)
+    assert isinstance(Algorithm.get_algorithm("calc_deep_plugin_metric"), Algorithm)
+
+
+def test_a_plugin_composite_is_built_and_reported(tmp_path):
+    """register_from_list is the documented way to declare a composite, so it must be built."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_composite", COMPOSITE_PLUGIN)
+
+    report = register_plugin(name)
+
+    assert isinstance(Algorithm.get_algorithm("plugin_composite"), CompositeAlgorithm)
+    assert report.algorithms == ("calc_composite_plugin_metric", "plugin_composite")
+    assert not _pending_composites
+
+
+def test_a_rejected_plugin_leaves_no_declaration_pending(tmp_path):
+    """A declaration surviving rollback would make the next build raise about a plugin that has gone.
+
+    The composite here names an algorithm nobody registers, so it is still pending when the walk's
+    own build fails -- which is the only moment at which rollback has a declaration to undo.
+    """
+    name = write_plugin(tmp_path, "popcon_test_plugin_unbuildable", UNBUILDABLE_COMPOSITE_PLUGIN)
+    pending_at_start = pending_composites()
+
+    with pytest.raises(RuntimeError, match="no_such_algorithm"):
+        register_plugin(name)
+
+    assert pending_composites() == pending_at_start
+    cfspopcon.algorithm_class.build_pending_composites()  # must not raise about the rejected plugin
+
+
+def test_a_plugin_which_removes_a_variables_units_is_a_clash(tmp_path):
+    """Losing a variable's default units is a clash as much as changing them is."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_shrinks", SHRINKING_PLUGIN)
+    cfspopcon.discover_builtin_algorithms()
+
+    with pytest.raises(PluginClashError, match=r"major_radius.*\(removed\)"):
+        register_plugin(name)
+
+    assert default_unit("major_radius") == "meter"
+
+
+def test_an_override_of_a_builtin_is_a_clash(tmp_path):
+    """override=True keeps the name, so only comparing names would let a replaced builtin through."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_override", OVERRIDE_PLUGIN)
+    cfspopcon.discover_builtin_algorithms()
+    original = Algorithm.get_algorithm("calc_plasma_volume")
+
+    with pytest.raises(PluginClashError, match="algorithm 'calc_plasma_volume' was replaced"):
+        register_plugin(name)
+
+    assert Algorithm.get_algorithm("calc_plasma_volume") is original
+
+
+# --- Several plugins as one unit ------------------------------------------------------------------
+
+SPANNING_A = dedent(
+    """
+    from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+    from cfspopcon.unit_handling import Unitfull
+    from cfspopcon.unit_handling.default_units import extend_default_units_map
+
+    extend_default_units_map({"span_a_metric": "meter"})
+
+    @Algorithm.register_algorithm(return_keys=["span_a_metric"])
+    def calc_span_a_metric(major_radius: Unitfull) -> Unitfull:
+        return major_radius
+
+    # Names an algorithm from the other plugin, which has not been walked yet.
+    CompositeAlgorithm.register_from_list(["calc_span_a_metric", "calc_span_b_metric"], name="spanning_composite")
+    """
+)
+
+SPANNING_B = dedent(
+    """
+    from cfspopcon.algorithm_class import Algorithm
+    from cfspopcon.unit_handling import Unitfull
+    from cfspopcon.unit_handling.default_units import extend_default_units_map
+
+    extend_default_units_map({"span_b_metric": "meter"})
+
+    @Algorithm.register_algorithm(return_keys=["span_b_metric"])
+    def calc_span_b_metric(minor_radius: Unitfull) -> Unitfull:
+        return minor_radius
+    """
+)
+
+
+@pytest.fixture()
+def spanning_plugins(tmp_path):
+    """Two plugins whose composite spans them both, declared in the one walked first."""
+    write_plugin(tmp_path, "popcon_test_span_a", SPANNING_A)
+    write_plugin(tmp_path, "popcon_test_span_b", SPANNING_B)
+    return "popcon_test_span_a", "popcon_test_span_b"
+
+
+def test_a_composite_may_span_plugins_registered_together(spanning_plugins):
+    """One outer scope for the set, so the composite build waits for every plugin."""
+    reports = register_plugins(*spanning_plugins)
+
+    assert isinstance(Algorithm.get_algorithm("spanning_composite"), CompositeAlgorithm)
+    # Attributed to the plugin that declared it, not to the one that completed it.
+    assert reports[0].algorithms == ("calc_span_a_metric", "spanning_composite")
+    assert reports[1].algorithms == ("calc_span_b_metric",)
+
+
+def test_registering_the_same_plugins_one_at_a_time_cannot_span_them(spanning_plugins):
+    """The naive loop: each call is its own outer scope, so the first build has nothing to build on."""
+    first, second = spanning_plugins
+
+    with pytest.raises(RuntimeError, match="calc_span_b_metric"):
+        register_plugin(first)
+
+    # And the failure aborted before the second plugin, so nothing registered it either.
+    assert "calc_span_b_metric" not in Algorithm.instances
+
+
+def test_a_failing_plugin_rolls_back_the_whole_set(tmp_path):
+    """All-or-nothing: a plugin listed before the failure must not stay half-registered."""
+    good = write_plugin(tmp_path, "popcon_test_set_good", SUBMODULE_PLUGIN)
+    broken = write_plugin(tmp_path, "popcon_test_set_broken", BROKEN_PLUGIN)
+
+    with pytest.raises(ImportError, match="broken plugin"):
+        register_plugins(good, broken)
+
+    assert "calc_deep_plugin_metric" not in Algorithm.instances
+    assert "deep_plugin_metric" not in default_units_map()
+    assert _successful_registrations == {}
+
+
+# --- The `plugins` section of an input file --------------------------------------------------------
+
+
+def write_case(tmp_path: Path, plugins: list[str], algorithms: list[str], **inputs) -> Path:
+    """Write a case directory whose input.yaml lists the given plugins and algorithms."""
+    case_dir = tmp_path / "case"
+    case_dir.mkdir(exist_ok=True)
+    (case_dir / "input.yaml").write_text(yaml.safe_dump({"plugins": plugins, "algorithms": algorithms, **inputs}))
+    return case_dir
+
+
+def test_an_input_file_can_name_a_plugin_algorithm(tmp_path):
+    """The point of the feature: a case file lists its own plugins and then uses their algorithms."""
+    name = write_plugin(tmp_path, "popcon_test_case_plugin", COMPOSITE_PLUGIN)
+    case_dir = write_case(
+        tmp_path,
+        plugins=[name],
+        algorithms=["calc_plasma_volume", "calc_composite_plugin_metric"],
+        major_radius=1.85,
+        inverse_aspect_ratio=0.3,
+        areal_elongation=1.75,
+    )
+
+    input_parameters, algorithm, _, _ = cfspopcon.read_case(case_dir)
+
+    assert "plugins" not in input_parameters  # consumed, not treated as an input variable
+    result = algorithm.update_dataset(xr.Dataset(input_parameters))
+    assert result["composite_plugin_metric"].pint.units == ureg.m**3
+
+
+def test_an_input_file_composite_may_span_its_plugins(tmp_path, spanning_plugins):
+    """The `plugins` list is registered as one unit, so a spanning composite may be named."""
+    case_dir = write_case(tmp_path, plugins=list(spanning_plugins), algorithms=["spanning_composite"])
+
+    _, algorithm, _, _ = cfspopcon.read_case(case_dir)
+
+    assert [alg._name for alg in algorithm.algorithms] == ["calc_span_a_metric", "calc_span_b_metric"]
+
+
+def test_a_plugin_which_does_not_import_names_itself_and_the_input_file(tmp_path):
+    """A bare ModuleNotFoundError does not say where the name came from."""
+    case_dir = write_case(tmp_path, plugins=["popcon_test_no_such_plugin"], algorithms=[])
+
+    with pytest.raises(ModuleNotFoundError, match="popcon_test_no_such_plugin.*'plugins' section"):
+        cfspopcon.read_case(case_dir)
+
+
+def test_a_case_without_a_plugins_section_is_unaffected(tmp_path):
+    """The key is optional, and absent it nothing is imported."""
+    case_dir = tmp_path / "case_no_plugins"
+    case_dir.mkdir()
+    (case_dir / "input.yaml").write_text(yaml.safe_dump({"algorithms": ["calc_plasma_volume"], "major_radius": 1.85}))
+
+    input_parameters, algorithm, _, _ = cfspopcon.read_case(case_dir)
+
+    assert algorithm._name == "calc_plasma_volume"
+    assert "plugins" not in input_parameters
+
+
+def test_the_popcon_command_runs_a_case_with_plugins(tmp_path, run_script):
+    """popcon must register an input file's plugins for itself.
+
+    Run in a subprocess: this suite discovers at session start and other tests have already imported
+    plugin packages, so in-process this would pass whether the mechanism worked or not.
+    """
+    name = write_plugin(tmp_path, "popcon_test_cli_plugin", COMPOSITE_PLUGIN)
+    case_dir = write_case(
+        tmp_path,
+        plugins=[name],
+        algorithms=["calc_plasma_volume", "calc_composite_plugin_metric"],
+        major_radius=1.85,
+        inverse_aspect_ratio=0.3,
+        areal_elongation=1.75,
+    )
+    script = (
+        "import sys\n"
+        f"sys.path.insert(0, {str(tmp_path)!r})\n"
+        "import xarray as xr\n"
+        "import cfspopcon.cli as cli\n"
+        "from cfspopcon import Algorithm\n"
+        "def stop_after_read_case(*args, **kwargs):\n"
+        "    inputs, algorithm, points, plots = real_read_case(*args, **kwargs)\n"
+        "    result = algorithm.update_dataset(xr.Dataset(inputs))\n"
+        "    assert 'composite_plugin_metric' in result, list(result)\n"
+        "    raise SystemExit(0)\n"
+        "real_read_case = cli.read_case\n"
+        "cli.read_case = stop_after_read_case\n"
+        f"cli.run_popcon({str(case_dir)!r}, False, {{}})\n"
+    )
+    run_script(script)
