@@ -9,59 +9,17 @@ Configuration Enums
 
 Formulas
 ========================
-.. automodule:: cfspopcon.formulas
 
-Auxiliary Power
-----------------
-.. automodule:: cfspopcon.formulas.auxiliary_power
+The formulas subpackages are documented by walking their submodules.
 
-Energy Confinement
-----------------------
-.. automodule:: cfspopcon.formulas.energy_confinement
+.. currentmodule:: cfspopcon
 
-Fusion Power
-----------------
-.. automodule:: cfspopcon.formulas.fusion_power
+.. autosummary::
+   :toctree: _generated
+   :template: autosummary/module.rst
+   :recursive:
 
-Geometry
-----------------
-.. automodule:: cfspopcon.formulas.geometry
-
-Metrics
-----------------
-.. automodule:: cfspopcon.formulas.metrics
-
-Plasma Current
-----------------
-.. automodule:: cfspopcon.formulas.plasma_current
-
-Plasma Pressure
------------------------
-.. automodule:: cfspopcon.formulas.plasma_pressure
-
-Plasma Profiles
---------------------
-.. automodule:: cfspopcon.formulas.plasma_profiles
-
-Separatrix Conditions
--------------------------------
-.. automodule:: cfspopcon.formulas.separatrix_conditions
-
-Radiated Power
---------------------
-.. automodule:: cfspopcon.formulas.radiated_power
-
-Scrape Off Layer
---------------------
-.. automodule:: cfspopcon.formulas.scrape_off_layer
-
-Impurity seeding, dilution and Z-effective
--------------------------------------------
-.. automodule:: cfspopcon.formulas.impurities
-
-Atomic Data
----------------------------------
-.. automodule:: cfspopcon.formulas.atomic_data
+   formulas
 
 Algorithms
 =====================
