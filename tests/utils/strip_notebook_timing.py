@@ -14,7 +14,11 @@ def strip_timing(path: Path) -> bool:
     """Remove per-cell execution timing from the notebook, reporting whether anything changed."""
     notebook = json.loads(path.read_text())
 
-    stripped = [cell for cell in notebook["cells"] if cell.get("metadata", {}).pop("execution", None) is not None]
+    stripped = False
+    for cell in notebook["cells"]:
+        if cell.get("metadata", {}).pop("execution", None) is not None:
+            stripped = True
+
     if not stripped:
         return False
 
@@ -25,10 +29,12 @@ def strip_timing(path: Path) -> bool:
 
 def main() -> int:
     """Strip each notebook named on the command line, failing if any of them needed it."""
-    rewritten = [path for path in (Path(arg) for arg in sys.argv[1:]) if strip_timing(path)]
-
-    for path in rewritten:
-        print(f"Stripped execution timing metadata from {path}")
+    rewritten = []
+    for arg in sys.argv[1:]:
+        path = Path(arg)
+        if strip_timing(path):
+            print(f"Stripped execution timing metadata from {path}")
+            rewritten.append(path)
 
     return 1 if rewritten else 0
 

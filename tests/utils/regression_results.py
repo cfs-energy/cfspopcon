@@ -18,8 +18,8 @@ ALL_CASE_NAMES = [path.parent.relative_to(CASES_DIR).stem for path in ALL_CASE_P
 @click.command()
 def update_regression_results_cli() -> None:
     """Run the example cases and save them in tests/regression_results."""
-    # Run as a script rather than under pytest, so nothing has populated the registry that read_case
-    # resolves the cases' algorithm names against. Discover the same way the popcon command does.
+    # This runs as a script, not under pytest, so nothing has filled the registry yet -- and
+    # read_case resolves the algorithm names each case lists. Discover as the popcon command does.
     discover_builtin_algorithms()
 
     for case in ALL_CASE_PATHS:
