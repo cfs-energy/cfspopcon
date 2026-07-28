@@ -350,13 +350,8 @@ class CompositeAlgorithm:
         """Makes a doc-string detailing the function inputs and outputs."""
         components = f"[{', '.join(alg._name for alg in self.algorithms)}]"
 
-        return_string = (
-            f"CompositeAlgorithm: {self._name}\n"
-            if self._name is not None
-            else "CompositeAlgorithm\n"
-            f"Composed of {components}\n"
-            f"Inputs:\n{', '.join(self.input_keys)}\n"
-            f"Outputs:\n{', '.join(self.return_keys)}"
+        return_string = (f"CompositeAlgorithm: {self._name}\n" if self._name is not None else "CompositeAlgorithm\n") + (
+            f"Composed of {components}\nInputs:\n{', '.join(self.input_keys)}\nOutputs:\n{', '.join(self.return_keys)}"
         )
         return return_string
 

@@ -21,6 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`calc_analytic_profiles`, `calc_prf_profiles` algorithms** now take `rho` as an input and no longer return it; the `npoints` argument is removed. (#139)
 - **`wraps_ufunc`** infers `output_core_dims` from the number of return units, so multi-return functions no longer need to pass it explicitly. (#141)
 
+### Fixed
+
+- **A named `CompositeAlgorithm`'s docstring** listed only its name. Operator precedence between the conditional expression and the implicitly concatenated strings meant the components, inputs and outputs were built only for an unnamed composite; since every registered composite is named, they were missing everywhere they were used.
+
 ### Removed
 
 - **`calc_peaked_profiles`, `calc_1D_plasma_profiles` algorithms** — replaced by `calc_peaking_and_analytic_profiles` / `calc_peaking_and_prf_profiles`. (#139)

@@ -300,3 +300,13 @@ def test_call_single_output_is_unwrapped():
 
     alg = Algorithm(function=add_one, return_keys=["y"], skip_registration=True)
     assert alg(x=4) == 5
+
+
+def test_named_composite_docstring_lists_its_components(how_many_birds: Algorithm, how_many_animals: Algorithm):
+    composite = CompositeAlgorithm([how_many_birds, how_many_animals], name="count_the_farm")
+
+    assert composite.__doc__ is not None
+    assert composite.__doc__.startswith("CompositeAlgorithm: count_the_farm\n")
+    assert "Composed of [count_birds, count_animals]" in composite.__doc__
+    assert "Inputs:\n" in composite.__doc__
+    assert "Outputs:\n" in composite.__doc__
