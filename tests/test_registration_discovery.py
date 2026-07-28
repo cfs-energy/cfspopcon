@@ -20,18 +20,22 @@ from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, _pending_co
 
 @pytest.fixture()
 def clean_composites():
-    """Isolate a test's composite declarations from any the rest of the session is relying on.
+    """Isolate a test's registrations and declarations from the rest of the session.
 
     cfspopcon's own modules declare composites at import time, and pytest imports every test module
     during collection, so the pending list is generally non-empty before any test runs. Set it
-    aside for the duration rather than building or discarding those declarations.
+    aside for the duration rather than building or discarding those declarations, and undo whatever
+    the test registers so it cannot depend on, or leak into, another test.
     """
+    Algorithm.algorithms()  # settle discovery first, so the snapshot below is of a full registry
     saved = _pending_composites[:]
+    registered = set(Algorithm.instances)
     _pending_composites.clear()
-    declared: list[str] = []
-    yield declared
-    for name in declared:
-        Algorithm.instances.pop(name, None)
+    yield
+    # Diff the registry rather than asking each test to declare what it added: a test which fails
+    # partway still registered whatever it got to, and that must not leak into the next one.
+    for name in set(Algorithm.instances) - registered:
+        del Algorithm.instances[name]
     _pending_composites[:] = saved
     if saved and _discovery._discovered:
         # Discovery completed while the real declarations were set aside, so nothing else will
@@ -84,9 +88,9 @@ def test_formulas_submodule_resolves_before_the_registry_is_queried():
         "import cfspopcon\n"
         "from cfspopcon import _discovery, formulas\n"
         "assert not _discovery._discovered, 'discovery should not have run on a bare import'\n"
+        "assert 'geometry' in dir(formulas) and '__name__' in dir(formulas)\n"
         "assert formulas.geometry.analytical.calc_plasma_volume is not None\n"
         "assert not _discovery._discovered, 'attribute access must not trigger discovery'\n"
-        "assert 'geometry' in dir(formulas) and '__name__' in dir(formulas)\n"
     )
     subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
 
@@ -200,8 +204,6 @@ def test_formulas_rejects_an_unknown_attribute():
 
 def test_composites_build_regardless_of_declaration_order(clean_composites):
     """A composite may be declared before the algorithms and composites it is built from."""
-    declared = clean_composites
-    declared += ["_probe_base", "_probe_composite", "_probe_of_composite"]
 
     # Declared first, but depends on a composite which is itself declared after its own component.
     CompositeAlgorithm.register_from_list(keys=["_probe_composite"], name="_probe_of_composite")
@@ -231,8 +233,6 @@ def test_unsatisfiable_composite_names_its_missing_components(clean_composites):
 
 def test_pending_composite_builds_once_a_later_step_registers_its_component(clean_composites):
     """A declaration left pending by a failed build is satisfied when the component turns up."""
-    declared = clean_composites
-    declared += ["_probe_late_base", "_probe_late_composite"]
     CompositeAlgorithm.register_from_list(keys=["_probe_late_base"], name="_probe_late_composite")
 
     with pytest.raises(RuntimeError, match=r"_probe_late_composite"):
@@ -259,8 +259,6 @@ def test_a_broken_entry_point_fails_the_query_loudly(fake_entry_points, fresh_di
 
 def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_composites):
     """A declaration is dropped from the pending list only once it has actually been built."""
-    declared = clean_composites
-    declared += ["_probe_component", "_probe_survivor"]
     Algorithm.from_single_function(
         lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_component", skip_unit_conversion=True
     )
@@ -330,8 +328,6 @@ def test_a_package_name_which_does_not_resolve_leaves_the_registry_usable(fresh_
 
 def test_a_composite_missing_a_component_is_completed_by_a_later_walk(tmp_path, monkeypatch, clean_composites):
     """An unbuildable composite is recoverable, unlike a walk that raised: the declaration waits."""
-    declared = clean_composites
-    declared += ["_probe_supplied", "_probe_waiting"]
     _write_package(
         tmp_path,
         "_probe_declarer",
