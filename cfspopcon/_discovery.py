@@ -20,6 +20,7 @@ and every later query re-raises that same error. Half a registry is not worth re
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import pkgutil
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
@@ -36,7 +37,7 @@ ENTRY_POINT_GROUP = "cfspopcon.algorithms"
 
 _discovered = False
 _discovering = False
-_failure: Exception | None = None
+_failure: BaseException | None = None
 _failure_traceback: TracebackType | None = None
 
 
@@ -51,6 +52,10 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
     built from them. Composites declared with
     :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list` are built once the
     outermost walk finishes, since a registry query from a module being imported re-enters here.
+
+    A walk which raises has left the registry half-populated, so it is latched and re-raised by
+    every later query. A composite which could not be built is not: its declaration stays pending,
+    and walking the package which supplies the missing algorithm still completes it.
     """
     from .algorithm_class import build_pending_composites
 
@@ -58,22 +63,28 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
 
     ensure_discovered()  # whatever the walk imports may refer to cfspopcon's own algorithms
 
-    if isinstance(package, str):
-        package = importlib.import_module(package)
+    name = package if isinstance(package, str) else None
+    if name is not None and importlib.util.find_spec(name) is None:
+        # A name which does not resolve has run no code, so it must not poison the registry.
+        raise ModuleNotFoundError(f"No module named {name!r}", name=name)
 
     outermost = not _discovering
     _discovering = True  # a registry query from a walked module must not build composites yet
     try:
-        for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
+        if name is not None:
+            package = importlib.import_module(name)
+        for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):  # type:ignore[union-attr]
             importlib.import_module(info.name)
-        if outermost:
-            build_pending_composites()
-    except Exception as exc:
-        # A half-walked package poisons the registry; say so on every later query.
+    except BaseException as exc:
+        # A half-walked package poisons the registry; say so on every later query. BaseException,
+        # so that interrupting a slow first discovery does not leave usable-looking leftovers.
         _failure, _failure_traceback = exc, exc.__traceback__
         raise
     finally:
         _discovering = not outermost
+
+    if outermost:
+        build_pending_composites()
 
 
 def discover_builtin_algorithms() -> None:
@@ -121,7 +132,7 @@ def ensure_discovered() -> None:
         discover_builtin_algorithms()
         load_entry_point_algorithms()
         build_pending_composites()
-    except Exception as exc:
+    except BaseException as exc:
         _failure, _failure_traceback = exc, exc.__traceback__
         raise
     finally:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable, Iterator, Sequence
+from difflib import get_close_matches
 from functools import wraps
 from pathlib import Path  # noqa: TC003
 from typing import Any, ClassVar
@@ -20,6 +21,28 @@ GenericFunctionType = Callable[..., Any]
 #: Composites declared by :meth:`CompositeAlgorithm.register_from_list` but not yet built, as
 #: (name, component names). Drained by :func:`build_pending_composites`.
 _pending_composites: list[tuple[str, list[str]]] = []
+
+
+def _not_found_message(key: str) -> str:
+    """Explain as specifically as possible why an algorithm name did not resolve."""
+    if any(name == key for name, _ in _pending_composites):
+        return (
+            f"algorithm '{key}' is declared but not built yet. Composites are built only once discovery has "
+            "finished, so one cannot be looked up from a module that discovery is importing, nor from an "
+            "entry-point target. Declare yours with CompositeAlgorithm.register_from_list instead."
+        )
+
+    close_matches = get_close_matches(key, Algorithm.algorithms(), n=1)
+    if close_matches:
+        return f"algorithm '{key}' not found. Did you mean '{close_matches[0]}'?"
+
+    return (
+        f"algorithm '{key}' not found. cfspopcon's own algorithms are registered by walking cfspopcon.formulas, "
+        "so a module under that package is enough (a new subfolder still needs an __init__.py). An algorithm "
+        "defined elsewhere needs a cfspopcon.algorithms entry point, which is the only route the command-line "
+        "interface sees, or a discover_algorithms_in_package call if you are driving cfspopcon yourself. Run "
+        "popcon_algorithms to list everything that is registered."
+    )
 
 
 def _register(name: str, algorithm: Algorithm | CompositeAlgorithm, override: bool) -> None:
@@ -272,15 +295,7 @@ class Algorithm:
     def get_algorithm(cls, key: str) -> Algorithm | CompositeAlgorithm:
         """Retrieves an algorithm by name."""
         if key not in cls.algorithms():
-            error_message = (
-                f"algorithm '{key}' not found. "
-                "cfspopcon's own algorithms are registered by walking cfspopcon.formulas, so a module under "
-                "that package is enough (a new subfolder still needs an __init__.py). An algorithm defined "
-                "elsewhere needs a cfspopcon.algorithms entry point, which is the only route the command-line "
-                "interface sees, or a discover_algorithms_in_package call if you are driving cfspopcon "
-                "yourself. Run popcon_algorithms to list everything that is registered."
-            )
-            raise KeyError(error_message)
+            raise KeyError(_not_found_message(key))
 
         return cls.instances[key]
 

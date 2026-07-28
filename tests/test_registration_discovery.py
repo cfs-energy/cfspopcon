@@ -274,3 +274,97 @@ def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_
     assert "_probe_survivor" in [name for name, _ in _pending_composites]
     with pytest.raises(RuntimeError, match="already registered"):
         build_pending_composites()  # still fails the same way rather than quietly succeeding
+
+
+def _write_package(root, name, modules):
+    """Create an importable package under `root`, as {submodule name: source}."""
+    pkg = root / name
+    pkg.mkdir(parents=True, exist_ok=True)
+    (pkg / "__init__.py").write_text(modules.pop("__init__", ""))
+    for module, source in modules.items():
+        (pkg / f"{module}.py").write_text(source)
+    return pkg
+
+
+def _forget(*package_names):
+    for name in [m for m in sys.modules if m.split(".")[0] in package_names]:
+        sys.modules.pop(name, None)
+
+
+def test_a_package_which_fails_to_import_is_blamed_rather_than_the_next_caller(tmp_path, monkeypatch, fresh_discovery):
+    """A half-walked package poisons the registry, and later callers are told why, not blamed."""
+    _write_package(
+        tmp_path,
+        "_probe_broken_pkg",
+        {
+            "__init__": (
+                "from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm\n"
+                "Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_half', skip_unit_conversion=True)\n"
+                "CompositeAlgorithm.register_from_list(['_probe_half'], name='_probe_orphan')\n"
+                "raise ImportError('an optional dependency is missing')\n"
+            )
+        },
+    )
+    _write_package(tmp_path, "_probe_innocent_pkg", {"m": "x = 1\n"})
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(ImportError, match="optional dependency"):
+            _discovery.discover_algorithms_in_package("_probe_broken_pkg")
+
+        # The innocent package's own walk is fine, so it must not be blamed for the orphan.
+        with pytest.raises(ImportError, match="optional dependency"):
+            _discovery.discover_algorithms_in_package("_probe_innocent_pkg")
+    finally:
+        for name in ("_probe_half", "_probe_orphan"):
+            Algorithm.instances.pop(name, None)
+        _pending_composites[:] = [entry for entry in _pending_composites if entry[0] != "_probe_orphan"]
+        _forget("_probe_broken_pkg", "_probe_innocent_pkg")
+
+
+def test_a_package_name_which_does_not_resolve_leaves_the_registry_usable(fresh_discovery):
+    """A typo has run no code, so it must not poison discovery for the rest of the process."""
+    with pytest.raises(ModuleNotFoundError):
+        _discovery.discover_algorithms_in_package("_probe_no_such_package")
+    assert len(Algorithm.algorithms()) > 100
+
+
+def test_a_composite_missing_a_component_is_completed_by_a_later_walk(tmp_path, monkeypatch, clean_composites):
+    """An unbuildable composite is recoverable, unlike a walk that raised: the declaration waits."""
+    declared = clean_composites
+    declared += ["_probe_supplied", "_probe_waiting"]
+    _write_package(
+        tmp_path,
+        "_probe_declarer",
+        {
+            "m": "from cfspopcon.algorithm_class import CompositeAlgorithm\nCompositeAlgorithm.register_from_list(['_probe_supplied'], name='_probe_waiting')\n"
+        },
+    )
+    _write_package(
+        tmp_path,
+        "_probe_supplier",
+        {
+            "m": "from cfspopcon.algorithm_class import Algorithm\n"
+            "Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_supplied', skip_unit_conversion=True)\n"
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(RuntimeError, match="_probe_waiting"):
+            _discovery.discover_algorithms_in_package("_probe_declarer")
+        _discovery.discover_algorithms_in_package("_probe_supplier")
+        assert isinstance(Algorithm.get_algorithm("_probe_waiting"), CompositeAlgorithm)
+    finally:
+        _forget("_probe_declarer", "_probe_supplier")
+
+
+def test_a_misspelled_algorithm_name_suggests_the_real_one():
+    """The commonest mistake deserves a pointer, not a lecture about entry points."""
+    with pytest.raises(KeyError, match="Did you mean 'calc_plasma_volume'"):
+        Algorithm.get_algorithm("calc_plasma_volme")
+
+
+def test_looking_up_a_declared_but_unbuilt_composite_says_so(clean_composites):
+    """A composite looked up too early is a different problem from one that does not exist."""
+    CompositeAlgorithm.register_from_list(keys=["calc_plasma_volume"], name="_probe_not_yet_built")
+    with pytest.raises(KeyError, match="declared but not built yet"):
+        Algorithm.get_algorithm("_probe_not_yet_built")

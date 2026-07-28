@@ -29,7 +29,7 @@ release because of the breaking changes listed below. (#147)
 
 ### Changed
 
-- **The algorithm registry is populated lazily** — discovery runs once, on the first query through `Algorithm.algorithms()`, `Algorithm.get_algorithm()`, `Algorithm.write_yaml()` or the `algorithms` accessor. Code which reads `Algorithm.instances` directly must call `discover_builtin_algorithms()` first. (#147)
+- **The algorithm registry is populated lazily** — discovery runs once, on the first query through `Algorithm.algorithms()`, `Algorithm.get_algorithm()`, `Algorithm.write_yaml()` or the `cfspopcon.registry` accessor. Code which reads `Algorithm.instances` directly must call `discover_builtin_algorithms()` first. (#147)
 - **Composite algorithms are no longer module-level variables** — `calc_peaking_and_analytic_profiles`, `calc_peaking_and_prf_profiles` and `calc_power_balance_from_input_P_aux` are declared rather than built at import time, so they are reached through the registry (`registry["name"]`) instead of imported from their defining module. (#147)
 - **`cfspopcon.formulas` submodules are imported on first attribute access** rather than eagerly, so `cfspopcon.formulas.geometry` keeps working. Its `__all__` is now discovered by scanning the package instead of being hand-maintained, so `from cfspopcon.formulas import *` still exports exactly the submodules. (#147)
 - **`skip_registration=True` no longer raises on a duplicate name** — it is honoured before the duplicate-name check, so a variant of an already-registered algorithm can be constructed without touching the registry. (#147)
@@ -42,6 +42,6 @@ release because of the breaking changes listed below. (#147)
 
 ### Removed
 
-- **`CompositeAlgorithm.from_list`** — to build an unnamed composite from a list of names, index the registry instead: `algorithms[["a", "b"]]`. To register a named one, use `CompositeAlgorithm.register_from_list`; for a named but unregistered composite, construct `CompositeAlgorithm([...], name=...)` directly. (#147)
+- **`CompositeAlgorithm.from_list`** — to build an unnamed composite from a list of names, index the registry instead: `registry[["a", "b"]]`. To register a named one, use `CompositeAlgorithm.register_from_list`; for a named but unregistered composite, construct `CompositeAlgorithm([...], name=...)` directly. (#147)
 - **`calc_peaked_profiles`, `calc_1D_plasma_profiles` algorithms** — replaced by `calc_peaking_and_analytic_profiles` / `calc_peaking_and_prf_profiles`. (#139)
 - **`density_profile_form`, `temp_profile_form` inputs** — and with them, mixed density/temperature profile forms. (#139)
