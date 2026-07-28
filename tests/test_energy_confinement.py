@@ -3,7 +3,7 @@ import pytest
 import xarray as xr
 
 from cfspopcon.algorithm_class import registry
-from cfspopcon.formulas.energy_confinement import (
+from cfspopcon.formulas.energy_confinement.energy_confinement_time import (
     calc_energy_confinement_time_from_scaling,
     calc_energy_confinement_time_from_stored_energy_and_input_power,
     calc_H98y2,

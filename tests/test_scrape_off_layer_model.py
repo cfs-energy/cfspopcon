@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from cfspopcon import formulas
+from cfspopcon.formulas.scrape_off_layer import lambda_q as lambda_q_module
 from cfspopcon.named_options import LambdaQScaling
 from cfspopcon.unit_handling import ureg
 
@@ -66,7 +66,7 @@ def test_lambda_q_scalings(
     q_star,
     lambda_q_factor,
 ):
-    lambda_q = formulas.scrape_off_layer.calc_lambda_q(
+    lambda_q = lambda_q_module.calc_lambda_q(
         lambda_q_scaling=scaling,
         average_total_pressure=average_total_pressure,
         power_crossing_separatrix=power_crossing_separatrix,
@@ -95,16 +95,16 @@ def test_lambda_q_scalings_with_algorithms(
     lambda_q_factor,
 ):
     if scaling == LambdaQScaling.Brunner:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_brunner(
+        lambda_q = lambda_q_module.calc_lambda_q_with_brunner(
             average_total_pressure=average_total_pressure, lambda_q_factor=lambda_q_factor
         )
     elif scaling == LambdaQScaling.EichRegression14:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_14(
+        lambda_q = lambda_q_module.calc_lambda_q_with_eich_regression_14(
             B_pol_out_mid=B_pol_out_mid,
             lambda_q_factor=lambda_q_factor,
         )
     elif scaling == LambdaQScaling.EichRegression15:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_15(
+        lambda_q = lambda_q_module.calc_lambda_q_with_eich_regression_15(
             power_crossing_separatrix=power_crossing_separatrix,
             major_radius=major_radius,
             B_pol_out_mid=B_pol_out_mid,
@@ -112,7 +112,7 @@ def test_lambda_q_scalings_with_algorithms(
             lambda_q_factor=lambda_q_factor,
         )
     elif scaling == LambdaQScaling.EichRegression9:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_9(
+        lambda_q = lambda_q_module.calc_lambda_q_with_eich_regression_9(
             magnetic_field_on_axis=magnetic_field_on_axis,
             q_star=q_star,
             power_crossing_separatrix=power_crossing_separatrix,

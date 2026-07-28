@@ -1,16 +1,9 @@
 """Routines to calculate the plasma pressure, beta and related quantities."""
 
-from .beta import calc_beta_normalized, calc_beta_poloidal, calc_beta_toroidal, calc_beta_total, calc_troyon_limit
-from .plasma_temperature import calc_average_ion_temp_from_temperature_ratio
-from .pressure import calc_average_total_pressure, calc_peak_pressure
+from . import beta, plasma_temperature, pressure
 
 __all__ = [
-    "calc_average_ion_temp_from_temperature_ratio",
-    "calc_average_total_pressure",
-    "calc_beta_normalized",
-    "calc_beta_poloidal",
-    "calc_beta_toroidal",
-    "calc_beta_total",
-    "calc_peak_pressure",
-    "calc_troyon_limit",
+    "beta",
+    "plasma_temperature",
+    "pressure",
 ]
