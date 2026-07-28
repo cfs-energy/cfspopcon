@@ -6,8 +6,13 @@ __version__ = metadata(__package__)["Version"]
 __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
-from ._discovery import discover_algorithms_in_package, discover_builtin_algorithms
-from .algorithm_class import Algorithm, CompositeAlgorithm, registry
+from .algorithm_class import (
+    Algorithm,
+    CompositeAlgorithm,
+    discover_algorithms_in_package,
+    discover_builtin_algorithms,
+    registry,
+)
 from .deprecation_handler import handle_deprecated_arguments
 from .input_file_handling import process_input_dictionary, read_case
 from .plotting import read_plot_style

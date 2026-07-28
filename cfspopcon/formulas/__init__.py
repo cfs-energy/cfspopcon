@@ -1,15 +1,11 @@
 """Formulas used for the POPCON analysis.
 
 Submodules are not imported by hand here: their algorithms are found by
-:func:`cfspopcon._discovery.discover_builtin_algorithms`, a ``pkgutil`` walk of this package. Adding
-a new ``formulas/...`` module is therefore sufficient to register its algorithms — no edit to this
-file is required.
+:func:`cfspopcon.algorithm_class.discover_builtin_algorithms`, a ``pkgutil`` walk of this package.
+Adding a new ``formulas/...`` module is therefore sufficient to register its algorithms.
 
-That walk only runs when discovery is called, so the submodules are imported on first attribute
-access instead. Importing one by name always works, discovery or not, because the import system finds
-it. Reading it as an attribute of an already-imported package -- ``cfspopcon.formulas.geometry``, for
-instance -- is what needs the hook, and used to work only because this file imported every submodule
-eagerly.
+Since that walk only runs when discovery is called, submodules are imported on first attribute
+access instead, so that reading ``cfspopcon.formulas.geometry`` still works without it.
 """
 
 import importlib

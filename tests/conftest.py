@@ -8,7 +8,7 @@ import yaml
 
 import cfspopcon
 from cfspopcon import discover_builtin_algorithms
-from cfspopcon.algorithm_class import Algorithm, _pending_composites, build_pending_composites
+from cfspopcon.algorithm_class import Algorithm, _pending_composites
 
 xr.set_options(display_width=300)
 
@@ -40,10 +40,6 @@ def clean_composites():
     for name in set(Algorithm.instances) - registered:
         del Algorithm.instances[name]
     _pending_composites[:] = saved
-    if saved:
-        # Set aside while something else built the real declarations, so nothing will build these
-        # now. Do it here, or they stay pending for the rest of the session.
-        build_pending_composites()
 
 
 @pytest.fixture()
