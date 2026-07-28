@@ -8,48 +8,18 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
+from utils.throwaway_packages import forget_packages, write_package
 
 import cfspopcon
 from cfspopcon import _discovery
 from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, _pending_composites, build_pending_composites
 
 
-@pytest.fixture()
-def clean_composites():
-    """Isolate a test's registrations and declarations from the rest of the session.
-
-    cfspopcon's own modules declare composites at import time, and pytest imports every test module
-    during collection, so the pending list is generally non-empty before any test runs. Set it
-    aside for the duration rather than building or discarding those declarations, and undo whatever
-    the test registers so it cannot depend on, or leak into, another test.
-    """
-    saved = _pending_composites[:]
-    registered = set(Algorithm.instances)
-    _pending_composites.clear()
-    yield
-    # Diff the registry rather than asking each test to declare what it added: a test which fails
-    # partway still registered whatever it got to, and that must not leak into the next one.
-    for name in set(Algorithm.instances) - registered:
-        del Algorithm.instances[name]
-    _pending_composites[:] = saved
-    if saved:
-        # Set aside while something else built the real declarations, so nothing will build these
-        # now. Do it here, or they stay pending for the rest of the session.
-        build_pending_composites()
-
-
-@pytest.fixture()
-def fake_entry_points(monkeypatch):
-    """Install fake entry points, each loading to one of the given targets."""
-
-    def install(*targets):
-        eps = [SimpleNamespace(load=lambda target=target: target) for target in targets]
-        monkeypatch.setattr(_discovery, "entry_points", lambda group: eps)
-
-    return install
+def register_probe(name):
+    """Register a throwaway single-input algorithm under `name`."""
+    return Algorithm.from_single_function(lambda _probe_in: _probe_in, return_keys=["_probe_out"], name=name, skip_unit_conversion=True)
 
 
 def test_the_registry_is_empty_until_discovery_runs():
@@ -108,7 +78,7 @@ def test_a_nested_walk_leaves_the_composite_build_to_the_outermost_one(tmp_path,
 
     The inner walk must not build, or it would fail on a component the outer walk has not reached.
     """
-    _write_package(
+    write_package(
         tmp_path,
         "_probe_inner_pkg",
         {
@@ -117,7 +87,7 @@ def test_a_nested_walk_leaves_the_composite_build_to_the_outermost_one(tmp_path,
             "CompositeAlgorithm.register_from_list(['_probe_inner', '_probe_outer'], name='_probe_spanning')\n"
         },
     )
-    _write_package(
+    write_package(
         tmp_path,
         "_probe_outer_pkg",
         {
@@ -132,7 +102,7 @@ def test_a_nested_walk_leaves_the_composite_build_to_the_outermost_one(tmp_path,
         _discovery.discover_algorithms_in_package("_probe_outer_pkg")
         assert isinstance(Algorithm.get_algorithm("_probe_spanning"), CompositeAlgorithm)
     finally:
-        _forget("_probe_inner_pkg", "_probe_outer_pkg")
+        forget_packages("_probe_inner_pkg", "_probe_outer_pkg")
 
 
 def test_drop_in_module_is_discovered_without_editing_init():
@@ -204,11 +174,10 @@ def test_formulas_rejects_an_unknown_attribute():
 
 def test_composites_build_regardless_of_declaration_order(clean_composites):
     """A composite may be declared before the algorithms and composites it is built from."""
-
     # Declared first, but depends on a composite which is itself declared after its own component.
     CompositeAlgorithm.register_from_list(keys=["_probe_composite"], name="_probe_of_composite")
     CompositeAlgorithm.register_from_list(keys=["_probe_base"], name="_probe_composite")
-    Algorithm.from_single_function(lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_base", skip_unit_conversion=True)
+    register_probe("_probe_base")
 
     build_pending_composites()
 
@@ -238,9 +207,7 @@ def test_pending_composite_builds_once_a_later_step_registers_its_component(clea
     with pytest.raises(RuntimeError, match=r"_probe_late_composite"):
         build_pending_composites()
 
-    Algorithm.from_single_function(
-        lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_late_base", skip_unit_conversion=True
-    )
+    register_probe("_probe_late_base")
     build_pending_composites()
     assert isinstance(Algorithm.get_algorithm("_probe_late_composite"), CompositeAlgorithm)
     assert not _pending_composites
@@ -259,9 +226,7 @@ def test_a_broken_entry_point_fails_discovery_loudly(fake_entry_points):
 
 def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_composites):
     """A declaration is dropped from the pending list only once it has actually been built."""
-    Algorithm.from_single_function(
-        lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_component", skip_unit_conversion=True
-    )
+    register_probe("_probe_component")
     # The first collides with an already-registered name; the second is perfectly buildable.
     CompositeAlgorithm.register_from_list(keys=["_probe_component"], name="calc_plasma_volume")
     CompositeAlgorithm.register_from_list(keys=["_probe_component"], name="_probe_survivor")
@@ -274,21 +239,6 @@ def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_
         build_pending_composites()  # still fails the same way rather than quietly succeeding
 
 
-def _write_package(root, name, modules):
-    """Create an importable package under `root`, as {submodule name: source}."""
-    pkg = root / name
-    pkg.mkdir(parents=True, exist_ok=True)
-    (pkg / "__init__.py").write_text(modules.pop("__init__", ""))
-    for module, source in modules.items():
-        (pkg / f"{module}.py").write_text(source)
-    return pkg
-
-
-def _forget(*package_names):
-    for name in [m for m in sys.modules if m.split(".")[0] in package_names]:
-        sys.modules.pop(name, None)
-
-
 def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatch, clean_composites):
     """The failure names the module that broke, and does not poison discovery process-wide.
 
@@ -296,7 +246,7 @@ def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatc
     registered is still registered, so the retry trips the already-registered guard instead of
     reporting the original cause. Fix the cause and start a new process.
     """
-    _write_package(
+    write_package(
         tmp_path,
         "_probe_broken_pkg",
         {
@@ -307,7 +257,7 @@ def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatc
             )
         },
     )
-    _write_package(tmp_path, "_probe_innocent_pkg", {"m": "x = 1\n"})
+    write_package(tmp_path, "_probe_innocent_pkg", {"m": "x = 1\n"})
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
         with pytest.raises(ImportError, match="optional dependency"):
@@ -317,7 +267,7 @@ def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatc
         _discovery.discover_algorithms_in_package("_probe_innocent_pkg")
         assert isinstance(Algorithm.get_algorithm("_probe_half"), Algorithm)
     finally:
-        _forget("_probe_broken_pkg", "_probe_innocent_pkg")
+        forget_packages("_probe_broken_pkg", "_probe_innocent_pkg")
 
 
 def test_a_package_name_which_does_not_resolve_leaves_the_registry_usable():
@@ -329,14 +279,14 @@ def test_a_package_name_which_does_not_resolve_leaves_the_registry_usable():
 
 def test_a_composite_missing_a_component_is_completed_by_a_later_walk(tmp_path, monkeypatch, clean_composites):
     """An unbuildable composite is recoverable, unlike a walk that raised: the declaration waits."""
-    _write_package(
+    write_package(
         tmp_path,
         "_probe_declarer",
         {
             "m": "from cfspopcon.algorithm_class import CompositeAlgorithm\nCompositeAlgorithm.register_from_list(['_probe_supplied'], name='_probe_waiting')\n"
         },
     )
-    _write_package(
+    write_package(
         tmp_path,
         "_probe_supplier",
         {
@@ -351,7 +301,7 @@ def test_a_composite_missing_a_component_is_completed_by_a_later_walk(tmp_path, 
         _discovery.discover_algorithms_in_package("_probe_supplier")
         assert isinstance(Algorithm.get_algorithm("_probe_waiting"), CompositeAlgorithm)
     finally:
-        _forget("_probe_declarer", "_probe_supplier")
+        forget_packages("_probe_declarer", "_probe_supplier")
 
 
 def test_a_misspelled_algorithm_name_suggests_the_real_one():

@@ -34,8 +34,8 @@ def _not_found_message(key: str) -> str:
 
     if not Algorithm.instances:
         return (
-            f"algorithm '{key}' not found: the registry is empty because discovery has not run. Call "
-            "cfspopcon.discover_builtin_algorithms() first."
+            f"algorithm '{key}' not found: the registry is empty because discovery has not run. "
+            "Call cfspopcon.discover_builtin_algorithms() first."
         )
 
     close_matches = get_close_matches(key, Algorithm.algorithms(), n=1)
@@ -43,11 +43,10 @@ def _not_found_message(key: str) -> str:
         return f"algorithm '{key}' not found. Did you mean '{close_matches[0]}'?"
 
     return (
-        f"algorithm '{key}' not found. cfspopcon's own algorithms are registered by walking cfspopcon.formulas, "
-        "so a module under that package is enough (a new subfolder still needs an __init__.py). An algorithm "
-        "defined elsewhere needs a cfspopcon.algorithms entry point, which is the only route the command-line "
-        "interface sees, or a discover_algorithms_in_package call if you are driving cfspopcon yourself. Run "
-        "popcon_algorithms to list everything that is registered."
+        f"algorithm '{key}' not found. Algorithms under cfspopcon.formulas are registered by "
+        "discover_builtin_algorithms; one defined elsewhere needs a cfspopcon.algorithms entry point (the only "
+        "route the command-line interface sees) or a discover_algorithms_in_package call. Run popcon_algorithms "
+        "to list what is registered."
     )
 
 
