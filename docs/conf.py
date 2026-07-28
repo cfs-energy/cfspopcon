@@ -103,7 +103,7 @@ extensions = [
     "nbsphinx",
 ]
 
-nitpick_ignore = [("py:class", "Ellipsis")]
+nitpick_ignore = [("py:class", "Ellipsis"), ("py:class", "ModuleType")]
 
 # -- nbsphinx
 exclude_patterns = ["_build", "static"]

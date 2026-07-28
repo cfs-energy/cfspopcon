@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
+from difflib import get_close_matches
 from functools import wraps
 from pathlib import Path  # noqa: TC003
 from typing import Any, ClassVar
@@ -17,14 +18,61 @@ from .unit_handling import Quantity, convert_to_default_units, ureg
 LabelledReturnFunctionType = Callable[..., dict[str, Any]]
 GenericFunctionType = Callable[..., Any]
 
+#: Composites declared by :meth:`CompositeAlgorithm.register_from_list` but not yet built, as
+#: (name, component names). Drained by :func:`build_pending_composites`.
+_pending_composites: list[tuple[str, list[str]]] = []
+
+
+def _not_found_message(key: str) -> str:
+    """Explain as specifically as possible why an algorithm name did not resolve."""
+    if any(name == key for name, _ in _pending_composites):
+        return (
+            f"algorithm '{key}' is declared but not built yet. Composites are built only once discovery has "
+            "finished, so one cannot be looked up from a module that discovery is importing. Declare yours "
+            "with CompositeAlgorithm.register_from_list instead."
+        )
+
+    if not Algorithm.instances:
+        return (
+            f"algorithm '{key}' not found: the registry is empty because discovery has not run. "
+            "Call cfspopcon.discover_builtin_algorithms() first."
+        )
+
+    close_matches = get_close_matches(key, Algorithm.algorithms(), n=1)
+    if close_matches:
+        return f"algorithm '{key}' not found. Did you mean '{close_matches[0]}'?"
+
+    return (
+        f"algorithm '{key}' not found. Algorithms under cfspopcon.formulas are registered by "
+        "discover_builtin_algorithms; one defined in another package needs a discover_algorithms_in_package "
+        "call for that package. Run popcon_algorithms to list what is registered."
+    )
+
+
+def _register(name: str, algorithm: Algorithm | CompositeAlgorithm, override: bool) -> None:
+    """Add an algorithm to the registry, refusing to silently replace one of the same name."""
+    if name in Algorithm.instances and not override:
+        raise RuntimeError(
+            f"Algorithm '{name}' is already registered. Pass override=True to replace it, or build it "
+            "without registering (skip_registration=True for an Algorithm, register=False for a composite)."
+        )
+    Algorithm.instances[name] = algorithm
+
 
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
+    #: The registered algorithms, keyed by name. Empty until discovery has run; see
+    #: :mod:`cfspopcon._discovery`.
     instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
-        self, function: LabelledReturnFunctionType, return_keys: list[str], name: str | None = None, skip_registration: bool = False
+        self,
+        function: LabelledReturnFunctionType,
+        return_keys: list[str],
+        name: str | None = None,
+        skip_registration: bool = False,
+        override: bool = False,
     ):
         """Initialise an Algorithm.
 
@@ -32,15 +80,15 @@ class Algorithm:
             function: a callable function
             return_keys: the arguments which are returned from the function
             name: Descriptive name for algorithm
-            skip_registration: flag to skip adding the Algorithm to 'instances' (useful for testing)
+            skip_registration: construct the Algorithm without adding it to 'instances' (useful for
+                testing, or for a coexisting variant of an already-registered algorithm)
+            override: replace an already-registered algorithm of this name, rather than raising
         """
         self._function = function
         self._name = self._function.__name__ if name is None else name
 
-        if self._name in self.instances:
-            raise RuntimeError(f"Algorithm {self._name} has been defined multiple times.")
         if not skip_registration:
-            self.instances[self._name] = self
+            _register(self._name, self, override)
 
         self._signature = inspect.signature(function)
         for p in self._signature.parameters.values():
@@ -157,6 +205,7 @@ class Algorithm:
         name: str | None = None,
         skip_unit_conversion: bool = False,
         skip_registration: bool = False,
+        override: bool = False,
     ) -> Algorithm:
         """Build an Algorithm which wraps a single function."""
         if not isinstance(return_keys, list):
@@ -180,15 +229,27 @@ class Algorithm:
 
             return result_dict
 
-        return cls(wrapped_function, return_keys, name=name if name is not None else func.__name__, skip_registration=skip_registration)
+        return cls(
+            wrapped_function,
+            return_keys,
+            name=name if name is not None else func.__name__,
+            skip_registration=skip_registration,
+            override=override,
+        )
 
     @classmethod
-    def register_algorithm(cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False) -> GenericFunctionType:
+    def register_algorithm(
+        cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
+    ) -> GenericFunctionType:
         """Decorate a function and turn it into an Algorithm. Usage: @Algorithm.register_algorithm(return_keys=["..."])."""
 
         def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
             Algorithm.from_single_function(
-                func, return_keys=return_keys, name=name if name is not None else func.__name__, skip_unit_conversion=skip_unit_conversion
+                func,
+                return_keys=return_keys,
+                name=name if name is not None else func.__name__,
+                skip_unit_conversion=skip_unit_conversion,
+                override=override,
             )
             return func
 
@@ -235,15 +296,8 @@ class Algorithm:
     @classmethod
     def get_algorithm(cls, key: str) -> Algorithm | CompositeAlgorithm:
         """Retrieves an algorithm by name."""
-        if key not in cls.algorithms():
-            error_message = (
-                f"algorithm '{key}' not found. "
-                "If you have constructed or registered an Algorithm of this name, "
-                "make sure that it is imported in the top-level cfspopcon __init__.py. "
-                "Algorithms which have been successfully registered and imported will "
-                "appear in the algorithms.yaml file."
-            )
-            raise KeyError(error_message)
+        if key not in cls.instances:
+            raise KeyError(_not_found_message(key))
 
         return cls.instances[key]
 
@@ -251,8 +305,12 @@ class Algorithm:
 class CompositeAlgorithm:
     """A class which combined multiple Algorithms into a single object which behaves like an Algorithm."""
 
-    def __init__(  # noqa: PLR0912
-        self, algorithms: Sequence[Algorithm | CompositeAlgorithm], name: str | None = None, register: bool = False
+    def __init__(
+        self,
+        algorithms: Sequence[Algorithm | CompositeAlgorithm],
+        name: str | None = None,
+        register: bool = False,
+        override: bool = False,
     ):
         """Initialise a CompositeAlgorithm, combining several other Algorithms.
 
@@ -260,6 +318,7 @@ class CompositeAlgorithm:
             algorithms: a list of Algorithms, in the order that they should be executed.
             name: a name used to refer to the composite algorithm.
             register: flag register a named CompositeAlgorithm to 'Algorithm.instances' (ignored if name = None)
+            override: replace an already-registered algorithm of this name, rather than raising
         """
         if not (isinstance(algorithms, Sequence) and all(isinstance(alg, Algorithm | CompositeAlgorithm) for alg in algorithms)):
             raise TypeError("Should pass a list of algorithms or composites to CompositeAlgorithm.")
@@ -267,9 +326,7 @@ class CompositeAlgorithm:
         self.algorithms: list[Algorithm] = []
 
         if (name is not None) and (register):
-            if name in Algorithm.instances:
-                raise RuntimeError(f"Algorithm {name} has been defined multiple times.")
-            Algorithm.instances[name] = self
+            _register(name, self, override)
 
         # flattens composite algorithms into their respective list of plain Algorithms
         for alg in algorithms:
@@ -341,10 +398,15 @@ class CompositeAlgorithm:
         self.__doc__ = self._make_docstring()
 
     @classmethod
-    def from_list(cls, keys: list[str], name: str | None = None, register: bool = False) -> CompositeAlgorithm:
-        """Build a CompositeAlgorithm from a list of Algorithm names."""
-        algorithms = [Algorithm.get_algorithm(key) for key in keys]
-        return CompositeAlgorithm(algorithms=algorithms, name=name, register=register)
+    def register_from_list(cls, keys: list[str], name: str) -> None:
+        """Declare a named CompositeAlgorithm, to be built once its components are registered.
+
+        Nothing is looked up here, so a module can declare a composite whichever order discovery
+        happens to import it in. :func:`build_pending_composites` builds the declarations, and is
+        called for you at the end of discovery. To build one immediately from already-registered
+        algorithms, index the registry instead: ``registry[["a", "b"]]``.
+        """
+        _pending_composites.append((name, list(keys)))
 
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
@@ -518,3 +580,61 @@ def _validate_inputs(
     if not quiet:
         warn(message, stacklevel=3)
     return False
+
+
+def build_pending_composites() -> None:
+    """Build every composite declared by :meth:`CompositeAlgorithm.register_from_list`.
+
+    A composite may be built from other composites, so each pass builds whichever declarations have
+    all of their components registered by now, and repeats. A pass which builds nothing cannot be
+    satisfied from what is registered, and raises naming the missing components. Declarations stay
+    pending on failure, so a later discovery step which registers them can still build them.
+
+    Each pass therefore shortens the pending list, since it either builds something or has already
+    raised. A pass which does not raises too, rather than looping: unreachable today, but a later
+    change which breaks that reasoning should fail visibly instead of hanging.
+    """
+    while _pending_composites:
+        ready = [(name, keys) for name, keys in _pending_composites if all(key in Algorithm.instances for key in keys)]
+        if not ready:
+            unresolved = "; ".join(
+                f"'{name}' is missing [{', '.join(k for k in keys if k not in Algorithm.instances)}]" for name, keys in _pending_composites
+            )
+            raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
+
+        pending_before_pass = len(_pending_composites)
+        for entry in ready:
+            name, keys = entry
+            CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
+            _pending_composites.remove(entry)  # drop it only once it has actually been built
+
+        if len(_pending_composites) >= pending_before_pass:
+            raise RuntimeError(
+                f"Building the composite algorithms made no progress: {len(_pending_composites)} still declared "
+                f"({', '.join(name for name, _ in _pending_composites)}) after a pass over {len(ready)} "
+                f"which had all of their components."
+            )
+
+
+class _AlgorithmRegistry:
+    """Provides indexed access to the algorithm registry.
+
+    ``registry["name"]`` returns the named :class:`Algorithm`; ``registry[["a", "b"]]`` returns an
+    unregistered :class:`CompositeAlgorithm` which executes those algorithms in the order given.
+    """
+
+    def __getitem__(self, key: str | list[str] | tuple[str, ...]) -> Algorithm | CompositeAlgorithm:
+        """Look up an Algorithm by name, or build a CompositeAlgorithm from a list/tuple of names."""
+        if isinstance(key, str):
+            return Algorithm.get_algorithm(key)
+        if isinstance(key, (list, tuple)):
+            return CompositeAlgorithm([Algorithm.get_algorithm(name) for name in key])
+        raise TypeError("Index the algorithm registry with a name (str) or a list/tuple of names.")
+
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over the registered algorithm names (also powers ``"name" in registry``)."""
+        return iter(Algorithm.algorithms())
+
+
+registry = _AlgorithmRegistry()
+"""Registry accessor, where ``registry["name"]`` gives an Algorithm and ``registry[["a", "b"]]`` a CompositeAlgorithm."""
