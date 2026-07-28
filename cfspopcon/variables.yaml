@@ -35,6 +35,7 @@ areal_elongation:
   - calc_current_relaxation_time
   - calc_loop_voltage
   - calc_f_shaping_for_qstar
+  - calc_power_balance_from_input_P_aux
 atomic_data:
   default_units: null
   description:
@@ -78,13 +79,14 @@ average_electron_density:
   - calc_jch_profiles
   - calc_analytic_profiles
   - calc_prf_profiles
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
   - two_point_model_fixed_fpow
   - two_point_model_fixed_qpart
   - calc_separatrix_electron_density
   - calc_LH_transition_threshold_power
   - calc_LI_transition_threshold_power
+  - calc_power_balance_from_input_P_aux
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
 average_electron_temp:
   default_units: kiloelectron_volt
   description:
@@ -107,9 +109,9 @@ average_electron_temp:
   - calc_analytic_profiles
   - calc_prf_profiles
   - calc_peak_electron_temp
+  - calc_temperature_peaking
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-  - calc_temperature_peaking
 average_ion_density:
   default_units: _1e19_per_cubic_metre
   description:
@@ -143,6 +145,7 @@ average_ion_mass:
   - calc_SepOS_L_mode_density_limit
   - calc_SepOS_LH_transition
   - calc_LH_transition_threshold_power
+  - calc_power_balance_from_input_P_aux
 average_ion_temp:
   default_units: kiloelectron_volt
   description:
@@ -161,9 +164,9 @@ average_ion_temp:
   - calc_analytic_profiles
   - calc_prf_profiles
   - calc_peak_ion_temp
+  - calc_temperature_peaking
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-  - calc_temperature_peaking
 average_total_pressure:
   default_units: pascal
   description:
@@ -539,6 +542,7 @@ energy_confinement_time:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
+  - calc_power_balance_from_input_P_aux
   used_by:
   - calc_H98y2
   - switch_to_linearised_ohmic_confinement_below_threshold
@@ -602,6 +606,7 @@ fraction_of_external_power_coupled:
   used_by:
   - calc_auxiliary_power
   - calc_input_power_for_fixed_auxiliary_power
+  - calc_power_balance_from_input_P_aux
 fraction_of_P_SOL_to_divertor:
   default_units: dimensionless
   description:
@@ -665,6 +670,7 @@ H98y2:
   - Ratio of energy confinement time to the ITER98y2 scaling
   set_by:
   - calc_H98y2
+  - calc_power_balance_from_input_P_aux
   used_by: []
 heavier_fuel_species_fraction:
   default_units: dimensionless
@@ -801,6 +807,7 @@ inverse_aspect_ratio:
   - calc_q_star_from_plasma_current
   - calc_lambda_q
   - calc_lambda_q_with_eich_regression_15
+  - calc_power_balance_from_input_P_aux
 invmu_0_dLedR:
   default_units: dimensionless
   description:
@@ -997,6 +1004,7 @@ magnetic_field_on_axis:
   - calc_SepOS_ideal_MHD_limit
   - calc_LH_transition_threshold_power
   - calc_LI_transition_threshold_power
+  - calc_power_balance_from_input_P_aux
 major_radius:
   default_units: meter
   description:
@@ -1032,8 +1040,6 @@ major_radius:
   - calc_q_star_from_plasma_current
   - calc_cylindrical_edge_safety_factor
   - calc_effective_collisionality
-  - calc_peaking_and_analytic_profiles
-  - calc_peaking_and_prf_profiles
   - calc_B_tor_omp
   - calc_parallel_heat_flux_density
   - calc_q_perp
@@ -1044,6 +1050,9 @@ major_radius:
   - calc_SepOS_ideal_MHD_limit
   - calc_power_crossing_separatrix_in_electron_channel
   - calc_LH_transition_threshold_power
+  - calc_power_balance_from_input_P_aux
+  - calc_peaking_and_analytic_profiles
+  - calc_peaking_and_prf_profiles
 max_flattop_duration:
   default_units: second
   description:
@@ -1200,6 +1209,7 @@ P_alpha:
   used_by:
   - calc_auxiliary_power
   - calc_input_power_for_fixed_auxiliary_power
+  - calc_power_balance_from_input_P_aux
 P_auxiliary_absorbed:
   default_units: megawatt
   description:
@@ -1207,6 +1217,7 @@ P_auxiliary_absorbed:
   set_by:
   - calc_auxiliary_power
   - calc_input_power_for_fixed_auxiliary_power
+  - calc_power_balance_from_input_P_aux
   used_by: []
 P_auxiliary_launched:
   default_units: megawatt
@@ -1218,6 +1229,7 @@ P_auxiliary_launched:
   used_by:
   - calc_input_power_for_fixed_auxiliary_power
   - calc_fusion_gain
+  - calc_power_balance_from_input_P_aux
 P_external:
   default_units: megawatt
   description:
@@ -1226,6 +1238,7 @@ P_external:
   set_by:
   - calc_auxiliary_power
   - calc_input_power_for_fixed_auxiliary_power
+  - calc_power_balance_from_input_P_aux
   used_by: []
 P_fusion:
   default_units: megawatt
@@ -1245,6 +1258,7 @@ P_in:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
+  - calc_power_balance_from_input_P_aux
   used_by:
   - calc_auxiliary_power
   - calc_energy_confinement_time_from_scaling
@@ -1292,6 +1306,7 @@ P_ohmic:
   - calc_auxiliary_power
   - calc_input_power_for_fixed_auxiliary_power
   - calc_fusion_gain
+  - calc_power_balance_from_input_P_aux
 P_rad_bremsstrahlung:
   default_units: megawatt
   description:
@@ -1392,9 +1407,9 @@ peak_electron_temp:
   - Peak electron temperature
   set_by:
   - calc_peak_electron_temp
+  - calc_temperature_peaking
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-  - calc_temperature_peaking
   used_by:
   - calc_peak_pressure
 peak_fuel_ion_density:
@@ -1415,9 +1430,9 @@ peak_ion_temp:
   - Peak ion temperature
   set_by:
   - calc_peak_ion_temp
+  - calc_temperature_peaking
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-  - calc_temperature_peaking
   used_by:
   - calc_triple_product
   - calc_peak_pressure
@@ -1463,6 +1478,7 @@ plasma_current:
   - calc_poloidal_sound_larmor_radius
   - calc_LH_transition_threshold_power
   - calc_LI_transition_threshold_power
+  - calc_power_balance_from_input_P_aux
 plasma_stored_energy:
   default_units: megajoule
   description:
@@ -1474,6 +1490,7 @@ plasma_stored_energy:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
+  - calc_power_balance_from_input_P_aux
 plasma_volume:
   default_units: meter ** 3
   description:
@@ -1591,6 +1608,7 @@ q_star:
   - calc_plasma_current_from_qstar
   - calc_lambda_q
   - calc_lambda_q_with_eich_regression_9
+  - calc_power_balance_from_input_P_aux
 radas_dir:
   default_units: null
   description:
@@ -1801,6 +1819,7 @@ separatrix_elongation:
   - calc_vertical_minor_radius_from_elongation_and_minor_radius
   - calc_synchrotron_radiation
   - calc_intrinsic_radiated_power_from_core
+  - calc_power_balance_from_input_P_aux
 separatrix_power_transient:
   default_units: megawatt
   description:
@@ -1820,6 +1839,7 @@ separatrix_triangularity:
   - solve_energy_confinement_scaling_for_input_power
   - switch_to_linearised_ohmic_confinement_below_threshold
   - switch_to_L_mode_confinement_below_threshold
+  - calc_power_balance_from_input_P_aux
 SepOS_density_limit:
   default_units: dimensionless
   description:
@@ -2035,9 +2055,9 @@ temperature_peaking:
   - calc_prf_profiles
   - calc_peak_electron_temp
   - calc_peak_ion_temp
+  - calc_temperature_peaking
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-  - calc_temperature_peaking
 toroidal_flux_expansion:
   default_units: dimensionless
   description:
@@ -2081,6 +2101,7 @@ triangularity_psi95:
   - calc_cylindrical_edge_safety_factor
   - calc_critical_alpha_MHD
   - calc_poloidal_sound_larmor_radius
+  - calc_power_balance_from_input_P_aux
 triangularity_ratio_sep_to_psi95:
   default_units: dimensionless
   description:
@@ -2161,6 +2182,6 @@ z_effective:
   - calc_neoclassical_loop_resistivity
   - calc_current_relaxation_time
   - calc_effective_collisionality
+  - calc_power_crossing_separatrix_in_electron_channel
   - calc_peaking_and_analytic_profiles
   - calc_peaking_and_prf_profiles
-  - calc_power_crossing_separatrix_in_electron_channel
