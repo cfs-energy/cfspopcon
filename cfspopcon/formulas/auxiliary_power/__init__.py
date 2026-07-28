@@ -2,6 +2,4 @@
 
 from . import auxiliary_power
 
-__all__ = [
-    "auxiliary_power",
-]
+__all__ = ["auxiliary_power"]

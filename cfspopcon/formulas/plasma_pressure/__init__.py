@@ -2,8 +2,4 @@
 
 from . import beta, plasma_temperature, pressure
 
-__all__ = [
-    "beta",
-    "plasma_temperature",
-    "pressure",
-]
+__all__ = ["beta", "plasma_temperature", "pressure"]

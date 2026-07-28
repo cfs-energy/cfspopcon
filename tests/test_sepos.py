@@ -2,10 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.formulas.geometry import analytical
-from cfspopcon.formulas.metrics import collisionality
-from cfspopcon.formulas.plasma_current import safety_factor
-from cfspopcon.formulas.scrape_off_layer import heat_flux_density
+from cfspopcon import formulas
 from cfspopcon.formulas.separatrix_conditions import separatrix_operational_space as sepos
 from cfspopcon.unit_handling import Quantity, get_units, ureg
 from cfspopcon.unit_handling import dimensionless_magnitude as dmag
@@ -113,7 +110,7 @@ def cylindrical_safety_factor(
     elongation_psi95,
     triangularity_psi95,
 ):
-    return safety_factor.calc_cylindrical_edge_safety_factor(
+    return formulas.plasma_current.safety_factor.calc_cylindrical_edge_safety_factor(
         major_radius=major_radius,
         minor_radius=minor_radius,
         elongation_psi95=elongation_psi95,
@@ -134,7 +131,7 @@ def alpha_t(
     ion_to_electron_temp_ratio,
     cylindrical_safety_factor,
 ):
-    return collisionality.calc_alpha_t(
+    return formulas.metrics.collisionality.calc_alpha_t(
         separatrix_electron_density=separatrix_electron_density,
         separatrix_electron_temp=separatrix_electron_temp,
         cylindrical_safety_factor=cylindrical_safety_factor,
@@ -316,7 +313,7 @@ def B_pol_out_mid(
     plasma_current,
     minor_radius,
 ):
-    return heat_flux_density.calc_B_pol_omp(
+    return formulas.scrape_off_layer.heat_flux_density.calc_B_pol_omp(
         plasma_current=plasma_current,
         minor_radius=minor_radius,
     )
@@ -328,7 +325,7 @@ def B_t_out_mid(
     major_radius,
     minor_radius,
 ):
-    return heat_flux_density.calc_B_tor_omp(
+    return formulas.scrape_off_layer.heat_flux_density.calc_B_tor_omp(
         magnetic_field_on_axis=magnetic_field_on_axis,
         major_radius=major_radius,
         minor_radius=minor_radius,
@@ -361,7 +358,7 @@ def surface_area(
     inverse_aspect_ratio,
     areal_elongation,
 ):
-    return analytical.calc_plasma_surface_area(
+    return formulas.geometry.analytical.calc_plasma_surface_area(
         major_radius=major_radius,
         inverse_aspect_ratio=inverse_aspect_ratio,
         areal_elongation=areal_elongation,

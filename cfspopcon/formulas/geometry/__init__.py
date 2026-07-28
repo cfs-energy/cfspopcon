@@ -2,7 +2,4 @@
 
 from . import analytical, volume_integral
 
-__all__ = [
-    "analytical",
-    "volume_integral",
-]
+__all__ = ["analytical", "volume_integral"]

@@ -2,8 +2,4 @@
 
 from . import power_crossing_separatrix, separatrix_operational_space, threshold_power
 
-__all__ = [
-    "power_crossing_separatrix",
-    "separatrix_operational_space",
-    "threshold_power",
-]
+__all__ = ["power_crossing_separatrix", "separatrix_operational_space", "threshold_power"]

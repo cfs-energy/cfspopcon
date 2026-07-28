@@ -10,13 +10,10 @@ Configuration Enums
 Formulas
 ========================
 
-The formulas subpackages are documented by walking their submodules.
-
 .. currentmodule:: cfspopcon
 
 .. autosummary::
    :toctree: _generated
-   :template: autosummary/module.rst
    :recursive:
 
    formulas

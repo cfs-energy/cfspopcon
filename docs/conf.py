@@ -121,9 +121,7 @@ autoclass_content = "both"
 autodoc_typehints = "signature"
 
 # -- autosummary
-# The formulas subpackages re-export only the classes they define, so walk the
-# submodules to document their functions rather than listing each module here.
-templates_path = ["templates"]
+# The formulas subpackages no longer re-export their functions, so walk the submodules to document them.
 autosummary_generate = True
 
 # -- doctest

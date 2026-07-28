@@ -2,7 +2,4 @@
 
 from . import flux_consumption, inductances
 
-__all__ = [
-    "flux_consumption",
-    "inductances",
-]
+__all__ = ["flux_consumption", "inductances"]

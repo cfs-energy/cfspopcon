@@ -695,9 +695,9 @@ impurity_concentration:
   description:
   - Concentration of each impurity species, relative to the electron density.
   set_by:
-  - set_up_impurity_concentration_array
   - calc_core_seeded_impurity_concentration
   - calc_edge_impurity_concentration
+  - set_up_impurity_concentration_array
   used_by:
   - calc_impurity_radiated_power_mavrin_coronal
   - calc_impurity_radiated_power_mavrin_noncoronal

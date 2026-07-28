@@ -70,7 +70,6 @@ instance/
 
 # Sphinx documentation
 docs/_*
-# autosummary writes module stubs here during the build
 docs/doc_sources/_generated/
 
 # PyBuilder

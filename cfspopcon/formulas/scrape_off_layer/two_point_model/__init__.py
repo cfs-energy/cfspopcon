@@ -2,8 +2,4 @@
 
 from . import model, target_first_model, two_point_model_algorithms
 
-__all__ = [
-    "model",
-    "target_first_model",
-    "two_point_model_algorithms",
-]
+__all__ = ["model", "target_first_model", "two_point_model_algorithms"]
