@@ -9,7 +9,7 @@ from typing import Any
 import click
 import yaml
 
-from cfspopcon import Algorithm, discover_builtin_algorithms
+from cfspopcon import Algorithm
 from cfspopcon.unit_handling import Quantity
 
 
@@ -18,8 +18,6 @@ class VariableConsistencyChecker:
 
     def __init__(self) -> None:
         """Read in the keys from the algorithms, default units and the physics glossary."""
-        # Algorithm.instances is populated lazily, so fill it before reading the registry directly.
-        discover_builtin_algorithms()
         self.glossary, self.glossary_keys = self.read_physics_glossary()
         self.algorithm_keys = self.read_algorithm_keys()
         self.variables_dict, self.variable_keys = self.read_variables_dict()

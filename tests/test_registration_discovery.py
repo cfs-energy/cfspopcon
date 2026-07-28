@@ -313,8 +313,10 @@ def test_a_package_which_fails_to_import_is_blamed_rather_than_the_next_caller(t
         with pytest.raises(ImportError, match="optional dependency"):
             _discovery.discover_algorithms_in_package("_probe_innocent_pkg")
     finally:
+        # _instances, not instances: reading the latter completes discovery, which re-raises the
+        # failure this test just latched.
         for name in ("_probe_half", "_probe_orphan"):
-            Algorithm.instances.pop(name, None)
+            Algorithm._instances.pop(name, None)
         _pending_composites[:] = [entry for entry in _pending_composites if entry[0] != "_probe_orphan"]
         _forget("_probe_broken_pkg", "_probe_innocent_pkg")
 
@@ -364,3 +366,23 @@ def test_looking_up_a_declared_but_unbuilt_composite_says_so(clean_composites):
     CompositeAlgorithm.register_from_list(keys=["calc_plasma_volume"], name="_probe_not_yet_built")
     with pytest.raises(KeyError, match="declared but not built yet"):
         Algorithm.get_algorithm("_probe_not_yet_built")
+
+
+def test_reading_the_registry_directly_completes_discovery_first():
+    """Algorithm.instances must not hand back a partially-registered registry.
+
+    Run in a subprocess because discovery is process-wide and any earlier test has already run it.
+    Covers the access routes a dict subclass could not intercept, which is why this is a property
+    on the metaclass.
+    """
+    script = (
+        "from cfspopcon import Algorithm\n"
+        "from cfspopcon import _discovery\n"
+        "assert not _discovery._discovered, 'discovery should not have run on a bare import'\n"
+        "assert len(Algorithm.instances) > 100, len(Algorithm.instances)\n"
+        "assert len(dict(Algorithm.instances)) > 100\n"
+        "assert len({**Algorithm.instances}) > 100\n"
+        "assert 'calc_plasma_volume' in Algorithm.instances\n"
+        "assert len(list(Algorithm.instances)) == len(Algorithm.instances.keys())\n"
+    )
+    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])

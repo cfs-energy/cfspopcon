@@ -91,8 +91,8 @@ def discover_builtin_algorithms() -> None:
     """Populate the registry now rather than on the first query, by walking :mod:`cfspopcon.formulas`.
 
     Entry-point providers are loaded too, since this runs the same discovery the first query would.
-    Useful for code which reads ``Algorithm.instances`` directly instead of going through the
-    registry accessors.
+    Reading the registry already does this for you; call it to front-load the cost, to fail early on
+    a broken installation, or to pick up a module added since discovery last ran.
     """
     from . import formulas
 
