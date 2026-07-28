@@ -585,6 +585,11 @@ def build_pending_composites() -> None:
     all of their components registered by now, and repeats. A pass which builds nothing cannot be
     satisfied from what is registered, and raises naming the missing components. Declarations stay
     pending on failure, so a later discovery step which registers them can still build them.
+
+    Every pass must therefore shorten the pending list, and one which does not raises rather than
+    looping. Nothing can currently reach that: a pass either builds at least one composite or has
+    already raised. It is there so that a future change which breaks that reasoning fails visibly
+    instead of hanging.
     """
     while _pending_composites:
         ready = [(name, keys) for name, keys in _pending_composites if all(key in Algorithm.instances for key in keys)]
@@ -594,10 +599,18 @@ def build_pending_composites() -> None:
             )
             raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
 
+        pending_before_pass = len(_pending_composites)
         for entry in ready:
             name, keys = entry
             CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
             _pending_composites.remove(entry)  # drop it only once it has actually been built
+
+        if len(_pending_composites) >= pending_before_pass:
+            raise RuntimeError(
+                f"Building the composite algorithms made no progress: {pending_before_pass} still declared "
+                f"({', '.join(name for name, _ in _pending_composites)}) after a pass which built "
+                f"{len(ready)} of them."
+            )
 
 
 class _AlgorithmRegistry:

@@ -5,8 +5,9 @@ Submodules are not imported by hand here: their algorithms are found by
 a new ``formulas/...`` module is therefore sufficient to register its algorithms — no edit to this
 file is required.
 
-Since that walk only happens when discovery is called, the subpackages are imported on first
-attribute access instead, so ``cfspopcon.formulas.geometry`` works without discovering first.
+That walk only runs when discovery is called. So that any submodule stays importable on its own
+without discovering first -- ``from cfspopcon.formulas import geometry``, for instance -- they are
+imported on first attribute access instead.
 """
 
 import importlib
