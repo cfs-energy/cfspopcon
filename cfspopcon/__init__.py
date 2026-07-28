@@ -7,7 +7,7 @@ __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
 from ._discovery import discover_algorithms_in_package, discover_builtin_algorithms
-from .algorithm_class import Algorithm, CompositeAlgorithm, algorithms
+from .algorithm_class import Algorithm, CompositeAlgorithm, registry
 from .deprecation_handler import handle_deprecated_arguments
 from .formulas.atomic_data import AtomicData
 from .input_file_handling import process_input_dictionary, read_case
@@ -24,7 +24,6 @@ __all__ = [
     "Algorithm",
     "AtomicData",
     "CompositeAlgorithm",
-    "algorithms",
     "convert_to_default_units",
     "convert_units",
     "discover_algorithms_in_package",
@@ -37,6 +36,7 @@ __all__ = [
     "process_input_dictionary",
     "read_case",
     "read_plot_style",
+    "registry",
     "set_default_units",
     "shaping_and_selection",
 ]

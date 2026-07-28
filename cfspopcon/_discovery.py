@@ -1,7 +1,8 @@
 """Automatic discovery of registered algorithms.
 
 Replaces the "import every submodule in ``__init__.py`` to register" pattern with a ``pkgutil``
-walk of :mod:`cfspopcon.formulas` (so adding ``formulas/foo/bar.py`` is enough), plus an entry-point
+walk of :mod:`cfspopcon.formulas` (so adding ``formulas/foo/bar.py`` is enough, though a new subfolder
+still needs an ``__init__.py`` -- a directory without one is not walked), plus an entry-point
 group (``cfspopcon.algorithms``) through which an installed distribution can contribute algorithms
 with no cfspopcon-side import. Both run lazily, once, on the first registry query; the
 ``@Algorithm.register_algorithm`` decorator is unchanged.
@@ -74,7 +75,12 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
 
 
 def discover_builtin_algorithms() -> None:
-    """Register cfspopcon's own algorithms by walking the :mod:`cfspopcon.formulas` package."""
+    """Populate the registry now rather than on the first query, by walking :mod:`cfspopcon.formulas`.
+
+    Entry-point providers are loaded too, since this runs the same discovery the first query would.
+    Useful for code which reads ``Algorithm.instances`` directly instead of going through the
+    registry accessors.
+    """
     from . import formulas
 
     discover_algorithms_in_package(formulas)

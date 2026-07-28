@@ -274,10 +274,11 @@ class Algorithm:
         if key not in cls.algorithms():
             error_message = (
                 f"algorithm '{key}' not found. "
-                "cfspopcon's own algorithms are registered by walking cfspopcon.formulas, so a module "
-                "under that package is enough; an algorithm defined elsewhere needs a cfspopcon.algorithms "
-                "entry point, or an explicit discover_algorithms_in_package call. Successfully registered "
-                "algorithms appear in the algorithms.yaml file."
+                "cfspopcon's own algorithms are registered by walking cfspopcon.formulas, so a module under "
+                "that package is enough (a new subfolder still needs an __init__.py). An algorithm defined "
+                "elsewhere needs a cfspopcon.algorithms entry point, which is the only route the command-line "
+                "interface sees, or a discover_algorithms_in_package call if you are driving cfspopcon "
+                "yourself. Run popcon_algorithms to list everything that is registered."
             )
             raise KeyError(error_message)
 
@@ -386,7 +387,7 @@ class CompositeAlgorithm:
         Nothing is looked up here, so a module can declare a composite whichever order discovery
         happens to import it in. :func:`build_pending_composites` builds the declarations, and is
         called for you at the end of discovery. To build one immediately from already-registered
-        algorithms, index the registry instead: ``algorithms[["a", "b"]]``.
+        algorithms, index the registry instead: ``registry[["a", "b"]]``.
         """
         _pending_composites.append((name, list(keys)))
 
@@ -394,13 +395,8 @@ class CompositeAlgorithm:
         """Makes a doc-string detailing the function inputs and outputs."""
         components = f"[{', '.join(alg._name for alg in self.algorithms)}]"
 
-        return_string = (
-            f"CompositeAlgorithm: {self._name}\n"
-            if self._name is not None
-            else "CompositeAlgorithm\n"
-            f"Composed of {components}\n"
-            f"Inputs:\n{', '.join(self.input_keys)}\n"
-            f"Outputs:\n{', '.join(self.return_keys)}"
+        return_string = (f"CompositeAlgorithm: {self._name}\n" if self._name is not None else "CompositeAlgorithm\n") + (
+            f"Composed of {components}\nInputs:\n{', '.join(self.input_keys)}\nOutputs:\n{', '.join(self.return_keys)}"
         )
         return return_string
 
@@ -590,7 +586,7 @@ def build_pending_composites() -> None:
 class _AlgorithmRegistry:
     """Provides indexed access to the algorithm registry.
 
-    ``algorithms["name"]`` returns the named :class:`Algorithm`; ``algorithms[["a", "b"]]`` returns an
+    ``registry["name"]`` returns the named :class:`Algorithm`; ``registry[["a", "b"]]`` returns an
     unregistered :class:`CompositeAlgorithm` which executes those algorithms in the order given.
     """
 
@@ -611,5 +607,5 @@ class _AlgorithmRegistry:
         return len(Algorithm.algorithms())
 
 
-algorithms = _AlgorithmRegistry()
-"""Registry accessor, where ``algorithms["name"]`` gives an Algorithm and ``algorithms[["a", "b"]]`` a CompositeAlgorithm."""
+registry = _AlgorithmRegistry()
+"""Registry accessor, where ``registry["name"]`` gives an Algorithm and ``registry[["a", "b"]]`` a CompositeAlgorithm."""

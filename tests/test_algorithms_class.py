@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithms
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, registry
 from cfspopcon.unit_handling import ureg
 
 
@@ -326,24 +326,24 @@ def test_registration_semantics_skip_override_and_collision():
 
 
 def test_registry_indexing():
-    """algorithms[...] returns an Algorithm or CompositeAlgorithm."""
+    """registry[...] returns an Algorithm or CompositeAlgorithm."""
     names = ["calc_plasma_volume", "calc_plasma_surface_area"]
     for name in names:
-        assert name in algorithms
-        assert isinstance(algorithms[name], Algorithm)
-    assert isinstance(algorithms[names], CompositeAlgorithm)
-    assert isinstance(algorithms[tuple(names)], CompositeAlgorithm)
+        assert name in registry
+        assert isinstance(registry[name], Algorithm)
+    assert isinstance(registry[names], CompositeAlgorithm)
+    assert isinstance(registry[tuple(names)], CompositeAlgorithm)
 
     # A composite runs its algorithms in the order the names are given.
-    assert [alg._name for alg in algorithms[names].algorithms] == names
-    assert [alg._name for alg in algorithms[names[::-1]].algorithms] == names[::-1]
+    assert [alg._name for alg in registry[names].algorithms] == names
+    assert [alg._name for alg in registry[names[::-1]].algorithms] == names[::-1]
 
-    assert len(algorithms) == len(list(algorithms))
+    assert len(registry) == len(list(registry))
 
     with pytest.raises(TypeError, match="name .str. or a list"):
-        algorithms[123]
+        registry[123]
     with pytest.raises(KeyError):
-        algorithms["not_a_registered_algorithm_name"]
+        registry["not_a_registered_algorithm_name"]
 
 
 def test_composite_registration_collision_and_override():

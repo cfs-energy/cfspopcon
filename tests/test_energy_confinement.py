@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import algorithms
+from cfspopcon.algorithm_class import registry
 from cfspopcon.formulas.energy_confinement import (
     calc_energy_confinement_time_from_scaling,
     calc_energy_confinement_time_from_stored_energy_and_input_power,
@@ -115,7 +115,7 @@ def test_calc_power_balance_from_input_p_aux_uses_explicit_alpha_power():
         )
     )
 
-    ds = algorithms["calc_power_balance_from_input_P_aux"].update_dataset(ds)
+    ds = registry["calc_power_balance_from_input_P_aux"].update_dataset(ds)
 
     np.testing.assert_allclose(magnitude_in_units(ds["P_auxiliary_absorbed"], ureg.MW), 22.4, rtol=1e-9)
     np.testing.assert_allclose(magnitude_in_units(ds["P_in"], ureg.MW), 54.9, rtol=1e-9)
