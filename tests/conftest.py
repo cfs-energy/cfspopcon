@@ -1,14 +1,13 @@
 import subprocess
 import sys
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 import xarray as xr
 import yaml
 
 import cfspopcon
-from cfspopcon import _discovery, discover_builtin_algorithms
+from cfspopcon import discover_builtin_algorithms
 from cfspopcon.algorithm_class import Algorithm, _pending_composites, build_pending_composites
 
 xr.set_options(display_width=300)
@@ -60,24 +59,6 @@ def run_script():
         assert result.returncode == 0, f"{result.stdout}\n{result.stderr}"
 
     return run
-
-
-@pytest.fixture()
-def fake_entry_points(monkeypatch):
-    """Install fake entry points, from targets that `load` returns or from `loaders` it calls.
-
-    Pass a loader when resolving the target is the thing under test, so that it happens during
-    discovery rather than while the test is setting itself up.
-    """
-
-    def install(*targets, loaders=()):
-        loaders = [*(lambda target=target: target for target in targets), *loaders]
-        eps = [SimpleNamespace(value=f"fake_provider:{index}", load=load) for index, load in enumerate(loaders)]
-        monkeypatch.setattr(_discovery, "entry_points", lambda group: eps)
-        # Which targets have been loaded is process-global, so give each test its own record.
-        monkeypatch.setattr(_discovery, "_loaded_entry_points", set())
-
-    return install
 
 
 @pytest.fixture(scope="session")

@@ -72,7 +72,7 @@ def test_formulas_submodule_resolves_without_discovery(run_script):
 
 
 def test_a_nested_walk_leaves_the_composite_build_to_the_outermost_one(tmp_path, monkeypatch, clean_composites):
-    """A provider which walks its own package may declare a composite spanning both walks.
+    """A package which walks another may declare a composite spanning both walks.
 
     The inner walk must not build, or it would fail on a component the outer walk has not reached.
     """
@@ -154,29 +154,6 @@ def test_discover_algorithms_in_a_specified_package(tmp_path, monkeypatch):
             sys.modules.pop(name, None)
 
 
-def test_entry_point_callable_is_invoked(fake_entry_points):
-    """A downstream entry point whose target is a callable is invoked to register (no cfspopcon import)."""
-    called = []
-    fake_entry_points(lambda: called.append(True))
-    _discovery.load_entry_point_algorithms()
-    assert called == [True]
-
-
-def test_a_callable_entry_point_is_not_invoked_twice(fake_entry_points):
-    """Discovery may be called more than once, and a callable target registers each time it runs.
-
-    Without this, the second call would trip the duplicate-registration guard on the target's own
-    algorithms -- and the entry-point docs recommend exactly this kind of target.
-    """
-    called = []
-    fake_entry_points(lambda: called.append(True))
-
-    _discovery.discover_builtin_algorithms()
-    _discovery.discover_builtin_algorithms()
-
-    assert called == [True]
-
-
 def test_formulas_rejects_an_unknown_attribute():
     """__getattr__ must raise AttributeError, not a ModuleNotFoundError from the failed import."""
     from cfspopcon import formulas
@@ -224,17 +201,6 @@ def test_pending_composite_builds_once_a_later_step_registers_its_component(clea
     build_pending_composites()
     assert isinstance(Algorithm.get_algorithm("_probe_late_composite"), CompositeAlgorithm)
     assert not _pending_composites
-
-
-def test_a_broken_entry_point_fails_discovery_loudly(fake_entry_points):
-    """A provider whose target raises must not be papered over: discovery propagates it."""
-
-    def broken():
-        raise ImportError("this distribution is broken")
-
-    fake_entry_points(broken)
-    with pytest.raises(ImportError, match="this distribution is broken"):
-        _discovery.discover_builtin_algorithms()
 
 
 def test_a_composite_that_fails_to_build_does_not_take_the_others_with_it(clean_composites):
@@ -322,7 +288,7 @@ def test_a_composite_missing_a_component_is_completed_by_a_later_walk(tmp_path, 
 
 
 def test_a_misspelled_algorithm_name_suggests_the_real_one():
-    """The commonest mistake deserves a pointer, not a lecture about entry points."""
+    """The commonest mistake deserves a pointer, not a lecture about how discovery works."""
     with pytest.raises(KeyError, match="Did you mean 'calc_plasma_volume'"):
         Algorithm.get_algorithm("calc_plasma_volme")
 

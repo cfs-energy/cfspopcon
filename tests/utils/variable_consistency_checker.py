@@ -9,7 +9,7 @@ from typing import Any
 import click
 import yaml
 
-from cfspopcon import Algorithm, discover_algorithms_in_package, formulas
+from cfspopcon import Algorithm, discover_builtin_algorithms
 from cfspopcon.unit_handling import Quantity
 
 
@@ -234,9 +234,7 @@ class VariableConsistencyChecker:
 @click.option("--run", is_flag=True, help="Modifies the checked files in-place.")
 def check_variables_cli(run: bool) -> None:
     """Check whether the Algorithm keys, the default_units file and the physics_glossary file are consistent."""
-    # Walk cfspopcon.formulas directly rather than calling discover_builtin_algorithms: that also
-    # loads entry-point providers, whose keys belong in their own package's units map, not this one's.
-    discover_algorithms_in_package(formulas)
+    discover_builtin_algorithms()
     variable_consistency_checker = VariableConsistencyChecker()
     variable_consistency_checker.run(apply_changes=run)
 

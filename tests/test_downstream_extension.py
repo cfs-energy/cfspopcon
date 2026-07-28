@@ -6,8 +6,6 @@ using the Algorithm/CompositeAlgorithm machinery on its own, having never called
 discover_builtin_algorithms.
 """
 
-import importlib
-
 import pytest
 import xarray as xr
 from utils.throwaway_packages import forget_packages, write_package
@@ -110,34 +108,6 @@ def test_a_downstream_composite_runs_end_to_end(downstream_package):
 
     assert result["_ds_metric"] == 2.0 * result["plasma_volume"]
     assert result["_ds_metric"].pint.units == ureg.m**3
-
-
-@pytest.mark.parametrize("target", ["module", "callable"])
-def test_an_entry_point_provider_extends_the_registry(downstream_package, target, fake_entry_points, tmp_path):
-    """Both entry-point target kinds register the package's algorithms during discovery.
-
-    The target must not be resolved before discovery runs, or the registration would happen at
-    resolution time and the test would pass whether the entry point was consulted or not.
-    """
-    if target == "module":
-        # A module target is imported, not walked, so point it at a module which walks on import.
-        write_package(tmp_path, "_ds_entry_pkg", {"__init__": f"import cfspopcon\ncfspopcon.discover_algorithms_in_package('{PACKAGE}')\n"})
-        load = lambda: importlib.import_module("_ds_entry_pkg")  # noqa: E731
-    else:
-        load = lambda: lambda: cfspopcon.discover_algorithms_in_package(PACKAGE)  # noqa: E731
-
-    fake_entry_points(loaders=[load])
-    assert "calc_ds_metric" not in Algorithm.instances, "the entry point must not have been loaded yet"
-
-    try:
-        cfspopcon.discover_builtin_algorithms()
-
-        for name in DECLARED_COMPOSITES:
-            assert isinstance(Algorithm.get_algorithm(name), CompositeAlgorithm), name
-    finally:
-        # Must happen even if an assertion fails, or the module stays in sys.modules and the next
-        # test to write over that name imports this one's copy.
-        forget_packages("_ds_entry_pkg")
 
 
 def test_walking_before_the_builtins_are_discovered_says_what_is_missing(downstream_package, run_script):

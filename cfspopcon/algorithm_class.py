@@ -28,8 +28,8 @@ def _not_found_message(key: str) -> str:
     if any(name == key for name, _ in _pending_composites):
         return (
             f"algorithm '{key}' is declared but not built yet. Composites are built only once discovery has "
-            "finished, so one cannot be looked up from a module that discovery is importing, nor from an "
-            "entry-point target. Declare yours with CompositeAlgorithm.register_from_list instead."
+            "finished, so one cannot be looked up from a module that discovery is importing. Declare yours "
+            "with CompositeAlgorithm.register_from_list instead."
         )
 
     if not Algorithm.instances:
@@ -44,9 +44,8 @@ def _not_found_message(key: str) -> str:
 
     return (
         f"algorithm '{key}' not found. Algorithms under cfspopcon.formulas are registered by "
-        "discover_builtin_algorithms; one defined elsewhere needs a cfspopcon.algorithms entry point (the only "
-        "route the command-line interface sees) or a discover_algorithms_in_package call. Run popcon_algorithms "
-        "to list what is registered."
+        "discover_builtin_algorithms; one defined in another package needs a discover_algorithms_in_package "
+        "call for that package. Run popcon_algorithms to list what is registered."
     )
 
 
