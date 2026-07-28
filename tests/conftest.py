@@ -64,11 +64,18 @@ def run_script():
 
 @pytest.fixture()
 def fake_entry_points(monkeypatch):
-    """Install fake entry points, each loading to one of the given targets."""
+    """Install fake entry points, from targets that `load` returns or from `loaders` it calls.
 
-    def install(*targets):
-        eps = [SimpleNamespace(load=lambda target=target: target) for target in targets]
+    Pass a loader when resolving the target is the thing under test, so that it happens during
+    discovery rather than while the test is setting itself up.
+    """
+
+    def install(*targets, loaders=()):
+        loaders = [*(lambda target=target: target for target in targets), *loaders]
+        eps = [SimpleNamespace(value=f"fake_provider:{index}", load=load) for index, load in enumerate(loaders)]
         monkeypatch.setattr(_discovery, "entry_points", lambda group: eps)
+        # Which targets have been loaded is process-global, so give each test its own record.
+        monkeypatch.setattr(_discovery, "_loaded_entry_points", set())
 
     return install
 

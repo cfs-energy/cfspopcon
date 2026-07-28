@@ -31,6 +31,9 @@ ENTRY_POINT_GROUP = "cfspopcon.algorithms"
 #: the outermost one, by which time both have registered their algorithms.
 _walking = False
 
+#: Entry-point targets loaded so far, by target specification.
+_loaded_entry_points: set[str] = set()
+
 
 def _discover(package: ModuleType | str, load_entry_points: bool = False) -> None:
     """Import every submodule of ``package``, then build whatever composites that satisfies."""
@@ -66,18 +69,28 @@ def discover_algorithms_in_package(package: ModuleType | str) -> None:
 
 
 def load_entry_point_algorithms() -> None:
-    """Load algorithm providers declared by any installed distribution via entry points."""
+    """Load algorithm providers declared by any installed distribution via entry points.
+
+    Each target is loaded at most once per process. Importing a module target twice is harmless
+    because the import is cached, but calling a callable target twice would register its algorithms
+    a second time and collide with itself. A target is recorded only once it has loaded, so a broken
+    provider keeps raising rather than being quietly skipped from the second call onwards.
+    """
     for ep in entry_points(group=ENTRY_POINT_GROUP):
+        if ep.value in _loaded_entry_points:
+            continue
         obj = ep.load()  # importing the target already runs a module's side effects
         if callable(obj):
             obj()  # a callable target registers explicitly (preferred; no import-time side effects)
+        _loaded_entry_points.add(ep.value)
 
 
 def discover_builtin_algorithms() -> None:
     """Register every algorithm cfspopcon and its entry-point providers define.
 
     Call this before using the registry: ``import cfspopcon`` deliberately registers nothing.
-    Repeated calls are cheap and change nothing, since the modules walked are already imported.
+    Repeated calls are cheap and change nothing: the modules walked are already imported, and each
+    entry-point target is loaded only once.
 
     Composites are built only once both the walk and the entry points have registered their
     algorithms, so a downstream composite may be built from cfspopcon's algorithms and vice versa.

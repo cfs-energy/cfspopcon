@@ -616,7 +616,7 @@ class _AlgorithmRegistry:
         raise TypeError("Index the algorithm registry with a name (str) or a list/tuple of names.")
 
     def __iter__(self) -> Iterator[str]:
-        """Iterate over the registered algorithm names (also powers ``"name" in algorithms``)."""
+        """Iterate over the registered algorithm names (also powers ``"name" in registry``)."""
         return iter(Algorithm.algorithms())
 
 

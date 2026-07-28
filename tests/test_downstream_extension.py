@@ -7,7 +7,6 @@ discover_builtin_algorithms.
 """
 
 import importlib
-from types import SimpleNamespace
 
 import pytest
 import xarray as xr
@@ -114,7 +113,7 @@ def test_a_downstream_composite_runs_end_to_end(downstream_package):
 
 
 @pytest.mark.parametrize("target", ["module", "callable"])
-def test_an_entry_point_provider_extends_the_registry(downstream_package, target, monkeypatch, tmp_path):
+def test_an_entry_point_provider_extends_the_registry(downstream_package, target, fake_entry_points, tmp_path):
     """Both entry-point target kinds register the package's algorithms during discovery.
 
     The target must not be resolved before discovery runs, or the registration would happen at
@@ -127,7 +126,7 @@ def test_an_entry_point_provider_extends_the_registry(downstream_package, target
     else:
         load = lambda: lambda: cfspopcon.discover_algorithms_in_package(PACKAGE)  # noqa: E731
 
-    monkeypatch.setattr(cfspopcon._discovery, "entry_points", lambda group: [SimpleNamespace(load=load)])
+    fake_entry_points(loaders=[load])
     assert "calc_ds_metric" not in Algorithm.instances, "the entry point must not have been loaded yet"
 
     try:

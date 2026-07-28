@@ -162,6 +162,21 @@ def test_entry_point_callable_is_invoked(fake_entry_points):
     assert called == [True]
 
 
+def test_a_callable_entry_point_is_not_invoked_twice(fake_entry_points):
+    """Discovery may be called more than once, and a callable target registers each time it runs.
+
+    Without this, the second call would trip the duplicate-registration guard on the target's own
+    algorithms -- and the entry-point docs recommend exactly this kind of target.
+    """
+    called = []
+    fake_entry_points(lambda: called.append(True))
+
+    _discovery.discover_builtin_algorithms()
+    _discovery.discover_builtin_algorithms()
+
+    assert called == [True]
+
+
 def test_formulas_rejects_an_unknown_attribute():
     """__getattr__ must raise AttributeError, not a ModuleNotFoundError from the failed import."""
     from cfspopcon import formulas
