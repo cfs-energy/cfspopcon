@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cfspopcon"
-version = "8.0.0"
+version = "9.0.0"
 description = "Empirically-derived scoping of tokamak operational space."
 authors = ["Commonwealth Fusion Systems"]
 readme = "README.md"
@@ -44,6 +44,7 @@ contourpy = "^1.3.0"
 pre-commit = "^4.2"
 pytest = "^9.0.3"
 pytest-cov = "^7.1.0"
+pytest-randomly = "^4.1.0"
 coverage = "^7.13.5"
 types-pyyaml = "^6.0.12.2"
 pandas-stubs = "^3.0.0.260204"

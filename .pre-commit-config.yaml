@@ -39,3 +39,10 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+-   repo: local
+    hooks:
+      - id: strip_notebook_timing
+        name: Strip notebook execution timing
+        entry: poetry run python tests/utils/strip_notebook_timing.py
+        language: system
+        types: [jupyter]

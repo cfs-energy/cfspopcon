@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, registry
 from cfspopcon.unit_handling import ureg
 
 
@@ -300,3 +300,67 @@ def test_call_single_output_is_unwrapped():
 
     alg = Algorithm(function=add_one, return_keys=["y"], skip_registration=True)
     assert alg(x=4) == 5
+
+
+def test_registration_semantics_skip_override_and_collision():
+    """skip_registration avoids the duplicate-name collision; override replaces; a plain duplicate raises."""
+    name = "_coexistence_probe"
+    Algorithm.instances.pop(name, None)
+    try:
+        first = Algorithm(function=lambda: {}, return_keys=[], name=name)
+        assert Algorithm.instances[name] is first
+
+        # skip_registration must not collide and must leave the registry untouched
+        Algorithm(function=lambda: {}, return_keys=[], name=name, skip_registration=True)
+        assert Algorithm.instances[name] is first
+
+        # override deliberately replaces the registered entry
+        third = Algorithm(function=lambda: {}, return_keys=[], name=name, override=True)
+        assert Algorithm.instances[name] is third
+
+        # a plain duplicate still raises, now with the actionable message
+        with pytest.raises(RuntimeError, match="already registered"):
+            Algorithm(function=lambda: {}, return_keys=[], name=name)
+    finally:
+        Algorithm.instances.pop(name, None)
+
+
+def test_registry_indexing():
+    """registry[...] returns an Algorithm or CompositeAlgorithm."""
+    names = ["calc_plasma_volume", "calc_plasma_surface_area"]
+    for name in names:
+        assert name in registry
+        assert isinstance(registry[name], Algorithm)
+    assert isinstance(registry[names], CompositeAlgorithm)
+    assert isinstance(registry[tuple(names)], CompositeAlgorithm)
+
+    # A composite runs its algorithms in the order the names are given.
+    assert [alg._name for alg in registry[names].algorithms] == names
+    assert [alg._name for alg in registry[names[::-1]].algorithms] == names[::-1]
+
+    with pytest.raises(TypeError, match="name .str. or a list"):
+        registry[123]
+    with pytest.raises(KeyError):
+        registry["not_a_registered_algorithm_name"]
+
+
+def test_composite_registration_collision_and_override():
+    """A named, registered CompositeAlgorithm follows the same collision rules as an Algorithm."""
+    name = "_composite_coexistence_probe"
+    component = Algorithm.get_algorithm("calc_plasma_volume")
+    Algorithm.instances.pop(name, None)
+    try:
+        first = CompositeAlgorithm([component], name=name, register=True)
+        assert Algorithm.instances[name] is first
+
+        # register=False must not collide, and must leave the registry untouched
+        CompositeAlgorithm([component], name=name, register=False)
+        assert Algorithm.instances[name] is first
+
+        with pytest.raises(RuntimeError, match="already registered"):
+            CompositeAlgorithm([component], name=name, register=True)
+
+        third = CompositeAlgorithm([component], name=name, register=True, override=True)
+        assert Algorithm.instances[name] is third
+    finally:
+        Algorithm.instances.pop(name, None)

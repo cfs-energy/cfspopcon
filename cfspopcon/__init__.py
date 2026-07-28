@@ -6,9 +6,9 @@ __version__ = metadata(__package__)["Version"]
 __author__ = metadata(__package__)["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
-from .algorithm_class import Algorithm, CompositeAlgorithm
+from ._discovery import discover_algorithms_in_package, discover_builtin_algorithms
+from .algorithm_class import Algorithm, CompositeAlgorithm, registry
 from .deprecation_handler import handle_deprecated_arguments
-from .formulas.atomic_data import AtomicData
 from .input_file_handling import process_input_dictionary, read_case
 from .plotting import read_plot_style
 from .unit_handling import (
@@ -21,10 +21,11 @@ from .unit_handling import (
 # export main classes users should need as well as the option enums
 __all__ = [
     "Algorithm",
-    "AtomicData",
     "CompositeAlgorithm",
     "convert_to_default_units",
     "convert_units",
+    "discover_algorithms_in_package",
+    "discover_builtin_algorithms",
     "file_io",
     "formulas",
     "handle_deprecated_arguments",
@@ -33,6 +34,7 @@ __all__ = [
     "process_input_dictionary",
     "read_case",
     "read_plot_style",
+    "registry",
     "set_default_units",
     "shaping_and_selection",
 ]

@@ -92,6 +92,7 @@ python_maximum_signature_line_length = 90
 extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     # linkcode to point to github would be nicer
@@ -103,7 +104,7 @@ extensions = [
     "nbsphinx",
 ]
 
-nitpick_ignore = [("py:class", "Ellipsis")]
+nitpick_ignore = [("py:class", "Ellipsis"), ("py:class", "ModuleType")]
 
 # -- nbsphinx
 exclude_patterns = ["_build", "static"]
@@ -118,6 +119,12 @@ autodoc_default_options = {
 }
 autoclass_content = "both"
 autodoc_typehints = "signature"
+
+# -- autosummary
+# The formulas subpackages re-export only the classes they define, so walk the
+# submodules to document their functions rather than listing each module here.
+templates_path = ["templates"]
+autosummary_generate = True
 
 # -- doctest
 doctest_global_setup = """
