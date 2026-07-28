@@ -36,10 +36,10 @@ if TYPE_CHECKING:
 #:     [project.entry-points."cfspopcon.algorithms"]
 #:     my_package = "my_package:register"
 #:
-#: This is how the ``popcon`` command-line interface reaches algorithms it does not itself ship: it
-#: is never told which packages to import, so an entry point is the only thing that tells it. A
-#: constant rather than an argument, because a downstream package has to spell the same string in its
-#: metadata for any of this to work; there is no use in reading a different group.
+#: This is how the ``popcon`` command-line interface reaches algorithms it does not itself ship: it is
+#: never told which packages to import, so an entry point is the only thing that tells it. The group
+#: is a constant rather than an argument because it is a fixed contract -- a downstream package spells
+#: this same string in its metadata -- so there is nothing to be gained by reading a different one.
 ENTRY_POINT_GROUP = "cfspopcon.algorithms"
 
 #: True while a walk is in progress, so a walk nested inside another leaves the composite build to
@@ -95,11 +95,10 @@ def load_entry_point_algorithms() -> None:
     Either way the target should only register algorithms, and should not look one up. Composites are
     built after every provider has been loaded, so no composite is in the registry yet at this point.
 
-    A target is loaded once per process, however many times discovery is called. Importing a module
-    twice does nothing, since Python caches it, but calling a function twice would try to register its
-    algorithms a second time, which is an error. A target counts as loaded only after it returns
-    without raising, so one which fails keeps reporting that failure instead of being skipped from
-    the next call onwards.
+    A target is loaded once per process, however many times discovery is called: importing a module
+    again does nothing, but calling a function again would register its algorithms twice, which is an
+    error. A target counts as loaded only once it has returned without raising, so one which fails
+    keeps reporting the failure instead of being skipped from then on.
     """
     for ep in entry_points(group=ENTRY_POINT_GROUP):
         if ep.value in _loaded_entry_points:

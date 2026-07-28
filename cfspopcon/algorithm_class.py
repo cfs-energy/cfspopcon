@@ -586,10 +586,9 @@ def build_pending_composites() -> None:
     satisfied from what is registered, and raises naming the missing components. Declarations stay
     pending on failure, so a later discovery step which registers them can still build them.
 
-    Every pass must therefore shorten the pending list, and one which does not raises rather than
-    looping. Nothing can currently reach that: a pass either builds at least one composite or has
-    already raised. It is there so that a future change which breaks that reasoning fails visibly
-    instead of hanging.
+    Each pass therefore shortens the pending list, since it either builds something or has already
+    raised. A pass which does not raises too, rather than looping: unreachable today, but a later
+    change which breaks that reasoning should fail visibly instead of hanging.
     """
     while _pending_composites:
         ready = [(name, keys) for name, keys in _pending_composites if all(key in Algorithm.instances for key in keys)]
@@ -607,9 +606,9 @@ def build_pending_composites() -> None:
 
         if len(_pending_composites) >= pending_before_pass:
             raise RuntimeError(
-                f"Building the composite algorithms made no progress: {pending_before_pass} still declared "
-                f"({', '.join(name for name, _ in _pending_composites)}) after a pass which built "
-                f"{len(ready)} of them."
+                f"Building the composite algorithms made no progress: {len(_pending_composites)} still declared "
+                f"({', '.join(name for name, _ in _pending_composites)}) after a pass over {len(ready)} "
+                f"which had all of their components."
             )
 
 
