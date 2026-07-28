@@ -18,6 +18,10 @@ The walk itself only registers algorithms and *declares* composites (see
 :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`); the declarations are
 built afterwards, once every component is registered. Because a composite may be built from other
 composites, that build repeats until all declarations are satisfied.
+
+Discovery is all-or-nothing: anything which goes wrong -- a module that will not import, a broken
+entry point, a composite naming an algorithm nobody registers -- fails the query that triggered it,
+and every later query re-raises that same error. Half a registry is not worth recovering.
 """
 
 from __future__ import annotations
@@ -31,53 +35,55 @@ if TYPE_CHECKING:
     from types import ModuleType
 
 #: Entry-point group downstream packages declare to contribute algorithms. The target may be a
-#: module (imported for its ``@register`` side effects) or a callable (invoked to register
-#: explicitly, with no import-time side effects).
+#: module (imported for its ``@register`` side effects) or a callable taking no arguments (invoked
+#: to register explicitly, with no import-time side effects). A target must only *register*:
+#: composites are not built until every provider has been loaded, so looking one up from an
+#: entry-point target will not find it.
 ENTRY_POINT_GROUP = "cfspopcon.algorithms"
 
 _discovered = False
 _discovering = False
+_failure: Exception | None = None
 
 
-def discover_algorithms_in_package(package: ModuleType | str, build_composites: bool = True) -> None:
+def discover_algorithms_in_package(package: ModuleType | str) -> None:
     """Import every submodule of ``package`` so its ``@Algorithm.register_algorithm`` decorators run.
 
     ``package`` is an imported package or its dotted name. Walking the package registers every
     algorithm defined anywhere beneath it, so a package (cfspopcon or one that builds on it) can
     register all of its algorithms without importing each module by hand.
 
-    Composites declared with :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list`
-    are built afterwards. Pass ``build_composites=False`` to leave them pending, when a later
-    discovery step still has to register the algorithms they are built from.
+    cfspopcon's own algorithms are registered first, so a composite declared by ``package`` may be
+    built from them. Composites declared with
+    :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.register_from_list` are built once the
+    outermost walk finishes, since a registry query from a module being imported re-enters here.
     """
-    from .algorithm_class import Algorithm, _pending_composites, build_pending_composites
+    from .algorithm_class import build_pending_composites
+
+    global _discovering  # noqa: PLW0603
+
+    ensure_discovered()  # whatever the walk imports may refer to cfspopcon's own algorithms
 
     if isinstance(package, str):
         package = importlib.import_module(package)
 
-    for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
-        # Python drops a module which raises partway from sys.modules, so a later attempt at
-        # discovery re-runs its body from the top. Undo whatever it registered before it raised,
-        # otherwise that re-run collides with its own leftovers and discovery can never succeed.
-        registered = set(Algorithm.instances)
-        declared = len(_pending_composites)
-        try:
+    outermost = not _discovering
+    _discovering = True  # a registry query from a walked module must not build composites yet
+    try:
+        for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
             importlib.import_module(info.name)
-        except BaseException:
-            for key in set(Algorithm.instances) - registered:
-                del Algorithm.instances[key]
-            del _pending_composites[declared:]
-            raise
+    finally:
+        _discovering = not outermost
 
-    if build_composites:
+    if outermost:
         build_pending_composites()
 
 
-def discover_builtin_algorithms(build_composites: bool = True) -> None:
+def discover_builtin_algorithms() -> None:
     """Register cfspopcon's own algorithms by walking the :mod:`cfspopcon.formulas` package."""
     from . import formulas
 
-    discover_algorithms_in_package(formulas, build_composites=build_composites)
+    discover_algorithms_in_package(formulas)
 
 
 def load_entry_point_algorithms(group: str = ENTRY_POINT_GROUP) -> None:
@@ -96,19 +102,24 @@ def ensure_discovered() -> None:
     versa.
 
     A registry query made from a module being imported by the walk re-enters this function; that
-    re-entrant call returns immediately rather than restarting the walk. A walk which raises leaves
-    the flag clear, so the next query retries instead of being stuck with a half-filled registry.
+    re-entrant call returns immediately rather than restarting the walk. A failure is remembered
+    and re-raised, so a half-discovered registry is never handed back as if it were complete.
     """
     from .algorithm_class import build_pending_composites
 
-    global _discovered, _discovering  # noqa: PLW0603
+    global _discovered, _discovering, _failure  # noqa: PLW0603
+    if _failure is not None:
+        raise _failure
     if _discovered or _discovering:
         return
     _discovering = True
     try:
-        discover_builtin_algorithms(build_composites=False)
+        discover_builtin_algorithms()
         load_entry_point_algorithms()
         build_pending_composites()
+    except Exception as exc:
+        _failure = exc
+        raise
     finally:
         _discovering = False
     _discovered = True

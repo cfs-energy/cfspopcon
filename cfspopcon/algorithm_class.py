@@ -585,26 +585,28 @@ def build_pending_composites() -> None:
 
     A composite may be built from other composites, so this repeats until every declaration has
     been built. Each pass builds whichever declarations have all of their components registered by
-    now and defers the rest; if a pass builds nothing, the remaining declarations can never be
-    satisfied and a RuntimeError names them along with the components they are missing.
+    now and defers the rest; if a pass builds nothing, the remaining declarations cannot be
+    satisfied from what is registered and a RuntimeError names them along with their missing
+    components. Those declarations stay pending, so a discovery step which registers the missing
+    algorithms later can still build them — and if none does, every attempt fails the same way
+    instead of quietly handing back a registry with the composite absent.
     """
     while _pending_composites:
+        pending = list(_pending_composites)
         deferred: list[tuple[str, list[str]]] = []
-        for name, keys in _pending_composites:
+        for name, keys in pending:
             if all(key in Algorithm.instances for key in keys):
                 # Read the registry directly: get_algorithm would re-enter discovery from here.
                 CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
             else:
                 deferred.append((name, keys))
 
-        if len(deferred) == len(_pending_composites):
+        _pending_composites[:] = deferred
+        if len(deferred) == len(pending):
             unresolved = "; ".join(
                 f"'{name}' is missing [{', '.join(k for k in keys if k not in Algorithm.instances)}]" for name, keys in deferred
             )
-            _pending_composites.clear()
             raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
-
-        _pending_composites[:] = deferred
 
 
 class _AlgorithmRegistry:
@@ -626,6 +628,10 @@ class _AlgorithmRegistry:
     def __iter__(self) -> Iterator[str]:
         """Iterate over the registered algorithm names (also powers ``"name" in algorithms``)."""
         return iter(Algorithm.algorithms())
+
+    def __len__(self) -> int:
+        """Count the registered algorithms."""
+        return len(Algorithm.algorithms())
 
 
 algorithms = _AlgorithmRegistry()

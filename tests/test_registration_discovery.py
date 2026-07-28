@@ -4,26 +4,60 @@ Replaces the previous ``test_for_anonymous_algorithms`` check: once discovery wa
 the "registered-but-not-importable" gap it guarded against can no longer occur.
 """
 
+import os
+import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
+import cfspopcon
 from cfspopcon import _discovery
 from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, _pending_composites, build_pending_composites
 
 
 @pytest.fixture()
 def clean_composites():
-    """Drop any composites (and their component stubs) a test declares."""
+    """Isolate a test's composite declarations from any the rest of the session is relying on.
+
+    cfspopcon's own modules declare composites at import time, and pytest imports every test module
+    during collection, so the pending list is generally non-empty before any test runs. Set it
+    aside for the duration rather than building or discarding those declarations.
+    """
+    saved = _pending_composites[:]
+    _pending_composites.clear()
     declared: list[str] = []
     yield declared
-    _pending_composites.clear()
     for name in declared:
         Algorithm.instances.pop(name, None)
+    _pending_composites[:] = saved
+    if saved and _discovery._discovered:
+        # Discovery completed while the real declarations were set aside, so nothing else will
+        # build them now. Do it here, or they stay pending for the rest of the session.
+        build_pending_composites()
 
 
-def test_discovery_is_idempotent_and_populates_registry():
+class _FakeEntryPoint:
+    """Stands in for an installed distribution's `cfspopcon.algorithms` entry point."""
+
+    def __init__(self, name, value, loader):
+        self.name, self.value, self._loader = name, value, loader
+
+    def load(self):
+        return self._loader()
+
+
+@pytest.fixture()
+def fake_entry_points(monkeypatch):
+    """Install fake entry points in place of any the environment really declares."""
+
+    def install(*entry_points):
+        monkeypatch.setattr(_discovery, "entry_points", lambda group: list(entry_points))
+
+    return install
+
+
+def test_discovery_is_idempotent_and_populates_registry(monkeypatch):
     # The first call populates the registry; a second call must be a no-op.
     _discovery.ensure_discovered()
     populated = dict(Algorithm.instances)
@@ -31,23 +65,51 @@ def test_discovery_is_idempotent_and_populates_registry():
     _discovery.ensure_discovered()
     assert Algorithm.instances == populated
 
+    # Comparing contents is not enough: sys.modules would hide a repeated walk. The latch has to
+    # stop the work happening at all, or every registry query re-walks the package.
+    walks = []
+    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", lambda: walks.append(True))
+    _discovery.ensure_discovered()
+    Algorithm.algorithms()
+    assert walks == []
 
-def test_failed_discovery_is_retried(monkeypatch):
-    """A discovery walk which raises must not leave the registry permanently half-filled."""
+
+def test_formulas_submodule_resolves_before_the_registry_is_queried():
+    """cfspopcon.formulas.geometry must work on a bare import, with no discovery having run.
+
+    Run in a subprocess: any earlier test in this session triggers discovery, which imports every
+    submodule and binds it as a real attribute, so __getattr__ would never be consulted here.
+    """
+    script = (
+        "import cfspopcon\n"
+        "from cfspopcon import _discovery, formulas\n"
+        "assert not _discovery._discovered, 'discovery should not have run on a bare import'\n"
+        "assert formulas.geometry.analytical.calc_plasma_volume is not None\n"
+        "assert not _discovery._discovered, 'attribute access must not trigger discovery'\n"
+        "assert 'geometry' in dir(formulas) and '__name__' in dir(formulas)\n"
+    )
+    subprocess.run([sys.executable, "-c", script], check=True, cwd=Path(cfspopcon.__file__).parents[1])
+
+
+def test_a_failed_discovery_keeps_failing_the_same_way(monkeypatch):
+    """Discovery is all-or-nothing: the failure is remembered, not quietly half-applied."""
     monkeypatch.setattr(_discovery, "_discovered", False)
     monkeypatch.setattr(_discovery, "_discovering", False)
+    monkeypatch.setattr(_discovery, "_failure", None)
 
-    def boom(build_composites=True):
+    def boom():
         raise ImportError("a formulas module failed to import")
 
     monkeypatch.setattr(_discovery, "discover_builtin_algorithms", boom)
-    with pytest.raises(ImportError):
+    with pytest.raises(ImportError, match="failed to import") as first:
         _discovery.ensure_discovered()
-    assert not _discovery._discovered
 
-    monkeypatch.undo()
-    # The next query must run the walk rather than trusting the failed attempt.
-    assert len(Algorithm.algorithms()) > 100
+    # Even once the cause is gone, the original error surfaces again rather than a registry which
+    # looks complete but is missing whatever the failed attempt never got to.
+    monkeypatch.setattr(_discovery, "discover_builtin_algorithms", lambda: None)
+    with pytest.raises(ImportError) as second:
+        Algorithm.algorithms()
+    assert second.value is first.value
 
 
 def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch):
@@ -56,7 +118,7 @@ def test_reentrant_discovery_does_not_restart_the_walk(monkeypatch):
     monkeypatch.setattr(_discovery, "_discovering", False)
     calls = []
 
-    def walk(build_composites=True):
+    def walk():
         calls.append(True)
         _discovery.ensure_discovered()  # re-entrant, as an import-time get_algorithm would be
 
@@ -69,21 +131,26 @@ def test_drop_in_module_is_discovered_without_editing_init():
     """A brand-new formulas submodule is found by the pkgutil walk with no __init__.py edit."""
     from cfspopcon import formulas
 
-    probe = Path(formulas.__file__).parent / "_probe_drop_in.py"
+    # Unique per process, so a concurrent or crashed run cannot collide with this one.
+    stem = f"_probe_drop_in_{os.getpid()}"
+    probe = Path(formulas.__file__).parent / f"{stem}.py"
     probe.write_text(
         "from cfspopcon.algorithm_class import Algorithm\n\n\n"
-        "@Algorithm.register_algorithm(return_keys=['_probe_out'], skip_unit_conversion=True)\n"
-        "def calc_probe(_probe_in):\n"
+        f"@Algorithm.register_algorithm(return_keys=['{stem}_out'], skip_unit_conversion=True)\n"
+        f"def calc_{stem}(_probe_in):\n"
         '    """Throwaway probe algorithm."""\n'
         "    return _probe_in\n"
     )
     try:
         _discovery.discover_builtin_algorithms()
-        assert isinstance(Algorithm.get_algorithm("calc_probe"), Algorithm)
+        assert isinstance(Algorithm.get_algorithm(f"calc_{stem}"), Algorithm)
     finally:
-        Algorithm.instances.pop("calc_probe", None)
+        Algorithm.instances.pop(f"calc_{stem}", None)
         probe.unlink()
-        sys.modules.pop("cfspopcon.formulas._probe_drop_in", None)
+        # Importing it leaves bytecode behind, which would otherwise litter the package directory.
+        for cached in probe.parent.glob(f"__pycache__/{stem}.*.pyc"):
+            cached.unlink()
+        sys.modules.pop(f"cfspopcon.formulas.{stem}", None)
 
 
 def test_discover_algorithms_in_a_specified_package(tmp_path, monkeypatch):
@@ -111,25 +178,18 @@ def test_discover_algorithms_in_a_specified_package(tmp_path, monkeypatch):
             sys.modules.pop(name, None)
 
 
-def test_entry_point_callable_is_invoked(monkeypatch):
+def test_entry_point_callable_is_invoked(fake_entry_points):
     """A downstream entry point whose target is a callable is invoked to register (no cfspopcon import)."""
     called = []
-
-    class _FakeEntryPoint:
-        def load(self):
-            return lambda: called.append(True)
-
-    monkeypatch.setattr(_discovery, "entry_points", lambda group: [_FakeEntryPoint()])
+    fake_entry_points(_FakeEntryPoint("probe", "probe:register", lambda: lambda: called.append(True)))
     _discovery.load_entry_point_algorithms()
     assert called == [True]
 
 
-def test_formulas_subpackages_are_importable_as_attributes():
-    """cfspopcon.formulas.<subpackage> resolves without the registry having been queried first."""
+def test_formulas_rejects_an_unknown_attribute():
+    """__getattr__ must raise AttributeError, not a ModuleNotFoundError from the failed import."""
     from cfspopcon import formulas
 
-    assert "geometry" in dir(formulas)
-    assert formulas.geometry.analytical.calc_plasma_volume is not None
     with pytest.raises(AttributeError):
         formulas.not_a_subpackage
 
@@ -158,40 +218,39 @@ def test_unsatisfiable_composite_names_its_missing_components(clean_composites):
     with pytest.raises(RuntimeError, match=r"_probe_doomed.*_probe_never_registered"):
         build_pending_composites()
 
-    # The pending list is drained, so an unrelated later build is not tripped up by this one.
+    # The declaration stays pending, so a retry fails the same way instead of quietly returning a
+    # registry with the composite missing.
+    assert [name for name, _ in _pending_composites] == ["_probe_doomed"]
+    with pytest.raises(RuntimeError, match=r"_probe_doomed"):
+        build_pending_composites()
+
+
+def test_pending_composite_builds_once_a_later_step_registers_its_component(clean_composites):
+    """A declaration left pending by a failed build is satisfied when the component turns up."""
+    declared = clean_composites
+    declared += ["_probe_late_base", "_probe_late_composite"]
+    CompositeAlgorithm.register_from_list(keys=["_probe_late_base"], name="_probe_late_composite")
+
+    with pytest.raises(RuntimeError, match=r"_probe_late_composite"):
+        build_pending_composites()
+
+    Algorithm.from_single_function(
+        lambda _probe_in: _probe_in, return_keys=["_probe_out"], name="_probe_late_base", skip_unit_conversion=True
+    )
+    build_pending_composites()
+    assert isinstance(Algorithm.get_algorithm("_probe_late_composite"), CompositeAlgorithm)
     assert not _pending_composites
 
 
-def test_partially_executed_module_is_rolled_back_so_discovery_can_retry(tmp_path, monkeypatch):
-    """A module which registers and then raises must not poison the retry with its own leftovers."""
-    pkg = tmp_path / "_flaky_probe_pkg"
-    pkg.mkdir()
-    (pkg / "__init__.py").write_text("")
-    (pkg / "flaky.py").write_text(
-        "import os\n\n"
-        "from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm\n\n\n"
-        "@Algorithm.register_algorithm(return_keys=['_flaky_out'], skip_unit_conversion=True)\n"
-        "def calc_flaky_probe(_flaky_in):\n"
-        '    """Throwaway probe algorithm."""\n'
-        "    return _flaky_in\n\n\n"
-        "CompositeAlgorithm.register_from_list(keys=['calc_flaky_probe'], name='_flaky_composite')\n\n"
-        "if not os.environ.get('FLAKY_PROBE_OK'):\n"
-        "    raise ImportError('transient failure after registering')\n"
-    )
-    monkeypatch.syspath_prepend(str(tmp_path))
-    try:
-        with pytest.raises(ImportError):
-            _discovery.discover_algorithms_in_package("_flaky_probe_pkg")
+def test_a_broken_entry_point_fails_the_query_loudly(fake_entry_points, monkeypatch):
+    """An unloadable provider must not be papered over: the registry query says so."""
+    monkeypatch.setattr(_discovery, "_discovered", False)
+    monkeypatch.setattr(_discovery, "_discovering", False)
+    monkeypatch.setattr(_discovery, "_failure", None)
 
-        # Python re-runs the module body on the next attempt, so nothing may be left behind.
-        assert "calc_flaky_probe" not in Algorithm.instances
-        assert "_flaky_composite" not in [name for name, _ in _pending_composites]
+    def broken():
+        raise ImportError("this distribution is broken")
 
-        monkeypatch.setenv("FLAKY_PROBE_OK", "1")
-        _discovery.discover_algorithms_in_package("_flaky_probe_pkg")
-        assert isinstance(Algorithm.get_algorithm("_flaky_composite"), CompositeAlgorithm)
-    finally:
-        for name in ("calc_flaky_probe", "_flaky_composite"):
-            Algorithm.instances.pop(name, None)
-        for name in [m for m in sys.modules if m == "_flaky_probe_pkg" or m.startswith("_flaky_probe_pkg.")]:
-            sys.modules.pop(name, None)
+    fake_entry_points(_FakeEntryPoint("broken", "broken:register", lambda: broken))
+    with pytest.raises(ImportError, match="this distribution is broken"):
+        _discovery.ensure_discovered()

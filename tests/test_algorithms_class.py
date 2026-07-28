@@ -334,6 +334,12 @@ def test_registry_indexing():
     assert isinstance(algorithms[names], CompositeAlgorithm)
     assert isinstance(algorithms[tuple(names)], CompositeAlgorithm)
 
+    # A composite runs its algorithms in the order the names are given.
+    assert [alg._name for alg in algorithms[names].algorithms] == names
+    assert [alg._name for alg in algorithms[names[::-1]].algorithms] == names[::-1]
+
+    assert len(algorithms) == len(list(algorithms))
+
     with pytest.raises(TypeError, match="name .str. or a list"):
         algorithms[123]
     with pytest.raises(KeyError):

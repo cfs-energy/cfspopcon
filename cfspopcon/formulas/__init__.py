@@ -13,16 +13,18 @@ import importlib
 import pkgutil
 from types import ModuleType
 
-_SUBMODULES = sorted(info.name for info in pkgutil.iter_modules(__path__))
+#: Discovered rather than hand-maintained, but still spelled __all__ so that
+#: ``from cfspopcon.formulas import *`` exports the submodules and nothing else.
+__all__ = sorted(info.name for info in pkgutil.iter_modules(__path__))  # noqa: PLE0605
 
 
 def __getattr__(name: str) -> ModuleType:
     """Import a submodule of ``cfspopcon.formulas`` on first attribute access (PEP 562)."""
-    if name in _SUBMODULES:
+    if name in __all__:
         return importlib.import_module(f".{name}", __name__)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def __dir__() -> list[str]:
     """List the submodules alongside the usual module attributes, without importing them all."""
-    return sorted(set(_SUBMODULES) | set(globals()))
+    return sorted(set(__all__) | set(globals()))
