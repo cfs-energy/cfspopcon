@@ -1,12 +1,31 @@
-"""Defines a class for different POPCON algorithms."""
+"""Defines a class for different POPCON algorithms, and the discovery which registers them.
+
+To use cfspopcon's algorithms, all that is needed is::
+
+    import cfspopcon
+
+    cfspopcon.discover_builtin_algorithms()
+
+That walks :mod:`cfspopcon.formulas` with ``pkgutil``, registering every algorithm cfspopcon defines
+and building every composite, after which they can be looked up by name in ``cfspopcon.registry``.
+Importing cfspopcon on its own registers nothing. A package built on cfspopcon adds algorithms of its
+own the same way, by calling :func:`discover_algorithms_in_package` on itself.
+
+The walk registers algorithms, but only *declares* composites (see
+:meth:`CompositeAlgorithm.register_from_list`), so the order it happens to visit modules in does not
+matter: :func:`build_pending_composites` builds the declarations once the walk has finished.
+"""
 
 from __future__ import annotations
 
+import importlib
 import inspect
+import pkgutil
 from collections.abc import Callable, Iterator, Sequence
 from difflib import get_close_matches
 from functools import wraps
 from pathlib import Path  # noqa: TC003
+from types import ModuleType  # noqa: TC003
 from typing import Any, ClassVar
 from warnings import warn
 
@@ -22,14 +41,16 @@ GenericFunctionType = Callable[..., Any]
 #: (name, component names). Drained by :func:`build_pending_composites`.
 _pending_composites: list[tuple[str, list[str]]] = []
 
+#: How many walks are in progress, so a nested one leaves the composite build to the outermost.
+_walk_depth = 0
+
 
 def _not_found_message(key: str) -> str:
     """Explain as specifically as possible why an algorithm name did not resolve."""
     if any(name == key for name, _ in _pending_composites):
         return (
-            f"algorithm '{key}' is declared but not built yet. Composites are built only once discovery has "
-            "finished, so one cannot be looked up from a module that discovery is importing. Declare yours "
-            "with CompositeAlgorithm.register_from_list instead."
+            f"algorithm '{key}' is declared but not built yet: composites are built only once discovery has "
+            "finished, so one cannot be looked up from a module that discovery is importing."
         )
 
     if not Algorithm.instances:
@@ -43,9 +64,9 @@ def _not_found_message(key: str) -> str:
         return f"algorithm '{key}' not found. Did you mean '{close_matches[0]}'?"
 
     return (
-        f"algorithm '{key}' not found. Algorithms under cfspopcon.formulas are registered by "
-        "discover_builtin_algorithms; one defined in another package needs a discover_algorithms_in_package "
-        "call for that package. Run popcon_algorithms to list what is registered."
+        f"algorithm '{key}' not found. discover_builtin_algorithms registers those under cfspopcon.formulas; "
+        "one in another package needs a discover_algorithms_in_package call for it. "
+        "Run popcon_algorithms to list what is registered."
     )
 
 
@@ -62,8 +83,7 @@ def _register(name: str, algorithm: Algorithm | CompositeAlgorithm, override: bo
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    #: The registered algorithms, keyed by name. Empty until discovery has run; see
-    #: :mod:`cfspopcon._discovery`.
+    #: The registered algorithms, keyed by name. Empty until :func:`discover_builtin_algorithms` has run.
     instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
@@ -581,13 +601,10 @@ def build_pending_composites() -> None:
     """Build every composite declared by :meth:`CompositeAlgorithm.register_from_list`.
 
     A composite may be built from other composites, so each pass builds whichever declarations have
-    all of their components registered by now, and repeats. A pass which builds nothing cannot be
-    satisfied from what is registered, and raises naming the missing components. Declarations stay
-    pending on failure, so a later discovery step which registers them can still build them.
-
-    Each pass therefore shortens the pending list, since it either builds something or has already
-    raised. A pass which does not raises too, rather than looping: unreachable today, but a later
-    change which breaks that reasoning should fail visibly instead of hanging.
+    all of their components registered by now, and repeats. A pass which can build nothing raises,
+    naming the missing components, and leaves the declarations pending so that a later walk which
+    registers them can still build them. Every pass therefore either builds something or raises,
+    which is what terminates the loop.
     """
     while _pending_composites:
         ready = [(name, keys) for name, keys in _pending_composites if all(key in Algorithm.instances for key in keys)]
@@ -597,18 +614,45 @@ def build_pending_composites() -> None:
             )
             raise RuntimeError(f"Could not build the composite algorithms: {unresolved}.")
 
-        pending_before_pass = len(_pending_composites)
-        for entry in ready:
-            name, keys = entry
+        for name, keys in ready:
             CompositeAlgorithm([Algorithm.instances[key] for key in keys], name=name, register=True)
-            _pending_composites.remove(entry)  # drop it only once it has actually been built
+            _pending_composites.remove((name, keys))  # drop it only once it has actually been built
 
-        if len(_pending_composites) >= pending_before_pass:
-            raise RuntimeError(
-                f"Building the composite algorithms made no progress: {len(_pending_composites)} still declared "
-                f"({', '.join(name for name, _ in _pending_composites)}) after a pass over {len(ready)} "
-                f"which had all of their components."
-            )
+
+def discover_algorithms_in_package(package: ModuleType | str) -> None:
+    """Register every algorithm defined anywhere beneath ``package``, given as a module or its name.
+
+    Lets a package which builds on cfspopcon register all of its algorithms without importing each
+    module by hand. A new subfolder needs an ``__init__.py``: a directory without one is not walked.
+
+    Composites the walk declares are built when it finishes, so they may name anything registered by
+    then -- including cfspopcon's own algorithms, which means :func:`discover_builtin_algorithms` has
+    to have run first. A walk nested inside another leaves the build to the outermost one, so two
+    packages may declare composites spanning each other.
+    """
+    global _walk_depth  # noqa: PLW0603
+    _walk_depth += 1
+    try:
+        # Counted as in-progress before this import, since importing the package may itself walk.
+        if isinstance(package, str):
+            package = importlib.import_module(package)
+        for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
+            importlib.import_module(info.name)
+    finally:
+        _walk_depth -= 1
+    if not _walk_depth:
+        build_pending_composites()
+
+
+def discover_builtin_algorithms() -> None:
+    """Register every algorithm cfspopcon defines, by walking :mod:`cfspopcon.formulas`.
+
+    Call this before using the registry: ``import cfspopcon`` deliberately registers nothing.
+    Repeated calls are cheap and change nothing, since the modules walked are already imported.
+    """
+    from . import formulas
+
+    discover_algorithms_in_package(formulas)
 
 
 class _AlgorithmRegistry:
