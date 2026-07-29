@@ -22,6 +22,7 @@ import importlib
 import inspect
 import pkgutil
 from collections.abc import Callable, Iterator, Sequence
+from contextlib import contextmanager
 from difflib import get_close_matches
 from functools import wraps
 from pathlib import Path  # noqa: TC003
@@ -624,29 +625,54 @@ def build_pending_composites() -> None:
             _pending_composites.remove((name, keys))  # drop it only once it has actually been built
 
 
-def discover_algorithms_in_package(package: ModuleType | str) -> None:
-    """Register every algorithm defined anywhere beneath ``package``, given as a module or its name.
+@contextmanager
+def deferred_composite_build() -> Iterator[None]:
+    """Treat everything registered inside the block as one unit, building composites when it exits.
 
-    Lets a package which builds on cfspopcon register all of its algorithms without importing each
-    module by hand. A new subfolder needs an ``__init__.py``: a directory without one is not walked.
-
-    Composites the walk declares are built when it finishes, so they may name anything registered by
-    then -- including cfspopcon's own algorithms, which means :func:`discover_builtin_algorithms` has
-    to have run first. A walk nested inside another leaves the build to the outermost one, so two
-    packages may declare composites spanning each other.
+    Blocks nest: only the outermost one builds, so a composite declared in one package may name an
+    algorithm registered by another, provided both are registered inside the same outermost block.
+    This is what :func:`discover_algorithms_in_packages` and plugin registration use to walk several
+    packages without each walk building on its own way out.
     """
     global _walk_depth  # noqa: PLW0603
     _walk_depth += 1
     try:
-        # Counted as in-progress before this import, since importing the package may itself walk.
-        if isinstance(package, str):
-            package = importlib.import_module(package)
-        for info in pkgutil.walk_packages(package.__path__, prefix=f"{package.__name__}."):
-            importlib.import_module(info.name)
+        yield
     finally:
         _walk_depth -= 1
     if not _walk_depth:
         build_pending_composites()
+
+
+def discover_algorithms_in_packages(*packages: ModuleType | str) -> None:
+    """Register every algorithm defined anywhere beneath each of ``packages``, as a single unit.
+
+    Lets a package which builds on cfspopcon register all of its algorithms without importing each
+    module by hand. A new subfolder needs an ``__init__.py``: a directory without one is not walked.
+
+    All of the walks share one :func:`deferred_composite_build` block, so a composite may span the
+    packages given, in either direction. The composites are built once every package has been walked,
+    and may name anything registered by then -- including cfspopcon's own algorithms, which means
+    :func:`discover_builtin_algorithms` has to have run first.
+
+    A package which fails to import aborts the remaining ones, and nothing it registered is undone.
+    Registering plugins is the caller that cares; see :func:`cfspopcon.plugins.register_plugins`, which rolls
+    the whole set back.
+    """
+    with deferred_composite_build():
+        for package in packages:
+            # Inside the block, since importing the package may itself walk.
+            module = importlib.import_module(package) if isinstance(package, str) else package
+            for info in pkgutil.walk_packages(module.__path__, prefix=f"{module.__name__}."):
+                importlib.import_module(info.name)
+
+
+def discover_algorithms_in_package(package: ModuleType | str) -> None:
+    """Register every algorithm defined anywhere beneath ``package``, given as a module or its name.
+
+    Single-package spelling of :func:`discover_algorithms_in_packages`.
+    """
+    discover_algorithms_in_packages(package)
 
 
 def discover_builtin_algorithms() -> None:
@@ -657,7 +683,32 @@ def discover_builtin_algorithms() -> None:
     """
     from . import formulas
 
-    discover_algorithms_in_package(formulas)
+    discover_algorithms_in_packages(formulas)
+
+
+def registered_algorithms() -> dict[str, Algorithm | CompositeAlgorithm]:
+    """Return a copy of the registry, mapping name to algorithm.
+
+    Keyed by name *and* holding the objects, so a caller comparing two snapshots can tell a name
+    which was added from one which was replaced -- see the ``override`` flag on :class:`Algorithm`.
+    """
+    return dict(Algorithm.instances)
+
+
+def pending_composites() -> list[tuple[str, list[str]]]:
+    """Return a copy of the composites declared but not yet built, as (name, component names)."""
+    return [(name, list(keys)) for name, keys in _pending_composites]
+
+
+def restore_registry(algorithms: dict[str, Algorithm | CompositeAlgorithm], pending: list[tuple[str, list[str]]]) -> None:
+    """Replace the registry and the pending declarations with the given snapshots.
+
+    Both are needed together: undoing registrations without undoing declarations leaves a composite
+    pending whose components have gone, and the next build would raise naming it.
+    """
+    Algorithm.instances.clear()
+    Algorithm.instances.update(algorithms)
+    _pending_composites[:] = pending
 
 
 class _AlgorithmRegistry:

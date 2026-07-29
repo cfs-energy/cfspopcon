@@ -9,6 +9,7 @@ import yaml
 
 from .algorithm_class import Algorithm, CompositeAlgorithm
 from .helpers import convert_named_options
+from .plugins import register_plugins
 from .unit_handling import set_default_units
 
 
@@ -49,6 +50,7 @@ def process_input_dictionary(
     """Convert an input dictionary into an processed dictionary, a CompositeAlgorithm and dictionaries defining points and plots.
 
     Several processing steps are applied, including;
+        * The `plugins` entry, if present, is a list of importable packages which are registered with `cfspopcon.register_plugins` before anything else happens, so that the rest of the file may name their algorithms and variables.
         * The `algorithms` entry is converted into a `cfspopcon.CompositeAlgorithm`. This basically gives the list of operations that we want to perform on the input data.
         * The `points` entry is stored in a separate dictionary. This gives a set of key-value pairs of 'optimal' points (for instance, giving the point with the maximum fusion power gain).
         * The `grids` entry is converted into an `xr.DataArray` storing a `np.linspace` or `np.logspace` of values which we scan over. We usually scan over `average_electron_density` and `average_electron_temp`, but there's nothing preventing you from scanning over other numerical input variables or having more than 2 dimensions which you scan over (n.b. this can get expensive!).
@@ -59,6 +61,8 @@ def process_input_dictionary(
         repr_d: Dictionary to process
         case_dir: Relative paths specified in repr_d are interpreted as relative to this directory
     """
+    process_plugins(repr_d)
+
     algorithms = repr_d.pop("algorithms", dict())
     algorithm_list: list[Algorithm | CompositeAlgorithm] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
 
@@ -79,6 +83,35 @@ def process_input_dictionary(
     process_units(repr_d)
 
     return repr_d, algorithm, points, plots
+
+
+def process_plugins(repr_d: dict[str, Any]) -> None:
+    """Register the plugin packages the input file lists, so their algorithms can be named by it.
+
+    The whole set is registered in one call, so a composite in one plugin may name an algorithm from
+    another. Must run before the ``algorithms`` names are resolved and before the remaining keys have
+    their units looked up, since a plugin supplies both.
+
+    Note that this imports the modules an input file names, which is code execution driven by a data
+    file. The file is already user-authored and already selects code by naming algorithms, but a case
+    file from an untrusted source will run its plugins' module-level code. There is no sandboxing on
+    offer; pass plugins on the command line instead if that matters.
+    """
+    plugins = repr_d.pop("plugins", [])
+    if isinstance(plugins, str):
+        # A single name, or one passed through read_case's kwargs override, which are always strings.
+        plugins = [plugins]
+    if not plugins:
+        return
+
+    try:
+        register_plugins(*plugins)
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            f"Could not import '{exc.name}', listed in the 'plugins' section of the input file. "
+            "A plugin must be an importable package; note that the import name may differ from the "
+            "name of the distribution which provides it."
+        ) from exc
 
 
 def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]
