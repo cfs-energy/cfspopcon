@@ -14,6 +14,15 @@ from cfspopcon.unit_handling import Quantity
 
 
 class VariableConsistencyChecker:
+    # KNOWN HAZARD, not yet guarded. This scans *all* of Algorithm.instances and writes the result to
+    # cfspopcon's own variables.yaml. If a plugin has been registered in the same process, its
+    # variables are treated as cfspopcon's: `--run` adds them to variables.yaml, with default_units
+    # None, so the plugin's real units are discarded too. Verified by probe, not by test.
+    #
+    # Nothing triggers it today, because check_variables_cli below calls only
+    # discover_builtin_algorithms(), and the pre-commit hook runs in a clean environment. It is one
+    # stray cfspopcon.register_plugin call away. See PLUGINS_IDEA.md ("E7") for the fix under
+    # discussion: drop set_by/used_by, and stop the checker adding keys it was not given.
     """A class for comparing the keys in algorithms, default units and the physics glossary."""
 
     def __init__(self) -> None:
@@ -234,6 +243,8 @@ class VariableConsistencyChecker:
 @click.option("--run", is_flag=True, help="Modifies the checked files in-place.")
 def check_variables_cli(run: bool) -> None:
     """Check whether the Algorithm keys, the default_units file and the physics_glossary file are consistent."""
+    # Only the builtins: registering a plugin here would write its variables into cfspopcon's
+    # variables.yaml. See the note on VariableConsistencyChecker.
     discover_builtin_algorithms()
     variable_consistency_checker = VariableConsistencyChecker()
     variable_consistency_checker.run(apply_changes=run)

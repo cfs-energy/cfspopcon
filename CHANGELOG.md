@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`discover_algorithms_in_packages(*packages)`** — walk several packages as a single unit, so a composite may span them. `discover_algorithms_in_package` is the single-package spelling.
 - **`cfspopcon.algorithm_class.deferred_composite_build()`** — a context manager which treats everything registered inside it as one unit, building the declared composites when the outermost block exits.
 - **`read_default_units_from_file(path)`** — takes a path or a package resource, so a package may ship its own `variables.yaml` and load its default units from it rather than hand-writing a units dictionary. Defaults to cfspopcon's own file, as before.
+- **`plugin_variables.yaml`** — a plugin which ships a file of this name in its package root has its default units loaded automatically when it is registered, so it needs no units code of its own. It is read before the plugin's modules are imported, so an `extend_default_units_map` call in the plugin overrides the file. cfspopcon's own `variables.yaml` is never written to: a plugin's variables live only in the plugin.
 - **`extend_default_units_map` is exported from `cfspopcon.unit_handling`** — the supported way for a downstream package to declare default units for variables of its own, since `read_default_units_from_file()` reads only cfspopcon's `variables.yaml` and takes no path argument. It was previously reachable only from `cfspopcon.unit_handling.default_units`.
 
 ### Changed

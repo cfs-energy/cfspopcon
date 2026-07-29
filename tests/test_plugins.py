@@ -13,7 +13,7 @@ import cfspopcon
 from cfspopcon import Algorithm, CompositeAlgorithm, PluginClashError, register_plugin, register_plugins
 from cfspopcon.algorithm_class import _pending_composites, pending_composites, restore_registry, registered_algorithms
 from cfspopcon.plugins import _failed_registrations, _successful_registrations
-from cfspopcon.unit_handling import ureg
+from cfspopcon.unit_handling import Quantity, ureg
 from cfspopcon.unit_handling.default_units import default_unit, default_units_map, extend_default_units_map, reset_default_units
 
 OK_PLUGIN = dedent(
@@ -470,3 +470,114 @@ def test_the_popcon_command_runs_a_case_with_plugins(tmp_path, run_script):
         f"cli.run_popcon({str(case_dir)!r}, False, {{}})\n"
     )
     run_script(script)
+
+
+# --- A plugin's own variables file -----------------------------------------------------------------
+
+PLUGIN_VARIABLES = """\
+file_declared_metric:
+  default_units: meter**2
+  description:
+  - An area declared by the plugin's own variables file
+  set_by:
+  - calc_file_declared_metric
+  used_by: []
+file_declared_selector:
+  default_units: null
+  description:
+  - A class-typed switch, declared with no units
+"""
+
+FILE_UNITS_PLUGIN = dedent(
+    """
+    from cfspopcon.algorithm_class import Algorithm
+    from cfspopcon.unit_handling import Unitfull
+
+    # No extend_default_units_map call: the units come from plugin_variables.yaml.
+    @Algorithm.register_algorithm(return_keys=["file_declared_metric"])
+    def calc_file_declared_metric(major_radius: Unitfull) -> Unitfull:
+        return major_radius**2
+    """
+)
+
+
+def test_a_plugin_declares_its_units_in_its_own_variables_file(tmp_path):
+    """A plugin ships plugin_variables.yaml instead of writing a units dict in Python."""
+    write_package(tmp_path, "popcon_test_plugin_file_units", {"algorithms": FILE_UNITS_PLUGIN})
+    (tmp_path / "popcon_test_plugin_file_units" / "plugin_variables.yaml").write_text(PLUGIN_VARIABLES)
+
+    report = register_plugin("popcon_test_plugin_file_units")
+
+    assert default_unit("file_declared_metric") == "meter**2"
+    assert default_unit("file_declared_selector") is None
+    # The file's variables show up in the report the same way an inline declaration would.
+    assert "file_declared_metric" in report.variables
+
+    result = Algorithm.get_algorithm("calc_file_declared_metric").update_dataset(xr.Dataset({"major_radius": Quantity(2.0, ureg.m)}))
+    assert result["file_declared_metric"] == Quantity(4.0, ureg.m**2)
+
+
+def test_cfspopcons_own_variables_file_is_never_written_to(tmp_path):
+    """A plugin's variables live in the plugin; cfspopcon's variables.yaml is left alone."""
+    cfspopcon_variables = Path(cfspopcon.__file__).parent / "variables.yaml"
+    before = cfspopcon_variables.read_bytes()
+
+    write_package(tmp_path, "popcon_test_plugin_untouched", {"algorithms": FILE_UNITS_PLUGIN})
+    (tmp_path / "popcon_test_plugin_untouched" / "plugin_variables.yaml").write_text(PLUGIN_VARIABLES)
+    register_plugin("popcon_test_plugin_untouched")
+
+    assert cfspopcon_variables.read_bytes() == before
+    assert "file_declared_metric" not in yaml.safe_load(before)
+
+
+def test_a_plugin_without_a_variables_file_is_unaffected(tmp_path):
+    """The file is optional; a plugin declaring its units inline still works."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_no_file", SUBMODULE_PLUGIN)
+
+    report = register_plugin(name)
+
+    assert report.variables == ("deep_plugin_metric",)
+
+
+# --- Which plugin in a rejected set is blamed ------------------------------------------------------
+
+
+def test_only_the_offender_is_blamed_for_a_clash(tmp_path):
+    """A plugin rolled back alongside an offender must not be accused of the offender's clash."""
+    innocent = write_plugin(tmp_path, "popcon_test_innocent", SUBMODULE_PLUGIN)
+    offender = write_plugin(tmp_path, "popcon_test_offender", CLASH_PLUGIN)
+
+    with pytest.raises(PluginClashError) as raised:
+        register_plugins(innocent, offender)
+
+    # The raised error names the offender and its clash, and not the innocent plugin.
+    assert "popcon_test_offender" in str(raised.value)
+    assert "popcon_test_innocent" not in str(raised.value)
+
+    # Asked again, each is told its own story.
+    with pytest.raises(PluginClashError, match="average_electron_density"):
+        register_plugin(offender)
+    with pytest.raises(PluginClashError, match="registered nothing.*rolled back as part of a set"):
+        register_plugin(innocent)
+
+
+def test_a_plugin_redefining_an_earlier_plugins_variable_is_the_offender(tmp_path):
+    """Clashes are diffed per plugin, so a plugin-versus-plugin redefinition is attributed correctly."""
+    first = write_plugin(tmp_path, "popcon_test_first", SUBMODULE_PLUGIN)
+    second = write_plugin(
+        tmp_path,
+        "popcon_test_second",
+        dedent(
+            """
+            from cfspopcon.unit_handling.default_units import extend_default_units_map
+
+            extend_default_units_map({"deep_plugin_metric": "second"})   # the other plugin's variable
+            """
+        ),
+    )
+
+    with pytest.raises(PluginClashError, match="popcon_test_second") as raised:
+        register_plugins(first, second)
+
+    assert "deep_plugin_metric" in str(raised.value)
+    assert "popcon_test_first" not in str(raised.value)
