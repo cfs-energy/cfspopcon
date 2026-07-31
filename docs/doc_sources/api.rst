@@ -9,6 +9,7 @@ Configuration Enums
 
 Formulas
 ========================
+.. automodule:: cfspopcon.formulas
 
 Auxiliary Power
 ----------------
