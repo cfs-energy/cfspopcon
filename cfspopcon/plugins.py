@@ -18,8 +18,16 @@ from .algorithm_class import (
 from .unit_handling import ureg
 from .unit_handling.default_units import default_units_map, extend_default_units_map, read_default_units_from_file, reset_default_units
 
-#: A plugin may ship a file of this name in its package root, in the same shape as cfspopcon's own
-#: ``variables.yaml``, declaring the default units of the variables it introduces.
+#: A plugin may ship a file of this name in its package root, declaring the default units of the
+#: variables it introduces. The shape is that of cfspopcon's own ``variables.yaml`` — each variable
+#: name maps to a dictionary with a ``default_units`` entry; a flat ``name: units`` mapping is not
+#: accepted::
+#:
+#:     widget_temperature:
+#:       default_units: kelvin
+#:       description: Operating temperature of the widget.
+#:
+#: A ``description`` is encouraged but not yet surfaced anywhere; ``set_by``/``used_by`` are ignored.
 PLUGIN_VARIABLES_FILE = "plugin_variables.yaml"
 
 
