@@ -21,6 +21,17 @@ def test_coordinate_formatter(z):
     assert np.isclose(float(z_string.split("=")[1]), x_test + y_test, atol=0.01)
 
 
+def test_coordinate_formatter_with_units(z):
+    # A unitful field must not crash the readout, and should show its units.
+    formatter = plotting.CoordinateFormatter(z.pint.quantify(ureg.MW))
+
+    ret_string = formatter(1.23, -3.45)
+
+    assert ret_string.endswith("[MW]")
+    z_string = ret_string.split(",")[2]
+    assert np.isclose(float(z_string.split("=")[1].removesuffix("[MW]")), 1.23 - 3.45, atol=0.01)
+
+
 @pytest.mark.filterwarnings("error")
 def test_label_contour(z):
     # Make sure that the label contour functionality runs through.
