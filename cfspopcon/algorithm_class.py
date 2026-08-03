@@ -592,25 +592,38 @@ def _validate_inputs(
             # which can be provided (but which might have default values).
             unused_config_keys.remove(key)
 
-    if len(missing_input_keys) == 0 and len(unused_config_keys) == 0:
+    missing = sorted(missing_input_keys)
+    unused = sorted(unused_config_keys)
+
+    if not missing and not unused:
         return True
-
-    elif len(missing_input_keys) > 0 and len(unused_config_keys) > 0:
-        message = f"Missing input parameters [{', '.join(missing_input_keys)}]. Also had unused input parameters [{', '.join(unused_config_keys)}]."
-        if raise_error_on_missing_inputs:
-            raise RuntimeError(message)
-
-    elif len(missing_input_keys) > 0:
-        message = f"Missing input parameters [{', '.join(missing_input_keys)}]."
-        if raise_error_on_missing_inputs:
-            raise RuntimeError(message)
-
+    elif missing and unused:
+        message = f"Missing input parameters [{', '.join(missing)}]. Also had unused input parameters [{', '.join(unused)}]."
+    elif missing:
+        message = f"Missing input parameters [{', '.join(missing)}]."
     else:
-        message = f"Unused input parameters [{', '.join(unused_config_keys)}]."
+        message = f"Unused input parameters [{', '.join(unused)}]."
+    message = "\n".join([message, *_input_hints(algorithm, missing, unused)])
 
+    if missing and raise_error_on_missing_inputs:
+        raise RuntimeError(message)
     if not quiet:
         warn(message, stacklevel=3)
     return False
+
+
+def _input_hints(algorithm: Algorithm | CompositeAlgorithm, missing: list[str], unused: list[str]) -> list[str]:
+    """Suggest a fix per missing or unused input, where the registry or a near-miss offers one."""
+    hints = []
+    for key in missing:
+        setters = algorithms_setting(key)
+        if setters:
+            hints.append(f"'{key}' is set by [{', '.join(setters)}]: add one to your algorithms list, or provide '{key}' as an input.")
+    for key in unused:
+        close_matches = get_close_matches(key, algorithm.input_keys, n=1)
+        if close_matches:
+            hints.append(f"Unused parameter '{key}': did you mean '{close_matches[0]}'?")
+    return hints
 
 
 def build_pending_composites() -> None:

@@ -126,6 +126,19 @@ def test_plugin_algorithms_appear_in_registry_queries(tmp_path):
     assert "calc_test_plugin_metric" in algorithms_using("average_electron_density")
 
 
+def test_missing_input_hint_names_plugin_algorithm(tmp_path):
+    """The missing-input hint can name a plugin's algorithm as the setter."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_hint", OK_PLUGIN)
+    register_plugin(name)
+
+    def needs_metric(test_plugin_metric):
+        return {"probe_out": test_plugin_metric}
+
+    alg = Algorithm(function=needs_metric, return_keys=["probe_out"], skip_registration=True)
+    with pytest.raises(RuntimeError, match=r"'test_plugin_metric' is set by \[calc_test_plugin_metric\]"):
+        alg.validate_inputs({}, raise_error_on_missing_inputs=True)
+
+
 def test_register_plugin_is_idempotent(tmp_path):
     """Registering the same plugin twice returns the original report."""
     name = write_plugin(tmp_path, "popcon_test_plugin_twice", OK_PLUGIN)

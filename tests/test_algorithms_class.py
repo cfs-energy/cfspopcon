@@ -346,6 +346,26 @@ def test_registry_indexing():
         registry["not_a_registered_algorithm_name"]
 
 
+def test_missing_input_hint_names_setters():
+    def needs_volume(plasma_volume):
+        return {"probe_out": plasma_volume}
+
+    alg = Algorithm(function=needs_volume, return_keys=["probe_out"], skip_registration=True)
+    with pytest.raises(RuntimeError, match=r"'plasma_volume' is set by \[calc_plasma_volume\]"):
+        alg.validate_inputs({}, raise_error_on_missing_inputs=True)
+
+
+def test_unused_input_hint_suggests_close_match(how_many_birds, how_many_animals):
+    count_the_farm = how_many_birds + how_many_animals
+    with pytest.raises(RuntimeError, match="did you mean 'things_that_baa'"):
+        count_the_farm.validate_inputs(dict(things_that_quack=1, things_that_baaa=4))
+
+
+def test_no_hint_without_a_setter_or_close_match(how_many_birds):
+    with pytest.raises(RuntimeError, match=r"^Missing input parameters \[things_that_quack\].$"):
+        how_many_birds.validate_inputs({}, raise_error_on_missing_inputs=True)
+
+
 def test_registry_queries():
     """algorithms_setting/algorithms_using answer from the live registry, sorted."""
     assert algorithms_setting("plasma_volume") == ["calc_plasma_volume"]
