@@ -496,9 +496,6 @@ file_declared_metric:
   default_units: meter**2
   description:
   - An area declared by the plugin's own variables file
-  set_by:
-  - calc_file_declared_metric
-  used_by: []
 file_declared_selector:
   default_units: null
   description:
