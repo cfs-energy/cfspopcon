@@ -150,7 +150,7 @@
             "attrs": {
                 "units": "ampere"
             },
-            "data": 800000.,
+            "data": 800000.0,
             "dims": []
         },
         "poloidal_sound_larmor_radius": {

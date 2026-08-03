@@ -120,6 +120,17 @@ def read_dataset_from_netcdf(filepath: Path) -> xr.Dataset:
 # floats lead to a large, meaningless diff of the reference JSON files.
 
 
+def _rounded_float_repr(x: float) -> str:
+    """Format to 6 significant figures, keeping the result a valid JSON number.
+
+    '#' keeps the decimal point, but a value whose integer part uses all 6 figures ends in a bare
+    trailing point (e.g. '732029.'), which json cannot read back; one more significant figure puts
+    a digit after the point instead.
+    """
+    formatted = f"{x:#.6g}"
+    return f"{x:#.7g}" if formatted.endswith(".") else formatted
+
+
 class _RoundingFloat(float):
     """A modified version of the 'float' built-in, with a modified __repr__.
 
@@ -128,7 +139,7 @@ class _RoundingFloat(float):
     From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
     """
 
-    __repr__ = staticmethod(lambda x: f"{x:#.6g}")  # type:ignore[assignment,unused-ignore]
+    __repr__ = staticmethod(_rounded_float_repr)  # type:ignore[assignment,unused-ignore]
 
 
 class _ModifyJSONFloatRepr:
