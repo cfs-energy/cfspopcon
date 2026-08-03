@@ -7,6 +7,7 @@ from textwrap import dedent
 import pytest
 import xarray as xr
 import yaml
+from click.testing import CliRunner
 from utils.throwaway_packages import forget_packages, write_package
 
 import cfspopcon
@@ -19,7 +20,11 @@ from cfspopcon import (
     register_plugin,
     register_plugins,
 )
+
+# Imported here, not inside the CLI test: restore_registries evicts any package first imported
+# during a test, and evicting cfspopcon.cli would take the whole of cfspopcon with it.
 from cfspopcon.algorithm_class import _pending_composites, pending_composites, restore_registry, registered_algorithms
+from cfspopcon.cli import write_algorithms_yaml
 from cfspopcon.plugins import _failed_registrations, _successful_registrations
 from cfspopcon.unit_handling import Quantity, ureg
 from cfspopcon.unit_handling.default_units import default_unit, default_units_map, extend_default_units_map, reset_default_units
@@ -137,6 +142,18 @@ def test_missing_input_hint_names_plugin_algorithm(tmp_path):
     alg = Algorithm(function=needs_metric, return_keys=["probe_out"], skip_registration=True)
     with pytest.raises(RuntimeError, match=r"'test_plugin_metric' is set by \[calc_test_plugin_metric\]"):
         alg.validate_inputs({}, raise_error_on_missing_inputs=True)
+
+
+def test_popcon_algorithms_lists_plugin_algorithms(tmp_path):
+    """popcon_algorithms --plugin adds the plugin's algorithms to the listing."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_listing", OK_PLUGIN)
+    output = tmp_path / "algs.yaml"
+
+    assert CliRunner().invoke(write_algorithms_yaml, ["-o", str(output)], catch_exceptions=False).exit_code == 0
+    assert "calc_test_plugin_metric" not in yaml.safe_load(output.read_text())
+
+    assert CliRunner().invoke(write_algorithms_yaml, ["-o", str(output), "--plugin", name], catch_exceptions=False).exit_code == 0
+    assert "calc_test_plugin_metric" in yaml.safe_load(output.read_text())
 
 
 def test_register_plugin_is_idempotent(tmp_path):
