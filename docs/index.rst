@@ -26,5 +26,6 @@ If you are interested in how to setup a development environment to make changes 
   doc_sources/Usage
   doc_sources/physics_glossary
   doc_sources/dev_guide
+  doc_sources/authoring_a_plugin
   doc_sources/api
   doc_sources/bib
