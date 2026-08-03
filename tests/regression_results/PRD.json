@@ -254,7 +254,7 @@
             "attrs": {
                 "units": "pascal"
             },
-            "data": 732029.,
+            "data": 732029.0,
             "dims": []
         },
         "beta_poloidal": {
