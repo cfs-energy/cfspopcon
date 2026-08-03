@@ -15,14 +15,14 @@ from cfspopcon.unit_handling import Quantity
 
 class VariableConsistencyChecker:
     # KNOWN HAZARD, not yet guarded. This scans *all* of Algorithm.instances and writes the result to
-    # cfspopcon's own variables.yaml. If a plugin has been registered in the same process, its
-    # variables are treated as cfspopcon's: `--run` adds them to variables.yaml, with default_units
-    # None, so the plugin's real units are discarded too. Verified by probe, not by test.
+    # cfspopcon's own variables.yaml. If a plugin has been registered in the same process, `--run`
+    # adds its variable keys to variables.yaml, with default_units None, so the plugin's real units
+    # are discarded too. Verified by probe, not by test.
     #
     # Nothing triggers it today, because check_variables_cli below calls only
     # discover_builtin_algorithms(), and the pre-commit hook runs in a clean environment. It is one
-    # stray cfspopcon.register_plugin call away. See PLUGINS_IDEA.md ("E7") for the fix under
-    # discussion: drop set_by/used_by, and stop the checker adding keys it was not given.
+    # stray cfspopcon.register_plugin call away. The remaining fix is to stop the checker adding
+    # keys it was not given.
     """A class for comparing the keys in algorithms, default units and the physics glossary."""
 
     def __init__(self) -> None:
@@ -163,21 +163,9 @@ class VariableConsistencyChecker:
             exit(0) if success else exit(1)
 
         all_keys = sorted((self.variable_keys - unused_variable_keys) | unlisted_args, key=str.lower)
-        algs_using_variable: dict[str, list[str]] = {key: [] for key in all_keys}
-        algs_setting_variable: dict[str, list[str]] = {key: [] for key in all_keys}
-        for alg in Algorithm.instances.values():
-            # A composite can reach a variable through several of its members;
-            # dedupe so each algorithm is listed once per variable.
-            for key in set(alg.input_keys):
-                algs_using_variable[key].append(alg._name)  # type:ignore[arg-type]
-            for key in set(alg.return_keys):
-                algs_setting_variable[key].append(alg._name)  # type:ignore[arg-type]
 
         new_variables_dict = dict()
         for key in all_keys:
-            used_by = algs_using_variable[key]
-            set_by = algs_setting_variable[key]
-
             if key in self.variables_dict:
                 default_units = self.variables_dict[key]["default_units"]
                 if default_units is not None:
@@ -197,8 +185,6 @@ class VariableConsistencyChecker:
             new_variables_dict[key] = dict(
                 default_units=default_units,
                 description=description,
-                set_by=set_by,
-                used_by=used_by,
             )
 
         with as_file(files("cfspopcon").joinpath("variables.yaml")) as filepath:

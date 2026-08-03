@@ -142,6 +142,11 @@ class Algorithm:
         )
         return return_string
 
+    @property
+    def name(self) -> str:
+        """The name this algorithm is registered under (the function's name unless overridden)."""
+        return self._name
+
     def __repr__(self) -> str:
         """Return a simple string description of the Algorithm."""
         return f"Algorithm: {self._name}"
@@ -431,7 +436,7 @@ class CompositeAlgorithm:
 
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
-        components = f"[{', '.join(alg._name for alg in self.algorithms)}]"
+        components = f"[{', '.join(alg.name for alg in self.algorithms)}]"
 
         return_string = (
             f"CompositeAlgorithm: {self._name}\n"
@@ -442,6 +447,11 @@ class CompositeAlgorithm:
             f"Outputs:\n{', '.join(self.return_keys)}"
         )
         return return_string
+
+    @property
+    def name(self) -> str | None:
+        """The name this composite is registered under, or None for an unnamed composite."""
+        return self._name
 
     def __repr__(self) -> str:
         """Return a simple string description of the CompositeAlgorithm."""
@@ -463,7 +473,7 @@ class CompositeAlgorithm:
                 needed_by[parameter] = []
                 for alg in self.algorithms:
                     if parameter in alg.input_keys:
-                        needed_by[parameter].append(alg._name)
+                        needed_by[parameter].append(alg.name)
 
             error_string = ", ".join(f"{key} needed by [{', '.join(val)}]" for key, val in needed_by.items())
             raise TypeError(f"CompositeAlgorithm.run() missing arguments: {error_string}")
@@ -516,9 +526,9 @@ class CompositeAlgorithm:
         for algorithm in self.algorithms:
             for key in algorithm.return_keys:
                 if key not in key_setter.keys():
-                    key_setter[key] = [algorithm._name]
+                    key_setter[key] = [algorithm.name]
                 else:
-                    key_setter[key].append(algorithm._name)
+                    key_setter[key].append(algorithm.name)
 
         overridden_variables = []
         for variable, algs in key_setter.items():
@@ -582,25 +592,38 @@ def _validate_inputs(
             # which can be provided (but which might have default values).
             unused_config_keys.remove(key)
 
-    if len(missing_input_keys) == 0 and len(unused_config_keys) == 0:
+    missing = sorted(missing_input_keys)
+    unused = sorted(unused_config_keys)
+
+    if not missing and not unused:
         return True
-
-    elif len(missing_input_keys) > 0 and len(unused_config_keys) > 0:
-        message = f"Missing input parameters [{', '.join(missing_input_keys)}]. Also had unused input parameters [{', '.join(unused_config_keys)}]."
-        if raise_error_on_missing_inputs:
-            raise RuntimeError(message)
-
-    elif len(missing_input_keys) > 0:
-        message = f"Missing input parameters [{', '.join(missing_input_keys)}]."
-        if raise_error_on_missing_inputs:
-            raise RuntimeError(message)
-
+    elif missing and unused:
+        message = f"Missing input parameters [{', '.join(missing)}]. Also had unused input parameters [{', '.join(unused)}]."
+    elif missing:
+        message = f"Missing input parameters [{', '.join(missing)}]."
     else:
-        message = f"Unused input parameters [{', '.join(unused_config_keys)}]."
+        message = f"Unused input parameters [{', '.join(unused)}]."
+    message = "\n".join([message, *_input_hints(algorithm, missing, unused)])
 
+    if missing and raise_error_on_missing_inputs:
+        raise RuntimeError(message)
     if not quiet:
         warn(message, stacklevel=3)
     return False
+
+
+def _input_hints(algorithm: Algorithm | CompositeAlgorithm, missing: list[str], unused: list[str]) -> list[str]:
+    """Suggest a fix per missing or unused input, where the registry or a near-miss offers one."""
+    hints = []
+    for key in missing:
+        setters = algorithms_setting(key)
+        if setters:
+            hints.append(f"'{key}' is set by [{', '.join(setters)}]: add one to your algorithms list, or provide '{key}' as an input.")
+    for key in unused:
+        close_matches = get_close_matches(key, algorithm.input_keys, n=1)
+        if close_matches:
+            hints.append(f"Unused parameter '{key}': did you mean '{close_matches[0]}'?")
+    return hints
 
 
 def build_pending_composites() -> None:
@@ -693,6 +716,24 @@ def registered_algorithms() -> dict[str, Algorithm | CompositeAlgorithm]:
     which was added from one which was replaced -- see the ``override`` flag on :class:`Algorithm`.
     """
     return dict(Algorithm.instances)
+
+
+def algorithms_setting(variable: str) -> list[str]:
+    """Return the names of the registered algorithms whose outputs include ``variable``, sorted.
+
+    Scans the live registry, so plugin algorithms appear once registered and nothing appears until
+    discovery has run. Composites are excluded: every composite containing a setter would repeat
+    it, and each one contains a plain Algorithm which sets the variable anyway.
+    """
+    return sorted(name for name, alg in Algorithm.instances.items() if isinstance(alg, Algorithm) and variable in alg.return_keys)
+
+
+def algorithms_using(variable: str) -> list[str]:
+    """Return the names of the registered algorithms whose inputs include ``variable``, sorted.
+
+    See :func:`algorithms_setting` for the scan's scope.
+    """
+    return sorted(name for name, alg in Algorithm.instances.items() if isinstance(alg, Algorithm) and variable in alg.input_keys)
 
 
 def pending_composites() -> list[tuple[str, list[str]]]:

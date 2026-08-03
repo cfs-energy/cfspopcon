@@ -9,9 +9,12 @@ from . import file_io, formulas, named_options, shaping_and_selection
 from .algorithm_class import (
     Algorithm,
     CompositeAlgorithm,
+    algorithms_setting,
+    algorithms_using,
     discover_algorithms_in_package,
     discover_algorithms_in_packages,
     discover_builtin_algorithms,
+    registered_algorithms,
     registry,
 )
 from .deprecation_handler import handle_deprecated_arguments
@@ -31,6 +34,8 @@ __all__ = [
     "CompositeAlgorithm",
     "PluginClashError",
     "PluginReport",
+    "algorithms_setting",
+    "algorithms_using",
     "convert_to_default_units",
     "convert_units",
     "discover_algorithms_in_package",
@@ -46,6 +51,7 @@ __all__ = [
     "read_plot_style",
     "register_plugin",
     "register_plugins",
+    "registered_algorithms",
     "registry",
     "set_default_units",
     "shaping_and_selection",
