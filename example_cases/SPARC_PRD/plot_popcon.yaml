@@ -16,6 +16,7 @@ coords:
 
 fill:
   variable: Q
+  # The variable's units are appended to cbar_label automatically: don't write them in.
   cbar_label: Q
   where:
       Q:

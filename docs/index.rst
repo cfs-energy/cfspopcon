@@ -24,6 +24,7 @@ If you are interested in how to setup a development environment to make changes 
   :maxdepth: 1
 
   doc_sources/Usage
+  doc_sources/plot_styles
   doc_sources/physics_glossary
   doc_sources/dev_guide
   doc_sources/api
