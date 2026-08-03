@@ -10,7 +10,15 @@ import yaml
 from utils.throwaway_packages import forget_packages, write_package
 
 import cfspopcon
-from cfspopcon import Algorithm, CompositeAlgorithm, PluginClashError, register_plugin, register_plugins
+from cfspopcon import (
+    Algorithm,
+    CompositeAlgorithm,
+    PluginClashError,
+    algorithms_setting,
+    algorithms_using,
+    register_plugin,
+    register_plugins,
+)
 from cfspopcon.algorithm_class import _pending_composites, pending_composites, restore_registry, registered_algorithms
 from cfspopcon.plugins import _failed_registrations, _successful_registrations
 from cfspopcon.unit_handling import Quantity, ureg
@@ -107,6 +115,15 @@ def test_registered_algorithm_runs_in_composite_chain(tmp_path):
     )
 
     assert dataset["test_plugin_metric"].item() == pytest.approx(25.0 / 85.235, rel=1e-3)
+
+
+def test_plugin_algorithms_appear_in_registry_queries(tmp_path):
+    """The registry queries include a plugin's algorithms once it is registered."""
+    name = write_plugin(tmp_path, "popcon_test_plugin_queries", OK_PLUGIN)
+    register_plugin(name)
+
+    assert "calc_test_plugin_metric" in algorithms_setting("test_plugin_metric")
+    assert "calc_test_plugin_metric" in algorithms_using("average_electron_density")
 
 
 def test_register_plugin_is_idempotent(tmp_path):

@@ -705,6 +705,24 @@ def registered_algorithms() -> dict[str, Algorithm | CompositeAlgorithm]:
     return dict(Algorithm.instances)
 
 
+def algorithms_setting(variable: str) -> list[str]:
+    """Return the names of the registered algorithms whose outputs include ``variable``, sorted.
+
+    Scans the live registry, so plugin algorithms appear once registered and nothing appears until
+    discovery has run. Composites are excluded: every composite containing a setter would repeat
+    it, and each one contains a plain Algorithm which sets the variable anyway.
+    """
+    return sorted(name for name, alg in Algorithm.instances.items() if isinstance(alg, Algorithm) and variable in alg.return_keys)
+
+
+def algorithms_using(variable: str) -> list[str]:
+    """Return the names of the registered algorithms whose inputs include ``variable``, sorted.
+
+    See :func:`algorithms_setting` for the scan's scope.
+    """
+    return sorted(name for name, alg in Algorithm.instances.items() if isinstance(alg, Algorithm) and variable in alg.input_keys)
+
+
 def pending_composites() -> list[tuple[str, list[str]]]:
     """Return a copy of the composites declared but not yet built, as (name, component names)."""
     return [(name, list(keys)) for name, keys in _pending_composites]

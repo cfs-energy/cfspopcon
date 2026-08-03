@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, registry
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithms_setting, algorithms_using, registry
 from cfspopcon.unit_handling import ureg
 
 
@@ -344,6 +344,29 @@ def test_registry_indexing():
         registry[123]
     with pytest.raises(KeyError):
         registry["not_a_registered_algorithm_name"]
+
+
+def test_registry_queries():
+    """algorithms_setting/algorithms_using answer from the live registry, sorted."""
+    assert algorithms_setting("plasma_volume") == ["calc_plasma_volume"]
+    users = algorithms_using("plasma_volume")
+    assert "calc_fusion_power" in users
+    assert users == sorted(users)
+    assert algorithms_setting("not_a_registered_variable") == []
+
+
+def test_registry_queries_exclude_composites():
+    """A registered composite never appears in a query answer; its components do."""
+    name = "_query_probe_composite"
+    component = Algorithm.get_algorithm("calc_plasma_volume")
+    Algorithm.instances.pop(name, None)
+    try:
+        CompositeAlgorithm([component], name=name, register=True)
+        assert name not in algorithms_setting("plasma_volume")
+        assert name not in algorithms_using("major_radius")
+        assert "calc_plasma_volume" in algorithms_setting("plasma_volume")
+    finally:
+        Algorithm.instances.pop(name, None)
 
 
 def test_composite_registration_collision_and_override():
