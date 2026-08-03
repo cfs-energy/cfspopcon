@@ -9,8 +9,7 @@ package which registers its algorithms when imported; an input file then names i
 per-case: the input file states its own dependencies, and a case is reproducible from the file
 alone.
 
-This page walks through a complete, deliberately non-physics example: a plugin which plans widget
-production.
+This page walks through a complete example: a plugin which plans widget production.
 
 Package layout
 ====================
