@@ -39,7 +39,7 @@ def handle_deprecated_arguments(
         else:
             raise NotImplementedError(f"Cannot handle a profile type of {profile_type}")
 
-        updated_alg_list = [new_alg if alg._name == "calc_peaked_profiles" else alg for alg in algorithm.algorithms]
+        updated_alg_list = [new_alg if alg.name == "calc_peaked_profiles" else alg for alg in algorithm.algorithms]
         algorithm = CompositeAlgorithm(
             algorithms=updated_alg_list,
         )

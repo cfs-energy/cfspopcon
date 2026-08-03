@@ -142,6 +142,11 @@ class Algorithm:
         )
         return return_string
 
+    @property
+    def name(self) -> str:
+        """The name this algorithm is registered under (the function's name unless overridden)."""
+        return self._name
+
     def __repr__(self) -> str:
         """Return a simple string description of the Algorithm."""
         return f"Algorithm: {self._name}"
@@ -431,7 +436,7 @@ class CompositeAlgorithm:
 
     def _make_docstring(self) -> str:
         """Makes a doc-string detailing the function inputs and outputs."""
-        components = f"[{', '.join(alg._name for alg in self.algorithms)}]"
+        components = f"[{', '.join(alg.name for alg in self.algorithms)}]"
 
         return_string = (
             f"CompositeAlgorithm: {self._name}\n"
@@ -442,6 +447,11 @@ class CompositeAlgorithm:
             f"Outputs:\n{', '.join(self.return_keys)}"
         )
         return return_string
+
+    @property
+    def name(self) -> str | None:
+        """The name this composite is registered under, or None for an unnamed composite."""
+        return self._name
 
     def __repr__(self) -> str:
         """Return a simple string description of the CompositeAlgorithm."""
@@ -463,7 +473,7 @@ class CompositeAlgorithm:
                 needed_by[parameter] = []
                 for alg in self.algorithms:
                     if parameter in alg.input_keys:
-                        needed_by[parameter].append(alg._name)
+                        needed_by[parameter].append(alg.name)
 
             error_string = ", ".join(f"{key} needed by [{', '.join(val)}]" for key, val in needed_by.items())
             raise TypeError(f"CompositeAlgorithm.run() missing arguments: {error_string}")
@@ -516,9 +526,9 @@ class CompositeAlgorithm:
         for algorithm in self.algorithms:
             for key in algorithm.return_keys:
                 if key not in key_setter.keys():
-                    key_setter[key] = [algorithm._name]
+                    key_setter[key] = [algorithm.name]
                 else:
-                    key_setter[key].append(algorithm._name)
+                    key_setter[key].append(algorithm.name)
 
         overridden_variables = []
         for variable, algs in key_setter.items():

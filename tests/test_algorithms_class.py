@@ -70,6 +70,7 @@ def test_composite_signature(how_many_birds, how_many_animals):
 
 
 def test_dummy_algorithm(how_many_birds, BIRDS):
+    assert how_many_birds.name == "count_birds"
     assert how_many_birds.return_keys == BIRDS
     assert how_many_birds.input_keys == ["things_that_quack", "things_that_cluck"]
     assert how_many_birds.required_input_keys == ["things_that_quack"]
@@ -98,6 +99,7 @@ def test_dummy_algorithm(how_many_birds, BIRDS):
 def test_dummy_composite_algorithm(how_many_birds, BIRDS, how_many_animals, ANIMALS):
     count_the_farm = how_many_birds + how_many_animals
 
+    assert count_the_farm.name is None
     assert set(count_the_farm.return_keys) == set(BIRDS).union(set(ANIMALS))
     assert set(count_the_farm.input_keys) == {"things_that_quack", "things_that_cluck", "things_that_baa", "new_chickens_per_count"}
     assert set(count_the_farm.required_input_keys) == {"things_that_quack", "things_that_baa"}
@@ -264,12 +266,12 @@ def test_get_algorithm():
     # Pass in Algorithm Enums
     for key in Algorithm.algorithms():
         alg = Algorithm.get_algorithm(key)
-        assert alg._name in [f"run_{key}", key, "<lambda>"]
+        assert alg.name in [f"run_{key}", key, "<lambda>"]
 
     # Pass in strings instead
     for key in Algorithm.algorithms():
         alg = Algorithm.get_algorithm(key)
-        assert alg._name in [f"run_{key}", key, "<lambda>"]
+        assert alg.name in [f"run_{key}", key, "<lambda>"]
 
 
 def test_blank_algorithm():
@@ -335,8 +337,8 @@ def test_registry_indexing():
     assert isinstance(registry[tuple(names)], CompositeAlgorithm)
 
     # A composite runs its algorithms in the order the names are given.
-    assert [alg._name for alg in registry[names].algorithms] == names
-    assert [alg._name for alg in registry[names[::-1]].algorithms] == names[::-1]
+    assert [alg.name for alg in registry[names].algorithms] == names
+    assert [alg.name for alg in registry[names[::-1]].algorithms] == names[::-1]
 
     with pytest.raises(TypeError, match="name .str. or a list"):
         registry[123]
