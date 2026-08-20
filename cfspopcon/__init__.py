@@ -11,6 +11,7 @@ from .deprecation_handler import handle_deprecated_arguments
 from .formulas.atomic_data import AtomicData
 from .input_file_handling import process_input_dictionary, read_case
 from .plotting import read_plot_style
+from .plugins import register_plugins
 from .unit_handling import (
     convert_to_default_units,
     convert_units,
@@ -33,6 +34,7 @@ __all__ = [
     "process_input_dictionary",
     "read_case",
     "read_plot_style",
+    "register_plugins",
     "set_default_units",
     "shaping_and_selection",
 ]

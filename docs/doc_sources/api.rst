@@ -66,6 +66,10 @@ Algorithms
 =====================
 .. automodule:: cfspopcon.algorithm_class
 
+Plugins
+=====================
+.. automodule:: cfspopcon.plugins
+
 
 Internals
 =====================
