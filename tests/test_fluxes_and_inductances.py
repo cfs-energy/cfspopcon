@@ -2,15 +2,17 @@ import numpy as np
 import xarray as xr
 from scipy import constants
 
-from cfspopcon.formulas.plasma_current.flux_consumption import (
+from cfspopcon.formulas.plasma_current.flux_consumption.flux_consumption import (
     calc_external_flux,
-    calc_external_inductance,
     calc_internal_flux,
+    calc_poloidal_field_flux,
+    calc_resistive_flux,
+)
+from cfspopcon.formulas.plasma_current.flux_consumption.inductances import (
+    calc_external_inductance,
     calc_internal_inductance_for_cylindrical,
     calc_internal_inductivity,
     calc_invmu_0_dLedR,
-    calc_poloidal_field_flux,
-    calc_resistive_flux,
     calc_vertical_field_mutual_inductance,
     calc_vertical_magnetic_field,
 )

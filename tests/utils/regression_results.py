@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 import xarray as xr
 
+from cfspopcon import discover_builtin_algorithms
 from cfspopcon.file_io import write_dataset_to_netcdf, write_point_to_file
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.deprecation_handler import handle_deprecated_arguments
@@ -17,6 +18,10 @@ ALL_CASE_NAMES = [path.parent.relative_to(CASES_DIR).stem for path in ALL_CASE_P
 @click.command()
 def update_regression_results_cli() -> None:
     """Run the example cases and save them in tests/regression_results."""
+    # This runs as a script, not under pytest, so nothing has filled the registry yet -- and
+    # read_case resolves the algorithm names each case lists. Discover as the popcon command does.
+    discover_builtin_algorithms()
+
     for case in ALL_CASE_PATHS:
         input_parameters, algorithm, points, plots = read_case(case)
 

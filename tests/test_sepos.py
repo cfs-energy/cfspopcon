@@ -153,7 +153,7 @@ def test_alpha_t(
 
 @pytest.fixture()
 def critical_alpha_MHD(elongation_psi95, triangularity_psi95):
-    return sepos.calc_critical_alpha_MHD(elongation_psi95, triangularity_psi95)
+    return sepos.shared.calc_critical_alpha_MHD(elongation_psi95, triangularity_psi95)
 
 
 @pytest.fixture()
@@ -171,7 +171,7 @@ def poloidal_sound_larmor_radius(
     separatrix_electron_temp,
     average_ion_mass,
 ):
-    return sepos.calc_poloidal_sound_larmor_radius(
+    return sepos.shared.calc_poloidal_sound_larmor_radius(
         minor_radius=minor_radius,
         elongation_psi95=elongation_psi95,
         triangularity_psi95=triangularity_psi95,
@@ -191,7 +191,7 @@ def L_mode_density_limit_condition(
     critical_alpha_MHD,
     alpha_t,
 ):
-    return sepos.calc_SepOS_L_mode_density_limit(
+    return sepos.density_limit.calc_SepOS_L_mode_density_limit(
         separatrix_electron_density=separatrix_electron_density,
         separatrix_electron_temp=separatrix_electron_temp,
         major_radius=major_radius,
@@ -221,7 +221,7 @@ def LH_transition_condition(
     alpha_t,
     poloidal_sound_larmor_radius,
 ):
-    return sepos.calc_SepOS_LH_transition(
+    return sepos.LH_transition.calc_SepOS_LH_transition(
         separatrix_electron_density=separatrix_electron_density,
         separatrix_electron_temp=separatrix_electron_temp,
         major_radius=major_radius,
@@ -253,7 +253,7 @@ def ideal_MHD_limit_condition(
     ion_to_electron_temp_ratio,
     poloidal_sound_larmor_radius,
 ):
-    return sepos.calc_SepOS_ideal_MHD_limit(
+    return sepos.MHD_limit.calc_SepOS_ideal_MHD_limit(
         separatrix_electron_density=separatrix_electron_density,
         separatrix_electron_temp=separatrix_electron_temp,
         major_radius=major_radius,
@@ -285,7 +285,7 @@ def power_crossing_separatrix_in_ion_channel(
     poloidal_sound_larmor_radius,
     ion_heat_diffusivity,
 ):
-    return sepos.calc_power_crossing_separatrix_in_ion_channel(
+    return sepos.sustainment_power.calc_power_crossing_separatrix_in_ion_channel(
         surface_area=surface_area,
         separatrix_electron_density=separatrix_electron_density,
         separatrix_electron_temp=separatrix_electron_temp,
@@ -358,7 +358,7 @@ def surface_area(
     inverse_aspect_ratio,
     areal_elongation,
 ):
-    return formulas.geometry.calc_plasma_surface_area(
+    return formulas.geometry.analytical.calc_plasma_surface_area(
         major_radius=major_radius,
         inverse_aspect_ratio=inverse_aspect_ratio,
         areal_elongation=areal_elongation,
@@ -379,7 +379,7 @@ def power_crossing_separatrix_in_electron_channel(
     alpha_t,
     poloidal_sound_larmor_radius,
 ):
-    return sepos.calc_power_crossing_separatrix_in_electron_channel(
+    return sepos.sustainment_power.calc_power_crossing_separatrix_in_electron_channel(
         separatrix_electron_temp=separatrix_electron_temp,
         target_electron_temp=target_electron_temp,
         cylindrical_safety_factor=cylindrical_safety_factor,

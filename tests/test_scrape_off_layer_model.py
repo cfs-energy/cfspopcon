@@ -66,7 +66,7 @@ def test_lambda_q_scalings(
     q_star,
     lambda_q_factor,
 ):
-    lambda_q = formulas.scrape_off_layer.calc_lambda_q(
+    lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q(
         lambda_q_scaling=scaling,
         average_total_pressure=average_total_pressure,
         power_crossing_separatrix=power_crossing_separatrix,
