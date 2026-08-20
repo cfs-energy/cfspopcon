@@ -1,8 +1,10 @@
 """Define default units for writing to/from disk."""
 
 from collections.abc import Iterable
-from importlib.resources import as_file, files
+from importlib.resources import files
+from importlib.resources.abc import Traversable
 from numbers import Number
+from pathlib import Path
 from typing import Any, overload
 
 import numpy as np
@@ -13,7 +15,7 @@ from pint import DimensionalityError, UndefinedUnitError
 from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
 
 
-def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
+def check_units_are_valid(units_dictionary: dict[str, str | None]) -> None:
     """Ensure that all units in units_dictionary are valid."""
     invalid_units = []
     for key, units in units_dictionary.items():
@@ -28,11 +30,20 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
         raise ValueError(msg)
 
 
-def read_default_units_from_file() -> None:
-    """Read in a units YAML file and add the units to the registered default units map."""
-    with as_file(files("cfspopcon").joinpath("variables.yaml")) as fp:
-        with open(fp) as f:
-            variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(f)
+def read_default_units_from_file(path: Path | Traversable | None = None) -> None:
+    """Read a variables YAML file and add its default units to the registered default units map.
+
+    Args:
+        path: a file in the shape of cfspopcon's own ``variables.yaml``, i.e. mapping each variable
+            name to a dictionary with a ``default_units`` entry. Defaults to that file. A package
+            shipping its own passes ``files("my_package").joinpath("variables.yaml")``, since the
+            file lives inside the package rather than at a path relative to the caller.
+    """
+    if path is None:
+        path = files("cfspopcon").joinpath("variables.yaml")
+
+    with path.open() as f:
+        variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(f)
     units_dictionary = {key: value["default_units"] for key, value in variables_dictionary.items()}
 
     check_units_are_valid(units_dictionary)
@@ -41,12 +52,13 @@ def read_default_units_from_file() -> None:
     _DEFAULT_UNITS |= units_dictionary
 
 
-# Module global state holding the registered default units mapping
-_DEFAULT_UNITS: dict[str, str] = {}
+# Module global state holding the registered default units mapping. A value of None marks a variable
+# which is not a unitful quantity, so it must be str | None rather than str.
+_DEFAULT_UNITS: dict[str, str | None] = {}
 read_default_units_from_file()
 
 
-def extend_default_units_map(units_dictionary: dict[str, str]) -> None:
+def extend_default_units_map(units_dictionary: dict[str, str | None]) -> None:
     """Extend the default units map with the given dictionary.
 
     Args:
@@ -55,6 +67,11 @@ def extend_default_units_map(units_dictionary: dict[str, str]) -> None:
     check_units_are_valid(units_dictionary)
     global _DEFAULT_UNITS  # noqa: PLW0603
     _DEFAULT_UNITS |= units_dictionary
+
+
+def default_units_map() -> dict[str, str | None]:
+    """Return a copy of the registered default units map."""
+    return dict(_DEFAULT_UNITS)
 
 
 def reset_default_units() -> None:
