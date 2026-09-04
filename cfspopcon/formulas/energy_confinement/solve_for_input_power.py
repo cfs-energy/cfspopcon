@@ -2,12 +2,12 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import ureg, wraps_ufunc
 from .read_energy_confinement_scalings import _get_confinement_scaling
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
+@algorithm(return_keys=["energy_confinement_time", "P_in"])
 @wraps_ufunc(
     return_units=dict(tau_e=ureg.s, P_tau=ureg.MW),
     input_units=dict(

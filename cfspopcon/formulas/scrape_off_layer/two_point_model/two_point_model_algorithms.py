@@ -2,14 +2,14 @@
 
 import xarray as xr
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....named_options import MomentumLossFunction
 from ....unit_handling import Unitfull
 from .model import solve_two_point_model
 from .target_first_model import solve_target_first_two_point_model
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "separatrix_electron_temp",
         "target_electron_density",
@@ -72,7 +72,7 @@ def two_point_model_fixed_fpow(
     return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, target_q_parallel)
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "separatrix_electron_temp",
         "target_electron_density",
@@ -136,7 +136,7 @@ def two_point_model_fixed_qpart(
     return (separatrix_electron_temp, target_electron_density, target_electron_temp, target_electron_flux, SOL_power_loss_fraction)
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "separatrix_electron_temp",
         "target_electron_density",

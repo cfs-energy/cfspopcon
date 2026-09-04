@@ -4,12 +4,12 @@ import numpy as np
 from numpy import float64
 from numpy.typing import NDArray
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import ureg, wraps_ufunc
 from ..geometry.volume_integral import integrate_profile_over_volume
 
 
-@Algorithm.register_algorithm(return_keys=["P_rad_synchrotron"])
+@algorithm(return_keys=["P_rad_synchrotron"])
 @wraps_ufunc(
     return_units=dict(P_rad_synchrotron=ureg.MW),
     input_units=dict(

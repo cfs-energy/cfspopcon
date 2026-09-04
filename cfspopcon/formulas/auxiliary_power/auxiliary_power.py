@@ -1,10 +1,10 @@
 """Routines to calculate the auxiliary (non-Ohmic, non-fusion) power."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg
 
 
-@Algorithm.register_algorithm(return_keys=["P_external", "P_auxiliary_absorbed", "P_auxiliary_launched"])
+@algorithm(return_keys=["P_external", "P_auxiliary_absorbed", "P_auxiliary_launched"])
 def calc_auxiliary_power(P_in: Unitfull, P_alpha: Unitfull, P_ohmic: Unitfull, fraction_of_external_power_coupled: Unitfull) -> Unitfull:
     """Calculate the required auxiliary power.
 
@@ -24,7 +24,7 @@ def calc_auxiliary_power(P_in: Unitfull, P_alpha: Unitfull, P_ohmic: Unitfull, f
     return P_external, P_auxiliary_absorbed, P_auxiliary_launched
 
 
-@Algorithm.register_algorithm(return_keys=["P_in", "P_auxiliary_absorbed", "P_external"])
+@algorithm(return_keys=["P_in", "P_auxiliary_absorbed", "P_external"])
 def calc_input_power_for_fixed_auxiliary_power(
     P_auxiliary_launched: Unitfull, P_alpha: Unitfull, P_ohmic: Unitfull, fraction_of_external_power_coupled: Unitfull
 ) -> Unitfull:

@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 
 from ... import named_options
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...helpers import get_item
 from ...unit_handling import Unitfull
 from .. import radiated_power
@@ -12,7 +12,7 @@ from ..atomic_data import AtomicData
 from .impurity_array_helpers import extend_impurity_concentration_array, make_impurity_concentration_array
 
 
-@Algorithm.register_algorithm(return_keys=["min_P_radiation"])
+@algorithm(return_keys=["min_P_radiation"])
 def calc_min_P_radiation_from_fraction(minimum_core_radiated_fraction: Unitfull, P_in: Unitfull) -> Unitfull:
     """Set the minimum radiated power as a fraction of the total input power.
 
@@ -26,7 +26,7 @@ def calc_min_P_radiation_from_fraction(minimum_core_radiated_fraction: Unitfull,
     return minimum_core_radiated_fraction * P_in
 
 
-@Algorithm.register_algorithm(return_keys=["min_P_radiation"])
+@algorithm(return_keys=["min_P_radiation"])
 def calc_min_P_radiation_from_LH_factor(maximum_P_LH_factor_for_P_SOL: Unitfull, P_LH_thresh: Unitfull, P_in: Unitfull) -> Unitfull:
     """Set the minimum radiated power such that P_sol doesn't go above some multiple of the LH threshold power.
 
@@ -41,7 +41,7 @@ def calc_min_P_radiation_from_LH_factor(maximum_P_LH_factor_for_P_SOL: Unitfull,
     return np.maximum(P_in - maximum_P_LH_factor_for_P_SOL * P_LH_thresh, 0.0)
 
 
-@Algorithm.register_algorithm(return_keys=["P_radiation", "P_radiation_from_core_seeded_impurity"])
+@algorithm(return_keys=["P_radiation", "P_radiation_from_core_seeded_impurity"])
 def calc_P_radiation_from_core_seeded_impurity(P_radiation: Unitfull, min_P_radiation: Unitfull) -> tuple[Unitfull, ...]:
     """Increases P_radiation until it is at least min_P_radiation.
 
@@ -67,7 +67,7 @@ def calc_P_radiation_from_core_seeded_impurity(P_radiation: Unitfull, min_P_radi
     return P_radiation, P_radiation_from_core_seeded_impurity
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "impurity_concentration",
     ]

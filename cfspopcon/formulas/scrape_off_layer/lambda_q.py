@@ -1,11 +1,11 @@
 """Routines to calculate the heat flux decay length (lambda_q), for several different scalings."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...named_options import LambdaQScaling
 from ...unit_handling import ureg, wraps_ufunc
 
 
-@Algorithm.register_algorithm(return_keys=["lambda_q"])
+@algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(
     return_units=dict(lambda_q=ureg.millimeter),
     input_units=dict(
@@ -72,7 +72,7 @@ def calc_lambda_q(
     return float(lambda_q)
 
 
-@Algorithm.register_algorithm(return_keys=["lambda_q"])
+@algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(
     return_units=dict(lambda_q=ureg.millimeter),
     input_units=dict(average_total_pressure=ureg.atm, lambda_q_factor=ureg.dimensionless),
@@ -85,7 +85,7 @@ def calc_lambda_q_with_brunner(average_total_pressure: float, lambda_q_factor: f
     return float(lambda_q_factor * 0.91 * average_total_pressure**-0.48)
 
 
-@Algorithm.register_algorithm(return_keys=["lambda_q"])
+@algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(
     return_units=dict(lambda_q=ureg.millimeter),
     input_units=dict(
@@ -105,7 +105,7 @@ def calc_lambda_q_with_eich_regression_9(
     return float(lambda_q_factor * 0.7 * magnetic_field_on_axis**-0.77 * q_star**1.05 * power_crossing_separatrix**0.09)
 
 
-@Algorithm.register_algorithm(return_keys=["lambda_q"])
+@algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(return_units=dict(lambda_q=ureg.millimeter), input_units=dict(B_pol_out_mid=ureg.tesla, lambda_q_factor=ureg.dimensionless))
 def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float, lambda_q_factor: float = 1.0) -> float:
     """Return lambda_q according to Eich regression 14.
@@ -115,7 +115,7 @@ def calc_lambda_q_with_eich_regression_14(B_pol_out_mid: float, lambda_q_factor:
     return float(lambda_q_factor * 0.63 * B_pol_out_mid**-1.19)
 
 
-@Algorithm.register_algorithm(return_keys=["lambda_q"])
+@algorithm(return_keys=["lambda_q"])
 @wraps_ufunc(
     return_units=dict(lambda_q=ureg.millimeter),
     input_units=dict(

@@ -9,6 +9,7 @@ from . import file_io, formulas, named_options, shaping_and_selection
 from .algorithm_class import (
     Algorithm,
     CompositeAlgorithm,
+    algorithm,
     algorithms_setting,
     algorithms_using,
     discover_builtin_algorithms,
@@ -31,6 +32,7 @@ __all__ = [
     "Algorithm",
     "AtomicData",
     "CompositeAlgorithm",
+    "algorithm",
     "algorithms_setting",
     "algorithms_using",
     "convert_to_default_units",

@@ -2,11 +2,11 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import Algorithm, algorithm
 from ...unit_handling import Unitfull
 
 
-@Algorithm.register_algorithm(return_keys=["plasma_volume"])
+@algorithm(return_keys=["plasma_volume"])
 def calc_plasma_volume(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull) -> Unitfull:
     """Calculate the plasma volume inside an up-down symmetrical last-closed-flux-surface.
 
@@ -31,7 +31,7 @@ def calc_plasma_volume(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, a
     )
 
 
-@Algorithm.register_algorithm(return_keys=["surface_area"])
+@algorithm(return_keys=["surface_area"])
 def calc_plasma_surface_area(major_radius: Unitfull, inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull) -> Unitfull:
     """Calculate the plasma surface area inside the last-closed-flux-surface.
 
@@ -48,7 +48,7 @@ def calc_plasma_surface_area(major_radius: Unitfull, inverse_aspect_ratio: Unitf
     )
 
 
-@Algorithm.register_algorithm(return_keys=["poloidal_circumference"])
+@algorithm(return_keys=["poloidal_circumference"])
 def calc_plasma_poloidal_circumference(minor_radius: Unitfull, areal_elongation: Unitfull) -> Unitfull:
     """Calculate the plasma poloidal circumference at the last-closed-flux-surface.
 

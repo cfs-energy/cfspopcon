@@ -4,7 +4,7 @@ import warnings
 from pathlib import Path
 from typing import Any
 
-from .algorithm_class import Algorithm, CompositeAlgorithm
+from .algorithm_class import Algorithm, CompositeAlgorithm, registry
 from .named_options import ProfileForm
 
 
@@ -33,9 +33,9 @@ def handle_deprecated_arguments(
         profile_type = density_profile_type
 
         if profile_type == ProfileForm.analytic:
-            new_alg = Algorithm.get_algorithm("calc_peaking_and_analytic_profiles")
+            new_alg = registry["calc_peaking_and_analytic_profiles"]
         elif profile_type == ProfileForm.prf:
-            new_alg = Algorithm.get_algorithm("calc_peaking_and_prf_profiles")
+            new_alg = registry["calc_peaking_and_prf_profiles"]
         else:
             raise NotImplementedError(f"Cannot handle a profile type of {profile_type}")
 

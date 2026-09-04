@@ -3,7 +3,7 @@
 import numpy as np
 import xarray as xr
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....named_options import RadiationMethod
 from ....unit_handling import Unitfull, ureg
 from ...atomic_data import AtomicData
@@ -13,7 +13,7 @@ from .post_and_jensen import calc_impurity_radiated_power_post_and_jensen
 from .radas import calc_impurity_radiated_power_radas
 
 
-@Algorithm.register_algorithm(return_keys=["P_rad_impurity"])
+@algorithm(return_keys=["P_rad_impurity"])
 def calc_impurity_radiated_power(
     radiated_power_method: RadiationMethod,
     rho: Unitfull,

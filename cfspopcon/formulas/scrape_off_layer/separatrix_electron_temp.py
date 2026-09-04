@@ -2,11 +2,11 @@
 
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Quantity
 
 
-@Algorithm.register_algorithm(return_keys=["separatrix_electron_temp"])
+@algorithm(return_keys=["separatrix_electron_temp"])
 def calc_separatrix_electron_temp(
     target_electron_temp: Quantity | xr.DataArray,
     q_parallel: Quantity | xr.DataArray,

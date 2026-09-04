@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....unit_handling import Unitfull, convert_units, ureg
 from .shared import (
     calc_curvature_drive,
@@ -14,7 +14,7 @@ from .shared import (
 )
 
 
-@Algorithm.register_algorithm(return_keys=["SepOS_MHD_limit"])
+@algorithm(return_keys=["SepOS_MHD_limit"])
 def calc_SepOS_ideal_MHD_limit(
     separatrix_electron_density: Unitfull,
     separatrix_electron_temp: Unitfull,

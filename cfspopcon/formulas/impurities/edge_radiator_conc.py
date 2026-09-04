@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import InterpolatedUnivariateSpline
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...helpers import get_item
 from ...named_options import AtomicSpecies
 from ...unit_handling import Unitfull, magnitude, magnitude_in_units, ureg, wraps_ufunc
@@ -14,7 +14,7 @@ from ..atomic_data import AtomicData
 from .impurity_array_helpers import extend_impurity_concentration_array
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "edge_impurity_concentration",
         "edge_impurity_concentration_in_core",

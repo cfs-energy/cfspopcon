@@ -1,10 +1,10 @@
 """Formulas to calculate the bootstrap fraction."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import Algorithm, algorithm
 from ...unit_handling import Unitfull
 
 
-@Algorithm.register_algorithm(return_keys=["bootstrap_fraction"])
+@algorithm(return_keys=["bootstrap_fraction"])
 def calc_bootstrap_fraction(
     ion_density_peaking: Unitfull,
     electron_density_peaking: Unitfull,

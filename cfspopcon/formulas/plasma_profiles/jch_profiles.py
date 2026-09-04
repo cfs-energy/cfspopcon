@@ -8,15 +8,13 @@ import xarray as xr
 from numpy.typing import NDArray
 from scipy.optimize import brentq
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import magnitude_in_units, ureg
 
 type FloatArray = NDArray[np.float64]
 
 
-@Algorithm.register_algorithm(
-    return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
-)
+@algorithm(return_keys=["rho", "electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"])
 def calc_jch_profiles(
     average_electron_density: float,
     average_electron_temp: float,
@@ -152,7 +150,7 @@ def calc_jch_profiles(
     return rho, electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "electron_density_pedestal_peaking",
         "ion_density_pedestal_peaking",

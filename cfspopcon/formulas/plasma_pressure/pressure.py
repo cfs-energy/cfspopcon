@@ -1,10 +1,10 @@
 """Routines to calculate the pressure."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, convert_units, ureg
 
 
-@Algorithm.register_algorithm(return_keys=["average_total_pressure"])
+@algorithm(return_keys=["average_total_pressure"])
 def calc_average_total_pressure(
     average_electron_density: Unitfull, average_electron_temp: Unitfull, average_ion_temp: Unitfull
 ) -> Unitfull:
@@ -12,7 +12,7 @@ def calc_average_total_pressure(
     return average_electron_density * (average_electron_temp + average_ion_temp)
 
 
-@Algorithm.register_algorithm(return_keys=["peak_pressure"])
+@algorithm(return_keys=["peak_pressure"])
 def calc_peak_pressure(
     peak_electron_temp: Unitfull,
     peak_ion_temp: Unitfull,

@@ -2,12 +2,12 @@
 
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull
 from .solve_for_input_power import solve_energy_confinement_scaling_for_input_power
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in", "SOC_LOC_ratio"])
+@algorithm(return_keys=["energy_confinement_time", "P_in", "SOC_LOC_ratio"])
 def switch_to_linearised_ohmic_confinement_below_threshold(
     plasma_stored_energy: Unitfull,
     energy_confinement_time: Unitfull,
@@ -72,7 +72,7 @@ def switch_to_linearised_ohmic_confinement_below_threshold(
     return (energy_confinement_time, P_in, SOC_LOC_ratio)
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time", "P_in"])
+@algorithm(return_keys=["energy_confinement_time", "P_in"])
 def switch_to_L_mode_confinement_below_threshold(
     plasma_stored_energy: Unitfull,
     energy_confinement_time: Unitfull,

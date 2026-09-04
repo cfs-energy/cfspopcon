@@ -1,16 +1,16 @@
 """Calculate simple metrics for the heat exhaust challenge."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull
 
 
-@Algorithm.register_algorithm(return_keys=["PB_over_R"])
+@algorithm(return_keys=["PB_over_R"])
 def calc_PB_over_R(power_crossing_separatrix: Unitfull, magnetic_field_on_axis: Unitfull, major_radius: Unitfull) -> Unitfull:
     """Calculate P_sep*B0/R0, which scales roughly the same as the parallel heat flux density entering the scrape-off-layer."""
     return power_crossing_separatrix * magnetic_field_on_axis / major_radius
 
 
-@Algorithm.register_algorithm(return_keys=["PBpRnSq"])
+@algorithm(return_keys=["PBpRnSq"])
 def calc_PBpRnSq(
     power_crossing_separatrix: Unitfull,
     magnetic_field_on_axis: Unitfull,

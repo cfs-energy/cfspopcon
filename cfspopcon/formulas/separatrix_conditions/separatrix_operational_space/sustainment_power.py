@@ -2,12 +2,12 @@
 
 import numpy as np
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....unit_handling import Quantity, Unitfull, ureg
 from .shared import calc_lambda_q_Eich2020H
 
 
-@Algorithm.register_algorithm(return_keys=["sustainment_power_in_ion_channel"])
+@algorithm(return_keys=["sustainment_power_in_ion_channel"])
 def calc_power_crossing_separatrix_in_ion_channel(
     surface_area: Unitfull,
     separatrix_electron_density: Unitfull,
@@ -48,7 +48,7 @@ def calc_power_crossing_separatrix_in_ion_channel(
     return P_SOL_i
 
 
-@Algorithm.register_algorithm(return_keys=["sustainment_power_in_electron_channel"])
+@algorithm(return_keys=["sustainment_power_in_electron_channel"])
 def calc_power_crossing_separatrix_in_electron_channel(
     separatrix_electron_temp: Unitfull,
     target_electron_temp: Unitfull,

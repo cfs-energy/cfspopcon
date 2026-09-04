@@ -3,7 +3,7 @@
 import xarray as xr
 
 from ... import named_options
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...helpers import get_item
 from ...unit_handling import Unitfull
 from .bremsstrahlung import calc_bremsstrahlung_radiation
@@ -11,7 +11,7 @@ from .impurity_radiated_power import calc_impurity_radiated_power
 from .synchrotron import calc_synchrotron_radiation
 
 
-@Algorithm.register_algorithm(return_keys=["P_radiation"])
+@algorithm(return_keys=["P_radiation"])
 def calc_intrinsic_radiated_power_from_core(
     rho: Unitfull,
     electron_density_profile: Unitfull,

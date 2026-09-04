@@ -2,12 +2,12 @@
 
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull
 from .impurity_charge_state import calc_impurity_charge_state
 
 
-@Algorithm.register_algorithm(
+@algorithm(
     return_keys=[
         "impurity_charge_state",
         "change_in_zeff",

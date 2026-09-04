@@ -6,7 +6,7 @@ TODO: Isaac please check this.
 import numpy as np
 import xarray as xr
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....named_options import SurfaceInductanceCoeffs, VertMagneticFieldEq
 from ....unit_handling import Unitfull, ureg
 from ....unit_handling import dimensionless_magnitude as dmag
@@ -52,7 +52,7 @@ def set_surface_inductance_coeffs(surface_inductance_coefficients: SurfaceInduct
         raise NotImplementedError(f"Unrecognised SurfaceInductanceCoeffs option {surface_inductance_coefficients.name}")
 
 
-@Algorithm.register_algorithm(return_keys=["internal_inductivity"])
+@algorithm(return_keys=["internal_inductivity"])
 def calc_internal_inductivity(
     cylindrical_safety_factor: Unitfull,
     safety_factor_on_axis: Unitfull = 1.0,
@@ -74,7 +74,7 @@ def calc_internal_inductivity(
     return np.log(1.65 + 0.89 * ((cylindrical_safety_factor / safety_factor_on_axis) - 1.0))
 
 
-@Algorithm.register_algorithm(return_keys=["internal_inductance"])
+@algorithm(return_keys=["internal_inductance"])
 def calc_internal_inductance_for_cylindrical(major_radius: Unitfull, internal_inductivity: Unitfull) -> Unitfull:
     """Calculate the internal inductance of the plasma (assuming a circular cross-section).
 
@@ -88,7 +88,7 @@ def calc_internal_inductance_for_cylindrical(major_radius: Unitfull, internal_in
     return ureg.mu_0 * major_radius * internal_inductivity / 2.0
 
 
-@Algorithm.register_algorithm(return_keys=["internal_inductance"])
+@algorithm(return_keys=["internal_inductance"])
 def calc_internal_inductance_for_noncylindrical(
     plasma_volume: Unitfull, poloidal_circumference: Unitfull, internal_inductivity: Unitfull
 ) -> Unitfull:
@@ -104,7 +104,7 @@ def calc_internal_inductance_for_noncylindrical(
     return ureg.mu_0 * internal_inductivity * plasma_volume / (poloidal_circumference**2)
 
 
-@Algorithm.register_algorithm(return_keys=["external_inductance"])
+@algorithm(return_keys=["external_inductance"])
 def calc_external_inductance(
     inverse_aspect_ratio: Unitfull,
     areal_elongation: Unitfull,
@@ -138,7 +138,7 @@ def calc_external_inductance(
     return ureg.mu_0 * major_radius * fa * (1 - inverse_aspect_ratio) / ((1 - inverse_aspect_ratio) + areal_elongation * fb)
 
 
-@Algorithm.register_algorithm(return_keys=["vertical_field_mutual_inductance"])
+@algorithm(return_keys=["vertical_field_mutual_inductance"])
 def calc_vertical_field_mutual_inductance(
     inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, surface_inductance_coefficients: SurfaceInductanceCoeffs
 ) -> Unitfull:
@@ -162,7 +162,7 @@ def calc_vertical_field_mutual_inductance(
     return (1 - inverse_aspect_ratio) ** 2 / ((1 - inverse_aspect_ratio) ** 2 * fc + fd * np.sqrt(areal_elongation))
 
 
-@Algorithm.register_algorithm(return_keys=["invmu_0_dLedR"])
+@algorithm(return_keys=["invmu_0_dLedR"])
 def calc_invmu_0_dLedR(
     inverse_aspect_ratio: Unitfull,
     areal_elongation: Unitfull,
@@ -214,7 +214,7 @@ def calc_invmu_0_dLedR(
     return invmu_0_dLedR
 
 
-@Algorithm.register_algorithm(return_keys=["vertical_magnetic_field"])
+@algorithm(return_keys=["vertical_magnetic_field"])
 def calc_vertical_magnetic_field(
     inverse_aspect_ratio: Unitfull,
     areal_elongation: Unitfull,

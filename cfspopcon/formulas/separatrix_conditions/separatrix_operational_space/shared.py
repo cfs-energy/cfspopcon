@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....unit_handling import Quantity, Unitfull, ureg, wraps_ufunc
 from ...metrics.larmor_radius import calc_larmor_radius
 
@@ -80,7 +80,7 @@ def calc_squared_scale_ratio(safety_factor: Unitfull, major_radius: Unitfull, pe
     return (safety_factor * major_radius / perpendicular_decay_length) ** 2
 
 
-@Algorithm.register_algorithm(return_keys=["critical_alpha_MHD"])
+@algorithm(return_keys=["critical_alpha_MHD"])
 def calc_critical_alpha_MHD(elongation_psi95: Unitfull, triangularity_psi95: Unitfull) -> Unitfull:
     """Calculate the critical value of alpha_MHD.
 
@@ -89,7 +89,7 @@ def calc_critical_alpha_MHD(elongation_psi95: Unitfull, triangularity_psi95: Uni
     return elongation_psi95**1.2 * (1 + 1.5 * triangularity_psi95)
 
 
-@Algorithm.register_algorithm(return_keys=["poloidal_sound_larmor_radius"])
+@algorithm(return_keys=["poloidal_sound_larmor_radius"])
 def calc_poloidal_sound_larmor_radius(
     minor_radius: Unitfull,
     elongation_psi95: Unitfull,

@@ -2,11 +2,11 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
-@Algorithm.register_algorithm(return_keys=["f_shaping"])
+@algorithm(return_keys=["f_shaping"])
 def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: Unitfull, triangularity_psi95: Unitfull) -> Unitfull:
     """Calculate the shaping function.
 
@@ -27,7 +27,7 @@ def calc_f_shaping_for_qstar(inverse_aspect_ratio: Unitfull, areal_elongation: U
     )
 
 
-@Algorithm.register_algorithm(return_keys=["plasma_current"])
+@algorithm(return_keys=["plasma_current"])
 @wraps_ufunc(
     input_units=dict(
         magnetic_field_on_axis=ureg.T,
@@ -61,7 +61,7 @@ def calc_plasma_current_from_qstar(
     return plasma_current
 
 
-@Algorithm.register_algorithm(return_keys=["q_star"])
+@algorithm(return_keys=["q_star"])
 @wraps_ufunc(
     input_units=dict(
         magnetic_field_on_axis=ureg.T,
@@ -95,7 +95,7 @@ def calc_q_star_from_plasma_current(
     return q_star
 
 
-@Algorithm.register_algorithm(return_keys=["cylindrical_safety_factor"])
+@algorithm(return_keys=["cylindrical_safety_factor"])
 def calc_cylindrical_edge_safety_factor(
     major_radius: Unitfull,
     minor_radius: Unitfull,
