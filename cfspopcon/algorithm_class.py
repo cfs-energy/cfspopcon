@@ -755,15 +755,16 @@ def _register_scanned(algorithms: list[Algorithm], declarations: list[CompositeD
             pending.remove(declaration)
 
 
-def register_plugin(plugin_name: str) -> None:
+def register_plugin(plugin_name: str) -> list[str]:
     """Register a plugin: its default units, its algorithms, and its composites.
 
     A ``variables.yaml`` in the package root is read into the default units map, every module
     beneath the package is imported (only directories containing an ``__init__.py`` are walked), and
     the Algorithms and composite declarations bound in those modules are then registered.
-    The scan at the end of this call is what registers; the imports only build the objects. A composite may
-    name anything registered by the end of its own plugin. The bundled algorithms are registered
-    before any other plugin. Repeated calls change nothing.
+    The scan at the end of this call is what registers; the imports only build the objects, so an
+    Algorithm a module imports from an unregistered package is registered as this plugin's. A
+    composite may name anything registered by the end of its own plugin. The bundled algorithms
+    are registered before any other plugin. Repeated calls change nothing.
 
     A plugin names the plugins whose registered algorithms it builds on with a module-level
     ``__popcon_requires__ = ("other_plugin",)``; each requirement is registered first, as its own
@@ -776,6 +777,9 @@ def register_plugin(plugin_name: str) -> None:
     Args:
         plugin_name: the plugin's import name, e.g. ``"my_popcon_plugin"``, which may differ from
             the distribution name.
+
+    Returns:
+        The names of the algorithms this call added to the registry.
 
     Raises:
         RuntimeError: if a declared composite names a component which is not registered by the end
@@ -818,6 +822,7 @@ def register_plugin(plugin_name: str) -> None:
         try:
             _load_plugin_variables(plugin_name)
             _register_scanned(algorithms, declarations)
+            return [name for name in Algorithm.instances if name not in algorithms_before]
         except BaseException:
             # The modules this call imported stay cached, and that is what makes a retry work:
             # after the broken module is fixed, the retry's scan finds the same objects and
@@ -862,14 +867,14 @@ def write_algorithms_yaml(filepath: Path) -> None:
         f.write(yaml.dump(dict(sorted(data.items()))))
 
 
-def discover_builtin_algorithms() -> None:
+def discover_builtin_algorithms() -> list[str]:
     """Register every algorithm cfspopcon defines, by walking :mod:`cfspopcon.formulas`.
 
     The first use of the registry does this on its own; an explicit call is useful for surfacing
     any registration failure at a chosen point, e.g. the start of a batch job. Repeated calls
     change nothing.
     """
-    register_plugin(_BUNDLED_PLUGIN)
+    return register_plugin(_BUNDLED_PLUGIN)
 
 
 def algorithms_setting(variable: str) -> list[str]:
