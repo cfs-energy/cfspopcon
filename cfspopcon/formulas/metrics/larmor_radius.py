@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg
 
 
@@ -14,7 +14,7 @@ def calc_larmor_radius(species_temperature: Unitfull, magnetic_field_strength: U
     return np.sqrt(species_temperature * species_mass) / (ureg.e * magnetic_field_strength)
 
 
-@Algorithm.register_algorithm(return_keys=["rho_star"])
+@algorithm(return_keys=["rho_star"])
 def calc_rho_star(
     average_ion_mass: Unitfull, average_ion_temp: Unitfull, magnetic_field_on_axis: Unitfull, minor_radius: Unitfull
 ) -> Unitfull:

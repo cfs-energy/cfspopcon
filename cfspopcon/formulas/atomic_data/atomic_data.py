@@ -8,7 +8,7 @@ from typing import TypeVar, cast
 import numpy as np
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...helpers import get_item
 from ...named_options import AtomicSpecies
 from ...unit_handling import Quantity, magnitude_in_units, ureg
@@ -290,7 +290,7 @@ class AtomicData:
         return self.noncoronal_Z_interpolators[(self.key_to_enum(species), ne_tau)]
 
 
-@Algorithm.register_algorithm(return_keys=["atomic_data", "radas_version"])
+@algorithm(return_keys=["atomic_data", "radas_version"])
 def read_atomic_data(radas_dir: Path) -> tuple[AtomicData, str]:
     """Construct an AtomicData interface and report the checked RADAS version summary."""
     atomic_data = AtomicData(get_item(radas_dir))

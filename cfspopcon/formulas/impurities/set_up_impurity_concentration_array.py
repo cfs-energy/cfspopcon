@@ -1,10 +1,10 @@
 """Calculate the mean charge state of an impurity for given plasma conditions."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull
 
 
-@Algorithm.register_algorithm(return_keys=["impurity_concentration"])
+@algorithm(return_keys=["impurity_concentration"])
 def set_up_impurity_concentration_array(intrinsic_impurity_concentration: Unitfull) -> Unitfull:
     """Set up the impurity concentration array, starting with the intrinsic impurities.
 

@@ -2,12 +2,12 @@
 
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull
 from .fusion_data import REACTIONS, DDFusionBoschHale, DDFusionHively, DHe3Fusion, DTFusionBoschHale, DTFusionHively, pB11Fusion
 
 
-@Algorithm.register_algorithm(return_keys=["average_ion_mass"])
+@algorithm(return_keys=["average_ion_mass"])
 def calc_average_ion_mass(fusion_reaction: str, heavier_fuel_species_fraction: Unitfull) -> Unitfull:
     """Calculate the average mass of the fuel ions, based on reaction type and fuel mixture ratio.
 

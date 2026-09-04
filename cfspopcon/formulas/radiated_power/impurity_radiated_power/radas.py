@@ -1,13 +1,13 @@
 """Calculate the impurity radiated power using the radas atomic_data."""
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....helpers import get_item
 from ....unit_handling import Unitfull, ureg
 from ...atomic_data import AtomicData
 from ...geometry.volume_integral import integrate_profile_over_volume
 
 
-@Algorithm.register_algorithm(return_keys=["P_rad_impurity"])
+@algorithm(return_keys=["P_rad_impurity"])
 def calc_impurity_radiated_power_radas(
     rho: Unitfull,
     electron_temp_profile: Unitfull,

@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, convert_units, ureg, wraps_ufunc
 
 
@@ -15,7 +15,7 @@ def calc_coulomb_logarithm(electron_density: float, electron_temp: float) -> flo
     return float(30.9 - np.log(electron_density**0.5 * electron_temp**-1.0))
 
 
-@Algorithm.register_algorithm(return_keys=["nu_star"])
+@algorithm(return_keys=["nu_star"])
 def calc_normalised_collisionality(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,
@@ -56,7 +56,7 @@ def calc_normalised_collisionality(
     )
 
 
-@Algorithm.register_algorithm(return_keys=["alpha_t"])
+@algorithm(return_keys=["alpha_t"])
 def calc_alpha_t(
     separatrix_electron_density: Unitfull,
     separatrix_electron_temp: Unitfull,
@@ -108,7 +108,7 @@ def calc_alpha_t(
     return convert_units(alpha_t, ureg.dimensionless)
 
 
-@Algorithm.register_algorithm(return_keys=["edge_collisionality"])
+@algorithm(return_keys=["edge_collisionality"])
 def calc_edge_collisionality(
     separatrix_electron_density: Unitfull,
     separatrix_electron_temp: Unitfull,

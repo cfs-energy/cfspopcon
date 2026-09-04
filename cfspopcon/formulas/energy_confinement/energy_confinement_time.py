@@ -2,12 +2,12 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm, CompositeAlgorithm
+from ...algorithm_class import CompositeAlgorithm, algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 from .read_energy_confinement_scalings import _get_confinement_scaling
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time"])
+@algorithm(return_keys=["energy_confinement_time"])
 @wraps_ufunc(
     return_units=dict(tau_e=ureg.s),
     input_units=dict(
@@ -88,7 +88,7 @@ def calc_energy_confinement_time_from_scaling(
     return tau_e
 
 
-@Algorithm.register_algorithm(return_keys=["energy_confinement_time"])
+@algorithm(return_keys=["energy_confinement_time"])
 def calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy: Unitfull, P_in: Unitfull) -> Unitfull:
     """Calculate the energy confinement time according to the definition, given a known input power and stored energy.
 
@@ -103,7 +103,7 @@ def calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_store
     return energy_confinement_time
 
 
-@Algorithm.register_algorithm(return_keys=["H98y2"])
+@algorithm(return_keys=["H98y2"])
 def calc_H98y2(
     energy_confinement_time: Unitfull,
     plasma_current: Unitfull,

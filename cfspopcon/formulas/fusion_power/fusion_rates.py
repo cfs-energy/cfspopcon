@@ -4,7 +4,7 @@ import xarray as xr
 from numpy import float64
 from numpy.typing import NDArray
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg
 from ..geometry.volume_integral import integrate_profile_over_volume
 from .fusion_data import (
@@ -14,7 +14,7 @@ from .fusion_data import (
 )
 
 
-@Algorithm.register_algorithm(return_keys=["P_fusion", "P_neutron", "P_alpha"])
+@algorithm(return_keys=["P_fusion", "P_neutron", "P_alpha"])
 def calc_fusion_power(
     fusion_reaction: str,
     ion_temp_profile: NDArray[float64],
@@ -78,7 +78,7 @@ def calc_fusion_power(
     return total_fusion_power, fusion_power_to_neutral, fusion_power_to_charged
 
 
-@Algorithm.register_algorithm(return_keys=["neutron_power_flux_to_walls", "neutron_rate"])
+@algorithm(return_keys=["neutron_power_flux_to_walls", "neutron_rate"])
 def calc_neutron_flux_to_walls(
     P_neutron: float,
     surface_area: float,

@@ -7,7 +7,7 @@ from typing import Any, ClassVar
 
 import yaml
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 
 
 class ConfinementScaling:
@@ -40,7 +40,7 @@ class ConfinementScaling:
         self.qstar_alpha = data["params"]["qstar_alpha"]
 
 
-@Algorithm.register_algorithm(return_keys=[])
+@algorithm(return_keys=[])
 def read_confinement_scalings() -> None:
     """Reads the energy confinement scalings from an energy_confinement_scalings.yaml file."""
     with as_file(files("cfspopcon.formulas.energy_confinement").joinpath("energy_confinement_scalings.yaml")) as filepath:

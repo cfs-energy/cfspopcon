@@ -1,10 +1,10 @@
 """Routines to calculate the resistivity and resistive (Ohmic) heating."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
-@Algorithm.register_algorithm(return_keys=["P_ohmic"])
+@algorithm(return_keys=["P_ohmic"])
 def calc_ohmic_power(inductive_plasma_current: Unitfull, loop_voltage: Unitfull) -> Unitfull:
     """Calculate the Ohmic heating power.
 
@@ -18,7 +18,7 @@ def calc_ohmic_power(inductive_plasma_current: Unitfull, loop_voltage: Unitfull)
     return inductive_plasma_current * loop_voltage
 
 
-@Algorithm.register_algorithm(return_keys=["spitzer_resistivity"])
+@algorithm(return_keys=["spitzer_resistivity"])
 @wraps_ufunc(input_units=dict(average_electron_temp=ureg.keV), return_units=dict(spitzer_resistivity=ureg.ohm * ureg.m))
 def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
     """Calculate the parallel Spitzer loop resistivity assuming the Coulomb logarithm = 17 and Z=1.
@@ -34,7 +34,7 @@ def calc_Spitzer_loop_resistivity(average_electron_temp: float) -> float:
     return float((2.8e-8) * (average_electron_temp ** (-1.5)))
 
 
-@Algorithm.register_algorithm(return_keys=["trapped_particle_fraction"])
+@algorithm(return_keys=["trapped_particle_fraction"])
 def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, resistivity_trapped_enhancement_method: int = 3) -> Unitfull:
     """Calculate the enhancement of the plasma resistivity due to trapped particles.
 
@@ -64,7 +64,7 @@ def calc_resistivity_trapped_enhancement(inverse_aspect_ratio: Unitfull, resisti
     return trapped_particle_fraction
 
 
-@Algorithm.register_algorithm(return_keys=["neoclassical_loop_resistivity"])
+@algorithm(return_keys=["neoclassical_loop_resistivity"])
 def calc_neoclassical_loop_resistivity(
     spitzer_resistivity: Unitfull, z_effective: Unitfull, trapped_particle_fraction: Unitfull
 ) -> Unitfull:
@@ -83,7 +83,7 @@ def calc_neoclassical_loop_resistivity(
     return spitzer_resistivity * z_effective * 0.9 * trapped_particle_fraction
 
 
-@Algorithm.register_algorithm(return_keys=["current_relaxation_time"])
+@algorithm(return_keys=["current_relaxation_time"])
 @wraps_ufunc(
     input_units=dict(
         major_radius=ureg.m,
@@ -116,7 +116,7 @@ def calc_current_relaxation_time(
     )  # [s]
 
 
-@Algorithm.register_algorithm(return_keys=["loop_voltage"])
+@algorithm(return_keys=["loop_voltage"])
 def calc_loop_voltage(
     major_radius: Unitfull,
     minor_radius: Unitfull,

@@ -3,11 +3,11 @@
 import numpy as np
 from scipy import constants
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
-@Algorithm.register_algorithm(return_keys=["B_pol_out_mid"])
+@algorithm(return_keys=["B_pol_out_mid"])
 @wraps_ufunc(
     return_units=dict(B_pol_omp=ureg.T),
     input_units=dict(plasma_current=ureg.A, minor_radius=ureg.m),
@@ -25,7 +25,7 @@ def calc_B_pol_omp(plasma_current: float, minor_radius: float) -> float:
     return float(constants.mu_0 * plasma_current / (2.0 * np.pi * minor_radius))
 
 
-@Algorithm.register_algorithm(return_keys=["B_t_out_mid"])
+@algorithm(return_keys=["B_t_out_mid"])
 def calc_B_tor_omp(magnetic_field_on_axis: Unitfull, major_radius: Unitfull, minor_radius: Unitfull) -> Unitfull:
     """Calculate the toroidal magnetic field at the outboard midplane.
 
@@ -40,7 +40,7 @@ def calc_B_tor_omp(magnetic_field_on_axis: Unitfull, major_radius: Unitfull, min
     return magnetic_field_on_axis * (major_radius / (major_radius + minor_radius))
 
 
-@Algorithm.register_algorithm(return_keys=["fieldline_pitch_at_omp"])
+@algorithm(return_keys=["fieldline_pitch_at_omp"])
 def calc_fieldline_pitch_at_omp(B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull) -> Unitfull:
     """Calculate the pitch of the magnetic field at the outboard midplane.
 
@@ -54,7 +54,7 @@ def calc_fieldline_pitch_at_omp(B_t_out_mid: Unitfull, B_pol_out_mid: Unitfull) 
     return np.sqrt(B_t_out_mid**2 + B_pol_out_mid**2) / B_pol_out_mid
 
 
-@Algorithm.register_algorithm(return_keys=["q_parallel"])
+@algorithm(return_keys=["q_parallel"])
 def calc_parallel_heat_flux_density(
     power_crossing_separatrix: Unitfull,
     fraction_of_P_SOL_to_divertor: Unitfull,
@@ -92,7 +92,7 @@ def calc_parallel_heat_flux_density(
     )
 
 
-@Algorithm.register_algorithm(return_keys=["q_perp"])
+@algorithm(return_keys=["q_perp"])
 def calc_q_perp(power_crossing_separatrix: Unitfull, major_radius: Unitfull, minor_radius: Unitfull, lambda_q: Unitfull) -> Unitfull:
     """Calculate the perpendicular heat flux at the outboard midplane.
 

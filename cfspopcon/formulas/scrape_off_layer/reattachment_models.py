@@ -2,12 +2,12 @@
 
 import numpy as np
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, convert_units, magnitude_in_units, ureg
 from .two_point_model.momentum_loss_functions import calc_SOL_momentum_loss_fraction
 
 
-@Algorithm.register_algorithm(return_keys=["target_neutral_pressure", "pumping_duct_neutral_pressure"])
+@algorithm(return_keys=["target_neutral_pressure", "pumping_duct_neutral_pressure"])
 def calc_neutral_pressure_kallenbach(
     average_ion_mass: Unitfull,
     kappa_e0: Unitfull,
@@ -70,7 +70,7 @@ def calc_neutral_pressure_kallenbach(
     return p_div, p_duct
 
 
-@Algorithm.register_algorithm(return_keys=["reattachment_time"])
+@algorithm(return_keys=["reattachment_time"])
 def calc_reattachment_time_henderson(
     target_neutral_pressure: Unitfull,
     target_electron_density: Unitfull,
@@ -105,7 +105,7 @@ def calc_reattachment_time_henderson(
     return reattachment_time
 
 
-@Algorithm.register_algorithm(return_keys=["ionization_volume"])
+@algorithm(return_keys=["ionization_volume"])
 def calc_ionization_volume_from_AUG(
     plasma_volume: Unitfull,
 ) -> Unitfull:
@@ -132,7 +132,7 @@ def mean_thermal_velocity(
     return np.sqrt(8.0 / np.pi * particle_temp / particle_mass)
 
 
-@Algorithm.register_algorithm(return_keys=["neutral_flux_density_factor"])
+@algorithm(return_keys=["neutral_flux_density_factor"])
 def calc_neutral_flux_density_factor(
     average_ion_mass: Unitfull,
     ratio_of_molecular_to_ion_mass: Unitfull = 2.0,

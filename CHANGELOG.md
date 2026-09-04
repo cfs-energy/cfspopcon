@@ -20,7 +20,7 @@ breaking.
 - **`__popcon_requires__`**: a plugin names the plugins whose algorithms its composites build on, as a module-level tuple; each requirement is registered first, and a circular requirement raises.
 - **`cfspopcon.registry`**: `registry["name"]` returns the registered `Algorithm`, `registry.register(...)` adds an algorithm, a composite, or a labelled function, and `"name" in registry` or iteration lists the registered names.
 - **`CompositeAlgorithm.declare(keys, name)`**: declare a composite by the names of its components before those exist; it is built and registered with its plugin, and a missing component is a `RuntimeError` naming it. `override=True` replaces a registered algorithm of the composite's name.
-- **`override` flag** on `@Algorithm.register_algorithm`, `Algorithm(...)`, `Algorithm.from_single_function` and `registry.register`: deliberately replace a registered algorithm of the same name.
+- **`override` flag** on `@algorithm`, `Algorithm(...)`, `Algorithm.from_single_function` and `registry.register`: deliberately replace a registered algorithm of the same name.
 - **`algorithms_setting(variable)` and `algorithms_using(variable)`**: which registered algorithms set, or take as an input, a given variable.
 - **`.name` property** on `Algorithm` and `CompositeAlgorithm`, replacing the private `._name`.
 - **`extend_default_units_map` exported from `cfspopcon.unit_handling`**: declare default units for new variables from code; `read_default_units_from_file` accepts a path, so a plugin can also ship its own `variables.yaml`.
@@ -35,6 +35,7 @@ breaking.
 
 - **Importing cfspopcon registers nothing** (**breaking**): the registry fills on its first use, or at a chosen point with `discover_builtin_algorithms()`. Formula modules import without side effects, so cfspopcon works as a plain library of functions, and a new `formulas` module is picked up with no edit to any `__init__.py` (a new subfolder still needs one, even empty).
 - **Construction and decoration register nothing** (**breaking**): an `Algorithm`, a decorated function, or a `CompositeAlgorithm` enters the registry only through `register_plugin` or `registry.register`.
+- **The label decorator is `@algorithm(return_keys=...)`** (**breaking**): a module-level decorator, exported from `cfspopcon`, replacing `@Algorithm.register_algorithm`. Update decorated functions in place.
 - **The bundled composites are declarations** (**breaking**): `calc_peaking_and_analytic_profiles`, `calc_peaking_and_prf_profiles` and `calc_power_balance_from_input_P_aux` are declarations at module level; the runnable composite is reached through the registry, e.g. `registry["calc_power_balance_from_input_P_aux"]`.
 - **Registration fails loudly and rolls back**: a module which does not import, or a composite naming an unregistered algorithm, raises; a failed `register_plugin` restores the registries, so the plugin can be fixed and registered again in the same session. Units defined with `ureg.define` are the one thing which cannot be rolled back.
 - **A composite resolves at the end of its plugin's registration**: it may name any algorithm registered by then; register a plugin after the plugins it builds on, or declare them with `__popcon_requires__`.

@@ -282,44 +282,6 @@ class Algorithm:
         )
 
     @classmethod
-    def register_algorithm(
-        cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
-    ) -> GenericFunctionType:
-        """Label a function as an Algorithm, for :func:`register_plugin` to find.
-
-        The algorithm enters the registry when the plugin defining the function is registered.
-
-        Example::
-
-            @Algorithm.register_algorithm(return_keys=["plasma_volume"])
-            def calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation):
-                ...
-
-        Args:
-            return_keys: the variable names of the function's outputs, in the order they are
-                returned.
-            name: the algorithm's name. Defaults to the function's name.
-            skip_unit_conversion: return the outputs as the function produces them, without
-                normalizing each one to its variable's default units.
-            override: at registration, replace an already-registered algorithm of the same name.
-
-        Returns:
-            The decorator, which labels the function and returns it unchanged.
-        """
-
-        def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
-            func.__popcon_algorithm__ = Algorithm.from_single_function(  # type:ignore[attr-defined]
-                func,
-                return_keys=return_keys,
-                name=name if name is not None else func.__name__,
-                skip_unit_conversion=skip_unit_conversion,
-                override=override,
-            )
-            return func
-
-        return function_wrapper
-
-    @classmethod
     def empty(cls) -> Algorithm:
         """Build an algorithm with no inputs and no outputs, for where an Algorithm is required but nothing should be computed.
 
@@ -348,6 +310,44 @@ class Algorithm:
             RuntimeError: if inputs are missing and ``raise_error_on_missing_inputs`` is set.
         """
         return _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
+
+
+def algorithm(
+    return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
+) -> GenericFunctionType:
+    """Label a function as an Algorithm, for :func:`register_plugin` to find.
+
+    The algorithm enters the registry when the plugin defining the function is registered.
+
+    Example::
+
+        @algorithm(return_keys=["plasma_volume"])
+        def calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation):
+            ...
+
+    Args:
+        return_keys: the variable names of the function's outputs, in the order they are
+            returned.
+        name: the algorithm's name. Defaults to the function's name.
+        skip_unit_conversion: return the outputs as the function produces them, without
+            normalizing each one to its variable's default units.
+        override: at registration, replace an already-registered algorithm of the same name.
+
+    Returns:
+        The decorator, which labels the function and returns it unchanged.
+    """
+
+    def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
+        func.__popcon_algorithm__ = Algorithm.from_single_function(  # type:ignore[attr-defined]
+            func,
+            return_keys=return_keys,
+            name=name if name is not None else func.__name__,
+            skip_unit_conversion=skip_unit_conversion,
+            override=override,
+        )
+        return func
+
+    return function_wrapper
 
 
 class CompositeAlgorithm:
@@ -916,7 +916,7 @@ class _AlgorithmRegistry:
         return Algorithm.instances[key]
 
     def register(self, algorithm: Algorithm | CompositeAlgorithm | GenericFunctionType, override: bool = False) -> None:
-        """Register an algorithm, a composite, or a function labelled by ``register_algorithm``, under its name.
+        """Register an algorithm, a composite, or a function labelled by :func:`algorithm`, under its name.
 
         Args:
             algorithm: the Algorithm or CompositeAlgorithm to register, or a labelled function.
@@ -939,4 +939,4 @@ class _AlgorithmRegistry:
 
 
 registry = _AlgorithmRegistry()
-"""Registry accessor: ``registry["name"]`` looks an algorithm up, ``registry.register`` adds one, and iteration lists the names."""
+"""Registry accessor, where ``registry["name"]`` looks an algorithm up, ``registry.register`` adds one, and iteration lists the names."""

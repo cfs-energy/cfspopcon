@@ -11,10 +11,10 @@ from cfspopcon.unit_handling import Quantity, default_units
 PLUGIN_INIT = ""
 
 PLUGIN_ALGORITHMS = (
-    "from cfspopcon.algorithm_class import Algorithm\n"
+    "from cfspopcon.algorithm_class import algorithm\n"
     "from cfspopcon.unit_handling import Unitfull\n"
     "\n\n"
-    "@Algorithm.register_algorithm(return_keys=['_probe_metric'])\n"
+    "@algorithm(return_keys=['_probe_metric'])\n"
     "def calc_probe_metric(plasma_volume: Unitfull) -> Unitfull:\n"
     '    """Twice the plasma volume."""\n'
     "    return 2.0 * plasma_volume\n"

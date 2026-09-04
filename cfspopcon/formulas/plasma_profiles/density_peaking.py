@@ -3,7 +3,7 @@
 import numpy as np
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg, wraps_ufunc
 
 
@@ -28,7 +28,7 @@ def calc_density_peaking(effective_collisionality: Unitfull, beta_toroidal: Unit
         return max(nu_n, 1.0 * ureg.dimensionless)
 
 
-@Algorithm.register_algorithm(return_keys=["ion_density_peaking", "peak_fuel_ion_density"])
+@algorithm(return_keys=["ion_density_peaking", "peak_fuel_ion_density"])
 def calc_ion_density_peaking(
     effective_collisionality: Unitfull,
     beta_toroidal: Unitfull,
@@ -54,7 +54,7 @@ def calc_ion_density_peaking(
     return ion_density_peaking, peak_fuel_ion_density
 
 
-@Algorithm.register_algorithm(return_keys=["electron_density_peaking", "peak_electron_density"])
+@algorithm(return_keys=["electron_density_peaking", "peak_electron_density"])
 def calc_electron_density_peaking(
     effective_collisionality: Unitfull,
     beta_toroidal: Unitfull,
@@ -78,7 +78,7 @@ def calc_electron_density_peaking(
     return electron_density_peaking, peak_electron_density
 
 
-@Algorithm.register_algorithm(return_keys=["effective_collisionality"])
+@algorithm(return_keys=["effective_collisionality"])
 @wraps_ufunc(
     return_units=dict(effective_collisionality=ureg.dimensionless),
     input_units=dict(

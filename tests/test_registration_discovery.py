@@ -124,8 +124,8 @@ def test_drop_in_module_is_discovered_without_editing_init():
     stem = f"_probe_drop_in_{os.getpid()}"
     probe = Path(formulas.__file__).parent / f"{stem}.py"
     probe.write_text(
-        "from cfspopcon.algorithm_class import Algorithm\n\n\n"
-        f"@Algorithm.register_algorithm(return_keys=['{stem}_out'], skip_unit_conversion=True)\n"
+        "from cfspopcon.algorithm_class import algorithm\n\n\n"
+        f"@algorithm(return_keys=['{stem}_out'], skip_unit_conversion=True)\n"
         f"def calc_{stem}(_probe_in):\n"
         '    """Throwaway probe algorithm."""\n'
         "    return _probe_in\n"
@@ -149,8 +149,8 @@ def test_registering_a_plugin_walks_nested_submodules(tmp_path, monkeypatch, cle
         "_walk_probe_pkg",
         {
             # Nested, and never imported by hand: only the walk can reach it.
-            "models/detachment": "from cfspopcon.algorithm_class import Algorithm\n\n\n"
-            "@Algorithm.register_algorithm(return_keys=['_walk_out'], skip_unit_conversion=True)\n"
+            "models/detachment": "from cfspopcon.algorithm_class import algorithm\n\n\n"
+            "@algorithm(return_keys=['_walk_out'], skip_unit_conversion=True)\n"
             "def calc_walk_probe(_walk_in):\n"
             '    """Throwaway algorithm in a nested submodule."""\n'
             "    return _walk_in\n"
@@ -384,13 +384,13 @@ _ds_deep = CompositeAlgorithm.declare(["_ds_of_builtin_composite", "_ds_mixed"],
 #: A new variable of the package's own, so this also exercises declaring default units in code,
 #: with ``extend_default_units_map``.
 DOWNSTREAM_ALGORITHMS = """\
-from cfspopcon.algorithm_class import Algorithm
+from cfspopcon.algorithm_class import algorithm
 from cfspopcon.unit_handling import extend_default_units_map
 
 extend_default_units_map({"_ds_metric": "m**3"})
 
 
-@Algorithm.register_algorithm(return_keys=["_ds_metric"])
+@algorithm(return_keys=["_ds_metric"])
 def calc_ds_metric(plasma_volume):
     \"\"\"Throwaway algorithm consuming a builtin algorithm's output.\"\"\"
     return 2.0 * plasma_volume
@@ -454,18 +454,18 @@ def test_the_machinery_works_without_the_builtin_algorithms(run_script):
     """
     script = """
 import xarray as xr
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithm
 from cfspopcon.unit_handling import Quantity, extend_default_units_map, ureg
 
 extend_default_units_map({"_solo_area": "m**2"})
 
 
-@Algorithm.register_algorithm(return_keys=["_solo_area"])
+@algorithm(return_keys=["_solo_area"])
 def calc_solo_area(_solo_width, _solo_height):
     return _solo_width * _solo_height
 
 
-@Algorithm.register_algorithm(return_keys=["_solo_label"], skip_unit_conversion=True)
+@algorithm(return_keys=["_solo_label"], skip_unit_conversion=True)
 def calc_solo_label(_solo_area):
     return "big" if _solo_area > Quantity(1.0, ureg.m**2) else "small"
 

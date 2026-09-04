@@ -3,13 +3,13 @@
 import numpy as np
 import xarray as xr
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...helpers import get_item
 from ...unit_handling import Unitfull
 from ..atomic_data import AtomicData
 
 
-@Algorithm.register_algorithm(return_keys=["impurity_charge_state"])
+@algorithm(return_keys=["impurity_charge_state"])
 def calc_impurity_charge_state(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,

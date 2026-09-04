@@ -1,10 +1,10 @@
 """Calculate the fusion gain factor."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, ureg
 
 
-@Algorithm.register_algorithm(return_keys=["Q"])
+@algorithm(return_keys=["Q"])
 def calc_fusion_gain(P_fusion: Unitfull, P_ohmic: Unitfull, P_auxiliary_launched: Unitfull) -> Unitfull:
     """Calculate the fusion gain, using the launched power in the denominator.
 
@@ -27,7 +27,7 @@ def calc_fusion_gain(P_fusion: Unitfull, P_ohmic: Unitfull, P_auxiliary_launched
     return Q
 
 
-@Algorithm.register_algorithm(return_keys=["fusion_triple_product"])
+@algorithm(return_keys=["fusion_triple_product"])
 def calc_triple_product(peak_fuel_ion_density: Unitfull, peak_ion_temp: Unitfull, energy_confinement_time: Unitfull) -> Unitfull:
     """Calculate the fusion triple product.
 

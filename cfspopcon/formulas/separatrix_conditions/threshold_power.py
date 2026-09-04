@@ -1,11 +1,11 @@
 """Calculate the threshold values for the power crossing the separatrix."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import Algorithm, algorithm
 from ...named_options import ConfinementPowerScaling
 from ...unit_handling import ureg, wraps_ufunc
 
 
-@Algorithm.register_algorithm(return_keys=["P_LH_thresh"])
+@algorithm(return_keys=["P_LH_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LH_thresh=ureg.MW),
     input_units=dict(
@@ -84,7 +84,7 @@ calc_ratio_P_LH = Algorithm.from_single_function(
 )
 
 
-@Algorithm.register_algorithm(return_keys=["P_LI_thresh"])
+@algorithm(return_keys=["P_LI_thresh"])
 @wraps_ufunc(
     return_units=dict(P_LI_thresh=ureg.MW),
     input_units=dict(

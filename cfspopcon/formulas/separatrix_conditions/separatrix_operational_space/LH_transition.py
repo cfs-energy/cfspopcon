@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....unit_handling import Unitfull
 from .shared import (
     calc_curvature_drive,
@@ -13,7 +13,7 @@ from .shared import (
 )
 
 
-@Algorithm.register_algorithm(return_keys=["SepOS_LH_transition"])
+@algorithm(return_keys=["SepOS_LH_transition"])
 def calc_SepOS_LH_transition(
     separatrix_electron_density: Unitfull,
     separatrix_electron_temp: Unitfull,

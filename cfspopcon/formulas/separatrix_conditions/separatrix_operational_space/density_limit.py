@@ -1,6 +1,6 @@
 """Calculate a function which is used to determine the L-mode density limit."""
 
-from ....algorithm_class import Algorithm
+from ....algorithm_class import algorithm
 from ....unit_handling import Unitfull
 from .shared import (
     calc_curvature_drive,
@@ -12,7 +12,7 @@ from .shared import (
 )
 
 
-@Algorithm.register_algorithm(return_keys=["SepOS_density_limit"])
+@algorithm(return_keys=["SepOS_density_limit"])
 def calc_SepOS_L_mode_density_limit(
     separatrix_electron_density: Unitfull,
     separatrix_electron_temp: Unitfull,

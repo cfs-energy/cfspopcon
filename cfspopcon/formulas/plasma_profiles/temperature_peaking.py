@@ -1,10 +1,10 @@
 """Estimate the temperature peaking."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull
 
 
-@Algorithm.register_algorithm(return_keys=["peak_electron_temp", "peak_ion_temp"])
+@algorithm(return_keys=["peak_electron_temp", "peak_ion_temp"])
 def calc_temperature_peaking(
     average_electron_temp: Unitfull,
     average_ion_temp: Unitfull,

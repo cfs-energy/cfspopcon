@@ -1,10 +1,10 @@
 """Calculate the plasma stored energy."""
 
-from ...algorithm_class import Algorithm
+from ...algorithm_class import algorithm
 from ...unit_handling import Unitfull, convert_units, ureg
 
 
-@Algorithm.register_algorithm(return_keys=["plasma_stored_energy"])
+@algorithm(return_keys=["plasma_stored_energy"])
 def calc_plasma_stored_energy(
     average_electron_density: Unitfull,
     average_electron_temp: Unitfull,

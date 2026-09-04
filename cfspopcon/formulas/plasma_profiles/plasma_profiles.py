@@ -3,7 +3,7 @@
 import numpy as np
 import xarray as xr
 
-from ...algorithm_class import Algorithm, CompositeAlgorithm
+from ...algorithm_class import Algorithm, CompositeAlgorithm, algorithm
 from .numerical_profile_fits import evaluate_density_and_temperature_profile_fits
 
 
@@ -39,7 +39,7 @@ def build_rho_grid(npoints: int = 50) -> np.ndarray:
     return np.linspace(0.0, 1.0 - edge_nudge, num=npoints)
 
 
-@Algorithm.register_algorithm(return_keys=["rho"])
+@algorithm(return_keys=["rho"])
 def define_radial_grid(n_points_for_confined_region_profiles: int = 50) -> np.ndarray:
     """Define the radial grid for profiles.
 
@@ -51,9 +51,7 @@ def define_radial_grid(n_points_for_confined_region_profiles: int = 50) -> np.nd
     return xr.DataArray(x, coords=dict(dim_rho=x))
 
 
-@Algorithm.register_algorithm(
-    return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
-)
+@algorithm(return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"])
 def calc_analytic_profiles(
     rho: np.ndarray,
     average_electron_density: float,
@@ -89,9 +87,7 @@ def calc_analytic_profiles(
     return electron_density_profile, fuel_ion_density_profile, electron_temp_profile, ion_temp_profile
 
 
-@Algorithm.register_algorithm(
-    return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"]
-)
+@algorithm(return_keys=["electron_density_profile", "fuel_ion_density_profile", "electron_temp_profile", "ion_temp_profile"])
 def calc_prf_profiles(
     rho: np.ndarray,
     average_electron_density: float,
@@ -179,7 +175,7 @@ calc_peaking_and_prf_profiles = CompositeAlgorithm.declare(
 )
 
 
-@Algorithm.register_algorithm(return_keys=[])
+@algorithm(return_keys=[])
 def calc_peaked_profiles():
     """Deprecated entry point for setting up profiles."""  # TODO: remove in a later release
     raise NotImplementedError("calc_peaked_profiles is deprecated.")

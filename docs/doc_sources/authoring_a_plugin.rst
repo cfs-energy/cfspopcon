@@ -36,17 +36,17 @@ registers nothing.
 An algorithm
 ====================
 
-Algorithms are defined with the :meth:`~cfspopcon.algorithm_class.Algorithm.register_algorithm`
+Algorithms are defined with the :func:`~cfspopcon.algorithm_class.algorithm`
 decorator, in any module of the package: registration walks the whole package, so
 ``__init__.py`` needs no imports of its own. ``algorithms.py``:
 
 .. code::
 
-  from cfspopcon.algorithm_class import Algorithm
+  from cfspopcon.algorithm_class import algorithm
   from cfspopcon.unit_handling import Unitfull
 
 
-  @Algorithm.register_algorithm(return_keys=["widgets_per_shift"])
+  @algorithm(return_keys=["widgets_per_shift"])
   def calc_widgets_per_shift(widget_rate: Unitfull, shift_length: Unitfull) -> Unitfull:
       """Compute the widgets produced in one shift."""
       return widget_rate * shift_length
@@ -84,7 +84,7 @@ Name collisions
 
 By default a plugin may only *add*. Registering an algorithm under a name which is already
 taken is an error, and the error message states the name; pass ``override=True`` to
-:meth:`~cfspopcon.algorithm_class.Algorithm.register_algorithm` or
+:func:`~cfspopcon.algorithm_class.algorithm` or
 :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.declare` to replace the registered
 algorithm deliberately, or rename yours. Changing the default units of a variable which is
 already defined is also an error, and units cannot be overridden; re-declaring a variable with
