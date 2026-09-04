@@ -12,7 +12,7 @@ import xarray as xr
 import yaml
 from pint import DimensionalityError, UndefinedUnitError
 
-from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
+from .setup_unit_handling import Quantity, Unit, convert_units, magnitude_in_units
 
 
 def check_units_are_valid(units_dictionary: dict[str, str | None]) -> None:
@@ -51,13 +51,21 @@ def _merge_default_units(units_dictionary: dict[str, str | None]) -> None:
     check_units_are_valid(units_dictionary)
 
     changed = {
-        key: new for key, new in units_dictionary.items() if key in _DEFAULT_UNIT_BY_VARIABLE and new != _DEFAULT_UNIT_BY_VARIABLE[key]
+        key: new
+        for key, new in units_dictionary.items()
+        if key in _DEFAULT_UNIT_BY_VARIABLE and not _same_units(new, _DEFAULT_UNIT_BY_VARIABLE[key])
     }
     if changed:
         listed = "\n".join(f"{key}: {_DEFAULT_UNIT_BY_VARIABLE[key]!r} -> {new!r}" for key, new in changed.items())
         raise ValueError(f"Refusing to change the default units of already-defined variables:\n{listed}")
 
-    _DEFAULT_UNIT_BY_VARIABLE.update(units_dictionary)
+    # Keep the first spelling, so a re-declaration cannot reword an existing entry.
+    _DEFAULT_UNIT_BY_VARIABLE.update({key: new for key, new in units_dictionary.items() if key not in _DEFAULT_UNIT_BY_VARIABLE})
+
+
+def _same_units(new: str | None, old: str | None) -> bool:
+    """Whether two spellings name the same unit, e.g. "m**3" and "meter ** 3"."""
+    return new == old or (new is not None and old is not None and Unit(new) == Unit(old))
 
 
 def read_default_units_from_file(units_file: str | Path | Traversable | None = None) -> None:

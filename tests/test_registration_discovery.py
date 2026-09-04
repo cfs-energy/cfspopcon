@@ -158,8 +158,9 @@ def test_registering_a_plugin_walks_nested_submodules(tmp_path, monkeypatch, cle
     )
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
-        register_plugin("_walk_probe_pkg")
+        assert "calc_walk_probe" in register_plugin("_walk_probe_pkg")
         assert isinstance(registry["calc_walk_probe"], Algorithm)
+        assert register_plugin("_walk_probe_pkg") == []
     finally:
         forget_packages("_walk_probe_pkg")
 
@@ -544,8 +545,10 @@ def test_changing_an_existing_variables_units_is_refused(tmp_path, monkeypatch, 
     try:
         with pytest.raises(ValueError, match="average_electron_temp"):
             register_plugin("_probe_clash_pkg")
-        # Re-declaring identical units is a no-op, so re-reading the same file is allowed.
+        # Re-declaring the same units, in any spelling, is a no-op.
         default_units.extend_default_units_map({"average_electron_temp": default_units.default_unit("average_electron_temp")})
+        default_units.extend_default_units_map({"plasma_volume": "m**3"})
+        assert default_units.default_unit("plasma_volume") == "meter ** 3"
     finally:
         forget_packages("_probe_clash_pkg")
 
