@@ -299,23 +299,23 @@ def test_named_composite_docstring_lists_its_components(how_many_birds: Algorith
 
 
 def test_registration_semantics_construction_register_and_override():
-    """Construction never registers; Algorithm.register does, with override replacing and a duplicate raising."""
+    """Construction never registers; registry.register does, with override replacing and a duplicate raising."""
     name = "_coexistence_probe"
     Algorithm.instances.pop(name, None)
     try:
         first = Algorithm(function=lambda: {}, return_keys=[], name=name)
         assert name not in Algorithm.instances
-        Algorithm.register(first)
+        registry.register(first)
         assert Algorithm.instances[name] is first
 
         # a second object of the same name may be built freely; registering it collides
         second = Algorithm(function=lambda: {}, return_keys=[], name=name)
         with pytest.raises(RuntimeError, match="already registered"):
-            Algorithm.register(second)
+            registry.register(second)
         assert Algorithm.instances[name] is first
 
         # override deliberately replaces the registered entry
-        Algorithm.register(second, override=True)
+        registry.register(second, override=True)
         assert Algorithm.instances[name] is second
     finally:
         Algorithm.instances.pop(name, None)
@@ -344,14 +344,14 @@ def test_from_list_builds_a_composite_in_the_order_given():
 
 
 def test_composite_construction_registers_nothing():
-    """Constructing a named CompositeAlgorithm leaves the registry untouched; Algorithm.register adds it."""
+    """Constructing a named CompositeAlgorithm leaves the registry untouched; registry.register adds it."""
     name = "_composite_coexistence_probe"
-    component = Algorithm.get_algorithm("calc_plasma_volume")
+    component = registry["calc_plasma_volume"]
     Algorithm.instances.pop(name, None)
     try:
         composite = CompositeAlgorithm([component], name=name)
         assert name not in Algorithm.instances
-        Algorithm.register(composite)
+        registry.register(composite)
         assert Algorithm.instances[name] is composite
     finally:
         Algorithm.instances.pop(name, None)
@@ -389,7 +389,7 @@ def test_registry_queries():
     name = "_query_probe_composite"
     Algorithm.instances.pop(name, None)
     try:
-        Algorithm.register(CompositeAlgorithm([Algorithm.get_algorithm("calc_plasma_volume")], name=name))
+        registry.register(CompositeAlgorithm([registry["calc_plasma_volume"]], name=name))
         assert name not in algorithms_setting("plasma_volume")
         assert name not in algorithms_using("major_radius")
     finally:

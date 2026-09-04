@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 import yaml
 
-from .algorithm_class import Algorithm, CompositeAlgorithm, register_plugin
+from .algorithm_class import Algorithm, CompositeAlgorithm, register_plugin, registry
 from .helpers import convert_named_options
 from .unit_handling import set_default_units
 
@@ -63,7 +63,7 @@ def process_input_dictionary(
     process_plugins(repr_d)
 
     algorithms = repr_d.pop("algorithms", dict())
-    algorithm_list: list[Algorithm | CompositeAlgorithm] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
+    algorithm_list: list[Algorithm | CompositeAlgorithm] = [registry[algorithm] for algorithm in algorithms]
 
     if len(algorithm_list) > 1:
         algorithm = CompositeAlgorithm(algorithm_list)
