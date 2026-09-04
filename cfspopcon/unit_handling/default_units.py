@@ -1,8 +1,10 @@
 """Define default units for writing to/from disk."""
 
 from collections.abc import Iterable
-from importlib.resources import as_file, files
+from importlib.resources import files
+from importlib.resources.abc import Traversable
 from numbers import Number
+from pathlib import Path
 from typing import Any, overload
 
 import numpy as np
@@ -13,8 +15,16 @@ from pint import DimensionalityError, UndefinedUnitError
 from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
 
 
-def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
-    """Ensure that all units in units_dictionary are valid."""
+def check_units_are_valid(units_dictionary: dict[str, str | None]) -> None:
+    """Ensure every unit in the given mapping is recognized.
+
+    Args:
+        units_dictionary: maps each variable name to the unit its values are normalized to,
+            with None for a variable which is not a unitful quantity.
+
+    Raises:
+        ValueError: if any unit is not recognized, listing the offending entries.
+    """
     invalid_units = []
     for key, units in units_dictionary.items():
         try:
@@ -28,51 +38,86 @@ def check_units_are_valid(units_dictionary: dict[str, str]) -> None:
         raise ValueError(msg)
 
 
-def read_default_units_from_file() -> None:
-    """Read in a units YAML file and add the units to the registered default units map."""
-    with as_file(files("cfspopcon").joinpath("variables.yaml")) as fp:
-        with open(fp) as f:
-            variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(f)
-    units_dictionary = {key: value["default_units"] for key, value in variables_dictionary.items()}
+def _merge_default_units(units_dictionary: dict[str, str | None]) -> None:
+    """Add entries to the default units map.
 
+    Args:
+        units_dictionary: maps each variable name to the unit its values are normalized to,
+            with None for a variable which is not a unitful quantity.
+
+    Raises:
+        ValueError: if a unit is not recognized, or an existing variable's units would change.
+    """
     check_units_are_valid(units_dictionary)
 
-    global _DEFAULT_UNITS  # noqa: PLW0603
-    _DEFAULT_UNITS |= units_dictionary
+    changed = {
+        key: new for key, new in units_dictionary.items() if key in _DEFAULT_UNIT_BY_VARIABLE and new != _DEFAULT_UNIT_BY_VARIABLE[key]
+    }
+    if changed:
+        listed = "\n".join(f"{key}: {_DEFAULT_UNIT_BY_VARIABLE[key]!r} -> {new!r}" for key, new in changed.items())
+        raise ValueError(f"Refusing to change the default units of already-defined variables:\n{listed}")
+
+    _DEFAULT_UNIT_BY_VARIABLE.update(units_dictionary)
 
 
-# Module global state holding the registered default units mapping
-_DEFAULT_UNITS: dict[str, str] = {}
+def read_default_units_from_file(units_file: str | Path | Traversable | None = None) -> None:
+    """Read a variables YAML file and add its default units to the default units map.
+
+    Args:
+        units_file: a YAML file mapping each variable name to an entry with a ``default_units``
+            key, in the shape of cfspopcon's own ``variables.yaml``. Defaults to that file.
+
+    Raises:
+        ValueError: if a unit is not recognized, or an existing variable's units would change.
+    """
+    source = files("cfspopcon").joinpath("variables.yaml") if units_file is None else units_file
+    if isinstance(source, str):
+        source = Path(source)
+    variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(source.read_text())
+    _merge_default_units({key: value["default_units"] for key, value in variables_dictionary.items()})
+
+
+# Maps a variable name to the unit its values are normalized to, or None for a variable
+# which is not a unitful quantity.
+_DEFAULT_UNIT_BY_VARIABLE: dict[str, str | None] = {}
 read_default_units_from_file()
 
 
-def extend_default_units_map(units_dictionary: dict[str, str]) -> None:
+def extend_default_units_map(units_dictionary: dict[str, str | None]) -> None:
     """Extend the default units map with the given dictionary.
 
     Args:
-        units_dictionary: dictionary of units to add to the default units map
+        units_dictionary: maps each variable name to the unit its values are normalized to,
+            with None for a variable which is not a unitful quantity.
+
+    Raises:
+        ValueError: if a unit is not recognized, or an existing variable's units would change.
     """
-    check_units_are_valid(units_dictionary)
-    global _DEFAULT_UNITS  # noqa: PLW0603
-    _DEFAULT_UNITS |= units_dictionary
+    _merge_default_units(units_dictionary)
+
+
+def default_units_map() -> dict[str, str | None]:
+    """Return a copy of the default units map.
+
+    Returns:
+        Maps each variable name to the unit its values are normalized to, with None for a
+        variable which is not a unitful quantity.
+    """
+    return dict(_DEFAULT_UNIT_BY_VARIABLE)
 
 
 def reset_default_units() -> None:
     """Reset the default units to an empty dictionary."""
-    global _DEFAULT_UNITS  # noqa: PLW0603
-    _DEFAULT_UNITS = {}
+    global _DEFAULT_UNIT_BY_VARIABLE  # noqa: PLW0603
+    _DEFAULT_UNIT_BY_VARIABLE = {}
 
 
 def default_unit(var: str) -> str | None:
     """Return cfspopcon's default unit for a given quantity.
 
-    The mapping of variable name to default unit is loaded upon module import.
-    By default this mapping will be initialized by the variables.yaml file
-    in the cfspopcon package. To modify the default units mapping see, use any
-    of the following functions:
-    - `read_default_units_from_file`
-    - `extend_default_units_map`
-    - `reset_default_units`
+    The mapping is seeded from cfspopcon's own ``variables.yaml`` and extended as further
+    plugins are registered. Use :func:`extend_default_units_map` or
+    :func:`read_default_units_from_file` to add entries directly.
 
     Args:
         var: Quantity name
@@ -80,7 +125,7 @@ def default_unit(var: str) -> str | None:
     Returns: Unit
     """
     try:
-        return _DEFAULT_UNITS[var]
+        return _DEFAULT_UNIT_BY_VARIABLE[var]
     except KeyError:
         raise KeyError(
             f"No default unit defined for {var}. Please check configured default units in the unit_handling submodule."

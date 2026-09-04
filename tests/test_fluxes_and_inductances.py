@@ -162,7 +162,7 @@ def test_calc_fg():
     np.testing.assert_allclose(fg, -3.2891718339522056, rtol=1e-5, atol=0)
 
 
-def test_calc_fg_Sum_Ne():
+def test_calc_fg_Sum_Ce():
     coeffs = SurfaceInductanceCoeffs.Barr
     fg_Sum_Ce = calc_fg_Sum_Ce(0.3, coeffs=set_surface_inductance_coeffs(coeffs))
     np.testing.assert_allclose(fg_Sum_Ce, 0.15044119670967493, rtol=1e-5, atol=0)

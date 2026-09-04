@@ -158,7 +158,7 @@ def calc_H98y2(
     return energy_confinement_time / tau_e_98y2
 
 
-CompositeAlgorithm.register_from_list(
+calc_power_balance_from_input_P_aux = CompositeAlgorithm.declare(
     keys=["calc_input_power_for_fixed_auxiliary_power", "calc_energy_confinement_time_from_stored_energy_and_input_power", "calc_H98y2"],
     name="calc_power_balance_from_input_P_aux",
 )

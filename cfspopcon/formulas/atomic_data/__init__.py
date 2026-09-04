@@ -1,7 +1,6 @@
 """Interface to atomic data files."""
 
-from . import atomic_data, coeff_interpolator
-from .atomic_data import AtomicData
+from .atomic_data import AtomicData, read_atomic_data
 from .coeff_interpolator import CoeffInterpolator
 
-__all__ = ["AtomicData", "CoeffInterpolator", "atomic_data", "coeff_interpolator"]
+__all__ = ["AtomicData", "CoeffInterpolator", "read_atomic_data"]

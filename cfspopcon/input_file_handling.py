@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 import yaml
 
-from .algorithm_class import Algorithm, CompositeAlgorithm
+from .algorithm_class import Algorithm, CompositeAlgorithm, register_plugin
 from .helpers import convert_named_options
 from .unit_handling import set_default_units
 
@@ -49,6 +49,7 @@ def process_input_dictionary(
     """Convert an input dictionary into an processed dictionary, a CompositeAlgorithm and dictionaries defining points and plots.
 
     Several processing steps are applied, including;
+        * The `plugins` entry is consumed: each plugin it lists is registered, so that later entries may name its algorithms and variables.
         * The `algorithms` entry is converted into a `cfspopcon.CompositeAlgorithm`. This basically gives the list of operations that we want to perform on the input data.
         * The `points` entry is stored in a separate dictionary. This gives a set of key-value pairs of 'optimal' points (for instance, giving the point with the maximum fusion power gain).
         * The `grids` entry is converted into an `xr.DataArray` storing a `np.linspace` or `np.logspace` of values which we scan over. We usually scan over `average_electron_density` and `average_electron_temp`, but there's nothing preventing you from scanning over other numerical input variables or having more than 2 dimensions which you scan over (n.b. this can get expensive!).
@@ -59,6 +60,8 @@ def process_input_dictionary(
         repr_d: Dictionary to process
         case_dir: Relative paths specified in repr_d are interpreted as relative to this directory
     """
+    process_plugins(repr_d)
+
     algorithms = repr_d.pop("algorithms", dict())
     algorithm_list: list[Algorithm | CompositeAlgorithm] = [Algorithm.get_algorithm(algorithm) for algorithm in algorithms]
 
@@ -79,6 +82,40 @@ def process_input_dictionary(
     process_units(repr_d)
 
     return repr_d, algorithm, points, plots
+
+
+def process_plugins(repr_d: dict[str, Any]) -> None:
+    """Register the plugins the input file lists, so that it can name their algorithms.
+
+    The plugins are registered in the order given, before the ``algorithms`` names are resolved and
+    before the remaining keys have their units looked up, since a plugin supplies both. Note that
+    registration imports the packages named: a case file from an untrusted source runs its plugins'
+    module-level code.
+
+    Args:
+        repr_d: the input dictionary; the ``plugins`` entry is removed from it.
+
+    Raises:
+        ModuleNotFoundError: if a listed plugin is not importable.
+    """
+    plugins = repr_d.pop("plugins", [])
+    if isinstance(plugins, str):
+        # A single name, or one passed through read_case's kwargs override, which are always strings.
+        plugins = [plugins]
+
+    for plugin in plugins:
+        try:
+            register_plugin(plugin)
+        except ModuleNotFoundError as exc:
+            if exc.name != plugin:
+                # A missing import inside the plugin is the plugin's fault, not the input file's.
+                raise
+            raise ModuleNotFoundError(
+                f"Could not import '{plugin}', listed in the 'plugins' section of the input file. A plugin "
+                "must be an importable package; note that the import name may differ from the name of the "
+                "distribution providing it.",
+                name=plugin,
+            ) from exc
 
 
 def process_grid_values(repr_d: dict[str, Any]):  # type:ignore[no-untyped-def]

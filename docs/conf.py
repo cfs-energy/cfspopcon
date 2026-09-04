@@ -135,7 +135,9 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    # docs.scipy.org outages fail the -W build; the committed snapshot keeps the scipy
+    # inventory available offline (the live one wins whenever it is reachable).
+    "scipy": ("https://docs.scipy.org/doc/scipy/", (None, "scipy-objects.inv")),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
 }

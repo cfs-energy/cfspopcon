@@ -152,7 +152,7 @@ calc_peak_ion_temp = Algorithm.from_single_function(
     name="calc_peak_ion_temp",
 )
 
-CompositeAlgorithm.register_from_list(
+calc_peaking_and_analytic_profiles = CompositeAlgorithm.declare(
     keys=[
         "calc_effective_collisionality",
         "calc_ion_density_peaking",
@@ -165,7 +165,7 @@ CompositeAlgorithm.register_from_list(
     name="calc_peaking_and_analytic_profiles",
 )
 
-CompositeAlgorithm.register_from_list(
+calc_peaking_and_prf_profiles = CompositeAlgorithm.declare(
     keys=[
         "calc_effective_collisionality",
         "calc_ion_density_peaking",

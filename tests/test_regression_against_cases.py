@@ -29,49 +29,23 @@ def assert_regression_datasets_allclose(dataset: xr.Dataset, reference_dataset: 
 
 
 @pytest.mark.regression
+@pytest.mark.parametrize("entry_point", ["run", "update_dataset"])
 @pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
 @pytest.mark.filterwarnings("ignore:Not all input parameters were used")
-def test_regression_against_case(case: Path):
-    input_parameters, algorithm, points, plots = read_case(case)
-    input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
-
-    case_name = case.parent.stem
-
-    dataset = algorithm.run(**input_parameters).merge(input_parameters)
-    write_dataset_to_netcdf(dataset, Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc")
-
-    dataset = (
-        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test1_{case.parent.stem}.nc")
-        .load()
-        .drop_vars(ignored_variables, errors="ignore")
-    )
-    reference_dataset = (
-        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc")
-        .load()
-        .drop_vars(ignored_variables, errors="ignore")
-    )
-
-    assert_regression_datasets_allclose(dataset, reference_dataset)
-
-
-@pytest.mark.regression
-@pytest.mark.parametrize("case", ALL_CASE_PATHS, ids=ALL_CASE_NAMES)
-@pytest.mark.filterwarnings("ignore:Not all input parameters were used")
-def test_regression_against_case_with_update(case: Path):
+def test_regression_against_case(case: Path, entry_point: str):
     input_parameters, algorithm, points, plots = read_case(case)
     input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
     case_name = case.parent.stem
 
-    dataset = xr.Dataset(input_parameters)
+    if entry_point == "run":
+        dataset = algorithm.run(**input_parameters).merge(input_parameters)
+    else:
+        dataset = algorithm.update_dataset(xr.Dataset(input_parameters))
 
-    dataset = algorithm.update_dataset(dataset)
-    write_dataset_to_netcdf(dataset, Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc")
+    output_path = Path(__file__).parent / "regression_results" / f"test_{entry_point}_{case_name}.nc"
+    write_dataset_to_netcdf(dataset, output_path)
 
-    dataset = (
-        read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"test2_{case.parent.stem}.nc")
-        .load()
-        .drop_vars(ignored_variables, errors="ignore")
-    )
+    dataset = read_dataset_from_netcdf(output_path).load().drop_vars(ignored_variables, errors="ignore")
     reference_dataset = (
         read_dataset_from_netcdf(Path(__file__).parent / "regression_results" / f"{case_name}_result.nc")
         .load()

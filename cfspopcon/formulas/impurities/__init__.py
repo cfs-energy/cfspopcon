@@ -1,11 +1,25 @@
 """Routines to calculate seeded impurity concentrations and the change in effective charge and dilution due to seeded and intrinsic impurities."""
 
-from . import core_radiator_conc, edge_radiator_conc, impurity_array_helpers, impurity_charge_state, zeff_and_dilution_from_impurities
+from .core_radiator_conc import (
+    calc_core_seeded_impurity_concentration,
+    calc_min_P_radiation_from_fraction,
+    calc_min_P_radiation_from_LH_factor,
+    calc_P_radiation_from_core_seeded_impurity,
+)
+from .edge_radiator_conc import calc_edge_impurity_concentration
+from .impurity_charge_state import calc_impurity_charge_state
+
+# Importable but kept out of __all__: the function shares its dotted name with its module, and
+# listing both makes the autosummary docs build flag a duplicate description.
+from .set_up_impurity_concentration_array import set_up_impurity_concentration_array  # noqa: F401
+from .zeff_and_dilution_from_impurities import calc_zeff_and_dilution_due_to_impurities
 
 __all__ = [
-    "core_radiator_conc",
-    "edge_radiator_conc",
-    "impurity_array_helpers",
-    "impurity_charge_state",
-    "zeff_and_dilution_from_impurities",
+    "calc_P_radiation_from_core_seeded_impurity",
+    "calc_core_seeded_impurity_concentration",
+    "calc_edge_impurity_concentration",
+    "calc_impurity_charge_state",
+    "calc_min_P_radiation_from_LH_factor",
+    "calc_min_P_radiation_from_fraction",
+    "calc_zeff_and_dilution_due_to_impurities",
 ]

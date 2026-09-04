@@ -1,19 +1,28 @@
 """Interface to different energy confinement scalings and routines to calculate the plasma stored energy."""
 
-from . import (
-    energy_confinement_time,
-    plasma_stored_energy,
-    read_energy_confinement_scalings,
-    solve_for_input_power,
-    switch_confinement_scaling_on_threshold,
+from .energy_confinement_time import (
+    calc_energy_confinement_time_from_scaling,
+    calc_energy_confinement_time_from_stored_energy_and_input_power,
+    calc_H98y2,
+    calc_power_balance_from_input_P_aux,
 )
-from .read_energy_confinement_scalings import ConfinementScaling
+from .plasma_stored_energy import calc_plasma_stored_energy
+from .read_energy_confinement_scalings import ConfinementScaling, read_confinement_scalings
+from .solve_for_input_power import solve_energy_confinement_scaling_for_input_power
+from .switch_confinement_scaling_on_threshold import (
+    switch_to_L_mode_confinement_below_threshold,
+    switch_to_linearised_ohmic_confinement_below_threshold,
+)
 
 __all__ = [
     "ConfinementScaling",
-    "energy_confinement_time",
-    "plasma_stored_energy",
-    "read_energy_confinement_scalings",
-    "solve_for_input_power",
-    "switch_confinement_scaling_on_threshold",
+    "calc_H98y2",
+    "calc_energy_confinement_time_from_scaling",
+    "calc_energy_confinement_time_from_stored_energy_and_input_power",
+    "calc_plasma_stored_energy",
+    "calc_power_balance_from_input_P_aux",
+    "read_confinement_scalings",
+    "solve_energy_confinement_scaling_for_input_power",
+    "switch_to_L_mode_confinement_below_threshold",
+    "switch_to_linearised_ohmic_confinement_below_threshold",
 ]
