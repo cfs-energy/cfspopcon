@@ -9,7 +9,7 @@ import click
 import matplotlib.pyplot as plt
 import xarray as xr
 
-from cfspopcon import file_io
+from cfspopcon import discover_builtin_algorithms, file_io
 from cfspopcon.deprecation_handler import handle_deprecated_arguments
 from cfspopcon.input_file_handling import read_case
 from cfspopcon.plotting import make_plot, read_plot_style
@@ -46,10 +46,13 @@ def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, 
 
 @click.command()
 @click.option("-o", "--output", default="./popcon_algorithms.yaml", type=click.Path(exists=False))
-def write_algorithms_yaml(output: str) -> None:
-    """Write all available algorithms to a yaml helper file."""
-    from cfspopcon import Algorithm
+@click.option("--plugin", "-p", "plugins", multiple=True, help="Also register this plugin package (repeatable).")
+def write_algorithms_yaml(output: str, plugins: tuple[str, ...]) -> None:
+    """Write the registered algorithms to a yaml helper file."""
+    from cfspopcon import Algorithm, register_plugin
 
+    for plugin in plugins:
+        register_plugin(plugin)
     Algorithm.write_yaml(Path(output))
 
 
@@ -61,6 +64,7 @@ def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:
         show: show the resulting plots
         cli_args: command-line arguments, takes precedence over config.
     """
+    discover_builtin_algorithms()  # read_case resolves algorithm names, so the registry must be populated
     input_parameters, algorithm, points, plots = read_case(case, cli_args)
     input_parameters, algorithm, points, plots = handle_deprecated_arguments(input_parameters, algorithm, points, plots)
     dataset = xr.Dataset(input_parameters)

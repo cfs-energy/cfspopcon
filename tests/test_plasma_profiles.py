@@ -1,11 +1,7 @@
 import numpy as np
 
-from cfspopcon.formulas.plasma_profiles import (
-    calc_analytic_profiles,
-    calc_jch_pedestal_peaking,
-    calc_jch_profiles,
-    define_radial_grid,
-)
+from cfspopcon.formulas.plasma_profiles.jch_profiles import calc_jch_pedestal_peaking, calc_jch_profiles
+from cfspopcon.formulas.plasma_profiles.plasma_profiles import calc_analytic_profiles, define_radial_grid
 from cfspopcon.unit_handling import magnitude_in_units, ureg
 
 
@@ -141,13 +137,12 @@ def test_calc_1d_plasma_profiles_skips_jch_when_not_requested():
 
 
 def test_calc_peaked_profiles_jch_reports_volume_and_pedestal_peaking():
-    from cfspopcon.formulas.plasma_profiles import (
+    from cfspopcon.formulas.plasma_profiles.density_peaking import (
         calc_effective_collisionality,
         calc_electron_density_peaking,
         calc_ion_density_peaking,
-        calc_peak_electron_temp,
-        calc_peak_ion_temp,
     )
+    from cfspopcon.formulas.plasma_profiles.plasma_profiles import calc_peak_electron_temp, calc_peak_ion_temp
 
     average_electron_density = 20.0 * ureg.n19
     average_electron_temp = 10.0 * ureg.keV

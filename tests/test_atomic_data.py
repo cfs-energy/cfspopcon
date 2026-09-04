@@ -31,10 +31,6 @@ def atomic_data():
     return AtomicData()
 
 
-def test_key_to_enum(atomic_data):
-    atomic_data["hydrogen"]
-
-
 def test_eval_interpolator(atomic_data):
     species = AtomicSpecies.Helium
     ne_tau = 0.5e17

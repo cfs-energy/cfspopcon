@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cfspopcon.formulas.energy_confinement import (
+from cfspopcon.algorithm_class import registry
+from cfspopcon.formulas.energy_confinement.energy_confinement_time import (
     calc_energy_confinement_time_from_scaling,
     calc_energy_confinement_time_from_stored_energy_and_input_power,
     calc_H98y2,
-    calc_power_balance_from_input_P_aux,
 )
 from cfspopcon.formulas.energy_confinement.solve_for_input_power import solve_energy_confinement_scaling_for_input_power
 from cfspopcon.unit_handling import magnitude_in_units, ureg
@@ -31,42 +31,28 @@ def kwargs():
     )
 
 
-def test_tau_e_forward_vs_inverse_calculation(kwargs):
-
-    P_in = 140.0 * ureg.MW
-
-    tau_e = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
-    plasma_stored_energy = P_in * tau_e
-
-    assert tau_e > 0.0 * ureg.seconds
-    assert plasma_stored_energy > 0.0 * ureg.MJ
-
-    tau_e_2, input_power_2 = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
-
-    assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_2, ureg.s))
-    assert np.isclose(magnitude_in_units(P_in, ureg.MW), magnitude_in_units(input_power_2, ureg.MW))
-
-    tau_e_3 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy=plasma_stored_energy, P_in=P_in)
-    assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_3, ureg.s))
-
-
-def test_tau_e_inverse_vs_forward_calculation(kwargs):
-
-    plasma_stored_energy = 14.0 * ureg.MJ
-
-    tau_e, P_in = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
-
-    tau_e_2 = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
-    plasma_stored_energy_2 = P_in * tau_e_2
+@pytest.mark.parametrize("start_from", ["input_power", "stored_energy"])
+def test_tau_e_scaling_round_trip(kwargs, start_from):
+    """Solving the scaling for input power inverts the forward calculation, from either starting point."""
+    if start_from == "input_power":
+        P_in = 140.0 * ureg.MW
+        tau_e = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
+        plasma_stored_energy = P_in * tau_e
+    else:
+        plasma_stored_energy = 14.0 * ureg.MJ
+        tau_e, P_in = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
 
     assert tau_e > 0.0 * ureg.seconds
     assert P_in > 0.0 * ureg.MW
+    assert plasma_stored_energy > 0.0 * ureg.MJ
 
-    assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_2, ureg.s))
-    assert np.isclose(magnitude_in_units(plasma_stored_energy, ureg.MJ), magnitude_in_units(plasma_stored_energy_2, ureg.MJ))
+    tau_e_2, P_in_2 = solve_energy_confinement_scaling_for_input_power(**kwargs, plasma_stored_energy=plasma_stored_energy)
+    tau_e_3 = calc_energy_confinement_time_from_scaling(**kwargs, P_in=P_in)
+    tau_e_4 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy=plasma_stored_energy, P_in=P_in)
 
-    tau_e_3 = calc_energy_confinement_time_from_stored_energy_and_input_power(plasma_stored_energy=plasma_stored_energy, P_in=P_in)
-    assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_3, ureg.s))
+    for tau_e_other in (tau_e_2, tau_e_3, tau_e_4):
+        assert np.isclose(magnitude_in_units(tau_e, ureg.s), magnitude_in_units(tau_e_other, ureg.s))
+    assert np.isclose(magnitude_in_units(P_in, ureg.MW), magnitude_in_units(P_in_2, ureg.MW))
 
 
 def test_solve_energy_confinement_scaling_reports_required_h98(kwargs):
@@ -115,7 +101,7 @@ def test_calc_power_balance_from_input_p_aux_uses_explicit_alpha_power():
         )
     )
 
-    ds = calc_power_balance_from_input_P_aux.update_dataset(ds)
+    ds = registry["calc_power_balance_from_input_P_aux"].update_dataset(ds)
 
     np.testing.assert_allclose(magnitude_in_units(ds["P_auxiliary_absorbed"], ureg.MW), 22.4, rtol=1e-9)
     np.testing.assert_allclose(magnitude_in_units(ds["P_in"], ureg.MW), 54.9, rtol=1e-9)

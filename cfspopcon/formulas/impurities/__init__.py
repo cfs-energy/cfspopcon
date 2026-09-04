@@ -8,7 +8,10 @@ from .core_radiator_conc import (
 )
 from .edge_radiator_conc import calc_edge_impurity_concentration
 from .impurity_charge_state import calc_impurity_charge_state
-from .set_up_impurity_concentration_array import set_up_impurity_concentration_array
+
+# Importable but kept out of __all__: the function shares its dotted name with its module, and
+# listing both makes the autosummary docs build flag a duplicate description.
+from .set_up_impurity_concentration_array import set_up_impurity_concentration_array  # noqa: F401
 from .zeff_and_dilution_from_impurities import calc_zeff_and_dilution_due_to_impurities
 
 __all__ = [
@@ -19,5 +22,4 @@ __all__ = [
     "calc_min_P_radiation_from_LH_factor",
     "calc_min_P_radiation_from_fraction",
     "calc_zeff_and_dilution_due_to_impurities",
-    "set_up_impurity_concentration_array",
 ]

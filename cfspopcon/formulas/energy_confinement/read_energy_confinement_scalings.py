@@ -52,13 +52,7 @@ def read_confinement_scalings() -> None:
 
 
 def _get_confinement_scaling(name: str) -> ConfinementScaling:
-    """Return a confinement scaling, loading the shared table on first use.
-
-    Some callers reach this module directly instead of coming through package
-    import paths that have already populated ``ConfinementScaling.instances``.
-    This helper keeps those direct calls working without duplicating registry
-    initialization logic.
-    """
+    """Return a confinement scaling, loading the shared table on first use."""
     if name not in ConfinementScaling.instances:
         read_confinement_scalings()
 

@@ -66,7 +66,8 @@ def test_lambda_q_scalings(
     q_star,
     lambda_q_factor,
 ):
-    lambda_q = formulas.scrape_off_layer.calc_lambda_q(
+    """calc_lambda_q dispatches to the scaling-specific function, and both match the reference value."""
+    lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q(
         lambda_q_scaling=scaling,
         average_total_pressure=average_total_pressure,
         power_crossing_separatrix=power_crossing_separatrix,
@@ -78,33 +79,17 @@ def test_lambda_q_scalings(
         lambda_q_factor=lambda_q_factor,
     )
 
-    assert np.isclose(lambda_q, result)
-
-
-@pytest.mark.parametrize(["scaling", "result"], lambda_q_tests.items(), ids=[key.name for key in lambda_q_tests.keys()])
-def test_lambda_q_scalings_with_algorithms(
-    scaling,
-    result,
-    average_total_pressure,
-    power_crossing_separatrix,
-    major_radius,
-    B_pol_out_mid,
-    inverse_aspect_ratio,
-    magnetic_field_on_axis,
-    q_star,
-    lambda_q_factor,
-):
     if scaling == LambdaQScaling.Brunner:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_brunner(
+        lambda_q_specific = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_brunner(
             average_total_pressure=average_total_pressure, lambda_q_factor=lambda_q_factor
         )
     elif scaling == LambdaQScaling.EichRegression14:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_14(
+        lambda_q_specific = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_14(
             B_pol_out_mid=B_pol_out_mid,
             lambda_q_factor=lambda_q_factor,
         )
     elif scaling == LambdaQScaling.EichRegression15:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_15(
+        lambda_q_specific = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_15(
             power_crossing_separatrix=power_crossing_separatrix,
             major_radius=major_radius,
             B_pol_out_mid=B_pol_out_mid,
@@ -112,13 +97,14 @@ def test_lambda_q_scalings_with_algorithms(
             lambda_q_factor=lambda_q_factor,
         )
     elif scaling == LambdaQScaling.EichRegression9:
-        lambda_q = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_9(
+        lambda_q_specific = formulas.scrape_off_layer.lambda_q.calc_lambda_q_with_eich_regression_9(
             magnetic_field_on_axis=magnetic_field_on_axis,
             q_star=q_star,
             power_crossing_separatrix=power_crossing_separatrix,
             lambda_q_factor=lambda_q_factor,
         )
     else:
-        raise NotImplementedError(f"Add the algorithm for {scaling.name}.")
+        raise NotImplementedError(f"Add the specific function for {scaling.name}.")
 
     assert np.isclose(lambda_q, result)
+    assert np.isclose(lambda_q, lambda_q_specific)

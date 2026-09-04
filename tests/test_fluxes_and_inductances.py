@@ -2,15 +2,17 @@ import numpy as np
 import xarray as xr
 from scipy import constants
 
-from cfspopcon.formulas.plasma_current.flux_consumption import (
+from cfspopcon.formulas.plasma_current.flux_consumption.flux_consumption import (
     calc_external_flux,
-    calc_external_inductance,
     calc_internal_flux,
+    calc_poloidal_field_flux,
+    calc_resistive_flux,
+)
+from cfspopcon.formulas.plasma_current.flux_consumption.inductances import (
+    calc_external_inductance,
     calc_internal_inductance_for_cylindrical,
     calc_internal_inductivity,
     calc_invmu_0_dLedR,
-    calc_poloidal_field_flux,
-    calc_resistive_flux,
     calc_vertical_field_mutual_inductance,
     calc_vertical_magnetic_field,
 )
@@ -160,7 +162,7 @@ def test_calc_fg():
     np.testing.assert_allclose(fg, -3.2891718339522056, rtol=1e-5, atol=0)
 
 
-def test_calc_fg_Sum_Ne():
+def test_calc_fg_Sum_Ce():
     coeffs = SurfaceInductanceCoeffs.Barr
     fg_Sum_Ce = calc_fg_Sum_Ce(0.3, coeffs=set_surface_inductance_coeffs(coeffs))
     np.testing.assert_allclose(fg_Sum_Ce, 0.15044119670967493, rtol=1e-5, atol=0)

@@ -152,38 +152,30 @@ calc_peak_ion_temp = Algorithm.from_single_function(
     name="calc_peak_ion_temp",
 )
 
-calc_peaking_and_analytic_profiles = CompositeAlgorithm(
-    algorithms=[
-        Algorithm.get_algorithm(alg)
-        for alg in [
-            "calc_effective_collisionality",
-            "calc_ion_density_peaking",
-            "calc_electron_density_peaking",
-            "calc_peak_electron_temp",
-            "calc_peak_ion_temp",
-            "define_radial_grid",
-            "calc_analytic_profiles",
-        ]
+calc_peaking_and_analytic_profiles = CompositeAlgorithm.declare(
+    keys=[
+        "calc_effective_collisionality",
+        "calc_ion_density_peaking",
+        "calc_electron_density_peaking",
+        "calc_peak_electron_temp",
+        "calc_peak_ion_temp",
+        "define_radial_grid",
+        "calc_analytic_profiles",
     ],
     name="calc_peaking_and_analytic_profiles",
-    register=True,
 )
 
-calc_peaking_and_prf_profiles = CompositeAlgorithm(
-    algorithms=[
-        Algorithm.get_algorithm(alg)
-        for alg in [
-            "calc_effective_collisionality",
-            "calc_ion_density_peaking",
-            "calc_electron_density_peaking",
-            "calc_peak_electron_temp",
-            "calc_peak_ion_temp",
-            "define_radial_grid",
-            "calc_prf_profiles",
-        ]
+calc_peaking_and_prf_profiles = CompositeAlgorithm.declare(
+    keys=[
+        "calc_effective_collisionality",
+        "calc_ion_density_peaking",
+        "calc_electron_density_peaking",
+        "calc_peak_electron_temp",
+        "calc_peak_ion_temp",
+        "define_radial_grid",
+        "calc_prf_profiles",
     ],
     name="calc_peaking_and_prf_profiles",
-    register=True,
 )
 
 

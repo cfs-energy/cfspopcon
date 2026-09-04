@@ -9,7 +9,7 @@ from typing import Any
 import click
 import yaml
 
-from cfspopcon import Algorithm
+from cfspopcon import Algorithm, discover_builtin_algorithms
 from cfspopcon.unit_handling import Quantity
 
 
@@ -154,21 +154,9 @@ class VariableConsistencyChecker:
             exit(0) if success else exit(1)
 
         all_keys = sorted((self.variable_keys - unused_variable_keys) | unlisted_args, key=str.lower)
-        algs_using_variable: dict[str, list[str]] = {key: [] for key in all_keys}
-        algs_setting_variable: dict[str, list[str]] = {key: [] for key in all_keys}
-        for alg in Algorithm.instances.values():
-            # A composite can reach a variable through several of its members;
-            # dedupe so each algorithm is listed once per variable.
-            for key in set(alg.input_keys):
-                algs_using_variable[key].append(alg._name)  # type:ignore[arg-type]
-            for key in set(alg.return_keys):
-                algs_setting_variable[key].append(alg._name)  # type:ignore[arg-type]
 
         new_variables_dict = dict()
         for key in all_keys:
-            used_by = algs_using_variable[key]
-            set_by = algs_setting_variable[key]
-
             if key in self.variables_dict:
                 default_units = self.variables_dict[key]["default_units"]
                 if default_units is not None:
@@ -188,8 +176,6 @@ class VariableConsistencyChecker:
             new_variables_dict[key] = dict(
                 default_units=default_units,
                 description=description,
-                set_by=set_by,
-                used_by=used_by,
             )
 
         with as_file(files("cfspopcon").joinpath("variables.yaml")) as filepath:
@@ -234,6 +220,7 @@ class VariableConsistencyChecker:
 @click.option("--run", is_flag=True, help="Modifies the checked files in-place.")
 def check_variables_cli(run: bool) -> None:
     """Check whether the Algorithm keys, the default_units file and the physics_glossary file are consistent."""
+    discover_builtin_algorithms()
     variable_consistency_checker = VariableConsistencyChecker()
     variable_consistency_checker.run(apply_changes=run)
 

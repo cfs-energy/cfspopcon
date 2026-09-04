@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithms_setting, algorithms_using, registry
 from cfspopcon.unit_handling import ureg
 
 
@@ -27,7 +27,7 @@ def how_many_birds(BIRDS):
         local_vars = locals()
         return {key: local_vars[key] for key in BIRDS}
 
-    return Algorithm(function=count_birds, return_keys=BIRDS, skip_registration=True)
+    return Algorithm(function=count_birds, return_keys=BIRDS)
 
 
 @pytest.fixture(scope="session")
@@ -50,7 +50,7 @@ def how_many_animals(ANIMALS):
         local_vars = locals()
         return {key: local_vars[key] for key in ANIMALS}
 
-    return Algorithm(function=count_animals, return_keys=ANIMALS, skip_registration=True)
+    return Algorithm(function=count_animals, return_keys=ANIMALS)
 
 
 def test_algorithm_kw_only():
@@ -58,7 +58,7 @@ def test_algorithm_kw_only():
         return {"p2_2": 10}
 
     with pytest.raises(ValueError, match="Algorithm only supports functions with keyword arguments.*?POSITIONAL_ONLY parameter p1"):
-        _ = Algorithm(function=test, return_keys=["p2_2"], skip_registration=True)
+        _ = Algorithm(function=test, return_keys=["p2_2"])
 
 
 def test_composite_signature(how_many_birds, how_many_animals):
@@ -70,6 +70,7 @@ def test_composite_signature(how_many_birds, how_many_animals):
 
 
 def test_dummy_algorithm(how_many_birds, BIRDS):
+    assert how_many_birds.name == "count_birds"
     assert how_many_birds.return_keys == BIRDS
     assert how_many_birds.input_keys == ["things_that_quack", "things_that_cluck"]
     assert how_many_birds.required_input_keys == ["things_that_quack"]
@@ -98,6 +99,7 @@ def test_dummy_algorithm(how_many_birds, BIRDS):
 def test_dummy_composite_algorithm(how_many_birds, BIRDS, how_many_animals, ANIMALS):
     count_the_farm = how_many_birds + how_many_animals
 
+    assert count_the_farm.name is None
     assert set(count_the_farm.return_keys) == set(BIRDS).union(set(ANIMALS))
     assert set(count_the_farm.input_keys) == {"things_that_quack", "things_that_cluck", "things_that_baa", "new_chickens_per_count"}
     assert set(count_the_farm.required_input_keys) == {"things_that_quack", "things_that_baa"}
@@ -242,9 +244,7 @@ def test_single_function_algorithm():
         c, d = b, a
         return c, d
 
-    alg = Algorithm.from_single_function(
-        dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True, skip_registration=True
-    )
+    alg = Algorithm.from_single_function(dummy_func, return_keys=["c", "d"], name="test_dummy", skip_unit_conversion=True)
 
     result = alg.run(a=1, b=2)
     assert result["c"] == 2
@@ -253,23 +253,9 @@ def test_single_function_algorithm():
     def in_and_out(average_electron_density):
         return average_electron_density * 2
 
-    alg = Algorithm.from_single_function(
-        in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out", skip_registration=True
-    )
+    alg = Algorithm.from_single_function(in_and_out, return_keys=["average_electron_density"], name="test_dummy_in_and_out")
     result = alg.run(average_electron_density=1.2 * ureg.n20)
     assert result["average_electron_density"] == 24.0 * ureg.n19
-
-
-def test_get_algorithm():
-    # Pass in Algorithm Enums
-    for key in Algorithm.algorithms():
-        alg = Algorithm.get_algorithm(key)
-        assert alg._name in [f"run_{key}", key, "<lambda>"]
-
-    # Pass in strings instead
-    for key in Algorithm.algorithms():
-        alg = Algorithm.get_algorithm(key)
-        assert alg._name in [f"run_{key}", key, "<lambda>"]
 
 
 def test_blank_algorithm():
@@ -298,7 +284,7 @@ def test_call_single_output_is_unwrapped():
     def add_one(x: int) -> dict[str, int]:
         return {"y": x + 1}
 
-    alg = Algorithm(function=add_one, return_keys=["y"], skip_registration=True)
+    alg = Algorithm(function=add_one, return_keys=["y"])
     assert alg(x=4) == 5
 
 
@@ -310,3 +296,101 @@ def test_named_composite_docstring_lists_its_components(how_many_birds: Algorith
     assert "Composed of [count_birds, count_animals]" in composite.__doc__
     assert "Inputs:\n" in composite.__doc__
     assert "Outputs:\n" in composite.__doc__
+
+
+def test_registration_semantics_construction_register_and_override():
+    """Construction never registers; Algorithm.register does, with override replacing and a duplicate raising."""
+    name = "_coexistence_probe"
+    Algorithm.instances.pop(name, None)
+    try:
+        first = Algorithm(function=lambda: {}, return_keys=[], name=name)
+        assert name not in Algorithm.instances
+        Algorithm.register(first)
+        assert Algorithm.instances[name] is first
+
+        # a second object of the same name may be built freely; registering it collides
+        second = Algorithm(function=lambda: {}, return_keys=[], name=name)
+        with pytest.raises(RuntimeError, match="already registered"):
+            Algorithm.register(second)
+        assert Algorithm.instances[name] is first
+
+        # override deliberately replaces the registered entry
+        Algorithm.register(second, override=True)
+        assert Algorithm.instances[name] is second
+    finally:
+        Algorithm.instances.pop(name, None)
+
+
+def test_registry_indexing():
+    """registry[...] looks a registered algorithm up by name."""
+    names = ["calc_plasma_volume", "calc_plasma_surface_area"]
+    for name in names:
+        assert name in registry
+        assert isinstance(registry[name], Algorithm)
+
+    with pytest.raises(TypeError, match="algorithm name"):
+        registry[names]
+    with pytest.raises(KeyError):
+        registry["not_a_registered_algorithm_name"]
+
+
+def test_from_list_builds_a_composite_in_the_order_given():
+    """from_list builds an unregistered composite whose algorithms run in the order named."""
+    names = ["calc_plasma_volume", "calc_plasma_surface_area"]
+    assert [alg.name for alg in CompositeAlgorithm.from_list(names).algorithms] == names
+    assert [alg.name for alg in CompositeAlgorithm.from_list(names[::-1]).algorithms] == names[::-1]
+    assert CompositeAlgorithm.from_list(names, name="_probe_from_list").name == "_probe_from_list"
+    assert "_probe_from_list" not in Algorithm.instances
+
+
+def test_composite_construction_registers_nothing():
+    """Constructing a named CompositeAlgorithm leaves the registry untouched; Algorithm.register adds it."""
+    name = "_composite_coexistence_probe"
+    component = Algorithm.get_algorithm("calc_plasma_volume")
+    Algorithm.instances.pop(name, None)
+    try:
+        composite = CompositeAlgorithm([component], name=name)
+        assert name not in Algorithm.instances
+        Algorithm.register(composite)
+        assert Algorithm.instances[name] is composite
+    finally:
+        Algorithm.instances.pop(name, None)
+
+
+def test_missing_input_hint_names_setters():
+    def needs_volume(plasma_volume):
+        return {"probe_out": plasma_volume}
+
+    alg = Algorithm(function=needs_volume, return_keys=["probe_out"])
+    with pytest.raises(RuntimeError, match=r"'plasma_volume' is set by \[calc_plasma_volume\]"):
+        alg.validate_inputs({}, raise_error_on_missing_inputs=True)
+
+
+def test_unused_input_hint_suggests_close_match(how_many_birds, how_many_animals):
+    count_the_farm = how_many_birds + how_many_animals
+    with pytest.raises(RuntimeError, match="did you mean 'things_that_baa'"):
+        count_the_farm.validate_inputs(dict(things_that_quack=1, things_that_baaa=4))
+
+
+def test_no_hint_without_a_setter_or_close_match(how_many_birds):
+    with pytest.raises(RuntimeError, match=r"^Missing input parameters \[things_that_quack\].$"):
+        how_many_birds.validate_inputs({}, raise_error_on_missing_inputs=True)
+
+
+def test_registry_queries():
+    """algorithms_setting/algorithms_using answer from the live registry, and skip composites."""
+    assert algorithms_setting("plasma_volume") == ["calc_plasma_volume"]
+    assert algorithms_setting("not_a_registered_variable") == []
+
+    users = algorithms_using("plasma_volume")
+    assert "calc_fusion_power" in users
+    assert users == sorted(users)
+
+    name = "_query_probe_composite"
+    Algorithm.instances.pop(name, None)
+    try:
+        Algorithm.register(CompositeAlgorithm([Algorithm.get_algorithm("calc_plasma_volume")], name=name))
+        assert name not in algorithms_setting("plasma_volume")
+        assert name not in algorithms_using("major_radius")
+    finally:
+        Algorithm.instances.pop(name, None)
