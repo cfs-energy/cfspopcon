@@ -40,7 +40,7 @@ breaking.
 - **Registration fails loudly and rolls back**: a module which does not import, or a composite naming an unregistered algorithm, raises; a failed `register_plugin` restores the registries, so the plugin can be fixed and registered again in the same session. Units defined with `ureg.define` are the one thing which cannot be rolled back.
 - **A composite resolves at the end of its plugin's registration**: it may name any algorithm registered by then; register a plugin after the plugins it builds on, or declare them with `__popcon_requires__`.
 - **A variable's default units cannot change once defined** (**breaking**): re-declaring the same units, in any spelling, is allowed; a change raises a `ValueError` naming the variable.
-- **`register_plugin` returns the names of the algorithms it added**, an empty list on a repeated call.
+- **`register_plugin` and `discover_builtin_algorithms` return the names of the algorithms they added**, an empty list on a repeated call.
 - **Errors and warnings suggest the fix**: a missing input names the registered algorithms which set it, an unused input suggests the nearest matching name, and an unknown algorithm suggests the nearest registered name or registering the plugin which provides it.
 - **Profile form is selected by algorithm** (**breaking**): list a `calc_peaking_and_*_profiles` composite instead of setting the `density_profile_form` / `temp_profile_form` inputs. (#139)
 - **`calc_analytic_profiles`, `calc_prf_profiles`** (**breaking**): take `rho` as an input instead of returning it; the `npoints` argument is removed. (#139)
