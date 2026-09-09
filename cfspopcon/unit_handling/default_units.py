@@ -10,7 +10,7 @@ from typing import Any, overload
 import numpy as np
 import xarray as xr
 import yaml
-from pint import DimensionalityError, UndefinedUnitError
+from pint import DimensionalityError
 
 from .setup_unit_handling import Quantity, Unit, convert_units, magnitude_in_units
 
@@ -29,7 +29,8 @@ def check_units_are_valid(units_dictionary: dict[str, str | None]) -> None:
     for key, units in units_dictionary.items():
         try:
             Quantity(1.0, units)
-        except UndefinedUnitError:
+        # pint rejects a malformed spelling with a mix of error types
+        except Exception:
             invalid_units.append((key, units))
 
     if invalid_units:
@@ -76,13 +77,19 @@ def read_default_units_from_file(units_file: str | Path | Traversable | None = N
             key, in the shape of cfspopcon's own ``variables.yaml``. Defaults to that file.
 
     Raises:
-        ValueError: if a unit is not recognized, or an existing variable's units would change.
+        ValueError: if the file is not a mapping of entries with ``default_units``, a unit is
+            not recognized, or an existing variable's units would change.
     """
     source = files("cfspopcon").joinpath("variables.yaml") if units_file is None else units_file
     if isinstance(source, str):
         source = Path(source)
-    variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(source.read_text())
-    _merge_default_units({key: value["default_units"] for key, value in variables_dictionary.items()})
+    entries = yaml.safe_load(source.read_text()) or {}
+    if not isinstance(entries, dict):
+        raise ValueError(f"{source} must be a YAML mapping of variable names to entries.")
+    missing = [key for key, value in entries.items() if not isinstance(value, dict) or "default_units" not in value]
+    if missing:
+        raise ValueError(f"The following entries in {source} have no default_units:\n" + "\n".join(missing))
+    _merge_default_units({key: value["default_units"] for key, value in entries.items()})
 
 
 # Maps a variable name to the unit its values are normalized to, or None for a variable
