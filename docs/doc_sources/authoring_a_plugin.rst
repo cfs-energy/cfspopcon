@@ -42,7 +42,7 @@ decorator, in any module of the package: registration walks the whole package, s
 
 .. code::
 
-  from cfspopcon.algorithm_class import declare_algorithm
+  from cfspopcon import declare_algorithm
   from cfspopcon.unit_handling import Unitfull
 
 
@@ -88,7 +88,8 @@ taken is an error, and the error message states the name; pass ``override=True``
 :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.declare` to replace the registered
 algorithm deliberately, or rename yours. Changing the default units of a variable which is
 already defined is also an error, and units cannot be overridden; re-declaring a variable with
-identical units is allowed.
+the same units is allowed, in any equivalent spelling (``m**3`` and ``meter ** 3`` are the
+same units).
 
 A failed registration is rolled back completely, so you can fix the plugin and register it
 again in the same session.

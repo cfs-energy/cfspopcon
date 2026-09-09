@@ -758,32 +758,53 @@ def _register_scanned(algorithms: list[Algorithm], declarations: list[CompositeD
 def register_plugin(plugin_name: str) -> list[str]:
     """Register a plugin: its default units, its algorithms, and its composites.
 
-    A ``variables.yaml`` in the package root is read into the default units map, every module
-    beneath the package is imported (only directories containing an ``__init__.py`` are walked), and
-    the Algorithms and composite declarations bound in those modules are then registered.
-    The scan at the end of this call is what registers; the imports only build the objects, so an
-    Algorithm a module imports from an unregistered package is registered as this plugin's. A
-    composite may name anything registered by the end of its own plugin. The bundled algorithms
-    are registered before any other plugin. Repeated calls change nothing.
+    A plugin is an importable package built on cfspopcon:
 
-    A plugin names the plugins whose registered algorithms it builds on with a module-level
-    ``__popcon_requires__ = ("other_plugin",)``; each requirement is registered first, as its own
-    registration.
+    .. code-block:: text
+
+        my_popcon_plugin/
+        ├── __init__.py     (may be empty)
+        ├── analysis.py     (any number of modules; a subfolder needs its own __init__.py)
+        └── variables.yaml  (default units for the plugin's own variables)
+
+    with algorithms declared in any of its modules::
+
+        from cfspopcon import declare_algorithm
+
+        @declare_algorithm(return_keys=["widgets_per_shift"])
+        def calc_widgets_per_shift(widget_rate, shift_length):
+            ...
+
+    Registering the plugin by name registers all of the above in one step::
+
+        import cfspopcon
+
+        cfspopcon.register_plugin("my_popcon_plugin")
+        cfspopcon.registry["calc_widgets_per_shift"]
+
+    Every algorithm declared in the plugin's modules is registered, and so is an algorithm
+    one of those modules imports from elsewhere. Composites may combine the plugin's own
+    algorithms, the ones bundled with cfspopcon, and those of any plugin registered earlier.
+    Registering the same plugin again changes nothing.
+
+    A plugin whose composites build on another plugin's algorithms names that plugin in its
+    ``__init__.py``, with ``__popcon_requires__ = ("other_plugin",)``; each requirement is
+    registered first.
 
     Registration is atomic: if anything fails, the registries are restored, and the plugin can
-    be fixed and registered again in the same session. ``ureg.define`` calls are the exception;
-    pint has no un-define.
+    be fixed and registered again in the same session. Custom unit definitions are the one
+    thing which cannot be undone.
 
     Args:
-        plugin_name: the plugin's import name, e.g. ``"my_popcon_plugin"``, which may differ from
-            the distribution name.
+        plugin_name: the plugin's import name, e.g. ``"my_popcon_plugin"``, which may differ
+            from the installed distribution's name.
 
     Returns:
         The names of the algorithms this call added to the registry.
 
     Raises:
-        RuntimeError: if a declared composite names a component which is not registered by the end
-            of this plugin's registration, or the ``__popcon_requires__`` chain is circular.
+        RuntimeError: if a declared composite names an algorithm which is still missing once
+            the plugin is registered, or the ``__popcon_requires__`` chain is circular.
         ValueError: if the package is a plain module, or its units change an existing variable's.
     """
     global _BUNDLED_ALGORITHMS_DISCOVERED  # noqa: PLW0603
