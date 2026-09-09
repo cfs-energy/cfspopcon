@@ -755,6 +755,24 @@ def _register_scanned(algorithms: list[Algorithm], declarations: list[CompositeD
             pending.remove(declaration)
 
 
+def _roll_back_registration(
+    plugin_name: str, algorithms_before: dict[str, Algorithm | CompositeAlgorithm], units_before: dict[str, str | None]
+) -> None:
+    """Restore the registries after a failed registration, and evict the plugin's modules."""
+    global _BUNDLED_ALGORITHMS_DISCOVERED  # noqa: PLW0603
+    Algorithm.instances.clear()
+    Algorithm.instances.update(algorithms_before)
+    reset_default_units()
+    extend_default_units_map(units_before)
+    if plugin_name == _BUNDLED_PLUGIN:
+        _BUNDLED_ALGORITHMS_DISCOVERED = False
+    else:
+        # Registration is atomic, imports included: a retry re-imports the plugin
+        # from disk, so any fix is picked up.
+        for module_name in [m for m in sys.modules if m == plugin_name or m.startswith(f"{plugin_name}.")]:
+            del sys.modules[module_name]
+
+
 def register_plugin(plugin_name: str) -> list[str]:
     """Register a plugin: its default units, its algorithms, and its composites.
 
@@ -845,15 +863,7 @@ def register_plugin(plugin_name: str) -> list[str]:
             _register_scanned(algorithms, declarations)
             return [name for name in Algorithm.instances if name not in algorithms_before]
         except BaseException:
-            # The modules this call imported stay cached, and that is what makes a retry work:
-            # after the broken module is fixed, the retry's scan finds the same objects and
-            # registers them.
-            Algorithm.instances.clear()
-            Algorithm.instances.update(algorithms_before)
-            reset_default_units()
-            extend_default_units_map(units_before)
-            if plugin_name == _BUNDLED_PLUGIN:
-                _BUNDLED_ALGORITHMS_DISCOVERED = False
+            _roll_back_registration(plugin_name, algorithms_before, units_before)
             raise
     finally:
         _REGISTRATION_IN_PROGRESS.discard(plugin_name)

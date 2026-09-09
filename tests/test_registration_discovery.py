@@ -312,6 +312,32 @@ def test_a_failed_registration_can_be_retried_after_fixing(tmp_path, monkeypatch
         forget_packages("_probe_retry_pkg")
 
 
+def test_a_fix_to_an_already_imported_module_is_picked_up_on_retry(tmp_path, monkeypatch, clean_composites):
+    """A failed registration evicts the plugin's modules, so a source fix is seen without restarting Python."""
+    pkg = write_package(
+        tmp_path,
+        "_probe_cachedfix_pkg",
+        {
+            "m": "from cfspopcon.algorithm_class import Algorithm\n"
+            "_probe_clash = Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='calc_plasma_volume', skip_unit_conversion=True)\n"
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(RuntimeError, match="already registered"):
+            register_plugin("_probe_cachedfix_pkg")
+
+        (pkg / "m.py").write_text(
+            "from cfspopcon.algorithm_class import Algorithm\n"
+            "_probe_fixed = Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_fixed', skip_unit_conversion=True)\n"
+        )
+        importlib.invalidate_caches()
+        assert register_plugin("_probe_cachedfix_pkg") == ["_probe_fixed"]
+        assert isinstance(registry["_probe_fixed"], Algorithm)
+    finally:
+        forget_packages("_probe_cachedfix_pkg")
+
+
 def test_rollback_leaves_an_already_registered_package_alone(tmp_path, monkeypatch, clean_composites):
     """Only what the failing call imported is undone; an earlier registration survives."""
     write_package(
