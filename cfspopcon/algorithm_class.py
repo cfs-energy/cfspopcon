@@ -953,6 +953,7 @@ class _AlgorithmRegistry:
                 function.
             RuntimeError: if the name is registered and ``override`` is not set.
         """
+        _ensure_bundled_algorithms()
         algorithm = getattr(algorithm, "__popcon_algorithm__", algorithm)
         if not isinstance(algorithm, Algorithm | CompositeAlgorithm) or algorithm.name is None:
             raise ValueError("Only a named Algorithm or CompositeAlgorithm, or a labelled function, can be registered.")

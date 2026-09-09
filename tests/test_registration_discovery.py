@@ -55,6 +55,22 @@ def test_repeated_discovery_changes_nothing():
     assert Algorithm.instances == populated
 
 
+def test_registering_before_the_first_lookup_sees_the_builtins(run_script):
+    """registry.register brings the builtins in first, so replacing one works before any lookup.
+
+    Run in a subprocess, since the suite discovers at session start.
+    """
+    script = (
+        "import cfspopcon\n"
+        "from cfspopcon import Algorithm, registry\n"
+        "mine = Algorithm(lambda major_radius=1.0: {'plasma_volume': major_radius}, ['plasma_volume'], name='calc_plasma_volume')\n"
+        "registry.register(mine, override=True)\n"
+        "assert registry['calc_plasma_volume'] is mine\n"
+        "assert len(list(registry)) > 100\n"
+    )
+    run_script(script)
+
+
 def test_browsing_formulas_registers_nothing(run_script):
     """cfspopcon.formulas is an ordinary package; browsing it must leave the registry empty.
 
