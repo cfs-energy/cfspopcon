@@ -1,7 +1,12 @@
 import pytest
 
 from cfspopcon.unit_handling import ureg
-from cfspopcon.unit_handling.default_units import check_units_are_valid, read_default_units_from_file
+from cfspopcon.unit_handling.default_units import (
+    check_units_are_valid,
+    default_unit,
+    extend_default_units_map,
+    read_default_units_from_file,
+)
 
 
 def test_read_default_units():
@@ -42,3 +47,24 @@ def test_a_variables_file_with_missing_entries_is_refused(tmp_path):
     empty = tmp_path / "empty.yaml"
     empty.write_text("")
     read_default_units_from_file(empty)
+
+
+def test_equivalent_respelling_is_a_no_op_keeping_the_first_spelling():
+    """Re-declaring the same units in another spelling is accepted; different units are refused."""
+    extend_default_units_map({"_probe_respell_var": "m**3"})
+    extend_default_units_map({"_probe_respell_var": "meter ** 3"})
+    assert default_unit("_probe_respell_var") == "m**3"
+
+    with pytest.raises(ValueError, match="_probe_respell_var"):
+        extend_default_units_map({"_probe_respell_var": "m**2"})
+
+
+def test_a_non_unitful_declaration_only_matches_itself():
+    """None re-declares over None; None and a unit refuse each other, both ways."""
+    extend_default_units_map({"_probe_none_var": None, "_probe_unitful_var": "m"})
+    extend_default_units_map({"_probe_none_var": None})
+
+    with pytest.raises(ValueError, match="_probe_none_var"):
+        extend_default_units_map({"_probe_none_var": "m"})
+    with pytest.raises(ValueError, match="_probe_unitful_var"):
+        extend_default_units_map({"_probe_unitful_var": None})

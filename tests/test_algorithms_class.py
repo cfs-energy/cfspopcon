@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithms_setting, algorithms_using, registry
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, algorithms_setting, algorithms_using, declare_algorithm, registry
 from cfspopcon.unit_handling import ureg
 
 
@@ -341,6 +341,27 @@ def test_from_list_builds_a_composite_in_the_order_given():
     assert [alg.name for alg in CompositeAlgorithm.from_list(names[::-1]).algorithms] == names[::-1]
     assert CompositeAlgorithm.from_list(names, name="_probe_from_list").name == "_probe_from_list"
     assert "_probe_from_list" not in Algorithm.instances
+
+
+def test_register_accepts_a_labelled_function_and_rejects_the_unlabelled():
+    """registry.register unwraps a declare_algorithm label; anything unnamed or unlabelled is refused."""
+    name = "_probe_labelled"
+    Algorithm.instances.pop(name, None)
+    try:
+
+        @declare_algorithm(return_keys=["_probe_labelled_out"], name=name, skip_unit_conversion=True)
+        def calc_probe_labelled(x):
+            return x
+
+        registry.register(calc_probe_labelled)
+        assert registry[name] is calc_probe_labelled.__popcon_algorithm__
+
+        with pytest.raises(ValueError, match="Only a named"):
+            registry.register(lambda x: x)
+        with pytest.raises(ValueError, match="Only a named"):
+            registry.register(CompositeAlgorithm([registry["calc_plasma_volume"]]))
+    finally:
+        Algorithm.instances.pop(name, None)
 
 
 def test_composite_construction_registers_nothing():

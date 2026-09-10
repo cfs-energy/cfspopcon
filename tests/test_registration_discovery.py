@@ -71,6 +71,20 @@ def test_registering_before_the_first_lookup_sees_the_builtins(run_script):
     run_script(script)
 
 
+def test_the_first_discovery_returns_every_builtin_name(run_script):
+    """discover_builtin_algorithms returns the added names: all builtins first, an empty list on a repeat.
+
+    Run in a subprocess, since the suite discovers at session start.
+    """
+    script = (
+        "import cfspopcon\n"
+        "added = cfspopcon.discover_builtin_algorithms()\n"
+        "assert len(added) > 100 and 'calc_plasma_volume' in added\n"
+        "assert cfspopcon.discover_builtin_algorithms() == []\n"
+    )
+    run_script(script)
+
+
 def test_browsing_formulas_registers_nothing(run_script):
     """cfspopcon.formulas is an ordinary package; browsing it must leave the registry empty.
 
@@ -227,10 +241,32 @@ def test_a_declared_composite_may_override_a_registered_name(tmp_path, monkeypat
     try:
         register_plugin("_probe_ov_first_pkg")
         assert not isinstance(registry["_probe_ov_target"], CompositeAlgorithm)
-        register_plugin("_probe_ov_second_pkg")
+        assert register_plugin("_probe_ov_second_pkg") == ["_probe_ov_part"]
         assert isinstance(registry["_probe_ov_target"], CompositeAlgorithm)
     finally:
         forget_packages("_probe_ov_first_pkg", "_probe_ov_second_pkg")
+
+
+def test_a_decorated_override_replaces_a_builtin(tmp_path, monkeypatch, clean_composites):
+    """@declare_algorithm(override=True) replaces the registered algorithm of the same name."""
+    write_package(
+        tmp_path,
+        "_probe_decov_pkg",
+        {
+            "m": "from cfspopcon.algorithm_class import declare_algorithm\n\n\n"
+            "@declare_algorithm(return_keys=['plasma_volume'], name='calc_plasma_volume', override=True, skip_unit_conversion=True)\n"
+            "def calc_probe_volume(major_radius):\n"
+            "    return major_radius\n"
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    builtin = registry["calc_plasma_volume"]
+    try:
+        assert register_plugin("_probe_decov_pkg") == []  # a replaced name is not a new name
+        assert registry["calc_plasma_volume"] is not builtin
+    finally:
+        forget_packages("_probe_decov_pkg")
+        Algorithm.instances["calc_plasma_volume"] = builtin
 
 
 def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatch, clean_composites):
@@ -628,7 +664,7 @@ def test_a_required_package_is_registered_first(tmp_path, monkeypatch, clean_com
     )
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
-        register_plugin("_probe_req_main_pkg")
+        assert set(register_plugin("_probe_req_main_pkg")) == {"_probe_req_main", "_probe_req_chain"}
         assert isinstance(registry["_probe_req_dep"], Algorithm)
         assert isinstance(registry["_probe_req_chain"], CompositeAlgorithm)
     finally:
