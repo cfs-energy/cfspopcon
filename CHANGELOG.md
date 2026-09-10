@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 9.0.0 - 2026-09-10
+
 This release makes cfspopcon extensible: plugin packages can add algorithms, composites, and
 variables, and a case's input file can use them like the built-in ones. To support this,
 importing cfspopcon runs no registration code at all. This is a breaking release, planned as a
