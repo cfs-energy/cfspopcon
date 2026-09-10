@@ -182,3 +182,9 @@ Publishing the drafted release on GitHub is what triggers the build-and-publish 
 ``verify`` exists because readthedocs serves the last successful ``stable`` build: a failed
 tag build leaves the previous version's docs in place, with the failure visible only in the
 readthedocs dashboard.
+
+readthedocs shows only *activated* versions in its version switcher, and by default that is
+``stable`` (the newest release tag) and ``latest`` (the ``main`` branch). To list every
+published version as well, add an automation rule in the readthedocs dashboard
+(Admin → Automation Rules): match the custom pattern ``^v``, action "Activate version".
+Already-published tags can be activated one at a time under Versions.

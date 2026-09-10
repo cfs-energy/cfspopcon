@@ -197,6 +197,21 @@ def publish(version: str) -> None:
     print(f"\nDraft release v{version} created! Review and publish it on GitHub, then run:\n  python scripts/release.py verify {version}")
 
 
+def _tag_commit(version: str) -> str:
+    """Resolve the release tag to its commit on origin, so a clone without the tag still verifies.
+
+    Raises:
+        SystemExit: If origin has no such tag.
+    """
+    out = _run("git", "ls-remote", "origin", f"refs/tags/v{version}*", capture=True)
+    refs = {ref: sha for sha, ref in (line.split("\t") for line in out.splitlines())}
+    # An annotated tag lists the tag object and a peeled line; the peeled line is the commit.
+    commit = refs.get(f"refs/tags/v{version}^{{}}") or refs.get(f"refs/tags/v{version}")
+    if not commit:
+        raise SystemExit(f"origin has no tag v{version}.")
+    return commit
+
+
 def verify(version: str) -> None:
     """Check that a published release actually reached PyPI and readthedocs.
 
@@ -210,7 +225,7 @@ def verify(version: str) -> None:
     print(f"PyPI has {version}: {'yes' if on_pypi else 'NO (publishing can lag a few minutes; re-run, then check the release workflow)'}")
     ok &= on_pypi
 
-    tag_commit = _run("git", "rev-list", "-n1", f"v{version}", capture=True)
+    tag_commit = _tag_commit(version)
     build = _get_json(RTD_BUILDS_URL)["results"][0]
     docs_ok = bool(build.get("success")) and build.get("commit") == tag_commit
     print(f"readthedocs stable built from v{version}: {'yes' if docs_ok else 'NO'}")
