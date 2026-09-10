@@ -49,11 +49,11 @@ def run_popcon_cli(case: str, show: bool, debug: bool, kwargs: tuple[tuple[str, 
 @click.option("--plugin", "-p", "plugins", multiple=True, help="Also register this plugin package (repeatable).")
 def write_algorithms_yaml(output: str, plugins: tuple[str, ...]) -> None:
     """Write the registered algorithms to a yaml helper file."""
-    from cfspopcon import Algorithm, register_plugin
+    from cfspopcon import algorithm_class, register_plugin
 
     for plugin in plugins:
         register_plugin(plugin)
-    Algorithm.write_yaml(Path(output))
+    algorithm_class.write_algorithms_yaml(Path(output))
 
 
 def run_popcon(case: str, show: bool, cli_args: dict[str, str]) -> None:

@@ -1,15 +1,7 @@
 """The physics formulas behind the POPCON analysis, one subpackage per topic.
 
-This package is the bundled plugin of cfspopcon. You can register it deliberately, like any other
-plugin, with ``register_plugin("cfspopcon.formulas")``.
-
-If you did not register the bundled plugin, the first use of the registry will trigger it
-automatically::
-
-    import cfspopcon
-
-    # registers the bundled plugin
-    volume_algorithm = cfspopcon.registry["calc_plasma_volume"]
+This package is the bundled plugin of cfspopcon: the first use of the registry registers every
+algorithm defined here.
 """
 
 from . import (

@@ -1,4 +1,4 @@
-"""Define default units for writing to/from disk."""
+"""The default units of cfspopcon's variables: the unit each value is normalized to."""
 
 from collections.abc import Iterable
 from importlib.resources import files
@@ -10,9 +10,9 @@ from typing import Any, overload
 import numpy as np
 import xarray as xr
 import yaml
-from pint import DimensionalityError, UndefinedUnitError
+from pint import DimensionalityError
 
-from .setup_unit_handling import Quantity, convert_units, magnitude_in_units
+from .setup_unit_handling import Quantity, Unit, convert_units, magnitude_in_units
 
 
 def check_units_are_valid(units_dictionary: dict[str, str | None]) -> None:
@@ -29,7 +29,8 @@ def check_units_are_valid(units_dictionary: dict[str, str | None]) -> None:
     for key, units in units_dictionary.items():
         try:
             Quantity(1.0, units)
-        except UndefinedUnitError:
+        # pint rejects a malformed spelling with a mix of error types
+        except Exception:
             invalid_units.append((key, units))
 
     if invalid_units:
@@ -51,30 +52,47 @@ def _merge_default_units(units_dictionary: dict[str, str | None]) -> None:
     check_units_are_valid(units_dictionary)
 
     changed = {
-        key: new for key, new in units_dictionary.items() if key in _DEFAULT_UNIT_BY_VARIABLE and new != _DEFAULT_UNIT_BY_VARIABLE[key]
+        key: new
+        for key, new in units_dictionary.items()
+        if key in _DEFAULT_UNIT_BY_VARIABLE and not _same_units(new, _DEFAULT_UNIT_BY_VARIABLE[key])
     }
     if changed:
         listed = "\n".join(f"{key}: {_DEFAULT_UNIT_BY_VARIABLE[key]!r} -> {new!r}" for key, new in changed.items())
         raise ValueError(f"Refusing to change the default units of already-defined variables:\n{listed}")
 
-    _DEFAULT_UNIT_BY_VARIABLE.update(units_dictionary)
+    # Keep the first spelling, so a re-declaration cannot reword an existing entry.
+    _DEFAULT_UNIT_BY_VARIABLE.update({key: new for key, new in units_dictionary.items() if key not in _DEFAULT_UNIT_BY_VARIABLE})
+
+
+def _same_units(new: str | None, old: str | None) -> bool:
+    """Whether two spellings name the same unit, e.g. "m**3" and "meter ** 3"."""
+    return new == old or (new is not None and old is not None and Unit(new) == Unit(old))
 
 
 def read_default_units_from_file(units_file: str | Path | Traversable | None = None) -> None:
     """Read a variables YAML file and add its default units to the default units map.
+
+    Re-declaring a variable with the units it already has is accepted in any equivalent
+    spelling, and the first spelling is kept.
 
     Args:
         units_file: a YAML file mapping each variable name to an entry with a ``default_units``
             key, in the shape of cfspopcon's own ``variables.yaml``. Defaults to that file.
 
     Raises:
-        ValueError: if a unit is not recognized, or an existing variable's units would change.
+        ValueError: if the file is not a mapping of entries with ``default_units``, a unit is
+            not recognized, or an existing variable's units would change.
     """
     source = files("cfspopcon").joinpath("variables.yaml") if units_file is None else units_file
     if isinstance(source, str):
         source = Path(source)
-    variables_dictionary: dict[str, dict[str, Any]] = yaml.safe_load(source.read_text())
-    _merge_default_units({key: value["default_units"] for key, value in variables_dictionary.items()})
+    entries = yaml.safe_load(source.read_text()) or {}
+    if not isinstance(entries, dict):
+        raise ValueError(f"{source} must be a YAML mapping of variable names to entries.")
+    missing = [key for key, value in entries.items() if not isinstance(value, dict) or "default_units" not in value]
+    if missing:
+        raise ValueError(f"The following entries in {source} have no default_units:\n" + "\n".join(str(key) for key in missing))
+    _merge_default_units({key: value["default_units"] for key, value in entries.items()})
 
 
 # Maps a variable name to the unit its values are normalized to, or None for a variable
@@ -85,6 +103,9 @@ read_default_units_from_file()
 
 def extend_default_units_map(units_dictionary: dict[str, str | None]) -> None:
     """Extend the default units map with the given dictionary.
+
+    Re-declaring a variable with the units it already has is accepted in any equivalent
+    spelling, and the first spelling is kept.
 
     Args:
         units_dictionary: maps each variable name to the unit its values are normalized to,
@@ -128,7 +149,7 @@ def default_unit(var: str) -> str | None:
         return _DEFAULT_UNIT_BY_VARIABLE[var]
     except KeyError:
         raise KeyError(
-            f"No default unit defined for {var}. Please check configured default units in the unit_handling submodule."
+            f"No default units defined for '{var}'. Declare them in the plugin's variables.yaml, or with extend_default_units_map."
         ) from None
 
 
@@ -178,14 +199,14 @@ def set_default_units(value: Any, key: str) -> Any: ...
 
 
 def set_default_units(value: Any, key: str) -> Any:
-    """Return value as a quantity with default units.
+    """Return value as a quantity carrying the variable's default units.
 
     Args:
-        value: magnitude of input value to convert to a Quantity
-        key: name of variable which we are setting the default units for
+        value: magnitude to attach units to
+        key: the variable whose default units apply
 
     Returns:
-        magnitude of value in default units
+        value with the variable's default units attached
     """
 
     def _is_number_not_bool(val: Any) -> bool:

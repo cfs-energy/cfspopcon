@@ -17,6 +17,7 @@ from cfspopcon.algorithm_class import (
     CompositeAlgorithm,
     discover_builtin_algorithms,
     register_plugin,
+    registry,
 )
 from cfspopcon.unit_handling import Quantity, ureg
 
@@ -26,7 +27,7 @@ def register_probe(name):
     algorithm = Algorithm.from_single_function(
         lambda _probe_in: _probe_in, return_keys=["_probe_out"], name=name, skip_unit_conversion=True
     )
-    Algorithm.register(algorithm)
+    registry.register(algorithm)
     return algorithm
 
 
@@ -52,6 +53,36 @@ def test_repeated_discovery_changes_nothing():
     assert len(populated) > 100
     discover_builtin_algorithms()
     assert Algorithm.instances == populated
+
+
+def test_registering_before_the_first_lookup_sees_the_builtins(run_script):
+    """registry.register brings the builtins in first, so replacing one works before any lookup.
+
+    Run in a subprocess, since the suite discovers at session start.
+    """
+    script = (
+        "import cfspopcon\n"
+        "from cfspopcon import Algorithm, registry\n"
+        "mine = Algorithm(lambda major_radius=1.0: {'plasma_volume': major_radius}, ['plasma_volume'], name='calc_plasma_volume')\n"
+        "registry.register(mine, override=True)\n"
+        "assert registry['calc_plasma_volume'] is mine\n"
+        "assert len(list(registry)) > 100\n"
+    )
+    run_script(script)
+
+
+def test_the_first_discovery_returns_every_builtin_name(run_script):
+    """discover_builtin_algorithms returns the added names: all builtins first, an empty list on a repeat.
+
+    Run in a subprocess, since the suite discovers at session start.
+    """
+    script = (
+        "import cfspopcon\n"
+        "added = cfspopcon.discover_builtin_algorithms()\n"
+        "assert len(added) > 100 and 'calc_plasma_volume' in added\n"
+        "assert cfspopcon.discover_builtin_algorithms() == []\n"
+    )
+    run_script(script)
 
 
 def test_browsing_formulas_registers_nothing(run_script):
@@ -92,7 +123,7 @@ def test_a_composite_may_span_packages_registered_earlier(tmp_path, monkeypatch,
     try:
         register_plugin("_probe_first_pkg")
         register_plugin("_probe_second_pkg")
-        assert isinstance(Algorithm.get_algorithm("_probe_spanning"), CompositeAlgorithm)
+        assert isinstance(registry["_probe_spanning"], CompositeAlgorithm)
     finally:
         forget_packages("_probe_first_pkg", "_probe_second_pkg")
 
@@ -123,15 +154,15 @@ def test_drop_in_module_is_discovered_without_editing_init():
     stem = f"_probe_drop_in_{os.getpid()}"
     probe = Path(formulas.__file__).parent / f"{stem}.py"
     probe.write_text(
-        "from cfspopcon.algorithm_class import Algorithm\n\n\n"
-        f"@Algorithm.register_algorithm(return_keys=['{stem}_out'], skip_unit_conversion=True)\n"
+        "from cfspopcon.algorithm_class import declare_algorithm\n\n\n"
+        f"@declare_algorithm(return_keys=['{stem}_out'], skip_unit_conversion=True)\n"
         f"def calc_{stem}(_probe_in):\n"
         '    """Throwaway probe algorithm."""\n'
         "    return _probe_in\n"
     )
     try:
         discover_builtin_algorithms()
-        assert isinstance(Algorithm.get_algorithm(f"calc_{stem}"), Algorithm)
+        assert isinstance(registry[f"calc_{stem}"], Algorithm)
     finally:
         Algorithm.instances.pop(f"calc_{stem}", None)
         probe.unlink()
@@ -148,8 +179,8 @@ def test_registering_a_plugin_walks_nested_submodules(tmp_path, monkeypatch, cle
         "_walk_probe_pkg",
         {
             # Nested, and never imported by hand: only the walk can reach it.
-            "models/detachment": "from cfspopcon.algorithm_class import Algorithm\n\n\n"
-            "@Algorithm.register_algorithm(return_keys=['_walk_out'], skip_unit_conversion=True)\n"
+            "models/detachment": "from cfspopcon.algorithm_class import declare_algorithm\n\n\n"
+            "@declare_algorithm(return_keys=['_walk_out'], skip_unit_conversion=True)\n"
             "def calc_walk_probe(_walk_in):\n"
             '    """Throwaway algorithm in a nested submodule."""\n'
             "    return _walk_in\n"
@@ -157,8 +188,9 @@ def test_registering_a_plugin_walks_nested_submodules(tmp_path, monkeypatch, cle
     )
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
-        register_plugin("_walk_probe_pkg")
-        assert isinstance(Algorithm.get_algorithm("calc_walk_probe"), Algorithm)
+        assert "calc_walk_probe" in register_plugin("_walk_probe_pkg")
+        assert isinstance(registry["calc_walk_probe"], Algorithm)
+        assert register_plugin("_walk_probe_pkg") == []
     finally:
         forget_packages("_walk_probe_pkg")
 
@@ -180,8 +212,8 @@ def test_composites_build_regardless_of_declaration_order(tmp_path, monkeypatch,
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
         register_plugin("_probe_order2_pkg")
-        assert isinstance(Algorithm.get_algorithm("_probe_composite"), CompositeAlgorithm)
-        assert isinstance(Algorithm.get_algorithm("_probe_of_composite"), CompositeAlgorithm)
+        assert isinstance(registry["_probe_composite"], CompositeAlgorithm)
+        assert isinstance(registry["_probe_of_composite"], CompositeAlgorithm)
     finally:
         forget_packages("_probe_order2_pkg")
 
@@ -208,11 +240,33 @@ def test_a_declared_composite_may_override_a_registered_name(tmp_path, monkeypat
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
         register_plugin("_probe_ov_first_pkg")
-        assert not isinstance(Algorithm.get_algorithm("_probe_ov_target"), CompositeAlgorithm)
-        register_plugin("_probe_ov_second_pkg")
-        assert isinstance(Algorithm.get_algorithm("_probe_ov_target"), CompositeAlgorithm)
+        assert not isinstance(registry["_probe_ov_target"], CompositeAlgorithm)
+        assert register_plugin("_probe_ov_second_pkg") == ["_probe_ov_part"]
+        assert isinstance(registry["_probe_ov_target"], CompositeAlgorithm)
     finally:
         forget_packages("_probe_ov_first_pkg", "_probe_ov_second_pkg")
+
+
+def test_a_decorated_override_replaces_a_builtin(tmp_path, monkeypatch, clean_composites):
+    """@declare_algorithm(override=True) replaces the registered algorithm of the same name."""
+    write_package(
+        tmp_path,
+        "_probe_decov_pkg",
+        {
+            "m": "from cfspopcon.algorithm_class import declare_algorithm\n\n\n"
+            "@declare_algorithm(return_keys=['plasma_volume'], name='calc_plasma_volume', override=True, skip_unit_conversion=True)\n"
+            "def calc_probe_volume(major_radius):\n"
+            "    return major_radius\n"
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    builtin = registry["calc_plasma_volume"]
+    try:
+        assert register_plugin("_probe_decov_pkg") == []  # a replaced name is not a new name
+        assert registry["calc_plasma_volume"] is not builtin
+    finally:
+        forget_packages("_probe_decov_pkg")
+        Algorithm.instances["calc_plasma_volume"] = builtin
 
 
 def test_a_walk_which_raises_blames_the_broken_package_only(tmp_path, monkeypatch, clean_composites):
@@ -289,9 +343,105 @@ def test_a_failed_registration_can_be_retried_after_fixing(tmp_path, monkeypatch
         (pkg / "broken.py").write_text("x = 1\n")
         importlib.invalidate_caches()
         register_plugin("_probe_retry_pkg")
-        assert isinstance(Algorithm.get_algorithm("_probe_retry"), Algorithm)
+        assert isinstance(registry["_probe_retry"], Algorithm)
     finally:
         forget_packages("_probe_retry_pkg")
+
+
+def test_a_failed_bundled_walk_does_not_latch_discovery(run_script):
+    """A failure during the bundled walk leaves discovery retryable on the next registry use.
+
+    Run in a subprocess, since the suite discovers at session start.
+    """
+    script = (
+        "import pkgutil\n"
+        "import cfspopcon\n"
+        "from cfspopcon import Algorithm, registry\n"
+        "real_walk = pkgutil.walk_packages\n"
+        "def broken_walk(*args, **kwargs):\n"
+        "    raise ImportError('forced walk failure')\n"
+        "pkgutil.walk_packages = broken_walk\n"
+        "try:\n"
+        "    registry['calc_plasma_volume']\n"
+        "    raise SystemExit('expected the forced failure')\n"
+        "except ImportError:\n"
+        "    pass\n"
+        "pkgutil.walk_packages = real_walk\n"
+        "assert isinstance(registry['calc_plasma_volume'], Algorithm)\n"
+    )
+    run_script(script)
+
+
+def test_a_fix_to_an_already_imported_module_is_picked_up_on_retry(tmp_path, monkeypatch, clean_composites):
+    """A failed registration evicts the plugin's modules, so a source fix is seen without restarting Python."""
+    pkg = write_package(
+        tmp_path,
+        "_probe_cachedfix_pkg",
+        {
+            "m": "from cfspopcon.algorithm_class import Algorithm\n"
+            "_probe_clash = Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='calc_plasma_volume', skip_unit_conversion=True)\n"
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(RuntimeError, match="already registered"):
+            register_plugin("_probe_cachedfix_pkg")
+
+        (pkg / "m.py").write_text(
+            "from cfspopcon.algorithm_class import Algorithm\n"
+            "_probe_fixed = Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_fixed', skip_unit_conversion=True)\n"
+        )
+        importlib.invalidate_caches()
+        assert register_plugin("_probe_cachedfix_pkg") == ["_probe_fixed"]
+        assert isinstance(registry["_probe_fixed"], Algorithm)
+    finally:
+        forget_packages("_probe_cachedfix_pkg")
+
+
+def test_rollback_covers_import_time_registration(tmp_path, monkeypatch, clean_composites):
+    """A failure rolls back registrations a module made at import time, so a fixed plugin retries cleanly."""
+    pkg = write_package(
+        tmp_path,
+        "_probe_boundary_pkg",
+        {
+            "aaa_registers": "from cfspopcon.algorithm_class import Algorithm, registry\n"
+            "registry.register(Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_regtime', skip_unit_conversion=True))\n",
+            "zzz_broken": "from cfspopcon.algorithm_class import CompositeAlgorithm\n"
+            "_probe_bad = CompositeAlgorithm.declare(['_probe_no_such'], name='_probe_bad_composite')\n",
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(RuntimeError, match="_probe_no_such"):
+            register_plugin("_probe_boundary_pkg")
+        assert "_probe_regtime" not in Algorithm.instances
+
+        # A different byte count, so the stale .pyc (same size, same mtime second) cannot be reused.
+        (pkg / "zzz_broken.py").write_text(
+            "from cfspopcon.algorithm_class import CompositeAlgorithm\n\n"
+            "_probe_bad = CompositeAlgorithm.declare(['_probe_regtime'], name='_probe_bad_composite')\n"
+        )
+        importlib.invalidate_caches()
+        added = register_plugin("_probe_boundary_pkg")
+        assert "_probe_regtime" in added
+        assert isinstance(registry["_probe_bad_composite"], CompositeAlgorithm)
+    finally:
+        forget_packages("_probe_boundary_pkg")
+
+
+def test_a_fix_to_a_bad_requires_is_picked_up_on_retry(tmp_path, monkeypatch, clean_composites):
+    """A failure before registration begins also evicts the plugin, so fixing __init__.py retries cleanly."""
+    pkg = write_package(tmp_path, "_probe_badreq_pkg", {"__init__": "__popcon_requires__ = 'not_a_tuple'\n"})
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(ValueError, match="__popcon_requires__"):
+            register_plugin("_probe_badreq_pkg")
+
+        (pkg / "__init__.py").write_text("")
+        importlib.invalidate_caches()
+        assert register_plugin("_probe_badreq_pkg") == []
+    finally:
+        forget_packages("_probe_badreq_pkg")
 
 
 def test_rollback_leaves_an_already_registered_package_alone(tmp_path, monkeypatch, clean_composites):
@@ -311,7 +461,7 @@ def test_rollback_leaves_an_already_registered_package_alone(tmp_path, monkeypat
         with pytest.raises(ImportError, match="broken on purpose"):
             register_plugin("_probe_faulty_pkg")
 
-        assert isinstance(Algorithm.get_algorithm("_probe_bystander"), Algorithm)
+        assert isinstance(registry["_probe_bystander"], Algorithm)
         assert "_probe_bystander_pkg" in sys.modules
     finally:
         forget_packages("_probe_bystander_pkg", "_probe_faulty_pkg")
@@ -320,11 +470,11 @@ def test_rollback_leaves_an_already_registered_package_alone(tmp_path, monkeypat
 def test_a_misspelled_algorithm_name_suggests_the_real_one():
     """A near-miss lookup suggests the registered name."""
     with pytest.raises(KeyError, match="Did you mean 'calc_plasma_volume'"):
-        Algorithm.get_algorithm("calc_plasma_volme")
+        registry["calc_plasma_volme"]
 
 
 def test_the_popcon_command_discovers_before_reading_the_case(run_script):
-    """popcon populates the registry before read_case runs, surfacing registration failures at startup.
+    """Popcon populates the registry before read_case runs, surfacing registration failures at startup.
 
     Stops at read_case, since only the ordering is under test, and runs in a subprocess because the
     suite has already discovered in this one.
@@ -383,13 +533,13 @@ _ds_deep = CompositeAlgorithm.declare(["_ds_of_builtin_composite", "_ds_mixed"],
 #: A new variable of the package's own, so this also exercises declaring default units in code,
 #: with ``extend_default_units_map``.
 DOWNSTREAM_ALGORITHMS = """\
-from cfspopcon.algorithm_class import Algorithm
+from cfspopcon.algorithm_class import declare_algorithm
 from cfspopcon.unit_handling import extend_default_units_map
 
 extend_default_units_map({"_ds_metric": "m**3"})
 
 
-@Algorithm.register_algorithm(return_keys=["_ds_metric"])
+@declare_algorithm(return_keys=["_ds_metric"])
 def calc_ds_metric(plasma_volume):
     \"\"\"Throwaway algorithm consuming a builtin algorithm's output.\"\"\"
     return 2.0 * plasma_volume
@@ -401,7 +551,7 @@ DECLARED_COMPOSITES = ["_ds_own", "_ds_mixed", "_ds_of_builtin_composite", "_ds_
 @pytest.fixture()
 def downstream_package(tmp_path, monkeypatch, clean_composites):
     """Walk an importable package which extends the builtin registry, and clean up after it."""
-    assert isinstance(Algorithm.get_algorithm(BUILTIN_COMPOSITE), CompositeAlgorithm)
+    assert isinstance(registry[BUILTIN_COMPOSITE], CompositeAlgorithm)
     write_package(
         tmp_path,
         DOWNSTREAM,
@@ -421,13 +571,13 @@ def downstream_package(tmp_path, monkeypatch, clean_composites):
 def test_a_walk_extends_the_builtin_registry(downstream_package):
     """Every declared composite builds, including ones nested three deep across both packages."""
     for name in DECLARED_COMPOSITES:
-        assert isinstance(Algorithm.get_algorithm(name), CompositeAlgorithm), name
+        assert isinstance(registry[name], CompositeAlgorithm), name
 
     # Flattening reaches through both packages: the deepest composite runs the builtin composite's
     # algorithms as well as the new one.
-    member_names = [alg.name for alg in Algorithm.get_algorithm("_ds_deep").algorithms]
+    member_names = [alg.name for alg in registry["_ds_deep"].algorithms]
     assert "calc_ds_metric" in member_names
-    builtin_members = [alg.name for alg in Algorithm.get_algorithm(BUILTIN_COMPOSITE).algorithms]
+    builtin_members = [alg.name for alg in registry[BUILTIN_COMPOSITE].algorithms]
     assert set(builtin_members) <= set(member_names)
 
 
@@ -440,7 +590,7 @@ def test_a_downstream_composite_runs_end_to_end(downstream_package):
             "areal_elongation": Quantity(1.75, ureg.dimensionless),
         }
     )
-    result = Algorithm.get_algorithm("_ds_mixed").update_dataset(inputs)
+    result = registry["_ds_mixed"].update_dataset(inputs)
 
     assert result["_ds_metric"] == 2.0 * result["plasma_volume"]
     assert result["_ds_metric"].pint.units == ureg.m**3
@@ -453,18 +603,18 @@ def test_the_machinery_works_without_the_builtin_algorithms(run_script):
     """
     script = """
 import xarray as xr
-from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm
+from cfspopcon.algorithm_class import Algorithm, CompositeAlgorithm, declare_algorithm
 from cfspopcon.unit_handling import Quantity, extend_default_units_map, ureg
 
 extend_default_units_map({"_solo_area": "m**2"})
 
 
-@Algorithm.register_algorithm(return_keys=["_solo_area"])
+@declare_algorithm(return_keys=["_solo_area"])
 def calc_solo_area(_solo_width, _solo_height):
     return _solo_width * _solo_height
 
 
-@Algorithm.register_algorithm(return_keys=["_solo_label"], skip_unit_conversion=True)
+@declare_algorithm(return_keys=["_solo_label"], skip_unit_conversion=True)
 def calc_solo_label(_solo_area):
     return "big" if _solo_area > Quantity(1.0, ureg.m**2) else "small"
 
@@ -543,8 +693,10 @@ def test_changing_an_existing_variables_units_is_refused(tmp_path, monkeypatch, 
     try:
         with pytest.raises(ValueError, match="average_electron_temp"):
             register_plugin("_probe_clash_pkg")
-        # Re-declaring identical units is a no-op, so re-reading the same file is allowed.
+        # Re-declaring the same units, in any spelling, is a no-op.
         default_units.extend_default_units_map({"average_electron_temp": default_units.default_unit("average_electron_temp")})
+        default_units.extend_default_units_map({"plasma_volume": "m**3"})
+        assert default_units.default_unit("plasma_volume") == "meter ** 3"
     finally:
         forget_packages("_probe_clash_pkg")
 
@@ -582,9 +734,9 @@ def test_a_required_package_is_registered_first(tmp_path, monkeypatch, clean_com
     )
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
-        register_plugin("_probe_req_main_pkg")
-        assert isinstance(Algorithm.get_algorithm("_probe_req_dep"), Algorithm)
-        assert isinstance(Algorithm.get_algorithm("_probe_req_chain"), CompositeAlgorithm)
+        assert set(register_plugin("_probe_req_main_pkg")) == {"_probe_req_main", "_probe_req_chain"}
+        assert isinstance(registry["_probe_req_dep"], Algorithm)
+        assert isinstance(registry["_probe_req_chain"], CompositeAlgorithm)
     finally:
         forget_packages("_probe_req_dep_pkg", "_probe_req_main_pkg")
 

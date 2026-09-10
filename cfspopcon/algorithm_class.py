@@ -24,7 +24,7 @@ from difflib import get_close_matches
 from functools import wraps
 from importlib.resources import files
 from pathlib import Path  # noqa: TC003
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
 from warnings import warn
 
 import xarray as xr
@@ -44,6 +44,9 @@ LabelledReturnFunctionType = Callable[..., dict[str, Any]]
 # A function with any signature and any return shape.
 GenericFunctionType = Callable[..., Any]
 
+# Preserves a decorated function's exact type.
+_F = TypeVar("_F", bound=Callable[..., Any])
+
 #: The bundled plugin: the package holding cfspopcon's own algorithms.
 _BUNDLED_PLUGIN = "cfspopcon.formulas"
 
@@ -56,14 +59,14 @@ _REGISTRATION_IN_PROGRESS: set[str] = set()
 
 def _algorithm_not_found_message(key: str) -> str:
     """Explain as specifically as possible why an algorithm name did not resolve."""
-    close_matches = get_close_matches(key, Algorithm.algorithms(), n=1)
+    close_matches = get_close_matches(key, list(Algorithm.instances), n=1)
     if close_matches:
         return f"algorithm '{key}' not found. Did you mean '{close_matches[0]}'?"
 
     return (
         f"algorithm '{key}' not found. If it comes from a plugin, register the plugin first: list it "
         "in the input file's plugins section, or call register_plugin. "
-        "Run popcon_algorithms to list what is registered."
+        "The popcon_algorithms command writes a listing of what is registered."
     )
 
 
@@ -77,7 +80,7 @@ def _register_algorithm(name: str, algorithm: Algorithm | CompositeAlgorithm, ov
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    #: The registered algorithms, keyed by name.
+    # The registered algorithms, keyed by name; reached through the registry accessor.
     instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
@@ -95,7 +98,8 @@ class Algorithm:
             return_keys: the variable names of the function's outputs, in the order they are
                 returned.
             name: the algorithm's name. Defaults to the function's name.
-            override: at registration, replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
         Raises:
             ValueError: if the function takes positional-only or variable positional arguments.
@@ -149,7 +153,7 @@ class Algorithm:
 
         Example::
 
-            algorithm = Algorithm.get_algorithm("algorithm_name")
+            algorithm = registry["algorithm_name"]
             outputs = algorithm(input_a=..., input_b=...)
 
         Args:
@@ -248,7 +252,8 @@ class Algorithm:
             name: the algorithm's name. Defaults to the function's name.
             skip_unit_conversion: return the outputs as the function produces them, without
                 normalizing each one to its variable's default units.
-            override: at registration, replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
         Returns:
             The Algorithm wrapping the function.
@@ -282,44 +287,6 @@ class Algorithm:
         )
 
     @classmethod
-    def register_algorithm(
-        cls, return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
-    ) -> GenericFunctionType:
-        """Label a function as an Algorithm, for :func:`register_plugin` to find.
-
-        The algorithm enters the registry when the plugin defining the function is registered.
-
-        Example::
-
-            @Algorithm.register_algorithm(return_keys=["plasma_volume"])
-            def calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation):
-                ...
-
-        Args:
-            return_keys: the variable names of the function's outputs, in the order they are
-                returned.
-            name: the algorithm's name. Defaults to the function's name.
-            skip_unit_conversion: return the outputs as the function produces them, without
-                normalizing each one to its variable's default units.
-            override: at registration, replace an already-registered algorithm of the same name.
-
-        Returns:
-            The decorator, which labels the function and returns it unchanged.
-        """
-
-        def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
-            func.__popcon_algorithm__ = Algorithm.from_single_function(  # type:ignore[attr-defined]
-                func,
-                return_keys=return_keys,
-                name=name if name is not None else func.__name__,
-                skip_unit_conversion=skip_unit_conversion,
-                override=override,
-            )
-            return func
-
-        return function_wrapper
-
-    @classmethod
     def empty(cls) -> Algorithm:
         """Build an algorithm with no inputs and no outputs, for where an Algorithm is required but nothing should be computed.
 
@@ -339,7 +306,7 @@ class Algorithm:
         Args:
             configuration: the inputs to check, as a mapping or dataset of variables.
             quiet: suppress the warning describing missing or unused inputs.
-            raise_error_on_missing_inputs: raise instead of warning when required inputs are missing.
+            raise_error_on_missing_inputs: raise instead of warning when required inputs are missing. Defaults to warning.
 
         Returns:
             True when every required input is present and every input is used.
@@ -349,72 +316,44 @@ class Algorithm:
         """
         return _validate_inputs(self, configuration, quiet=quiet, raise_error_on_missing_inputs=raise_error_on_missing_inputs)
 
-    @classmethod
-    def write_yaml(cls, filepath: Path) -> None:
-        """Write a YAML listing of the registered algorithms, their inputs and their outputs.
 
-        Args:
-            filepath: the file to write.
-        """
-        _ensure_bundled_algorithms()
-        data = dict()
+def declare_algorithm(
+    return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
+) -> Callable[[_F], _F]:
+    """Label a function as an Algorithm, for :func:`register_plugin` to find.
 
-        for name, alg in cls.instances.items():
-            alg_data = dict()
-            alg_data["inputs"] = alg.required_input_keys
-            alg_data["optionals"] = alg.default_keys
-            alg_data["returns"] = alg.return_keys
+    The algorithm enters the registry when the plugin defining the function is registered.
 
-            data[name] = alg_data
+    Example::
 
-        yaml_text = yaml.dump(dict(sorted(data.items())))
+        @declare_algorithm(return_keys=["plasma_volume"])
+        def calc_plasma_volume(major_radius, inverse_aspect_ratio, areal_elongation):
+            ...
 
-        with open(filepath, "w") as f:
-            f.write("# Autogenerated by Algorithm.write_yaml()\n\n")
-            f.write(yaml_text)
+    Args:
+        return_keys: the variable names of the function's outputs, in the order they are
+            returned.
+        name: the algorithm's name. Defaults to the function's name.
+        skip_unit_conversion: return the outputs as the function produces them, without
+            normalizing each one to its variable's default units.
+        override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
-    @classmethod
-    def algorithms(cls) -> list[str]:
-        """List the registered algorithm names."""
-        return list(cls.instances.keys())
+    Returns:
+        The decorator, which labels the function and returns it unchanged.
+    """
 
-    @classmethod
-    def register(cls, algorithm: Algorithm | CompositeAlgorithm | GenericFunctionType, override: bool = False) -> None:
-        """Register an algorithm, a composite, or a function labelled by ``register_algorithm``, under its name.
+    def function_wrapper(func: _F) -> _F:
+        func.__popcon_algorithm__ = Algorithm.from_single_function(  # type:ignore[attr-defined]
+            func,
+            return_keys=return_keys,
+            name=name if name is not None else func.__name__,
+            skip_unit_conversion=skip_unit_conversion,
+            override=override,
+        )
+        return func
 
-        Args:
-            algorithm: the Algorithm or CompositeAlgorithm to register, or a labelled function.
-            override: replace an already-registered algorithm of the same name.
-
-        Raises:
-            ValueError: if given anything but a named Algorithm, CompositeAlgorithm, or labelled
-                function.
-            RuntimeError: if the name is registered and ``override`` is not set.
-        """
-        algorithm = getattr(algorithm, "__popcon_algorithm__", algorithm)
-        if not isinstance(algorithm, Algorithm | CompositeAlgorithm) or algorithm.name is None:
-            raise ValueError("Only a named Algorithm or CompositeAlgorithm, or a labelled function, can be registered.")
-        _register_algorithm(algorithm.name, algorithm, override)
-
-    @classmethod
-    def get_algorithm(cls, key: str) -> Algorithm | CompositeAlgorithm:
-        """Retrieve an algorithm by name, registering the bundled algorithms first if needed.
-
-        Args:
-            key: the algorithm's registered name.
-
-        Returns:
-            The registered Algorithm or CompositeAlgorithm.
-
-        Raises:
-            KeyError: if no algorithm of that name is registered, with a suggestion for near
-                misses.
-        """
-        _ensure_bundled_algorithms()
-        if key not in cls.instances:
-            raise KeyError(_algorithm_not_found_message(key))
-
-        return cls.instances[key]
+    return function_wrapper
 
 
 class CompositeAlgorithm:
@@ -519,7 +458,7 @@ class CompositeAlgorithm:
         Returns:
             The composite of the named algorithms.
         """
-        return cls([Algorithm.get_algorithm(key) for key in keys], name=name)
+        return cls([registry[key] for key in keys], name=name)
 
     @classmethod
     def declare(cls, keys: list[str], name: str, override: bool = False) -> CompositeDeclaration:
@@ -527,14 +466,14 @@ class CompositeAlgorithm:
 
         Component names are resolved at registration, so declarations may appear in any order. Assign the result at
         module level, ``my_chain = CompositeAlgorithm.declare([...], name="my_chain")``, and
-        :func:`register_plugin` builds and registers it once the plugin's algorithms are in. Pass
-        ``override=True`` to replace an already-registered algorithm of the composite's name. To
+        :func:`register_plugin` builds and registers it once the plugin's algorithms are in. To
         build one now from already-registered algorithms, use :meth:`from_list`.
 
         Args:
             keys: the names of the component algorithms, in execution order.
             name: the name to register the built composite under.
-            override: at registration, replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
         Returns:
             The declaration, to bind at module level.
@@ -567,7 +506,7 @@ class CompositeAlgorithm:
         """
         result = kwargs
 
-        parameters_extra = set(kwargs) - set(self.required_input_keys)
+        parameters_extra = set(kwargs) - set(self.input_keys)
         parameters_missing = set(self.required_input_keys) - set(kwargs)
         if parameters_missing:
             needed_by: dict[str, list] = dict()
@@ -628,7 +567,7 @@ class CompositeAlgorithm:
             configuration: the inputs to check, as a mapping or dataset of variables.
             quiet: suppress the warning describing missing or unused inputs.
             raise_error_on_missing_inputs: raise instead of warning when required inputs are
-                missing or the algorithms are out of order.
+                missing or the algorithms are out of order. Defaults to raising.
             warn_for_overridden_variables: warn when a variable is set by more than one algorithm.
 
         Returns:
@@ -756,7 +695,7 @@ class CompositeDeclaration:
         """Record the component names, and the name to register the built composite under."""
         self.keys = keys
         self.name = name
-        #: At registration, replace an already-registered algorithm of the same name.
+        #: When the declaring plugin is registered, replace a registered algorithm of the same name.
         self.override = override
         #: The composite built from this declaration, once a registration has built it.
         self.built: CompositeAlgorithm | None = None
@@ -772,7 +711,7 @@ def _scan_plugin(plugin_name: str) -> tuple[list[Algorithm], list[CompositeDecla
         for attribute, value in list(vars(sys.modules[module_name]).items()):
             if attribute == "__popcon_requires__":
                 if not isinstance(value, list | tuple) or not all(isinstance(entry, str) for entry in value):
-                    raise ValueError(f"__popcon_requires__ in '{module_name}' must be a tuple of package names.")
+                    raise ValueError(f"__popcon_requires__ in '{module_name}' must be a tuple or list of plugin names.")
                 requirements.extend(value)
                 continue
             candidate = getattr(value, "__popcon_algorithm__", value)
@@ -822,31 +761,78 @@ def _register_scanned(algorithms: list[Algorithm], declarations: list[CompositeD
             pending.remove(declaration)
 
 
-def register_plugin(plugin_name: str) -> None:
+def _roll_back_registration(
+    plugin_name: str, algorithms_before: dict[str, Algorithm | CompositeAlgorithm], units_before: dict[str, str | None]
+) -> None:
+    """Restore the registries after a failed registration, and evict the plugin's modules."""
+    global _BUNDLED_ALGORITHMS_DISCOVERED  # noqa: PLW0603
+    Algorithm.instances.clear()
+    Algorithm.instances.update(algorithms_before)
+    reset_default_units()
+    extend_default_units_map(units_before)
+    if plugin_name == _BUNDLED_PLUGIN:
+        _BUNDLED_ALGORITHMS_DISCOVERED = False
+    else:
+        # Registration is atomic, imports included: a retry re-imports the plugin
+        # from disk, so any fix is picked up.
+        for module_name in [m for m in sys.modules if m == plugin_name or m.startswith(f"{plugin_name}.")]:
+            del sys.modules[module_name]
+
+
+def register_plugin(plugin_name: str) -> list[str]:
     """Register a plugin: its default units, its algorithms, and its composites.
 
-    A ``variables.yaml`` in the package root is read into the default units map, every module
-    beneath the package is imported (only directories containing an ``__init__.py`` are walked), and
-    the Algorithms and composite declarations bound in those modules are then registered.
-    The scan at the end of this call is what registers; the imports only build the objects. A composite may
-    name anything registered by the end of its own plugin. The bundled algorithms are registered
-    before any other plugin. Repeated calls change nothing.
+    A plugin is an importable package built on cfspopcon:
 
-    A plugin names the plugins whose registered algorithms it builds on with a module-level
-    ``__popcon_requires__ = ("other_plugin",)``; each requirement is registered first, as its own
-    registration.
+    .. code-block:: text
 
-    Registration is atomic: if anything fails, the registries are restored, and the plugin can
-    be fixed and registered again in the same session. ``ureg.define`` calls are the exception;
-    pint has no un-define.
+        my_popcon_plugin/
+        ├── __init__.py     (may be empty)
+        ├── algorithms.py   (any number of modules; a subfolder needs its own __init__.py)
+        └── variables.yaml  (default units for the plugin's own variables)
+
+    with algorithms declared in any of its modules::
+
+        from cfspopcon import declare_algorithm
+
+        @declare_algorithm(return_keys=["widgets_per_shift"])
+        def calc_widgets_per_shift(widget_rate, shift_length):
+            ...
+
+    Registering the plugin by name registers all of the above in one step::
+
+        import cfspopcon
+
+        cfspopcon.register_plugin("my_popcon_plugin")
+        cfspopcon.registry["calc_widgets_per_shift"]
+
+    Every algorithm declared in the plugin's modules is registered, and so is an algorithm
+    one of those modules imports from elsewhere. Composites may combine the plugin's own
+    algorithms, the ones bundled with cfspopcon, and those of any plugin registered earlier.
+    Registering the same plugin again changes nothing.
+
+    A plugin whose composites build on another plugin's algorithms names that plugin in its
+    ``__init__.py``, with ``__popcon_requires__ = ("other_plugin",)``; each requirement is
+    registered first.
+
+    If anything fails, everything the call changed is undone, and the plugin can be fixed and
+    registered again in the same session. Custom unit definitions are the one thing which
+    cannot be undone.
 
     Args:
-        plugin_name: the plugin's import name, e.g. ``"my_popcon_plugin"``, which may differ from
-            the distribution name.
+        plugin_name: the plugin's import name, e.g. ``"my_popcon_plugin"``, which may differ
+            from the installed distribution's name.
+
+    Returns:
+        The names newly registered for this plugin itself, excluding names registered for a
+        required plugin and names an ``override`` replaced. A repeated call returns an empty
+        list.
 
     Raises:
-        RuntimeError: if a declared composite names a component which is not registered by the end
-            of this plugin's registration, or the ``__popcon_requires__`` chain is circular.
+        ModuleNotFoundError: if the plugin, or a plugin it requires, cannot be imported.
+        RuntimeError: if an algorithm's name is already registered (pass ``override=True`` to
+            replace it), a declared composite names an algorithm which is still missing once
+            the plugin is registered, or the ``__popcon_requires__`` chain is circular.
         ValueError: if the package is a plain module, or its units change an existing variable's.
     """
     global _BUNDLED_ALGORITHMS_DISCOVERED  # noqa: PLW0603
@@ -859,6 +845,8 @@ def register_plugin(plugin_name: str) -> None:
     if plugin_name in _REGISTRATION_IN_PROGRESS:
         raise RuntimeError(f"Circular __popcon_requires__: '{plugin_name}' is already being registered.")
     _REGISTRATION_IN_PROGRESS.add(plugin_name)
+    algorithms_before = dict(Algorithm.instances)
+    units_before = default_units_map()
     try:
         package = importlib.import_module(plugin_name)
         if not hasattr(package, "__path__"):
@@ -870,8 +858,9 @@ def register_plugin(plugin_name: str) -> None:
             importlib.import_module(info.name)
         algorithms, declarations, requirements = _scan_plugin(plugin_name)
 
-        # Each requirement is its own registration, completed before this package's snapshot, so
-        # a failure here leaves already-registered requirements in place.
+        # Each requirement registers first, as its own call; the delta keeps its names out of
+        # this plugin's return value.
+        before_requirements = set(Algorithm.instances)
         for requirement in dict.fromkeys(requirements):
             try:
                 register_plugin(requirement)
@@ -880,22 +869,14 @@ def register_plugin(plugin_name: str) -> None:
                     raise ModuleNotFoundError(f"Could not import '{requirement}', required by '{plugin_name}'.", name=requirement) from exc
                 raise
 
-        algorithms_before = dict(Algorithm.instances)
-        units_before = default_units_map()
-        try:
-            _load_plugin_variables(plugin_name)
-            _register_scanned(algorithms, declarations)
-        except BaseException:
-            # The modules this call imported stay cached, and that is what makes a retry work:
-            # after the broken module is fixed, the retry's scan finds the same objects and
-            # registers them.
-            Algorithm.instances.clear()
-            Algorithm.instances.update(algorithms_before)
-            reset_default_units()
-            extend_default_units_map(units_before)
-            if plugin_name == _BUNDLED_PLUGIN:
-                _BUNDLED_ALGORITHMS_DISCOVERED = False
-            raise
+        requirement_names = set(Algorithm.instances) - before_requirements
+
+        _load_plugin_variables(plugin_name)
+        _register_scanned(algorithms, declarations)
+        return [name for name in Algorithm.instances if name not in algorithms_before and name not in requirement_names]
+    except BaseException:
+        _roll_back_registration(plugin_name, algorithms_before, units_before)
+        raise
     finally:
         _REGISTRATION_IN_PROGRESS.discard(plugin_name)
 
@@ -913,14 +894,34 @@ def _ensure_bundled_algorithms() -> None:
         register_plugin(_BUNDLED_PLUGIN)
 
 
-def discover_builtin_algorithms() -> None:
+def write_algorithms_yaml(filepath: Path) -> None:
+    """Write a YAML listing of the registered algorithms, their inputs and their outputs.
+
+    Args:
+        filepath: the file to write.
+    """
+    _ensure_bundled_algorithms()
+    data = {
+        name: {"inputs": alg.required_input_keys, "optionals": alg.default_keys, "returns": alg.return_keys}
+        for name, alg in Algorithm.instances.items()
+    }
+    with open(filepath, "w") as f:
+        f.write("# Autogenerated by popcon_algorithms\n\n")
+        f.write(yaml.dump(dict(sorted(data.items()))))
+
+
+def discover_builtin_algorithms() -> list[str]:
     """Register every algorithm cfspopcon defines, by walking :mod:`cfspopcon.formulas`.
 
     The first use of the registry does this on its own; an explicit call is useful for surfacing
     any registration failure at a chosen point, e.g. the start of a batch job. Repeated calls
     change nothing.
+
+    Returns:
+        The names of the bundled algorithms this call registered, which is all of them on
+        the first call and an empty list on a repeat.
     """
-    register_plugin(_BUNDLED_PLUGIN)
+    return register_plugin(_BUNDLED_PLUGIN)
 
 
 def algorithms_setting(variable: str) -> list[str]:
@@ -939,22 +940,64 @@ def algorithms_using(variable: str) -> list[str]:
 
 
 class _AlgorithmRegistry:
-    """Provides indexed access to the algorithm registry.
-
-    ``registry["name"]`` returns the registered :class:`Algorithm` or :class:`CompositeAlgorithm`.
-    """
+    """Name-keyed access to the registered algorithms."""
 
     def __getitem__(self, key: str) -> Algorithm | CompositeAlgorithm:
-        """Look up a registered Algorithm or CompositeAlgorithm by name."""
+        """Look up a registered algorithm by name, registering the bundled algorithms first if needed.
+
+        Args:
+            key: the algorithm's registered name.
+
+        Returns:
+            The registered Algorithm or CompositeAlgorithm.
+
+        Raises:
+            TypeError: if the key is not a name.
+            KeyError: if no algorithm of that name is registered, with a suggestion for near
+                misses.
+        """
         if not isinstance(key, str):
             raise TypeError("Index the algorithm registry with an algorithm name (str).")
-        return Algorithm.get_algorithm(key)
+        _ensure_bundled_algorithms()
+        if key not in Algorithm.instances:
+            raise KeyError(_algorithm_not_found_message(key))
+        return Algorithm.instances[key]
+
+    def register(self, algorithm: Algorithm | CompositeAlgorithm | GenericFunctionType, override: bool = False) -> None:
+        """Register an algorithm, a composite, or a function labelled by :func:`declare_algorithm`, under its name.
+
+        Args:
+            algorithm: the Algorithm or CompositeAlgorithm to register, or a labelled function.
+            override: replace an already-registered algorithm of the same name (a label's own
+                ``override`` applies only when its plugin is registered).
+
+        Raises:
+            ValueError: if given anything but a named Algorithm, CompositeAlgorithm, or labelled
+                function.
+            RuntimeError: if the name is registered and ``override`` is not set.
+        """
+        _ensure_bundled_algorithms()
+        algorithm = getattr(algorithm, "__popcon_algorithm__", algorithm)
+        if not isinstance(algorithm, Algorithm | CompositeAlgorithm) or algorithm.name is None:
+            raise ValueError("Only a named Algorithm or CompositeAlgorithm, or a labelled function, can be registered.")
+        _register_algorithm(algorithm.name, algorithm, override)
 
     def __iter__(self) -> Iterator[str]:
         """Iterate over the registered algorithm names (also powers ``"name" in registry``)."""
         _ensure_bundled_algorithms()
-        return iter(Algorithm.algorithms())
+        return iter(list(Algorithm.instances))
 
 
 registry = _AlgorithmRegistry()
-"""Registry accessor, where ``registry["name"]`` gives the registered Algorithm or CompositeAlgorithm."""
+"""The registered algorithms, by name.
+
+``registry["name"]`` returns the registered :class:`Algorithm` or :class:`CompositeAlgorithm`,
+registering the bundled algorithms on first use. ``registry.register(algorithm, override=...)``
+adds an algorithm, a composite, or a function labelled by :func:`declare_algorithm`, with
+``override=True`` replacing a registered algorithm of the same name. ``"name" in registry`` and
+iteration list the registered names::
+
+    volume = registry["calc_plasma_volume"]
+    registry.register(my_algorithm, override=True)
+    print(sorted(registry))
+"""

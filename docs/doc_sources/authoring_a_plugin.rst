@@ -36,17 +36,17 @@ registers nothing.
 An algorithm
 ====================
 
-Algorithms are defined with the :meth:`~cfspopcon.algorithm_class.Algorithm.register_algorithm`
+Algorithms are defined with the :func:`~cfspopcon.algorithm_class.declare_algorithm`
 decorator, in any module of the package: registration walks the whole package, so
 ``__init__.py`` needs no imports of its own. ``algorithms.py``:
 
 .. code::
 
-  from cfspopcon.algorithm_class import Algorithm
+  from cfspopcon import declare_algorithm
   from cfspopcon.unit_handling import Unitfull
 
 
-  @Algorithm.register_algorithm(return_keys=["widgets_per_shift"])
+  @declare_algorithm(return_keys=["widgets_per_shift"])
   def calc_widgets_per_shift(widget_rate: Unitfull, shift_length: Unitfull) -> Unitfull:
       """Compute the widgets produced in one shift."""
       return widget_rate * shift_length
@@ -84,11 +84,12 @@ Name collisions
 
 By default a plugin may only *add*. Registering an algorithm under a name which is already
 taken is an error, and the error message states the name; pass ``override=True`` to
-:meth:`~cfspopcon.algorithm_class.Algorithm.register_algorithm` or
+:func:`~cfspopcon.algorithm_class.declare_algorithm` or
 :meth:`~cfspopcon.algorithm_class.CompositeAlgorithm.declare` to replace the registered
 algorithm deliberately, or rename yours. Changing the default units of a variable which is
 already defined is also an error, and units cannot be overridden; re-declaring a variable with
-identical units is allowed.
+the same units is allowed, in any equivalent spelling (``m**3`` and ``meter ** 3`` are the
+same units).
 
 A failed registration is rolled back completely, so you can fix the plugin and register it
 again in the same session.
@@ -125,7 +126,7 @@ Run it like any other case; the result is written to ``widget_case/output/datase
   $ popcon widget_case
   Done
 
-To list a plugin's algorithms alongside the built-in ones, pass its name to
+To write a listing file of every registered algorithm, a plugin's included, pass its name to
 ``popcon_algorithms``; the option may be repeated for several plugins:
 
 .. code:: console
@@ -144,6 +145,7 @@ or use a given variable, plugins included:
 
   >>> import cfspopcon
   >>> cfspopcon.register_plugin("my_popcon_plugin")
+  ['calc_widgets_per_shift']
   >>> cfspopcon.algorithms_setting("widgets_per_shift")
   ['calc_widgets_per_shift']
 
