@@ -19,7 +19,7 @@ new major version; breaking entries are marked **breaking**.
 - **`__popcon_requires__`**: a plugin names the plugins whose algorithms its composites build on, as a module-level tuple; each requirement is registered first, and a circular requirement raises.
 - **`cfspopcon.registry`**: `registry["name"]` returns the registered `Algorithm` or `CompositeAlgorithm`, `registry.register(...)` adds an algorithm, a composite, or a labelled function, and `"name" in registry` or iteration lists the registered names.
 - **`CompositeAlgorithm.declare(keys, name)`**: declare a composite by the names of its components before those exist; it is built and registered with its plugin, and a missing component is a `RuntimeError` naming it. `override=True` replaces a registered algorithm of the composite's name.
-- **`override` flag** on `@declare_algorithm`, `Algorithm(...)`, `Algorithm.from_single_function` and `registry.register`: deliberately replace a registered algorithm of the same name.
+- **`override` flag** on `@declare_algorithm`, `Algorithm(...)`, `Algorithm.from_single_function` and `registry.register`: deliberately replace a registered algorithm of the same name. A label's flag applies when its plugin is registered; `registry.register` consults only its own argument.
 - **`algorithms_setting(variable)` and `algorithms_using(variable)`**: which registered algorithms set, or take as an input, a given variable.
 - **`.name` property** on `Algorithm` and `CompositeAlgorithm`, replacing the private `._name`.
 - **`extend_default_units_map` exported from `cfspopcon.unit_handling`**: declare default units for new variables from code; `read_default_units_from_file` accepts a path, so a plugin can also ship its own `variables.yaml`.

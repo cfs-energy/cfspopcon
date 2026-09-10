@@ -98,7 +98,8 @@ class Algorithm:
             return_keys: the variable names of the function's outputs, in the order they are
                 returned.
             name: the algorithm's name. Defaults to the function's name.
-            override: at registration, replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
         Raises:
             ValueError: if the function takes positional-only or variable positional arguments.
@@ -251,7 +252,8 @@ class Algorithm:
             name: the algorithm's name. Defaults to the function's name.
             skip_unit_conversion: return the outputs as the function produces them, without
                 normalizing each one to its variable's default units.
-            override: at registration, replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
         Returns:
             The Algorithm wrapping the function.
@@ -334,7 +336,8 @@ def declare_algorithm(
         name: the algorithm's name. Defaults to the function's name.
         skip_unit_conversion: return the outputs as the function produces them, without
             normalizing each one to its variable's default units.
-        override: at registration, replace an already-registered algorithm of the same name.
+        override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
     Returns:
         The decorator, which labels the function and returns it unchanged.
@@ -469,7 +472,8 @@ class CompositeAlgorithm:
         Args:
             keys: the names of the component algorithms, in execution order.
             name: the name to register the built composite under.
-            override: at registration, replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name when the plugin
+                declaring it is registered.
 
         Returns:
             The declaration, to bind at module level.
@@ -691,7 +695,7 @@ class CompositeDeclaration:
         """Record the component names, and the name to register the built composite under."""
         self.keys = keys
         self.name = name
-        #: At registration, replace an already-registered algorithm of the same name.
+        #: When the declaring plugin is registered, replace a registered algorithm of the same name.
         self.override = override
         #: The composite built from this declaration, once a registration has built it.
         self.built: CompositeAlgorithm | None = None
@@ -964,7 +968,8 @@ class _AlgorithmRegistry:
 
         Args:
             algorithm: the Algorithm or CompositeAlgorithm to register, or a labelled function.
-            override: replace an already-registered algorithm of the same name.
+            override: replace an already-registered algorithm of the same name (a label's own
+                ``override`` applies only when its plugin is registered).
 
         Raises:
             ValueError: if given anything but a named Algorithm, CompositeAlgorithm, or labelled
