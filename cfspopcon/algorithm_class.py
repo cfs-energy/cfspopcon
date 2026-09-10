@@ -823,7 +823,9 @@ def register_plugin(plugin_name: str) -> list[str]:
         list.
 
     Raises:
-        RuntimeError: if a declared composite names an algorithm which is still missing once
+        ModuleNotFoundError: if the plugin, or a plugin it requires, cannot be imported.
+        RuntimeError: if an algorithm's name is already registered (pass ``override=True`` to
+            replace it), a declared composite names an algorithm which is still missing once
             the plugin is registered, or the ``__popcon_requires__`` chain is circular.
         ValueError: if the package is a plain module, or its units change an existing variable's.
     """
@@ -930,7 +932,7 @@ def algorithms_using(variable: str) -> list[str]:
 
 
 class _AlgorithmRegistry:
-    """The store of registered algorithms, keyed by name.
+    """Name-keyed access to the registered algorithms.
 
     ``registry["name"]`` returns the registered :class:`Algorithm` or :class:`CompositeAlgorithm`,
     ``registry.register(...)`` adds one, and ``"name" in registry`` or iteration lists the names.

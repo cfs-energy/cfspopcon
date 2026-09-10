@@ -72,6 +72,9 @@ def _same_units(new: str | None, old: str | None) -> bool:
 def read_default_units_from_file(units_file: str | Path | Traversable | None = None) -> None:
     """Read a variables YAML file and add its default units to the default units map.
 
+    Re-declaring a variable with the units it already has is accepted in any equivalent
+    spelling, and the first spelling is kept.
+
     Args:
         units_file: a YAML file mapping each variable name to an entry with a ``default_units``
             key, in the shape of cfspopcon's own ``variables.yaml``. Defaults to that file.
@@ -100,6 +103,9 @@ read_default_units_from_file()
 
 def extend_default_units_map(units_dictionary: dict[str, str | None]) -> None:
     """Extend the default units map with the given dictionary.
+
+    Re-declaring a variable with the units it already has is accepted in any equivalent
+    spelling, and the first spelling is kept.
 
     Args:
         units_dictionary: maps each variable name to the unit its values are normalized to,
