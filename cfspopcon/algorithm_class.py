@@ -982,4 +982,15 @@ class _AlgorithmRegistry:
 
 
 registry = _AlgorithmRegistry()
-"""Registry accessor, where ``registry["name"]`` looks an algorithm up, ``registry.register`` adds one, and iteration lists the names."""
+"""The registered algorithms, by name.
+
+``registry["name"]`` returns the registered :class:`Algorithm` or :class:`CompositeAlgorithm`,
+registering the bundled algorithms on first use. ``registry.register(algorithm, override=...)``
+adds an algorithm, a composite, or a function labelled by :func:`declare_algorithm`, with
+``override=True`` replacing a registered algorithm of the same name. ``"name" in registry`` and
+iteration list the registered names::
+
+    volume = registry["calc_plasma_volume"]
+    registry.register(my_algorithm, override=True)
+    print(sorted(registry))
+"""
