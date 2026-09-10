@@ -842,6 +842,8 @@ def register_plugin(plugin_name: str) -> list[str]:
     if plugin_name in _REGISTRATION_IN_PROGRESS:
         raise RuntimeError(f"Circular __popcon_requires__: '{plugin_name}' is already being registered.")
     _REGISTRATION_IN_PROGRESS.add(plugin_name)
+    algorithms_before = dict(Algorithm.instances)
+    units_before = default_units_map()
     try:
         package = importlib.import_module(plugin_name)
         if not hasattr(package, "__path__"):
@@ -853,8 +855,9 @@ def register_plugin(plugin_name: str) -> list[str]:
             importlib.import_module(info.name)
         algorithms, declarations, requirements = _scan_plugin(plugin_name)
 
-        # Each requirement is its own registration, completed before this package's snapshot, so
-        # a failure here leaves already-registered requirements in place.
+        # Each requirement registers first, as its own call; the delta keeps its names out of
+        # this plugin's return value.
+        before_requirements = set(Algorithm.instances)
         for requirement in dict.fromkeys(requirements):
             try:
                 register_plugin(requirement)
@@ -863,19 +866,13 @@ def register_plugin(plugin_name: str) -> list[str]:
                     raise ModuleNotFoundError(f"Could not import '{requirement}', required by '{plugin_name}'.", name=requirement) from exc
                 raise
 
-        algorithms_before = dict(Algorithm.instances)
-        units_before = default_units_map()
-        try:
-            _load_plugin_variables(plugin_name)
-            _register_scanned(algorithms, declarations)
-            return [name for name in Algorithm.instances if name not in algorithms_before]
-        except BaseException:
-            _roll_back_registration(plugin_name, algorithms_before, units_before)
-            raise
+        requirement_names = set(Algorithm.instances) - before_requirements
+
+        _load_plugin_variables(plugin_name)
+        _register_scanned(algorithms, declarations)
+        return [name for name in Algorithm.instances if name not in algorithms_before and name not in requirement_names]
     except BaseException:
-        # The flag claims the builtins are registered, so any failure in this call releases it.
-        if plugin_name == _BUNDLED_PLUGIN:
-            _BUNDLED_ALGORITHMS_DISCOVERED = False
+        _roll_back_registration(plugin_name, algorithms_before, units_before)
         raise
     finally:
         _REGISTRATION_IN_PROGRESS.discard(plugin_name)

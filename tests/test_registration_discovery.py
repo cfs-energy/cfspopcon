@@ -398,6 +398,52 @@ def test_a_fix_to_an_already_imported_module_is_picked_up_on_retry(tmp_path, mon
         forget_packages("_probe_cachedfix_pkg")
 
 
+def test_rollback_covers_import_time_registration(tmp_path, monkeypatch, clean_composites):
+    """A failure rolls back registrations a module made at import time, so a fixed plugin retries cleanly."""
+    pkg = write_package(
+        tmp_path,
+        "_probe_boundary_pkg",
+        {
+            "aaa_registers": "from cfspopcon.algorithm_class import Algorithm, registry\n"
+            "registry.register(Algorithm.from_single_function(lambda x: x, return_keys=['y'], name='_probe_regtime', skip_unit_conversion=True))\n",
+            "zzz_broken": "from cfspopcon.algorithm_class import CompositeAlgorithm\n"
+            "_probe_bad = CompositeAlgorithm.declare(['_probe_no_such'], name='_probe_bad_composite')\n",
+        },
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(RuntimeError, match="_probe_no_such"):
+            register_plugin("_probe_boundary_pkg")
+        assert "_probe_regtime" not in Algorithm.instances
+
+        # A different byte count, so the stale .pyc (same size, same mtime second) cannot be reused.
+        (pkg / "zzz_broken.py").write_text(
+            "from cfspopcon.algorithm_class import CompositeAlgorithm\n\n"
+            "_probe_bad = CompositeAlgorithm.declare(['_probe_regtime'], name='_probe_bad_composite')\n"
+        )
+        importlib.invalidate_caches()
+        added = register_plugin("_probe_boundary_pkg")
+        assert "_probe_regtime" in added
+        assert isinstance(registry["_probe_bad_composite"], CompositeAlgorithm)
+    finally:
+        forget_packages("_probe_boundary_pkg")
+
+
+def test_a_fix_to_a_bad_requires_is_picked_up_on_retry(tmp_path, monkeypatch, clean_composites):
+    """A failure before registration begins also evicts the plugin, so fixing __init__.py retries cleanly."""
+    pkg = write_package(tmp_path, "_probe_badreq_pkg", {"__init__": "__popcon_requires__ = 'not_a_tuple'\n"})
+    monkeypatch.syspath_prepend(str(tmp_path))
+    try:
+        with pytest.raises(ValueError, match="__popcon_requires__"):
+            register_plugin("_probe_badreq_pkg")
+
+        (pkg / "__init__.py").write_text("")
+        importlib.invalidate_caches()
+        assert register_plugin("_probe_badreq_pkg") == []
+    finally:
+        forget_packages("_probe_badreq_pkg")
+
+
 def test_rollback_leaves_an_already_registered_package_alone(tmp_path, monkeypatch, clean_composites):
     """Only what the failing call imported is undone; an earlier registration survives."""
     write_package(
