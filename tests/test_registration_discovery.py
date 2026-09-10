@@ -348,6 +348,30 @@ def test_a_failed_registration_can_be_retried_after_fixing(tmp_path, monkeypatch
         forget_packages("_probe_retry_pkg")
 
 
+def test_a_failed_bundled_walk_does_not_latch_discovery(run_script):
+    """A failure during the bundled walk leaves discovery retryable on the next registry use.
+
+    Run in a subprocess, since the suite discovers at session start.
+    """
+    script = (
+        "import pkgutil\n"
+        "import cfspopcon\n"
+        "from cfspopcon import Algorithm, registry\n"
+        "real_walk = pkgutil.walk_packages\n"
+        "def broken_walk(*args, **kwargs):\n"
+        "    raise ImportError('forced walk failure')\n"
+        "pkgutil.walk_packages = broken_walk\n"
+        "try:\n"
+        "    registry['calc_plasma_volume']\n"
+        "    raise SystemExit('expected the forced failure')\n"
+        "except ImportError:\n"
+        "    pass\n"
+        "pkgutil.walk_packages = real_walk\n"
+        "assert isinstance(registry['calc_plasma_volume'], Algorithm)\n"
+    )
+    run_script(script)
+
+
 def test_a_fix_to_an_already_imported_module_is_picked_up_on_retry(tmp_path, monkeypatch, clean_composites):
     """A failed registration evicts the plugin's modules, so a source fix is seen without restarting Python."""
     pkg = write_package(

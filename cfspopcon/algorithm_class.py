@@ -869,6 +869,11 @@ def register_plugin(plugin_name: str) -> list[str]:
         except BaseException:
             _roll_back_registration(plugin_name, algorithms_before, units_before)
             raise
+    except BaseException:
+        # The flag claims the builtins are registered, so any failure in this call releases it.
+        if plugin_name == _BUNDLED_PLUGIN:
+            _BUNDLED_ALGORITHMS_DISCOVERED = False
+        raise
     finally:
         _REGISTRATION_IN_PROGRESS.discard(plugin_name)
 
