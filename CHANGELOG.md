@@ -15,14 +15,13 @@ new major version; breaking entries are marked **breaking**.
 
 - **Plugins**: `register_plugin("my_popcon_plugin")` registers a package built on cfspopcon: the default units in its `variables.yaml`, the algorithms defined in its modules, and the composites they declare. The plugin's `__init__.py` may be empty, and the bundled algorithms are always registered before any plugin. See the new "Authoring a Plugin" documentation page.
 - **`plugins` section in `input.yaml`**: a case lists the plugins it uses, registered in order before the `algorithms` names are resolved. `plugins` becomes a reserved top-level input-file key.
-- **`popcon_algorithms --plugin`** (repeatable): list a plugin's algorithms alongside the built-in ones.
+- **`popcon_algorithms --plugin`** (repeatable): include a plugin's algorithms in the written listing file.
 - **`__popcon_requires__`**: a plugin names the plugins whose algorithms its composites build on, as a module-level tuple; each requirement is registered first, and a circular requirement raises.
 - **`cfspopcon.registry`**: `registry["name"]` returns the registered `Algorithm` or `CompositeAlgorithm`, `registry.register(...)` adds an algorithm, a composite, or a labelled function, and `"name" in registry` or iteration lists the registered names.
 - **`CompositeAlgorithm.declare(keys, name)`**: declare a composite by the names of its components before those exist; it is built and registered with its plugin, and a missing component is a `RuntimeError` naming it. `override=True` replaces a registered algorithm of the composite's name.
 - **`override` flag** on `@declare_algorithm`, `Algorithm(...)`, `Algorithm.from_single_function` and `registry.register`: deliberately replace a registered algorithm of the same name. A label's flag applies when its plugin is registered; `registry.register` consults only its own argument.
 - **`algorithms_setting(variable)` and `algorithms_using(variable)`**: which registered algorithms set, or take as an input, a given variable.
-- **`.name` property** on `Algorithm` and `CompositeAlgorithm`, replacing the private `._name`.
-- **`extend_default_units_map` exported from `cfspopcon.unit_handling`**: declare default units for new variables from code; `read_default_units_from_file` accepts a path, so a plugin can also ship its own `variables.yaml`.
+- **`extend_default_units_map` and `read_default_units_from_file` exported from `cfspopcon.unit_handling`**: declare default units for new variables from code or from a `variables.yaml`-shaped file.
 - **JCH profile algorithms**: `calc_jch_profiles`, `calc_jch_pedestal_peaking`. (#139)
 - **Profile-selection composite algorithms**: `calc_peaking_and_analytic_profiles`, `calc_peaking_and_prf_profiles`. (#139)
 - **Radial-grid algorithm**: `define_radial_grid`, which provides `rho`. (#139)
@@ -41,7 +40,7 @@ new major version; breaking entries are marked **breaking**.
 - **A variable's default units cannot change once defined** (**breaking**): re-declaring the same units, in any spelling, is allowed; a change raises a `ValueError` naming the variable.
 - **`register_plugin` and `discover_builtin_algorithms` return the names of the algorithms they added**, an empty list on a repeated call; a plugin's list excludes names its requirements added.
 - **Errors and warnings suggest the fix**: a missing input names the registered algorithms which set it, an unused input suggests the nearest matching name, and an unknown algorithm suggests the nearest registered name or registering the plugin which provides it.
-- **Profile form is selected by algorithm** (**breaking**): list a `calc_peaking_and_*_profiles` composite instead of setting the `density_profile_form` / `temp_profile_form` inputs. (#139)
+- **Profile form is selected by algorithm** (**breaking**): list a `calc_peaking_and_*_profiles` composite instead of setting the `density_profile_form` / `temp_profile_form` inputs; only the `popcon` command migrates the old inputs (see Deprecated). (#139)
 - **`calc_analytic_profiles`, `calc_prf_profiles`** (**breaking**): take `rho` as an input instead of returning it; the `npoints` argument is removed. (#139)
 - **`wraps_ufunc`** infers `output_core_dims` from the number of return units, so multi-return functions need not pass it explicitly. (#141)
 
@@ -53,7 +52,7 @@ new major version; breaking entries are marked **breaking**.
 ### Deprecated
 
 - **`calc_peaked_profiles`**: stays registered as a placeholder which raises, naming the `calc_peaking_and_*_profiles` replacements. (#139)
-- **`density_profile_form`, `temp_profile_form` inputs**: accepted with a `FutureWarning` and migrated to the matching profile composite. (#139)
+- **`density_profile_form`, `temp_profile_form` inputs**: the `popcon` command accepts them with a `FutureWarning` and migrates to the matching profile composite. (#139)
 
 ### Removed
 
