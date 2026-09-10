@@ -13,6 +13,7 @@ new major version; breaking entries are marked **breaking**.
 
 ### Added
 
+- **Plot-style reference**: a documentation page listing every key a plot yaml file may use.
 - **Plugins**: `register_plugin("my_popcon_plugin")` registers a package built on cfspopcon: the default units in its `variables.yaml`, the algorithms defined in its modules, and the composites they declare. The plugin's `__init__.py` may be empty, and the bundled algorithms are always registered before any plugin. See the new "Authoring a Plugin" documentation page.
 - **`plugins` section in `input.yaml`**: a case lists the plugins it uses, registered in order before the `algorithms` names are resolved. `plugins` becomes a reserved top-level input-file key.
 - **`popcon_algorithms --plugin`** (repeatable): include a plugin's algorithms in the written listing file.
@@ -46,6 +47,8 @@ new major version; breaking entries are marked **breaking**.
 
 ### Fixed
 
+- **Point files are valid JSON for every value**: a float whose six-figure form ended in a bare decimal point (`732029.`) gains one more figure.
+- **The interactive readout under `popcon --show` works for unitful fill variables**, and shows the field's units.
 - **`CompositeAlgorithm.run` warned that a supplied optional input was unused**; the check compares against every accepted input.
 - **A named `CompositeAlgorithm`'s docstring** listed only its name; it now lists the components, inputs and outputs.
 
