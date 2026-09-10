@@ -219,6 +219,13 @@ def test_composite_of_composite(how_many_birds: Algorithm, how_many_animals: Alg
         )
 
 
+def test_run_accepts_a_supplied_optional_input_without_warning(how_many_birds, how_many_animals):
+    """An optional input passed explicitly is used, so run() must not report it as unused."""
+    composite = how_many_birds + how_many_animals
+    result = composite.run(things_that_quack=1, things_that_baa=4, new_chickens_per_count=10)
+    assert int(result["all_animals"]) == 17
+
+
 def test_repeated_dataset_updates(how_many_animals):
     ds = xr.Dataset(dict(all_birds=0, things_that_baa=0, new_chickens_per_count=1))
     ds = how_many_animals.update_dataset(ds)

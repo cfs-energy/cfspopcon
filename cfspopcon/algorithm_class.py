@@ -506,7 +506,7 @@ class CompositeAlgorithm:
         """
         result = kwargs
 
-        parameters_extra = set(kwargs) - set(self.required_input_keys)
+        parameters_extra = set(kwargs) - set(self.input_keys)
         parameters_missing = set(self.required_input_keys) - set(kwargs)
         if parameters_missing:
             needed_by: dict[str, list] = dict()

@@ -47,6 +47,7 @@ new major version; breaking entries are marked **breaking**.
 
 ### Fixed
 
+- **`CompositeAlgorithm.run` warned that a supplied optional input was unused**; the check compares against every accepted input.
 - **A named `CompositeAlgorithm`'s docstring** listed only its name; it now lists the components, inputs and outputs.
 
 ### Deprecated
