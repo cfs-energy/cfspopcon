@@ -44,6 +44,11 @@ def test_a_variables_file_with_missing_entries_is_refused(tmp_path):
     with pytest.raises(ValueError, match="mapping"):
         read_default_units_from_file(not_a_mapping)
 
+    int_key = tmp_path / "intkey.yaml"
+    int_key.write_text("5:\n  description:\n  - no units\n")
+    with pytest.raises(ValueError, match="5"):
+        read_default_units_from_file(int_key)
+
     empty = tmp_path / "empty.yaml"
     empty.write_text("")
     read_default_units_from_file(empty)

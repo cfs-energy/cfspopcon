@@ -66,7 +66,7 @@ def _algorithm_not_found_message(key: str) -> str:
     return (
         f"algorithm '{key}' not found. If it comes from a plugin, register the plugin first: list it "
         "in the input file's plugins section, or call register_plugin. "
-        "Run popcon_algorithms to list what is registered."
+        "The popcon_algorithms command writes a listing of what is registered."
     )
 
 
@@ -80,7 +80,7 @@ def _register_algorithm(name: str, algorithm: Algorithm | CompositeAlgorithm, ov
 class Algorithm:
     """A class which handles the input and output of POPCON algorithms."""
 
-    #: The registered algorithms, keyed by name.
+    # The registered algorithms, keyed by name; reached through the registry accessor.
     instances: ClassVar[dict[str, Algorithm | CompositeAlgorithm]] = dict()
 
     def __init__(
@@ -304,7 +304,7 @@ class Algorithm:
         Args:
             configuration: the inputs to check, as a mapping or dataset of variables.
             quiet: suppress the warning describing missing or unused inputs.
-            raise_error_on_missing_inputs: raise instead of warning when required inputs are missing.
+            raise_error_on_missing_inputs: raise instead of warning when required inputs are missing. Defaults to warning.
 
         Returns:
             True when every required input is present and every input is used.
@@ -463,8 +463,7 @@ class CompositeAlgorithm:
 
         Component names are resolved at registration, so declarations may appear in any order. Assign the result at
         module level, ``my_chain = CompositeAlgorithm.declare([...], name="my_chain")``, and
-        :func:`register_plugin` builds and registers it once the plugin's algorithms are in. Pass
-        ``override=True`` to replace an already-registered algorithm of the composite's name. To
+        :func:`register_plugin` builds and registers it once the plugin's algorithms are in. To
         build one now from already-registered algorithms, use :meth:`from_list`.
 
         Args:
@@ -564,7 +563,7 @@ class CompositeAlgorithm:
             configuration: the inputs to check, as a mapping or dataset of variables.
             quiet: suppress the warning describing missing or unused inputs.
             raise_error_on_missing_inputs: raise instead of warning when required inputs are
-                missing or the algorithms are out of order.
+                missing or the algorithms are out of order. Defaults to raising.
             warn_for_overridden_variables: warn when a variable is set by more than one algorithm.
 
         Returns:
@@ -708,7 +707,7 @@ def _scan_plugin(plugin_name: str) -> tuple[list[Algorithm], list[CompositeDecla
         for attribute, value in list(vars(sys.modules[module_name]).items()):
             if attribute == "__popcon_requires__":
                 if not isinstance(value, list | tuple) or not all(isinstance(entry, str) for entry in value):
-                    raise ValueError(f"__popcon_requires__ in '{module_name}' must be a tuple of package names.")
+                    raise ValueError(f"__popcon_requires__ in '{module_name}' must be a tuple or list of plugin names.")
                 requirements.extend(value)
                 continue
             candidate = getattr(value, "__popcon_algorithm__", value)
@@ -785,7 +784,7 @@ def register_plugin(plugin_name: str) -> list[str]:
 
         my_popcon_plugin/
         ├── __init__.py     (may be empty)
-        ├── analysis.py     (any number of modules; a subfolder needs its own __init__.py)
+        ├── algorithms.py   (any number of modules; a subfolder needs its own __init__.py)
         └── variables.yaml  (default units for the plugin's own variables)
 
     with algorithms declared in any of its modules::
@@ -812,9 +811,9 @@ def register_plugin(plugin_name: str) -> list[str]:
     ``__init__.py``, with ``__popcon_requires__ = ("other_plugin",)``; each requirement is
     registered first.
 
-    Registration is atomic: if anything fails, the registries are restored, and the plugin can
-    be fixed and registered again in the same session. Custom unit definitions are the one
-    thing which cannot be undone.
+    If anything fails, everything the call changed is undone, and the plugin can be fixed and
+    registered again in the same session. Custom unit definitions are the one thing which
+    cannot be undone.
 
     Args:
         plugin_name: the plugin's import name, e.g. ``"my_popcon_plugin"``, which may differ
@@ -937,11 +936,7 @@ def algorithms_using(variable: str) -> list[str]:
 
 
 class _AlgorithmRegistry:
-    """Name-keyed access to the registered algorithms.
-
-    ``registry["name"]`` returns the registered :class:`Algorithm` or :class:`CompositeAlgorithm`,
-    ``registry.register(...)`` adds one, and ``"name" in registry`` or iteration lists the names.
-    """
+    """Name-keyed access to the registered algorithms."""
 
     def __getitem__(self, key: str) -> Algorithm | CompositeAlgorithm:
         """Look up a registered algorithm by name, registering the bundled algorithms first if needed.

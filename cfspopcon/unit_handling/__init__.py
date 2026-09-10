@@ -9,6 +9,7 @@ from .default_units import (
     default_unit,
     extend_default_units_map,
     magnitude_in_default_units,
+    read_default_units_from_file,
     set_default_units,
 )
 from .setup_unit_handling import (
@@ -40,6 +41,7 @@ __all__ = [
     "magnitude",
     "magnitude_in_default_units",
     "magnitude_in_units",
+    "read_default_units_from_file",
     "set_default_units",
     "ureg",
     "wraps_ufunc",

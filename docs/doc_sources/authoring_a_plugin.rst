@@ -126,7 +126,7 @@ Run it like any other case; the result is written to ``widget_case/output/datase
   $ popcon widget_case
   Done
 
-To list a plugin's algorithms alongside the built-in ones, pass its name to
+To write a listing file of every registered algorithm, a plugin's included, pass its name to
 ``popcon_algorithms``; the option may be repeated for several plugins:
 
 .. code:: console

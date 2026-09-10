@@ -1,4 +1,4 @@
-"""Define default units for writing to/from disk."""
+"""The default units of cfspopcon's variables: the unit each value is normalized to."""
 
 from collections.abc import Iterable
 from importlib.resources import files
@@ -91,7 +91,7 @@ def read_default_units_from_file(units_file: str | Path | Traversable | None = N
         raise ValueError(f"{source} must be a YAML mapping of variable names to entries.")
     missing = [key for key, value in entries.items() if not isinstance(value, dict) or "default_units" not in value]
     if missing:
-        raise ValueError(f"The following entries in {source} have no default_units:\n" + "\n".join(missing))
+        raise ValueError(f"The following entries in {source} have no default_units:\n" + "\n".join(str(key) for key in missing))
     _merge_default_units({key: value["default_units"] for key, value in entries.items()})
 
 
@@ -149,7 +149,7 @@ def default_unit(var: str) -> str | None:
         return _DEFAULT_UNIT_BY_VARIABLE[var]
     except KeyError:
         raise KeyError(
-            f"No default unit defined for {var}. Please check configured default units in the unit_handling submodule."
+            f"No default units defined for '{var}'. Declare them in the plugin's variables.yaml, or with extend_default_units_map."
         ) from None
 
 
@@ -199,14 +199,14 @@ def set_default_units(value: Any, key: str) -> Any: ...
 
 
 def set_default_units(value: Any, key: str) -> Any:
-    """Return value as a quantity with default units.
+    """Return value as a quantity carrying the variable's default units.
 
     Args:
-        value: magnitude of input value to convert to a Quantity
-        key: name of variable which we are setting the default units for
+        value: magnitude to attach units to
+        key: the variable whose default units apply
 
     Returns:
-        magnitude of value in default units
+        value with the variable's default units attached
     """
 
     def _is_number_not_bool(val: Any) -> bool:

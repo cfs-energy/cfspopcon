@@ -29,7 +29,7 @@ This will run the :code:`run_popcon_cli` function from :code:`cfspopcon/cli.py`.
 sets the parameters for the POPCON analysis. Have a look at :code:`example_cases/SPARC_PRD/input.yaml` to see how this file is structured.
 
 The results of the POPCON analysis are stored in a :code:`output` folder in the directory where :code:`input.yaml` was read from. For the example case above, you can find the outputs in
-:code:`example_cases/SPARC_PRD/outputs`. These include a NetCDF dataset containing the results of the run, a JSON file representing points in plain-text, as well as any plots requested in the
+:code:`example_cases/SPARC_PRD/output`. These include a NetCDF dataset containing the results of the run, a JSON file representing points in plain-text, as well as any plots requested in the
 :code:`input.yaml` file.
 
 Getting started with Jupyter
