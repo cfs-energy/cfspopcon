@@ -818,9 +818,9 @@ def register_plugin(plugin_name: str) -> list[str]:
             from the installed distribution's name.
 
     Returns:
-        The names newly registered for this plugin itself: names registered for a required
-        plugin, and names an ``override`` replaced, are not listed. A repeated call returns
-        an empty list.
+        The names newly registered for this plugin itself, excluding names registered for a
+        required plugin and names an ``override`` replaced. A repeated call returns an empty
+        list.
 
     Raises:
         RuntimeError: if a declared composite names an algorithm which is still missing once
@@ -908,8 +908,8 @@ def discover_builtin_algorithms() -> list[str]:
     change nothing.
 
     Returns:
-        The names of the bundled algorithms this call registered: all of them on the first
-        call, an empty list on a repeat.
+        The names of the bundled algorithms this call registered, which is all of them on
+        the first call and an empty list on a repeat.
     """
     return register_plugin(_BUNDLED_PLUGIN)
 
