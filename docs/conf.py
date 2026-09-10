@@ -104,7 +104,7 @@ extensions = [
     "nbsphinx",
 ]
 
-nitpick_ignore = [("py:class", "Ellipsis"), ("py:class", "ModuleType")]
+nitpick_ignore = [("py:class", "Ellipsis"), ("py:class", "ModuleType"), ("py:class", "cfspopcon.algorithm_class._F")]
 
 # -- nbsphinx
 exclude_patterns = ["_build", "static"]

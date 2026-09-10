@@ -24,7 +24,7 @@ from difflib import get_close_matches
 from functools import wraps
 from importlib.resources import files
 from pathlib import Path  # noqa: TC003
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
 from warnings import warn
 
 import xarray as xr
@@ -43,6 +43,9 @@ LabelledReturnFunctionType = Callable[..., dict[str, Any]]
 
 # A function with any signature and any return shape.
 GenericFunctionType = Callable[..., Any]
+
+# Preserves a decorated function's exact type.
+_F = TypeVar("_F", bound=Callable[..., Any])
 
 #: The bundled plugin: the package holding cfspopcon's own algorithms.
 _BUNDLED_PLUGIN = "cfspopcon.formulas"
@@ -314,7 +317,7 @@ class Algorithm:
 
 def declare_algorithm(
     return_keys: list[str], name: str | None = None, skip_unit_conversion: bool = False, override: bool = False
-) -> GenericFunctionType:
+) -> Callable[[_F], _F]:
     """Label a function as an Algorithm, for :func:`register_plugin` to find.
 
     The algorithm enters the registry when the plugin defining the function is registered.
@@ -337,7 +340,7 @@ def declare_algorithm(
         The decorator, which labels the function and returns it unchanged.
     """
 
-    def function_wrapper(func: GenericFunctionType) -> GenericFunctionType:
+    def function_wrapper(func: _F) -> _F:
         func.__popcon_algorithm__ = Algorithm.from_single_function(  # type:ignore[attr-defined]
             func,
             return_keys=return_keys,
