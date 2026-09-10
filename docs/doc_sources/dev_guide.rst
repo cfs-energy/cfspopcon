@@ -166,3 +166,19 @@ To avoid having failures in the CI it's a good idea to run these locally first a
   poetry run make -C docs doctest
   poetry run make -C docs linkcheck
 
+
+Releasing
+=====================
+
+``scripts/release.py`` carries a release end to end:
+
+.. code:: console
+
+  $ python scripts/release.py prepare 9.0.0   # bump pyproject.toml, cut the changelog, commit and push
+  $ python scripts/release.py publish 9.0.0   # draft a GitHub release with the changelog section as notes
+  $ python scripts/release.py verify 9.0.0    # after publishing: check PyPI and the readthedocs build
+
+Publishing the drafted release on GitHub is what triggers the build-and-publish pipeline.
+``verify`` exists because readthedocs serves the last successful ``stable`` build: a failed
+tag build leaves the previous version's docs in place, with the failure visible only in the
+readthedocs dashboard.
