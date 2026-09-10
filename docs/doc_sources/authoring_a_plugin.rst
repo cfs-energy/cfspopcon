@@ -145,6 +145,7 @@ or use a given variable, plugins included:
 
   >>> import cfspopcon
   >>> cfspopcon.register_plugin("my_popcon_plugin")
+  ['calc_widgets_per_shift']
   >>> cfspopcon.algorithms_setting("widgets_per_shift")
   ['calc_widgets_per_shift']
 
