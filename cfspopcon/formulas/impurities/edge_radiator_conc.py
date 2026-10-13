@@ -38,11 +38,10 @@ def calc_edge_impurity_concentration(
 ) -> tuple[Unitfull, ...]:
     """Calculate the impurity concentration required to cool the scrape-off-layer using the Lengyel model.
 
-    The edge-radiator concentration in the core is added to the impurity_concentration array. If the array
-    already contains edge_impurity_species (for instance because it is also an intrinsic impurity, or the
-    core radiator), the edge-seeded concentration is added to the existing concentration rather than
-    replacing it. The Lengyel model does not credit radiation from the impurities already in the array
-    towards SOL_power_loss_fraction, so the computed concentration is treated as additional seeding.
+    The Lengyel model gives the total concentration of edge_impurity_species required for SOL_power_loss_fraction,
+    and edge_impurity_concentration_in_core is the core concentration of that same population. It is therefore
+    written into the impurity_concentration array as the concentration of edge_impurity_species, replacing any
+    existing entry (for instance if the species is also an intrinsic impurity, or the core radiator).
 
     Args:
         edge_impurity_species: :term:`glossary link<edge_impurity_species>`
@@ -82,7 +81,7 @@ def calc_edge_impurity_concentration(
 
     edge_impurity_concentration_in_core = edge_impurity_concentration / edge_impurity_enrichment
     impurity_concentration = extend_impurity_concentration_array(
-        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core, add=True
+        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core
     )
 
     return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurity_concentration)

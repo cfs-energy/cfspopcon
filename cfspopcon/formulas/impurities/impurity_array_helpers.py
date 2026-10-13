@@ -53,9 +53,9 @@ def extend_impurity_concentration_array(
     This method automatically handles broadcasting.
 
     If the array already has an entry for `species`, that entry is overwritten by `concentration`.
-    Pass `add=True` to instead add `concentration` to the existing entry, which is what the core
-    and edge radiator algorithms do so that an intrinsic concentration of the radiator species
-    is not lost. An existing entry which is NaN everywhere (as xarray alignment produces when a
+    Pass `add=True` to instead add `concentration` to the existing entry, for when `concentration`
+    is an increment (as for the core radiator, whose concentration is the extra amount needed on top
+    of what the existing impurities radiate). An existing entry which is NaN everywhere (as xarray alignment produces when a
     shorter array is merged into a dataset whose `dim_species` already lists the species) is
     treated as absent, so `add=True` writes `concentration` as-is rather than NaN.
 
