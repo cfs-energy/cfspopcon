@@ -86,6 +86,11 @@ def calc_core_seeded_impurity_concentration(
 ) -> Unitfull:
     """Calculate the concentration of a core radiator required to increase the radiated power by a desired amount.
 
+    The seeded concentration is added to the impurity_concentration array. If the array already contains
+    core_impurity_species (for instance because it is also an intrinsic impurity), the seeded concentration
+    is added to the existing concentration, since P_radiation_from_core_seeded_impurity is the radiated
+    power required on top of what the existing impurities already radiate.
+
     Args:
         P_radiation_from_core_seeded_impurity: :term:`glossary link<P_radiation_from_core_seeded_impurity>`
         impurity_concentration: :term:`glossary link<impurity_concentration>`
@@ -125,7 +130,7 @@ def calc_core_seeded_impurity_concentration(
     )
 
     impurity_concentration = extend_impurity_concentration_array(
-        impurity_concentration, core_impurity_species, core_seeded_impurity_concentration
+        impurity_concentration, core_impurity_species, core_seeded_impurity_concentration, add=True
     )
 
     return impurity_concentration

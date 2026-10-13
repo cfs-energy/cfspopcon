@@ -46,11 +46,18 @@ def make_impurity_concentration_array_from_kwargs(**kwargs: Any) -> xr.DataArray
 
 
 def extend_impurity_concentration_array(
-    array: xr.DataArray, species: str | AtomicSpecies, concentration: float | xr.DataArray
+    array: xr.DataArray, species: str | AtomicSpecies, concentration: float | xr.DataArray, add: bool = False
 ) -> xr.DataArray:
     """Append a new element to the impurity_concentration array.
 
     This method automatically handles broadcasting.
+
+    If the array already has an entry for `species`, that entry is overwritten by `concentration`.
+    Pass `add=True` to instead add `concentration` to the existing entry, which is what the core
+    and edge radiator algorithms do so that an intrinsic concentration of the radiator species
+    is not lost. An existing entry which is NaN everywhere (as xarray alignment produces when a
+    shorter array is merged into a dataset whose `dim_species` already lists the species) is
+    treated as absent, so `add=True` writes `concentration` as-is rather than NaN.
 
     N.b. You can also 'extend' an empty array, constructed via xr.DataArray()
 
@@ -69,19 +76,20 @@ def extend_impurity_concentration_array(
     if array.ndim == 0:
         # If the input array is empty, then just return the concentration instead of the input array
         return concentration.expand_dims("dim_species").assign_coords(dim_species=[species])
-    elif species in array.dim_species:
-        # If the input array already has the species that we are writing, we need to carefully write these values
-        # into the array
-        # First, we make sure that the array is of the correct shape to write concentration in
-        array = array.broadcast_like(concentration).copy()
-        # Then, we overwrite the values for the species that we are writing, using .loc instead of .sel since
-        # we can't assign values with .sel
-        array.loc[dict(dim_species=species)] = concentration
-        # Finally, we sort by the species atomic number, to ensure consistent ordering of the species.
-        return array.sortby("dim_species")
-    else:
-        # If the input array doesn't have the species that we're writing, we can simply concatenate the
-        # concentration array in, along the 'dim_species' dimension.
-        array = xr.concat((array, concentration.expand_dims("dim_species").assign_coords(dim_species=[species])), dim="dim_species")
-        # We again sort by the species atomic number, to ensure consistent ordering of the species.
-        return array.sortby("dim_species")
+
+    if species in array.dim_species:
+        # If the input array already has the species that we are writing, we take that entry out of the array
+        # (optionally adding it to the concentration), then concatenate the new entry back in below.
+        existing = array.sel(dim_species=species, drop=True)
+        # An entry which is NaN everywhere is one that xarray alignment padded in, rather than a concentration:
+        # for instance, when a dataset's dim_species coordinate already lists the species from an earlier run,
+        # so merging a shorter array into it fills the species with NaN. Such an entry is treated as absent.
+        if add and not existing.isnull().all():
+            concentration = existing + concentration
+        array = array.drop_sel(dim_species=species)
+
+    # Concatenate the concentration array in, along the 'dim_species' dimension. xr.concat broadcasts the
+    # entries against each other, so the concentration can have dimensions that the array doesn't (and vice versa).
+    array = xr.concat((array, concentration.expand_dims("dim_species").assign_coords(dim_species=[species])), dim="dim_species")
+    # We sort by the species atomic number, to ensure consistent ordering of the species.
+    return array.sortby("dim_species")

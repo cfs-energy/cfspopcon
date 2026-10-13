@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Fixed
+
+- **Radiator seeding no longer overwrites an intrinsic concentration of the same species** (#166): `calc_core_seeded_impurity_concentration` and `calc_edge_impurity_concentration` now add the seeded concentration to any existing entry for the radiator species in `impurity_concentration`, instead of replacing it. Previously, listing the radiator species (e.g. argon) in `intrinsic_impurity_concentration` lost the intrinsic part from `z_effective` and `dilution` (and set it to zero when no seeding was required), while its radiation was still counted in `P_radiation`. `extend_impurity_concentration_array` gains an `add=False` keyword to select this behaviour, and no longer strips pint units when writing over an existing species.
+
 ## 9.0.0 - 2026-09-10
 
 This release makes cfspopcon extensible: plugin packages can add algorithms, composites, and
