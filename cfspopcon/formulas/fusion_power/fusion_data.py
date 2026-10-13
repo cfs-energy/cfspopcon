@@ -144,7 +144,8 @@ class DDFusionBoschHale(FusionReaction):
     def calc_rate_coefficient(ion_temp: float) -> tuple[float, float, float]:
         r"""Calculate :math:`\\langle \\sigma v \rangle` for a given ion temperature.
 
-        Cross-section from :cite:`bosch_improved_1992`
+        Cross-section from :cite:`bosch_improved_1992`, equation 12, using coefficients from table VII, page 625
+        (third and fourth columns are D(d,p)T and D(d,n)3He reactions; valid for 0.2 <= ion_temp <= 100 keV).
 
         Args:
             ion_temp: [keV]
@@ -152,13 +153,16 @@ class DDFusionBoschHale(FusionReaction):
         Returns:
             :math:`\\langle \\sigma v \rangle` [cm^3/s]
         """
+        if not 0.2 <= ion_temp <= 100.0:
+            return np.nan, np.nan, np.nan
+
         # For D(d,n)3He
-        cBH_1 = [((31.3970**2) / 4.0) ** (1.0 / 3.0), 5.65718e-12, 3.41e-03, 1.99e-03, 0, 1.05e-05, 0, 0]  # 3.72e-16,
+        cBH_1 = [((31.3970**2) / 4.0) ** (1.0 / 3.0), 5.43360e-12, 5.85778e-03, 7.68222e-03, 0.0, -2.96400e-06, 0.0, 0.0]
 
         mc2_1 = 937814.0
 
         # For D(d,p)T
-        cBH_2 = [((31.3970**2) / 4.0) ** (1.0 / 3.0), 5.43360e-12, 5.86e-03, 7.68e-03, 0, -2.96e-06, 0, 0]  # 3.57e-16,
+        cBH_2 = [((31.3970**2) / 4.0) ** (1.0 / 3.0), 5.65718e-12, 3.41267e-03, 1.99167e-03, 0.0, 1.05060e-05, 0.0, 0.0]
 
         mc2_2 = 937814.0
 
@@ -230,30 +234,35 @@ class DDFusionBoschHale(FusionReaction):
 
         return convert_units(energy_to_charged_per_reaction, ureg.MJ)
 
-    def calc_power_density(self, ion_temp: Unitfull) -> Unitfull:
+    def calc_power_density(self, ion_temp: Unitfull, heavier_fuel_species_fraction: Unitfull | None = None) -> Unitfull:
         """Returns the total power density."""
+        del heavier_fuel_species_fraction
         _, sigmav_DD_to_pT, sigmav_DD_to_nHe3 = self.calc_rate_coefficient(ion_temp)
 
-        power_density = sigmav_DD_to_pT * self.energy_per_DD_to_pT_reaction + sigmav_DD_to_nHe3 * self.energy_per_DD_to_nHe3_reaction
+        power_density = 0.5 * (
+            sigmav_DD_to_pT * self.energy_per_DD_to_pT_reaction + sigmav_DD_to_nHe3 * self.energy_per_DD_to_nHe3_reaction
+        )
 
         return convert_units(power_density, ureg.MW * ureg.m**3)
 
-    def calc_power_density_to_neutrals(self, ion_temp: Unitfull) -> Unitfull:
+    def calc_power_density_to_neutrals(self, ion_temp: Unitfull, heavier_fuel_species_fraction: Unitfull | None = None) -> Unitfull:
         """Returns the power density going to uncharged species."""
+        del heavier_fuel_species_fraction
         _, sigmav_DD_to_pT, sigmav_DD_to_nHe3 = self.calc_rate_coefficient(ion_temp)
 
-        power_density = (
+        power_density = 0.5 * (
             sigmav_DD_to_pT * self.energy_to_neutrals_per_DD_to_pT_reaction
             + sigmav_DD_to_nHe3 * self.energy_to_neutrals_per_DD_to_nHe3_reaction
         )
 
         return convert_units(power_density, ureg.MW * ureg.m**3)
 
-    def calc_power_density_to_charged(self, ion_temp: Unitfull) -> Unitfull:
+    def calc_power_density_to_charged(self, ion_temp: Unitfull, heavier_fuel_species_fraction: Unitfull | None = None) -> Unitfull:
         """Returns the power density going to charged species."""
+        del heavier_fuel_species_fraction
         _, sigmav_DD_to_pT, sigmav_DD_to_nHe3 = self.calc_rate_coefficient(ion_temp)
 
-        power_density = (
+        power_density = 0.5 * (
             sigmav_DD_to_pT * self.energy_to_charged_per_DD_to_pT_reaction
             + sigmav_DD_to_nHe3 * self.energy_to_charged_per_DD_to_nHe3_reaction
         )
