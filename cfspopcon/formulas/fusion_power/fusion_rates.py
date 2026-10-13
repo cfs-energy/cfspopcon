@@ -109,7 +109,7 @@ def calc_neutron_flux_to_walls(
         )
 
     neutron_power_flux_to_walls = P_neutron / surface_area
-    if isinstance(reaction, DDFusionBoschHale | DDFusionHively):
+    if isinstance(reaction, DDFusionBoschHale):
         energy_per_neutron = reaction.energy_to_neutrals_per_DD_to_nHe3_reaction.to(ureg.MJ)
     else:
         energy_per_neutron = reaction.calc_energy_to_neutrals_per_reaction()

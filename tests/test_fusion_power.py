@@ -10,6 +10,12 @@ from cfspopcon.formulas.fusion_power import (
     calc_fusion_power,
     calc_neutron_flux_to_walls,
 )
+from cfspopcon.formulas.plasma_profiles.jch_profiles import calc_jch_profiles
+from cfspopcon.formulas.plasma_profiles.plasma_profiles import (
+    calc_analytic_profiles,
+    calc_prf_profiles,
+    define_radial_grid,
+)
 from cfspopcon.unit_handling import Quantity, magnitude_in_units, ureg
 
 # Bosch & Hale (1992), Nucl. Fusion 32 611, Table VIII (with 1993 erratum, Nucl. Fusion 33 1919):
@@ -56,8 +62,8 @@ def test_dd_bosch_hale_rate_coefficient_matches_table_viii(ion_temp_keV: float, 
     np.testing.assert_allclose(magnitude_in_units(sigmav_combined, unit), expected_pT + expected_nHe3, rtol=1e-3)
 
 
-@pytest.mark.parametrize("ion_temp_keV", [0.1, 100.1, 1000.0])
-def test_dd_bosch_hale_outside_validity_range_returns_nan(ion_temp_keV: float) -> None:
+@pytest.mark.parametrize("ion_temp_keV", [100.1, 1000.0])
+def test_dd_bosch_hale_above_validity_range_returns_nan(ion_temp_keV: float) -> None:
     reaction = DDFusionBoschHale()
     sigmav_combined, sigmav_pT, sigmav_nHe3 = reaction.calc_rate_coefficient(Quantity(ion_temp_keV, ureg.keV))
 
@@ -65,6 +71,36 @@ def test_dd_bosch_hale_outside_validity_range_returns_nan(ion_temp_keV: float) -
     assert np.isnan(magnitude_in_units(sigmav_combined, unit))
     assert np.isnan(magnitude_in_units(sigmav_pT, unit))
     assert np.isnan(magnitude_in_units(sigmav_nHe3, unit))
+
+
+@pytest.mark.parametrize("ion_temp_keV", [-1.0, 0.0, 1e-4, 0.05])
+def test_dd_bosch_hale_low_and_nonpositive_temperatures_are_finite(ion_temp_keV: float) -> None:
+    reaction = DDFusionBoschHale()
+    sigmav_combined, sigmav_pT, sigmav_nHe3 = reaction.calc_rate_coefficient(Quantity(ion_temp_keV, ureg.keV))
+
+    unit = ureg.cm**3 / ureg.s
+    for rate in (sigmav_combined, sigmav_pT, sigmav_nHe3):
+        val = float(magnitude_in_units(rate, unit))
+        assert np.isfinite(val)
+        assert val >= 0.0
+        if ion_temp_keV <= 0.0:
+            assert val == 0.0
+
+
+def test_dd_bosch_hale_energy_per_reaction_methods() -> None:
+    reaction = DDFusionBoschHale()
+    temps = xr.DataArray([0.0, 10.0, 20.0], dims=["dim_rho"]) * ureg.keV
+
+    e_total = reaction.calc_energy_per_reaction(temps)
+    e_neut = reaction.calc_energy_to_neutrals_per_reaction(temps)
+    e_charged = reaction.calc_energy_to_charged_per_reaction(temps)
+
+    np.testing.assert_allclose(
+        magnitude_in_units(e_total, ureg.MJ),
+        magnitude_in_units(e_neut + e_charged, ureg.MJ),
+    )
+    assert float(magnitude_in_units(e_total.isel(dim_rho=0), ureg.MJ)) == 0.0
+    assert float(magnitude_in_units(e_total.isel(dim_rho=1), ureg.MeV)) == pytest.approx(3.64, rel=1e-2)
 
 
 def test_dd_fusion_power_and_neutron_rate_for_uniform_profiles() -> None:
@@ -131,6 +167,85 @@ def test_dd_fusion_power_and_neutron_rate_for_uniform_profiles() -> None:
         heavier_fuel_species_fraction=heavier_fuel_species_fraction,
     )
     np.testing.assert_allclose(magnitude_in_units(average_ion_mass, ureg.amu), 2.0)
+
+
+@pytest.mark.parametrize("profile_kind", ["analytic", "prf", "jch"])
+def test_dd_fusion_power_and_neutron_rate_across_peaked_profile_families(profile_kind: str) -> None:
+    """Peaked profiles with cold edge knots (< 0.2 keV) must integrate to finite positive DD power."""
+    if profile_kind == "analytic":
+        rho = define_radial_grid(50) * ureg.dimensionless
+        _, ni, _, Ti = calc_analytic_profiles(
+            rho=rho,
+            average_electron_density=15.0 * ureg.n19,
+            average_electron_temp=5.0 * ureg.keV,
+            average_ion_temp=5.0 * ureg.keV,
+            electron_density_peaking=1.3 * ureg.dimensionless,
+            ion_density_peaking=1.3 * ureg.dimensionless,
+            temperature_peaking=2.5 * ureg.dimensionless,
+            dilution=0.85 * ureg.dimensionless,
+        )
+    elif profile_kind == "prf":
+        rho = define_radial_grid(50) * ureg.dimensionless
+        _, ni, _, Ti = calc_prf_profiles(
+            rho=rho,
+            average_electron_density=15.0 * ureg.n19,
+            average_electron_temp=2.5 * ureg.keV,
+            average_ion_temp=2.5 * ureg.keV,
+            electron_density_peaking=1.3 * ureg.dimensionless,
+            ion_density_peaking=1.3 * ureg.dimensionless,
+            temperature_peaking=2.5 * ureg.dimensionless,
+            dilution=0.85 * ureg.dimensionless,
+            normalized_inverse_temp_scale_length=2.5 * ureg.dimensionless,
+        )
+    else:
+        rho_raw, _, ni_raw, _, Ti_raw = calc_jch_profiles(
+            average_electron_density=15.0 * ureg.n19,
+            average_electron_temp=5.0 * ureg.keV,
+            average_ion_temp=5.0 * ureg.keV,
+            electron_density_peaking=1.3 * ureg.dimensionless,
+            ion_density_peaking=1.3 * ureg.dimensionless,
+            temperature_peaking=2.5 * ureg.dimensionless,
+            dilution=0.85 * ureg.dimensionless,
+            n_points_for_confined_region_profiles=100,
+            separatrix_electron_temp=0.10 * ureg.keV,
+        )
+        rho = rho_raw * ureg.dimensionless
+        ni = xr.DataArray(ni_raw, coords=dict(dim_rho=rho))
+        Ti = xr.DataArray(Ti_raw, coords=dict(dim_rho=rho))
+
+    # Edge temperature knot is below the 0.2 keV Bosch-Hale table minimum
+    assert float(magnitude_in_units(Ti.isel(dim_rho=-1), ureg.keV)) < 0.2
+
+    P_fusion, P_neutron, P_alpha = calc_fusion_power(
+        fusion_reaction="DDFusionBoschHale",
+        ion_temp_profile=Ti,
+        heavier_fuel_species_fraction=0.5 * ureg.dimensionless,
+        fuel_ion_density_profile=ni,
+        rho=rho,
+        plasma_volume=20.0 * ureg.m**3,
+    )
+
+    for power in (P_fusion, P_neutron, P_alpha):
+        val = float(magnitude_in_units(power, ureg.MW))
+        assert np.isfinite(val)
+        assert val > 0.0
+
+    np.testing.assert_allclose(
+        magnitude_in_units(P_fusion, ureg.MW),
+        magnitude_in_units(P_neutron + P_alpha, ureg.MW),
+    )
+
+    _, neutron_rate = calc_neutron_flux_to_walls(
+        P_neutron=P_neutron,
+        surface_area=60.0 * ureg.m**2,
+        fusion_reaction="DDFusionBoschHale",
+        ion_temp_profile=Ti,
+        heavier_fuel_species_fraction=0.5 * ureg.dimensionless,
+    )
+    np.testing.assert_allclose(
+        magnitude_in_units(neutron_rate * (2.45 * ureg.MeV), ureg.MW),
+        magnitude_in_units(P_neutron, ureg.MW),
+    )
 
 
 def test_disabled_reactions_still_raise() -> None:

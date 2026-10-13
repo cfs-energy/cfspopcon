@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- **`DDFusionBoschHale` reaction enabled and corrected** (#165): restored the full Bosch–Hale Table VII coefficients on the matching $\mathrm{D(d,n)^3He}$ and $\mathrm{D(d,p)T}$ branches (which were previously swapped and truncated), restricted `calc_rate_coefficient` to the $0.2 \le T_i \le 100\text{ keV}$ validity range, included the identical-reactant $\tfrac{1}{2}$ factor in `calc_power_density*`, and divided `P_neutron` by the $2.45\text{ MeV}$ energy per $\mathrm{D(d,n)^3He}$ neutron in `calc_neutron_flux_to_walls`.
+- **`DDFusionBoschHale` reaction enabled and corrected** (#165): restored the full Bosch–Hale Table VII coefficients on the matching $\mathrm{D(d,n)^3He}$ and $\mathrm{D(d,p)T}$ branches (which were previously swapped and truncated), guarded `calc_rate_coefficient` above $100\text{ keV}$ while returning $0.0$ for $T_i \le 0$, included the identical-reactant $\tfrac{1}{2}$ factor in `calc_power_density*`, and divided `P_neutron` by the $2.45\text{ MeV}$ energy per $\mathrm{D(d,n)^3He}$ neutron in `calc_neutron_flux_to_walls`.
 
 ## 9.0.0 - 2026-09-10
 
