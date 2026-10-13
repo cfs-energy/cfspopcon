@@ -348,6 +348,13 @@
             "data": 0.187041,
             "dims": []
         },
+        "core_seeded_impurity_concentration": {
+            "attrs": {
+                "units": "dimensionless"
+            },
+            "data": 0.00000,
+            "dims": []
+        },
         "current_relaxation_time": {
             "attrs": {
                 "units": "second"

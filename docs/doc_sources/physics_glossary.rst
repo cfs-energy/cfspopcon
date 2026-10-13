@@ -77,6 +77,9 @@ Physics Glossary
   core_radiated_power_fraction
     Fraction of input power radiated from the confined region before it reaches the separatrix.
 
+  core_seeded_impurity_concentration
+    Additional concentration of the core radiator (impurity density relative to the electron density) seeded to reach the minimum core radiated power.
+
   critical_alpha_MHD
     Critical value of :math:`\alpha_{MHD}` used in the separatrix operational space.
 

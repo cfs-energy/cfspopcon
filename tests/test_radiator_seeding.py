@@ -64,8 +64,10 @@ def test_core_seeding_adds_to_intrinsic_concentration(atomic_data, without_argon
         atomic_data=atomic_data,
     )
 
-    seeded_only = seed.run(impurity_concentration=without_argon, **kwargs)["impurity_concentration"]
-    seeded_on_top_of_intrinsic = seed.run(impurity_concentration=with_argon, **kwargs)["impurity_concentration"]
+    without = seed.run(impurity_concentration=without_argon, **kwargs)
+    with_intrinsic = seed.run(impurity_concentration=with_argon, **kwargs)
+    seeded_only = without["impurity_concentration"]
+    seeded_on_top_of_intrinsic = with_intrinsic["impurity_concentration"]
 
     if P_seed == 0.0:
         assert _argon(seeded_only) == 0.0
@@ -74,6 +76,13 @@ def test_core_seeding_adds_to_intrinsic_concentration(atomic_data, without_argon
     assert np.isclose(_argon(seeded_on_top_of_intrinsic), INTRINSIC_ARGON + _argon(seeded_only))
     assert np.isclose(_tungsten(seeded_on_top_of_intrinsic), INTRINSIC_TUNGSTEN)
     assert len(seeded_on_top_of_intrinsic.dim_species) == 2
+
+    # The seeded amount is reported separately, and does not depend on what was already in the array
+    core_seeded = magnitude(with_intrinsic["core_seeded_impurity_concentration"])
+    assert np.isclose(core_seeded, magnitude(without["core_seeded_impurity_concentration"]))
+    assert np.isclose(core_seeded, _argon(seeded_on_top_of_intrinsic) - INTRINSIC_ARGON)
+    if P_seed == 0.0:
+        assert core_seeded == 0.0
 
     # The impurity content agrees with the radiated power: what the seeded array radiates is what the
     # intrinsic array radiates, plus the requested seeded power.
@@ -136,7 +145,9 @@ def test_core_radiator_in_intrinsic_impurities_is_idempotent(cases_directory):
     xenon = first_run["impurity_concentration"].sel(dim_species=AtomicSpecies.Xenon)
     assert (magnitude(xenon) > intrinsic_xenon).any()
     assert (magnitude(xenon) >= intrinsic_xenon).all()
-    xr.testing.assert_allclose(
-        second_run["impurity_concentration"].transpose(*first_run["impurity_concentration"].dims),
-        first_run["impurity_concentration"],
-    )
+    # The array entry is the intrinsic concentration plus the reported seeded amount
+    core_seeded = first_run["core_seeded_impurity_concentration"]
+    np.testing.assert_allclose(magnitude(xenon).transpose(*core_seeded.dims), magnitude(core_seeded) + intrinsic_xenon)
+
+    for variable in ["impurity_concentration", "core_seeded_impurity_concentration"]:
+        xr.testing.assert_allclose(second_run[variable].transpose(*first_run[variable].dims), first_run[variable])

@@ -81,7 +81,7 @@ def calc_edge_impurity_concentration(
 
     edge_impurity_concentration_in_core = edge_impurity_concentration / edge_impurity_enrichment
     impurity_concentration = extend_impurity_concentration_array(
-        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core
+        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core, existing="replace"
     )
 
     return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurity_concentration)
