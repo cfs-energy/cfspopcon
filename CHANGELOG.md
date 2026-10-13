@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added
+
+- **`core_seeded_impurity_concentration`**: `calc_core_seeded_impurity_concentration` now also returns the seeded concentration of `core_impurity_species` on its own, alongside the updated `impurity_concentration`, mirroring `edge_impurity_concentration_in_core` from `calc_edge_impurity_concentration`. When the core radiator is also an intrinsic impurity, this is the only way to see how much was seeded.
+
+### Changed
+
+- **`extend_impurity_concentration_array(impurity_concentration, species, concentration, *, existing="replace")`** (**breaking**): the first parameter is renamed from `array` to `impurity_concentration`, and the keyword-only `existing` selects what happens when `species` is already in the array: `"replace"` (the default, and the previous behaviour) or `"add"`. Any other value raises `ValueError`. The docstring explains why the multi-species array is passed in and returned.
+- **`calc_core_seeded_impurity_concentration` returns a tuple** (**breaking** for code calling the undecorated function directly): `(core_seeded_impurity_concentration, impurity_concentration)`. Going through the registry or `Algorithm.run` is unaffected.
+
+### Fixed
+
+- **Core radiator seeding no longer overwrites an intrinsic concentration of the same species** (#166): `calc_core_seeded_impurity_concentration` now adds the seeded concentration to any existing entry for `core_impurity_species` in `impurity_concentration`, instead of replacing it. The seeded concentration is the increment needed to radiate `P_radiation_from_core_seeded_impurity` on top of the existing impurities, so previously, listing the core radiator in `intrinsic_impurity_concentration` lost the intrinsic part from `z_effective` and `dilution` (and set it to zero when no seeding was required), while its radiation was still counted in `P_radiation`. `calc_edge_impurity_concentration` still replaces any existing entry (now passed explicitly as `existing="replace"`), since the Lengyel concentration is the total for that species; this is now documented. `extend_impurity_concentration_array` no longer emits a `UnitStrippedWarning` when a unitful concentration is written over an existing species.
+
 ## 9.0.0 - 2026-09-10
 
 This release makes cfspopcon extensible: plugin packages can add algorithms, composites, and

@@ -69,6 +69,7 @@ def calc_P_radiation_from_core_seeded_impurity(P_radiation: Unitfull, min_P_radi
 
 @declare_algorithm(
     return_keys=[
+        "core_seeded_impurity_concentration",
         "impurity_concentration",
     ]
 )
@@ -83,8 +84,14 @@ def calc_core_seeded_impurity_concentration(
     radiated_power_scalar: Unitfull,
     core_impurity_species: named_options.AtomicSpecies,
     atomic_data: xr.DataArray | AtomicData,
-) -> Unitfull:
+) -> tuple[Unitfull, ...]:
     """Calculate the concentration of a core radiator required to increase the radiated power by a desired amount.
+
+    The seeded concentration is returned as core_seeded_impurity_concentration and added to the
+    impurity_concentration array. If the array already contains core_impurity_species (for instance
+    because it is also an intrinsic impurity), the seeded concentration is added to the existing
+    concentration, since P_radiation_from_core_seeded_impurity is the radiated power required on top
+    of what the existing impurities already radiate.
 
     Args:
         P_radiation_from_core_seeded_impurity: :term:`glossary link<P_radiation_from_core_seeded_impurity>`
@@ -99,7 +106,7 @@ def calc_core_seeded_impurity_concentration(
         atomic_data: :term:`glossary link<atomic_data>`
 
     Returns:
-        :term:`impurity_concentration`
+        :term:`core_seeded_impurity_concentration`, :term:`impurity_concentration`
     """
     if radiated_power_method == named_options.RadiationMethod.Inherent:
         radiated_power_method_for_core_impurity = named_options.RadiationMethod.Radas
@@ -125,7 +132,7 @@ def calc_core_seeded_impurity_concentration(
     )
 
     impurity_concentration = extend_impurity_concentration_array(
-        impurity_concentration, core_impurity_species, core_seeded_impurity_concentration
+        impurity_concentration, core_impurity_species, core_seeded_impurity_concentration, existing="add"
     )
 
-    return impurity_concentration
+    return core_seeded_impurity_concentration, impurity_concentration

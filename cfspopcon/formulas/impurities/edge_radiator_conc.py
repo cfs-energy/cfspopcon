@@ -38,6 +38,11 @@ def calc_edge_impurity_concentration(
 ) -> tuple[Unitfull, ...]:
     """Calculate the impurity concentration required to cool the scrape-off-layer using the Lengyel model.
 
+    The Lengyel model gives the total concentration of edge_impurity_species required for SOL_power_loss_fraction,
+    and edge_impurity_concentration_in_core is the core concentration of that same population. It is therefore
+    written into the impurity_concentration array as the concentration of edge_impurity_species, replacing any
+    existing entry (for instance if the species is also an intrinsic impurity, or the core radiator).
+
     Args:
         edge_impurity_species: :term:`glossary link<edge_impurity_species>`
         reference_electron_density: :term:`glossary link<reference_electron_density>`
@@ -76,7 +81,7 @@ def calc_edge_impurity_concentration(
 
     edge_impurity_concentration_in_core = edge_impurity_concentration / edge_impurity_enrichment
     impurity_concentration = extend_impurity_concentration_array(
-        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core
+        impurity_concentration, edge_impurity_species, edge_impurity_concentration_in_core, existing="replace"
     )
 
     return (edge_impurity_concentration, edge_impurity_concentration_in_core, impurity_concentration)
