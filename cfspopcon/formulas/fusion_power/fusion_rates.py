@@ -9,6 +9,8 @@ from ...unit_handling import Unitfull, ureg
 from ..geometry.volume_integral import integrate_profile_over_volume
 from .fusion_data import (
     REACTIONS,
+    DDFusionBoschHale,
+    DDFusionHively,
     DTFusionBoschHale,
     DTFusionHively,
 )
@@ -39,7 +41,7 @@ def calc_fusion_power(
     if isinstance(fusion_reaction, xr.DataArray):
         fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
-    if not isinstance(reaction, DTFusionBoschHale | DTFusionHively):
+    if not isinstance(reaction, DTFusionBoschHale | DTFusionHively | DDFusionBoschHale) or isinstance(reaction, DDFusionHively):
         raise NotImplementedError(
             f"Reaction {fusion_reaction} is currently disabled. See https://github.com/cfs-energy/cfspopcon/issues/43"
         )
@@ -101,16 +103,19 @@ def calc_neutron_flux_to_walls(
     if isinstance(fusion_reaction, xr.DataArray):
         fusion_reaction = fusion_reaction.item()
     reaction = REACTIONS[fusion_reaction]
-    if not isinstance(reaction, DTFusionBoschHale | DTFusionHively):
+    if not isinstance(reaction, DTFusionBoschHale | DTFusionHively | DDFusionBoschHale) or isinstance(reaction, DDFusionHively):
         raise NotImplementedError(
             f"Reaction {fusion_reaction} is currently disabled. See https://github.com/cfs-energy/cfspopcon/issues/43"
         )
 
     neutron_power_flux_to_walls = P_neutron / surface_area
-    energy_to_neutrals_per_reaction = reaction.calc_energy_to_neutrals_per_reaction()
+    if isinstance(reaction, DDFusionBoschHale):
+        energy_per_neutron = reaction.energy_to_neutrals_per_DD_to_nHe3_reaction.to(ureg.MJ)
+    else:
+        energy_per_neutron = reaction.calc_energy_to_neutrals_per_reaction()
 
     # Prevent division by zero.
-    neutron_rate = xr.where(energy_to_neutrals_per_reaction > 0, P_neutron / energy_to_neutrals_per_reaction, 0.0)  # type:ignore[no-untyped-call]
+    neutron_rate = xr.where(energy_per_neutron > 0, P_neutron / energy_per_neutron, 0.0)  # type:ignore[no-untyped-call]
 
     return neutron_power_flux_to_walls, neutron_rate
 
