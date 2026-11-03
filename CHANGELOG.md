@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Fixed
+
+- **`dim_` prefix stripped with `removeprefix`** (#169): `interp_to` points, plotted points and `order_dimensions` with units no longer raise `KeyError` for dimensions whose name starts with `d`, `i` or `m` (e.g. `magnetic_field_on_axis`), which `str.lstrip("dim_")` was truncating.
+
 ## 9.0.1 - 2026-10-13
 
 ### Fixed
