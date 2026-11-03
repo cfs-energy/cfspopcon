@@ -43,11 +43,11 @@ def order_dimensions(
                 array = array.broadcast_like(template[dim])
                 processed_dims.append(dim)
             else:
-                raise ValueError(f"Array does not have dimension {dim.lstrip('dim_')}")
+                raise ValueError(f"Array does not have dimension {dim.removeprefix('dim_')}")
 
     if units is not None:
         for dim, processed_dim in zip(dims, processed_dims, strict=False):
-            array[processed_dim] = magnitude(template[dim.lstrip("dim_")].pint.to(units[dim]))
+            array[processed_dim] = magnitude(template[dim.removeprefix("dim_")].pint.to(units[dim]))
 
     if order_for_plotting:
         processed_dims = processed_dims[::-1]
