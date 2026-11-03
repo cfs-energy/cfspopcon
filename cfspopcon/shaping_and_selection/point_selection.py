@@ -31,7 +31,7 @@ def find_values_at_nearest_point(dataset: xr.Dataset, point_params: dict) -> xr.
             )
 
             value = Quantity(float(request["value"]), request.get("units", ""))
-            requested_coords[dimension_name] = magnitude_in_default_units(value, key=dimension_name.lstrip("dim_"))
+            requested_coords[dimension_name] = magnitude_in_default_units(value, key=dimension_name.removeprefix("dim_"))
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")

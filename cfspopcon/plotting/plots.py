@@ -108,7 +108,7 @@ def make_popcon_plot(dataset: xr.Dataset, title: str, plot_params: dict, points_
             if hasattr(point[dimension_name].pint, "units") and point[dimension_name].pint.units is not None:
                 plotting_coords.append(magnitude_in_units(point[dimension_name], requested_units))
             else:
-                default_units = Quantity(1.0, default_unit(dimension_name.lstrip("dim_")))
+                default_units = Quantity(1.0, default_unit(dimension_name.removeprefix("dim_")))
                 plotting_coords.append(magnitude_in_units(point[dimension_name] * default_units, requested_units))
 
         legend_elements[label] = ax.scatter(

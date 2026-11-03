@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import xarray as xr
 
@@ -23,3 +24,18 @@ def test_order_dimensions(z):
     assert transform_coords.order_dimensions(z.isel(x=0), dims=("x", "y"), template=z).dims == ("y", "x")
     ds = xr.Dataset(dict(z=z))
     assert transform_coords.order_dimensions(z.isel(x=0), dims=("x", "y"), template=ds).dims == ("y", "x")
+
+
+def test_order_dimensions_with_units_for_dimension_starting_with_m():
+    magnetic_field = np.linspace(10.0, 14.0, num=5)
+    template = xr.Dataset(
+        dict(magnetic_field_on_axis=xr.DataArray(magnetic_field, dims="dim_magnetic_field_on_axis").pint.quantify("T")),
+        coords=dict(dim_magnetic_field_on_axis=magnetic_field),
+    )
+    array = xr.DataArray(np.arange(5.0), coords=dict(dim_magnetic_field_on_axis=magnetic_field))
+
+    ordered = transform_coords.order_dimensions(
+        array, dims=("magnetic_field_on_axis",), units=dict(magnetic_field_on_axis="kT"), template=template
+    )
+
+    np.testing.assert_allclose(ordered["dim_magnetic_field_on_axis"], magnetic_field / 1e3)
