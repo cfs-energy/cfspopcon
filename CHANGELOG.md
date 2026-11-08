@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Fixed
+
+- **Analytical impurity radiation**: use physical atomic numbers rather than enum ordinals in the Mavrin and Post & Jensen fits, preserving distinct isotope identities. Correct MavrinCoronal temperature binning and density-squared weighting, include the 100 keV endpoint in the coronal fits, and convert MavrinNoncoronal inputs to its native eV and m^-3 units.
+
 ## 9.0.1 - 2026-10-13
 
 ### Fixed

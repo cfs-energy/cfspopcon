@@ -50,7 +50,7 @@ def calc_impurity_radiated_power_post_and_jensen(
     Returns:
          [MW] Estimated radiation power due to this impurity
     """
-    impurity_Z = impurity_species.value
+    impurity_Z = impurity_species.atomic_number
 
     zimp = np.array([2, 4, 5, 6, 8, 18, 22, 26, 28, 42, 74])
 
@@ -146,7 +146,14 @@ def calc_impurity_radiated_power_post_and_jensen(
     log10_Lz = np.zeros(electron_temp_profile.size)
 
     for i in range(len(radc)):
-        it = np.nonzero((electron_temp_profile >= temperature_bin_borders[i]) & (electron_temp_profile < temperature_bin_borders[i + 1]))[0]
+        if i == len(radc) - 1:
+            it = np.nonzero(
+                (electron_temp_profile >= temperature_bin_borders[i]) & (electron_temp_profile <= temperature_bin_borders[i + 1])
+            )[0]
+        else:
+            it = np.nonzero(
+                (electron_temp_profile >= temperature_bin_borders[i]) & (electron_temp_profile < temperature_bin_borders[i + 1])
+            )[0]
         if it.size > 0:
             log10_Lz[it] = polyval(Tlog[it], radc[i, :, iz])
 

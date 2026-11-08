@@ -17,8 +17,8 @@ from ...geometry.volume_integral import integrate_profile_over_volume
     return_units=dict(radiated_power=ureg.MW),
     input_units=dict(
         rho=ureg.dimensionless,
-        electron_temp_profile=ureg.keV,
-        electron_density_profile=ureg.n19,
+        electron_temp_profile=ureg.eV,
+        electron_density_profile=ureg.m**-3,
         impurity_residence_time=ureg.s,
         impurity_concentration=ureg.dimensionless,
         impurity_species=None,
@@ -43,8 +43,8 @@ def calc_impurity_radiated_power_mavrin_noncoronal(  # noqa: PLR0912
 
     Args:
         rho: [~] :term:`glossary link<rho>`
-        electron_temp_profile: [keV] :term:`glossary link<electron_temp_profile>`
-        electron_density_profile: [1e19 m^-3] :term:`glossary link<electron_density_profile>`
+        electron_temp_profile: [eV] :term:`glossary link<electron_temp_profile>`
+        electron_density_profile: [m^-3] :term:`glossary link<electron_density_profile>`
         impurity_residence_time: [s] :term:`glossary link<impurity_residence_time>`
         impurity_concentration: [~] :term:`glossary link<impurity_concentration>`
         impurity_species: [] :term:`glossary link<impurity_species>`
@@ -53,7 +53,7 @@ def calc_impurity_radiated_power_mavrin_noncoronal(  # noqa: PLR0912
     Returns:
          [MW] Estimated radiation power due to this impurity
     """
-    impurity_Z = impurity_species.value
+    impurity_Z = impurity_species.atomic_number
 
     # He, Li, Be, C, N, O, Ne, Ar
     zimp = np.array([2, 3, 4, 6, 7, 8, 10, 18])
