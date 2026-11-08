@@ -49,9 +49,9 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
         plasma_volume: [m^3] :term:`glossary link<plasma_volume>`
 
     Returns:
-      k  [MW] Estimated radiation power due to this impurity
+        [MW] Estimated radiation power due to this impurity
     """
-    impurity_Z = impurity_species.value
+    impurity_Z = impurity_species.atomic_number
 
     zimp = np.array([2, 3, 4, 6, 7, 8, 10, 18, 36, 54, 74])
 
@@ -61,12 +61,12 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
 
     # If trying to evaluate for a temperature outside of the given range, assume nearest neighbor
     # and throw a warning
-    if any(electron_density_profile < 0.1) or any(electron_density_profile > 100):  # pragma: no cover
+    if any(electron_temp_profile < 0.1) or any(electron_temp_profile > 100):  # pragma: no cover
         warnings.warn(
             "Mavrin 2018 line radiation calculation is only valid between 0.1-100keV. Using nearest neighbor extrapolation.", stacklevel=3
         )
-    electron_density_profile = np.maximum(electron_density_profile, 0.1)
-    electron_density_profile = np.minimum(electron_density_profile, 100)
+    electron_temp_profile = np.maximum(electron_temp_profile, 0.1)
+    electron_temp_profile = np.minimum(electron_temp_profile, 100)
 
     # L_z coefficients for the 11 supported impurities
     if impurity_Z == 2:  # Helium
@@ -174,13 +174,18 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
 
     # solve for radiated power
 
-    Tlog = np.log10(electron_density_profile)
-    log10_Lz = np.zeros(electron_density_profile.size)
+    Tlog = np.log10(electron_temp_profile)
+    log10_Lz = np.zeros(electron_temp_profile.size)
 
     for i in range(len(radc)):
-        it = np.nonzero(
-            (electron_density_profile >= temperature_bin_borders[i]) & (electron_density_profile < temperature_bin_borders[i + 1])
-        )[0]
+        if i == len(radc) - 1:
+            it = np.nonzero(
+                (electron_temp_profile >= temperature_bin_borders[i]) & (electron_temp_profile <= temperature_bin_borders[i + 1])
+            )[0]
+        else:
+            it = np.nonzero(
+                (electron_temp_profile >= temperature_bin_borders[i]) & (electron_temp_profile < temperature_bin_borders[i + 1])
+            )[0]
         if it.size > 0:
             log10_Lz[it] = polyval(Tlog[it], radc[i])
 
@@ -188,7 +193,7 @@ def calc_impurity_radiated_power_mavrin_coronal(  # noqa: PLR0912, PLR0915
     radrate[np.isnan(radrate)] = 0
 
     # 1e38 factor to account for the fact that our n_e values are electron_density_profile values
-    qRad = radrate * electron_temp_profile * electron_temp_profile * impurity_concentration * 1e38  # W / (m^3 s)
+    qRad = radrate * electron_density_profile * electron_density_profile * impurity_concentration * 1e38  # W / (m^3 s)
     radiated_power = integrate_profile_over_volume.unitless_func(qRad, rho, plasma_volume)  # [W]
 
     return float(radiated_power) / 1e6  # MW

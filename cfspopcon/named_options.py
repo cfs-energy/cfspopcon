@@ -47,6 +47,30 @@ class AtomicSpecies(Enum):
         """Implements '>' to allow sorting."""
         return self.value > other.value
 
+    @property
+    def atomic_number(self) -> int:
+        """Return the atomic number (Z) of this species."""
+        return _ATOMIC_NUMBERS[self]
+
+
+_ATOMIC_NUMBERS: dict[AtomicSpecies, int] = {
+    AtomicSpecies.Hydrogen: 1,
+    AtomicSpecies.Deuterium: 1,
+    AtomicSpecies.Tritium: 1,
+    AtomicSpecies.Helium: 2,
+    AtomicSpecies.Lithium: 3,
+    AtomicSpecies.Beryllium: 4,
+    AtomicSpecies.Boron: 5,
+    AtomicSpecies.Carbon: 6,
+    AtomicSpecies.Nitrogen: 7,
+    AtomicSpecies.Oxygen: 8,
+    AtomicSpecies.Neon: 10,
+    AtomicSpecies.Argon: 18,
+    AtomicSpecies.Krypton: 36,
+    AtomicSpecies.Xenon: 54,
+    AtomicSpecies.Tungsten: 74,
+}
+
 
 class MomentumLossFunction(Enum):
     """Select which SOL momentum loss function to use."""
