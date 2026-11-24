@@ -113,7 +113,9 @@ jobs:
       - name: Run Tests
         env:
           MPLBACKEND: Agg
-        run: poetry run pytest tests --nbmake example_cases -m "not docs"
+        # The coverage floor is enforced in CI only, so that partial local runs pass.
+        # It is the measured coverage (87.5%) minus 3 percentage points, rounded down.
+        run: poetry run pytest tests --nbmake example_cases -m "not docs" --cov-fail-under=84
 
       - name: Regression Tests
         env:

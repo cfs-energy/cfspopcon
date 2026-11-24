@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Changed
+
+- **radas 1!2.0.0**: cfspopcon now requires `radas ^1!2.0.0`. `radas_config.yaml` is identical to radas's default `config.yaml`, which now has three `ne_tau` values (`0.5e16`, `0.5e17`, `0.5e18`), a 20 x 80 density and temperature grid, and no time evolution by default. The SPARC_PRD regression reference moves by at most 0.24%; AUG_SepOS is unchanged.
+- **CI**: the radas calculation runs on every CI run. Only the downloaded OpenADAS files (`radas_dir/data_files`) are cached, keyed on `radas_config.yaml`; the test job receives `radas_dir/output` as an artifact. The `force_radas_rebuild` workflow input is removed.
+- **CI**: workflows run with read-only token permissions by default, a dependency-review job runs on pull requests, and a weekly scheduled run re-resolves dependencies within the `pyproject.toml` ranges before testing.
+- **Type checking**: `ty` (pinned) replaces `mypy` as a blocking pre-commit and CI check. ruff now also enforces a complexity limit (`C901`, `max-complexity = 15`).
+- **Coverage floor**: enforced in CI only (`--cov-fail-under=84`), rather than in `pyproject.toml`.
+- `pint` is declared as `>=0.25.3`, matching radas.
+
+### Added
+
+- Pull request template, `CODEOWNERS` and Dependabot configuration.
+- A pre-commit hook rejecting AI-attribution trailers in commit messages.
+
 ## 9.0.2 - 2026-11-24
 
 ### Changed

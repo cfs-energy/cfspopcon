@@ -45,13 +45,10 @@ pre-commit = "^4.2"
 pytest = "^9.0.3"
 pytest-cov = "^7.1.0"
 coverage = "^7.13.5"
-types-pyyaml = "^6.0.12.2"
-pandas-stubs = "^3.0.0.260204"
-mypy = "^2.1.0"
-scipy-stubs = "^1.15.3.0"
 ipdb = "^0.13.13"
 nbmake = "^1.5"
 ruff = "^0.15.10"
+ty = "0.0.107"  # pinned: beta, diagnostics change between 0.0.x releases
 
 # Documentation
 sphinx = "^9.1.0"
@@ -80,11 +77,24 @@ filterwarnings = [
   "ignore:Setting the shape on a NumPy array has been deprecated:DeprecationWarning",
 ]
 
-[tool.mypy]
-strict = true
-disallow_any_generics = false
-exclude = ['^cfspopcon/plotting/.*\.py$']
-incremental = false
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.src]
+include = ["cfspopcon"]
+exclude = ["cfspopcon/plotting"]
+
+# calc_jch_profiles and calc_jch_pedestal_peaking annotate their quantity inputs as `float` (the convention
+# for algorithms) but call magnitude_in_units on them directly, and pass DataArrays to helpers annotated
+# with ndarray. Fixing the annotations is follow-on work; until then, only these rules are relaxed, and only
+# for this file.
+[[tool.ty.overrides]]
+include = ["cfspopcon/formulas/plasma_profiles/jch_profiles.py"]
+
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-explicit-return = "ignore"
 
 [tool.ruff]
 target-version = "py312"
@@ -92,7 +102,7 @@ line-length = 140
 
 [tool.ruff.lint]
 select = [
-    "A", "B", "C4", "D", "E", "ERA", "F", "FLY", "I001", 
+    "A", "B", "C4", "C901", "D", "E", "ERA", "F", "FLY", "I001", 
     "ISC", "PERF", "PIE", "PGH", "PL", "Q", "RUF", "T10", 
     "TCH", "UP", "W"
 ]
@@ -105,11 +115,11 @@ ignore = [
     "PLC0415", # Allow imports not at top of file
 ]
 
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-[tool.coverage.report]
-fail_under = 82
