@@ -7,12 +7,14 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Weekly run re-resolves dependencies within the pyproject ranges. schedule fires only from the default branch.
+  schedule:
+    - cron: "17 12 * * 1"
   workflow_dispatch:
-    inputs:
-      force_radas_rebuild:
-        description: "Regenerate radas_dir and overwrite the cached data (use when a dependency bump changed radas output and regression tests fail)"
-        type: boolean
-        default: false
+
+# Least privilege by default; jobs that need more (publish) declare their own permissions.
+permissions:
+  contents: read
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -23,14 +25,13 @@ concurrency:
 
 jobs:
   # --- JOB 1: GENERATE RADAS DATA ---
+  # The radas calculation runs on every CI run, so the tests always see output
+  # from the radas version in poetry.lock. Only the downloaded OpenADAS files
+  # (radas_dir/data_files) are cached, keyed on radas_config.yaml, since they
+  # depend only on which species and years the config requests.
   radas:
     name: Generate Radas Data
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write  # allow deleting the cache entry on a forced rebuild
-    outputs:
-      cache-key: ${{ steps.radas-key.outputs.key }}
     steps:
       - uses: actions/checkout@v6
 
@@ -46,45 +47,26 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      # The radas output depends on the radas package version and
-      # radas_config.yaml, so key the cache on those rather than the whole
-      # poetry.lock (which busts on every unrelated dependency bump).
-      # N.b. it is possible that bumping some dependencies could change the
-      # radas result enough to affect the regression result. You might need
-      # manually regenerate the radas_dir in this case.
-      - name: Compute radas cache key
-        id: radas-key
-        run: |
-          radas_version=$(grep -A1 '^name = "radas"$' poetry.lock | grep '^version' | sed -E 's/.*"(.*)".*/\1/')
-          echo "key=radas-v${radas_version//!/-}-${{ hashFiles('radas_config.yaml') }}" >> "$GITHUB_OUTPUT"
+      # Scheduled runs re-resolve within the pyproject ranges instead of using poetry.lock
+      # (the test job does the same), so the radas output matches the tests' environment.
+      - name: Re-resolve dependencies
+        if: github.event_name == 'schedule'
+        run: poetry --no-interaction update
 
-      # On a manual run with force_radas_rebuild, delete any existing cache
-      # entry for this key so the freshly generated data is saved in its place
-      # (actions/cache will not overwrite an existing key otherwise).
-      - name: Delete existing radas cache
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.force_radas_rebuild }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh cache delete "${{ steps.radas-key.outputs.key }}" --repo "${{ github.repository }}" \
-            || echo "No existing cache for this key; fresh data will be generated."
-
-      - name: Cache radas results
-        id: radas-cache
+      - name: Cache OpenADAS data files
         uses: actions/cache@v5
         with:
-          path: ./radas_dir
-          key: ${{ steps.radas-key.outputs.key }}
+          path: ./radas_dir/data_files
+          key: radas-data-files-${{ hashFiles('radas_config.yaml') }}
 
       - name: Make radas data
-        if: steps.radas-cache.outputs.cache-hit != 'true'
         run: poetry run radas -c radas_config.yaml
 
-      - name: Upload radas artifacts
+      - name: Upload radas output
         uses: actions/upload-artifact@v7
         with:
-          name: radas_dir
-          path: ./radas_dir
+          name: radas_output
+          path: ./radas_dir/output
           retention-days: 30
 
   # --- JOB 2: TEST ---
@@ -114,16 +96,19 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - name: Restore radas data
-        uses: actions/cache/restore@v5
-        id: radas-restore
+      - name: Download radas output
+        uses: actions/download-artifact@v8
         with:
-          path: ./radas_dir
-          key: ${{ needs.radas.outputs.cache-key }}
+          name: radas_output
+          path: ./radas_dir/output
 
-      - name: Verify Cache
-        if: steps.radas-restore.outputs.cache-hit != 'true'
-        run: exit 1
+      # Scheduled runs re-resolve within the pyproject ranges instead of using poetry.lock,
+      # so we find out when a new release of a dependency breaks the tests.
+      - name: Re-resolve dependencies
+        if: github.event_name == 'schedule'
+        run: |
+          poetry --no-interaction update
+          poetry show --top-level --no-truncate
 
       - name: Run Tests
         env:
@@ -155,11 +140,11 @@ jobs:
           mkdir tmp_dir && cd tmp_dir
           popcon ../example_cases/SPARC_PRD -d radas_dir WORKING_DIR/../radas_dir
 
-  # --- JOB 3: LINT ---
-  # pre-commit (ruff, mypy, variable-consistency check). Independent of the
+  # --- JOB 3: LINT AND TYPE CHECK ---
+  # pre-commit (ruff, ty, variable-consistency check). Independent of the
   # radas data, so it runs in parallel with everything else for fast feedback.
   lint:
-    name: Lint (pre-commit)
+    name: Lint and type check (pre-commit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -178,6 +163,21 @@ jobs:
 
       - name: Pre-commit checks
         run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files
+
+  # --- DEPENDENCY REVIEW: FAIL PRS THAT ADD OR BUMP A VULNERABLE DEPENDENCY ---
+  # Pull requests only, and deliberately not in build_release's needs: a skipped job would skip the release.
+  dependency_review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate
 
   # --- JOB 4: DOCUMENTATION ---
   # Sphinx build (warnings as errors) and doctests. Notebooks are not executed
