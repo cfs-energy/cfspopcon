@@ -105,7 +105,7 @@ class Algorithm:
             ValueError: if the function takes positional-only or variable positional arguments.
         """
         self._function = function
-        self._name = self._function.__name__ if name is None else name
+        self._name = self._function.__name__ if name is None else name  # ty: ignore[missing-attribute]
         self._override = override
 
         self._signature = inspect.signature(function)
@@ -215,7 +215,7 @@ class Algorithm:
             elif key in self.default_keys:
                 input_values[key] = self.default_values[key]
             else:
-                sorted_dataset_keys = ", ".join(sorted(dataset.keys()))  # type:ignore[arg-type]
+                sorted_dataset_keys = ", ".join(sorted(str(key) for key in dataset.keys()))
                 sorted_default_keys = ", ".join(sorted(self.default_keys))
                 raise KeyError(
                     f"KeyError for {self._name}: Key '{key}' not in dataset keys [{sorted_dataset_keys}] or default values [{sorted_default_keys}]"
@@ -282,7 +282,7 @@ class Algorithm:
         return cls(
             wrapped_function,
             return_keys,
-            name=name if name is not None else func.__name__,
+            name=name if name is not None else func.__name__,  # ty: ignore[missing-attribute]
             override=override,
         )
 
@@ -344,10 +344,10 @@ def declare_algorithm(
     """
 
     def function_wrapper(func: _F) -> _F:
-        func.__popcon_algorithm__ = Algorithm.from_single_function(  # type:ignore[attr-defined]
+        func.__popcon_algorithm__ = Algorithm.from_single_function(  # ty: ignore[missing-attribute]
             func,
             return_keys=return_keys,
-            name=name if name is not None else func.__name__,
+            name=name if name is not None else func.__name__,  # ty: ignore[missing-attribute]
             skip_unit_conversion=skip_unit_conversion,
             override=override,
         )
@@ -440,8 +440,8 @@ class CompositeAlgorithm:
             return wrapper
 
         self.run = _wrap(self._run)
-        # ignore due to mypy bug/missing feature https://github.com/python/mypy/issues/3482
-        self.run.__signature__ = inspect.Signature(  # type:ignore[attr-defined]
+        # ignore due to a type checker limitation: attributes cannot be set on functions
+        self.run.__signature__ = inspect.Signature(  # ty: ignore[missing-attribute]
             non_def_pars + def_pars, return_annotation=xr.Dataset
         )
         self._name = name
@@ -526,7 +526,7 @@ class CompositeAlgorithm:
             alg_kwargs = {key: result[key] for key in result.keys() if key in alg.input_keys}
 
             alg_result = alg.run(**alg_kwargs)
-            result.update(alg_result)  # type:ignore[arg-type]  # dict.update() doesn't like KeysView[Hashable]
+            result.update(alg_result)  # ty: ignore[no-matching-overload]  # dict.update() doesn't like KeysView[Hashable]
 
         return xr.Dataset(result)
 
@@ -554,7 +554,44 @@ class CompositeAlgorithm:
         else:
             return CompositeAlgorithm(algorithms=[*self.algorithms, *other.algorithms])
 
-    def validate_inputs(  # noqa: PLR0912
+    def _find_variable_setters(self, config_keys: list) -> dict[str, list[str]]:
+        """Map each variable to the names of everything setting it, with user input listed as "INPUT"."""
+        key_setter = {key: ["INPUT"] for key in config_keys}
+
+        for algorithm in self.algorithms:
+            for key in algorithm.return_keys:
+                if key not in key_setter.keys():
+                    key_setter[key] = [algorithm.name]
+                else:
+                    key_setter[key].append(algorithm.name)
+
+        return key_setter
+
+    @staticmethod
+    def _warn_for_overridden_variables(key_setter: dict[str, list[str]]) -> None:
+        """Warn about variables which are set more than once, so that they are silently overwritten."""
+        overridden_variables = [f"{variable}: ({', '.join(algs)})" for variable, algs in key_setter.items() if len(algs) > 1]
+
+        if len(overridden_variables) > 0:
+            warn(
+                f"The following variables were overridden internally (given as variable: (list of algorithms setting variable)): {', '.join(overridden_variables)}",
+                stacklevel=4,
+            )
+
+    def _find_out_of_order_parameters(self, config_keys: list) -> dict[str, Algorithm]:
+        """Find required inputs which are only set by an algorithm later in the list than the one requiring them."""
+        available_parameters = config_keys.copy()
+        out_of_order_parameters = {}
+        for algorithm in self.algorithms:
+            for key in algorithm.required_input_keys:
+                if key not in available_parameters:
+                    out_of_order_parameters[key] = algorithm
+            for key in algorithm.return_keys:
+                available_parameters.append(key)
+
+        return out_of_order_parameters
+
+    def validate_inputs(
         self,
         configuration: dict | xr.Dataset,
         quiet: bool = False,
@@ -578,37 +615,14 @@ class CompositeAlgorithm:
             RuntimeError: if ``raise_error_on_missing_inputs`` is set and inputs are missing or
                 the algorithms are out of order.
         """
-        # Check if variables are being silently internally overwritten
         config_keys = list(configuration.keys())
-        key_setter = {key: ["INPUT"] for key in config_keys}
+        key_setter = self._find_variable_setters(config_keys)
 
-        for algorithm in self.algorithms:
-            for key in algorithm.return_keys:
-                if key not in key_setter.keys():
-                    key_setter[key] = [algorithm.name]
-                else:
-                    key_setter[key].append(algorithm.name)
-
-        overridden_variables = []
-        for variable, algs in key_setter.items():
-            if len(algs) > 1:
-                overridden_variables.append(f"{variable}: ({', '.join(algs)})")
-
-        if warn_for_overridden_variables and len(overridden_variables) > 0:
-            warn(
-                f"The following variables were overridden internally (given as variable: (list of algorithms setting variable)): {', '.join(overridden_variables)}",
-                stacklevel=3,
-            )
+        if warn_for_overridden_variables:
+            self._warn_for_overridden_variables(key_setter)
 
         # Check that algorithms are ordered such that dependent algorithms follow those setting their required input keys
-        available_parameters = config_keys.copy()
-        out_of_order_parameters = {}
-        for algorithm in self.algorithms:
-            for key in algorithm.required_input_keys:
-                if key not in available_parameters:
-                    out_of_order_parameters[key] = algorithm
-            for key in algorithm.return_keys:
-                available_parameters.append(key)
+        out_of_order_parameters = self._find_out_of_order_parameters(config_keys)
 
         if len(out_of_order_parameters) > 0:
             message = ""
@@ -636,7 +650,7 @@ def _validate_inputs(
     raise_error_on_missing_inputs: bool = False,
 ) -> bool:
     """Check that all required inputs are defined, and warn if inputs are unused."""
-    config_keys = list(configuration.keys())
+    config_keys = [str(key) for key in configuration.keys()]
 
     unused_config_keys = config_keys.copy()
     missing_input_keys = set(algorithm.required_input_keys)

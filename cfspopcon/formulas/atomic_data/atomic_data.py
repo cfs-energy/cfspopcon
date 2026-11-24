@@ -251,7 +251,7 @@ class AtomicData:
         If a tolerance is not specified, raise a warning if the nearest ne_tau value is outside the specified tolerance.
         """
         if not isinstance(ne_tau, float):
-            ne_tau = float(magnitude_in_units(ne_tau, self.ne_tau_units))
+            ne_tau = float(magnitude_in_units(ne_tau, self.ne_tau_units))  # ty: ignore[invalid-argument-type]
 
         nearest_ne_tau = float(self.species_ne_tau[self.key_to_enum(species)].sel(dim_ne_tau=ne_tau, method="nearest"))
 
@@ -259,7 +259,7 @@ class AtomicData:
         default_ne_tau_rel_tolerance = 1e-2
 
         if tolerance_specified and not isinstance(ne_tau_rel_tolerance, float):
-            ne_tau_rel_tolerance = float(magnitude_in_units(ne_tau_rel_tolerance, self.ne_tau_units))  # type: ignore [arg-type]
+            ne_tau_rel_tolerance = float(magnitude_in_units(ne_tau_rel_tolerance, self.ne_tau_units))  # ty: ignore[invalid-argument-type]
         elif not tolerance_specified:
             ne_tau_rel_tolerance = default_ne_tau_rel_tolerance
 

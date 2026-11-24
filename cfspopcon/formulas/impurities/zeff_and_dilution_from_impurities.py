@@ -40,8 +40,8 @@ def calc_zeff_and_dilution_due_to_impurities(
     starting_dilution = 1.0
 
     impurity_charge_state = calc_impurity_charge_state(average_electron_density, average_electron_temp, impurity_concentration, atomic_data)
-    change_in_zeff = calc_change_in_zeff(impurity_charge_state, impurity_concentration)
-    change_in_dilution = calc_change_in_dilution(impurity_charge_state, impurity_concentration)
+    change_in_zeff = calc_change_in_zeff(impurity_charge_state, impurity_concentration)  # ty: ignore[invalid-argument-type]
+    change_in_dilution = calc_change_in_dilution(impurity_charge_state, impurity_concentration)  # ty: ignore[invalid-argument-type]
 
     z_effective = starting_zeff + change_in_zeff.sum(dim="dim_species")
     dilution = starting_dilution - change_in_dilution.sum(dim="dim_species")

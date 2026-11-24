@@ -17,15 +17,15 @@ def find_coords_of_contour(array: xr.DataArray, x_coord: str, y_coord: str, leve
         z=magnitude(array.transpose(x_coord, y_coord)),
     )
 
-    lines = cont_gen.lines(magnitude(convert_units(level, units)))  # type:ignore[arg-type]
+    lines = cont_gen.lines(magnitude(convert_units(level, units)))  # ty: ignore[invalid-argument-type]
     if not len(lines) == 1:
         raise RuntimeError(
             f"find_coords_of_contour returned {len(lines)} contours at level {level}. Use masks to isolate a single contour."
         )
-    lines = lines[0]  # type:ignore[assignment]
+    lines = lines[0]
 
-    contour_x = xr.DataArray(lines[:, 1], coords={x_coord: lines[:, 1]})  # type:ignore[call-overload]
-    contour_y = xr.DataArray(lines[:, 0], coords={x_coord: lines[:, 1]})  # type:ignore[call-overload]
+    contour_x = xr.DataArray(lines[:, 1], coords={x_coord: lines[:, 1]})  # ty: ignore[invalid-argument-type]
+    contour_y = xr.DataArray(lines[:, 0], coords={x_coord: lines[:, 1]})  # ty: ignore[invalid-argument-type]
     contour_x.name, contour_y.name = x_coord, y_coord
     return contour_x, contour_y
 
@@ -48,7 +48,7 @@ def interpolate_onto_line(
 
     interpolator = RegularGridInterpolator(  # type: ignore[call-overload]
         points=((array.coords[x_coord], array.coords[y_coord])),
-        values=magnitude(array).to_numpy(),  # type:ignore[union-attr]
+        values=magnitude(array).to_numpy(),  # ty: ignore[missing-attribute]
         method=interpolation_method,
     )
 

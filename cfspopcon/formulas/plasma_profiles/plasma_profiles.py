@@ -40,7 +40,7 @@ def build_rho_grid(npoints: int = 50) -> np.ndarray:
 
 
 @declare_algorithm(return_keys=["rho"])
-def define_radial_grid(n_points_for_confined_region_profiles: int = 50) -> np.ndarray:
+def define_radial_grid(n_points_for_confined_region_profiles: int = 50) -> xr.DataArray:
     """Define the radial grid for profiles.
 
     The grid is nudged just inside the LCFS (see :func:`build_rho_grid`) rather

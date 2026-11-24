@@ -53,25 +53,8 @@ def wraps_ufunc(  # noqa: PLR0915
     if not isinstance(pass_as_kwargs, tuple):
         raise ValueError(f"pass_as_kwargs must be passed as a tuple of keys, not {str(type(pass_as_kwargs))[1:-1]}")
 
-    pass_as_positional_args = [key for key in input_keys if key not in pass_as_kwargs]
-    for arg in pass_as_kwargs:
-        kwarg_position = input_keys.index(arg)
-        if kwarg_position < len(pass_as_positional_args):
-            raise ValueError(f"Argument {arg} in pass_as_kwargs appears before the positional args {pass_as_positional_args}")
-
-    if input_core_dims is not None:
-        if not len(input_core_dims) == len(pass_as_positional_args):
-            raise ValueError(
-                f"input_core_dims (len {len(input_core_dims)}) must the same length as positional_args ({pass_as_positional_args}, len {len(pass_as_positional_args)})"
-            )
-    else:
-        input_core_dims = len(pass_as_positional_args) * [()]
-
-    if output_core_dims is None:
-        if len(return_units) >= 1:
-            output_core_dims = len(return_units) * [()]
-        else:
-            output_core_dims = ((),)
+    pass_as_positional_args = _check_pass_as_kwargs(input_keys, pass_as_kwargs)
+    input_core_dims, output_core_dims = _resolve_core_dims(input_core_dims, output_core_dims, pass_as_positional_args, return_units)
 
     ufunc_kwargs: dict[str, Any] = dict(
         input_core_dims=input_core_dims,
@@ -87,12 +70,13 @@ def wraps_ufunc(  # noqa: PLR0915
         dask_gufunc_kwargs=dask_gufunc_kwargs,
     )
 
-    def _wraps_ufunc(func: FunctionType) -> FunctionType:  # noqa: PLR0915
+    def _wraps_ufunc(func: FunctionType) -> FunctionType:
         func_signature = signature(func)
+        func_name = getattr(func, "__name__", "UNNAMED")
         func_parameters = func_signature.parameters
 
         if not list(input_units.keys()) == list(func_parameters.keys()):
-            message = f"Keys for input_units for {getattr(func, '__name__', 'UNNAMED')} did not match the declared function inputs (n.b. order matters!)"
+            message = f"Keys for input_units for {func_name} did not match the declared function inputs (n.b. order matters!)"
             message += "\ni: input_key, func_param"
             for i, (input_key, func_param) in enumerate(
                 itertools.zip_longest(list(input_units.keys()), list(func_parameters.keys()), fillvalue="MISSING")
@@ -106,7 +90,7 @@ def wraps_ufunc(  # noqa: PLR0915
         default_values = {key: val.default for key, val in func_parameters.items() if val.default is not Parameter.empty}
 
         @functools.wraps(func)
-        def popcon_ufunc_wrapped_call(*args: Any, **kwargs: Any) -> Any:  # noqa: PLR0912
+        def popcon_ufunc_wrapped_call(*args: Any, **kwargs: Any) -> Any:
             """Transform args and kwargs, then call the inner function."""
             # if anything goes wrong we can do some extra work to provide a better error below
             try:
@@ -114,7 +98,7 @@ def wraps_ufunc(  # noqa: PLR0915
 
                 if not set(args_dict.keys()).isdisjoint(kwargs.keys()):
                     raise RuntimeError(
-                        f"{func.__name__} was called with repeat arguments. Input was interpreted as args={args_dict}, kwargs={kwargs}"
+                        f"{func_name} was called with repeat arguments. Input was interpreted as args={args_dict}, kwargs={kwargs}"
                     )
 
                 args_dict = {**args_dict, **kwargs}
@@ -157,20 +141,8 @@ def wraps_ufunc(  # noqa: PLR0915
                 # if that is the case we try and give a more helpful error
                 # if anything goes wrong in our frame inspection or we find that we aren't in a chained
                 # call we raise the previous exception
-                err = ""
                 try:
-                    import inspect
-
-                    frames = inspect.getouterframes(inspect.currentframe())
-                    # the first entry is the current call so check if any of the earlier callees are a __call__ from a FunctionWrapper
-                    for frame in frames[1:]:
-                        if frame.function == "popcon_ufunc_wrapped_call":
-                            f = frames[1]
-                            err = "Calling `wraps_ufunc` decorated function from within `wraps_ufunc` decorated function is not allowed!\n"
-                            err += f"Error at {f.filename}:{f.lineno}\n"
-                            err += "\n".join(f.code_context) if f.code_context else ""
-                            err += f"Try using `{frames[0].frame.f_locals['func'].__name__}.unitless_func(...)` instead."
-                            break
+                    err = _describe_chained_call(func_name)
                 except Exception:
                     # error while determining if we are withing a chained FunctionWrapper so re-raise original error
                     raise e from None
@@ -182,11 +154,68 @@ def wraps_ufunc(  # noqa: PLR0915
                     raise e
 
         # more meaningfull alias to the scalar non-unit version of the function
-        popcon_ufunc_wrapped_call.unitless_func = popcon_ufunc_wrapped_call.__wrapped__  # type:ignore[attr-defined]
-        popcon_ufunc_wrapped_call.__signature__ = _make_new_sig(func_signature, input_units, return_units)  # type:ignore[attr-defined]
+        popcon_ufunc_wrapped_call.unitless_func = popcon_ufunc_wrapped_call.__wrapped__  # ty: ignore[missing-attribute]
+        popcon_ufunc_wrapped_call.__signature__ = _make_new_sig(func_signature, input_units, return_units)  # ty: ignore[missing-attribute]
         return popcon_ufunc_wrapped_call
 
     return _wraps_ufunc
+
+
+def _check_pass_as_kwargs(input_keys: list[str], pass_as_kwargs: tuple) -> list[str]:
+    """Check pass_as_kwargs and return the keys which are passed to the function as vectorized positional args."""
+    if not isinstance(pass_as_kwargs, tuple):
+        raise ValueError(f"pass_as_kwargs must be passed as a tuple of keys, not {str(type(pass_as_kwargs))[1:-1]}")
+
+    pass_as_positional_args = [key for key in input_keys if key not in pass_as_kwargs]
+    for arg in pass_as_kwargs:
+        kwarg_position = input_keys.index(arg)
+        if kwarg_position < len(pass_as_positional_args):
+            raise ValueError(f"Argument {arg} in pass_as_kwargs appears before the positional args {pass_as_positional_args}")
+
+    return pass_as_positional_args
+
+
+def _resolve_core_dims(
+    input_core_dims: Sequence[Sequence] | None,
+    output_core_dims: Sequence[Sequence] | None,
+    pass_as_positional_args: list[str],
+    return_units: dict[str, str | Unit | None],
+) -> tuple[Sequence[Sequence], Sequence[Sequence]]:
+    """Check the input core dims and fill in the default (scalar) core dims for inputs and outputs."""
+    if input_core_dims is not None:
+        if not len(input_core_dims) == len(pass_as_positional_args):
+            raise ValueError(
+                f"input_core_dims (len {len(input_core_dims)}) must the same length as positional_args ({pass_as_positional_args}, len {len(pass_as_positional_args)})"
+            )
+    else:
+        input_core_dims = len(pass_as_positional_args) * [()]
+
+    if output_core_dims is None:
+        if len(return_units) >= 1:
+            output_core_dims = len(return_units) * [()]
+        else:
+            output_core_dims = ((),)
+
+    return input_core_dims, output_core_dims
+
+
+def _describe_chained_call(func_name: str) -> str:
+    """Describe the problem if a wraps_ufunc function was called from within another one, or return an empty string."""
+    import inspect
+
+    # the first entry is the frame of the wrapped call, which we are being called from.
+    frames = inspect.getouterframes(inspect.currentframe())[1:]
+    # the first entry is the current call so check if any of the earlier callees are a __call__ from a FunctionWrapper
+    for frame in frames[1:]:
+        if frame.function == "popcon_ufunc_wrapped_call":
+            f = frames[1]
+            err = "Calling `wraps_ufunc` decorated function from within `wraps_ufunc` decorated function is not allowed!\n"
+            err += f"Error at {f.filename}:{f.lineno}\n"
+            err += "\n".join(f.code_context) if f.code_context else ""
+            err += f"Try using `{func_name}.unitless_func(...)` instead."
+            return err
+
+    return ""
 
 
 def _check_units(units_dict: dict[str, str | Unit | None]) -> dict[str, str | Unit | None]:

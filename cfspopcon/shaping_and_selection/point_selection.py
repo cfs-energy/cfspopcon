@@ -118,7 +118,7 @@ def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> Dat
             normalization = Quantity(float(request.get("norm", request["value"])), request.get("units", ""))
             normalized_distance_squared.append(dimensionless_magnitude(((dataset[variable_name] - value) / normalization) ** 2))
 
-        euclidean_distance = np.sqrt(xr.concat(xr.broadcast(*normalized_distance_squared), dim="dim_distance").sum(dim="dim_distance"))  # type:ignore[call-overload]
+        euclidean_distance = np.sqrt(xr.concat(xr.broadcast(*normalized_distance_squared), dim="dim_distance").sum(dim="dim_distance"))  # ty: ignore[no-matching-overload]
         coords_of_point = find_coords_of_minimum(euclidean_distance, keep_dims=point_params.get("keep_dims", []), mask=mask)
 
         if "tolerance" in point_params:
@@ -155,7 +155,7 @@ def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], m
     along_dims = [dim for dim in masked_array.dims if dim not in keep_dims]
     point_coords = masked_array.argmin(dim=along_dims)
 
-    return point_coords  # type:ignore[return-value]
+    return point_coords  # ty: ignore[invalid-explicit-return]
 
 
 def find_coords_of_maximum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: xr.DataArray | None = None) -> DataArrayCoordinates:

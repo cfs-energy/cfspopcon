@@ -45,7 +45,7 @@ def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> xr.Da
         try:
             if val.size == 1:
                 if not coord:
-                    val = get_name(val.item())  # type:ignore[assignment]
+                    val = get_name(val.item())  # ty: ignore[invalid-assignment]
                 else:
                     val = xr.DataArray([get_name(val.item())])
             else:
@@ -139,7 +139,7 @@ class _RoundingFloat(float):
     From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
     """
 
-    __repr__ = staticmethod(_rounded_float_repr)  # type:ignore[assignment,unused-ignore]
+    __repr__ = staticmethod(_rounded_float_repr)  # ty: ignore[incompatible-attribute-override]
 
 
 class _ModifyJSONFloatRepr:
@@ -147,15 +147,15 @@ class _ModifyJSONFloatRepr:
 
     def __enter__(self) -> Self:
         """Change the float representation to fixed precision on entry."""
-        self.c_make_encoder = json.encoder.c_make_encoder  # type:ignore[attr-defined]
-        json.encoder.c_make_encoder = None  # type:ignore[attr-defined]
-        json.encoder.float = _RoundingFloat  # type:ignore[attr-defined]
+        self.c_make_encoder = json.encoder.c_make_encoder  # ty: ignore[missing-attribute]
+        json.encoder.c_make_encoder = None  # ty: ignore[missing-attribute]
+        json.encoder.float = _RoundingFloat  # ty: ignore[missing-attribute]
         return self
 
     def __exit__(self, *args: Any) -> None:
         """Change the float representation back to the default."""
-        json.encoder.c_make_encoder = self.c_make_encoder  # type:ignore[attr-defined]
-        json.encoder.float = float  # type:ignore[attr-defined]
+        json.encoder.c_make_encoder = self.c_make_encoder  # ty: ignore[missing-attribute]
+        json.encoder.float = float  # ty: ignore[missing-attribute]
 
 
 def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path) -> None:

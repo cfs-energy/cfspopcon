@@ -1,5 +1,7 @@
 """Calculate the concentration and effect of a core radiator required to achieve above a defined core radiative fraction."""
 
+from typing import Any
+
 import numpy as np
 import xarray as xr
 
@@ -106,7 +108,7 @@ def calc_core_seeded_impurity_concentration(
     else:
         radiated_power_method_for_core_impurity = radiated_power_method
 
-    kwargs = dict(
+    kwargs: dict[str, Any] = dict(
         radiated_power_method=radiated_power_method_for_core_impurity,
         rho=rho,
         electron_temp_profile=electron_temp_profile,

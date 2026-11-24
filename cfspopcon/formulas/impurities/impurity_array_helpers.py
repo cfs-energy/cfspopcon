@@ -30,11 +30,11 @@ def make_impurity_concentration_array(
             concentrations_list,
         ]
 
-    if not len(species_list) == len(concentrations_list):
+    if not len(species_list) == len(concentrations_list):  # ty: ignore[invalid-argument-type]
         raise ValueError(f"Dimension mismatch. Input was species list [{species_list}], concentrations list [{concentrations_list}]")
 
     array = xr.DataArray()
-    for species, concentration in zip(species_list, concentrations_list, strict=False):
+    for species, concentration in zip(species_list, concentrations_list, strict=False):  # ty: ignore[invalid-argument-type]
         array = extend_impurity_concentration_array(array, species, concentration)
 
     return array
