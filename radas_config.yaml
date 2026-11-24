@@ -15,8 +15,8 @@ globals:
   
   # Number of log-spaced points to use for electron density and electron temp.
   # Interpolation is used to map from raw data to points.
-  electron_density_resolution: 20
-  electron_temp_resolution: 80
+  electron_density_resolution: 50
+  electron_temp_resolution: 100
 
 data_file_config:
   adf11:
