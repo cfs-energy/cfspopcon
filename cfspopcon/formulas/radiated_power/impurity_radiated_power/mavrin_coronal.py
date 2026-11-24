@@ -160,9 +160,7 @@ def calc_impurity_radiated_power_mavrin_coronal(
     """
     impurity_Z = impurity_species.value
 
-    zimp = np.array([2, 3, 4, 6, 7, 8, 10, 18, 36, 54, 74])
-
-    if impurity_Z not in zimp:  # pragma: no cover
+    if impurity_Z not in _MAVRIN_FIT_COEFFICIENTS:  # pragma: no cover
         warnings.warn(f"Mavrin 2018 line radiation calculation not supported for impurity with Z={impurity_Z}", stacklevel=3)
         return np.nan
 

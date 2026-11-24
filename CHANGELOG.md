@@ -14,6 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Type checking**: `ty` (pinned) replaces `mypy` as a blocking pre-commit and CI check. ruff now also enforces a complexity limit (`C901`, `max-complexity = 15`).
 - **Coverage floor**: enforced in CI only (`--cov-fail-under=84`), rather than in `pyproject.toml`.
 - `pint` is declared as `>=0.25.3`, matching radas.
+- `magnitude`, `magnitude_in_units` and `dimensionless_magnitude` are typed with overloads (DataArray in, DataArray out), so they type-check without suppressions. Behaviour is unchanged.
+- `handle_deprecated_arguments` raises a `TypeError` (previously an `AttributeError`) when deprecated profile-form inputs are combined with a plain `Algorithm`.
+
+### Fixed
+
+- Integer values are accepted for `ne_tau` and for impurity concentrations, and `ne_tau_rel_tolerance` may be a dimensionless quantity (it was previously converted to `ne_tau` units).
 
 ### Added
 

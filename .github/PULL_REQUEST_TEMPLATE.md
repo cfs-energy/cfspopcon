@@ -24,7 +24,7 @@ the PR, say so in the AI tools used section. -->
 - [ ] Regression tests pass (`poetry run python tests/utils/regression_results.py` regenerates the references; `poetry run pytest --no-cov tests/test_regression_against_cases.py` checks them): results are unchanged, or the source of every change is expected and the changes are summarised under "Impacts to users"
 - [ ] Coverage reported (`pytest --cov`) and at or above the `--cov-fail-under` value in the CI workflow
 - [ ] Tests written for new features and for the edge cases they handle
-- [ ] `ruff check` and `ruff format --check` are clean (the same checks run in CI and in `pre-commit`)
+- [ ] `pre-commit run --all-files` is clean (`ruff check cfspopcon`, `ruff format`, `ty check`; the same checks run in CI)
 - [ ] Complexity within the ruff `C901` limit (`max-complexity` in `pyproject.toml`); any `# noqa: C901` is justified
 - [ ] `ty check` is clean
 - [ ] No Dependabot alerts left open by this PR, or the open ones are named below

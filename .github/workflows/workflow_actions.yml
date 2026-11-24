@@ -21,7 +21,8 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Only supersede older runs on the same pull request; never cancel a run on main (including the weekly scheduled one).
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # --- JOB 1: RUN RADAS AND CACHE THE OPENADAS DATA FILES ---
@@ -108,7 +109,9 @@ jobs:
 
       - name: Verify cache
         if: steps.radas-restore.outputs.cache-hit != 'true'
-        run: exit 1
+        run: |
+          echo "::error::OpenADAS data-file cache miss: the Run Radas job should have saved it for this radas_config.yaml"
+          exit 1
 
       # Regenerated in every job, so the output always matches this job's Python and dependencies.
       - name: Run radas

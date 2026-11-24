@@ -96,7 +96,7 @@ def interpolate_array_onto_new_coords(
     array = broadcast_arrays[-1]
 
     interpolated_array = xr.DataArray(
-        griddata(  # type: ignore[call-overload]
+        griddata(
             sample_points,
             np.ravel(magnitude(array)),
             mesh_coords,

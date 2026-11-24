@@ -3,14 +3,13 @@
 import warnings
 from collections.abc import Callable
 from functools import wraps
-from typing import Any, TypeVar, overload
+from typing import Any, overload
 
 import numpy as np
 import numpy.typing as npt
 import pint
 import pint_xarray  # type:ignore[import-untyped]
 import xarray as xr
-from typing_extensions import ParamSpec
 
 ureg = pint_xarray.setup_registry(
     pint.UnitRegistry(
@@ -20,9 +19,6 @@ ureg = pint_xarray.setup_registry(
 
 Quantity = ureg.Quantity
 Unit = ureg.Unit
-
-Params = ParamSpec("Params")
-Ret = TypeVar("Ret")
 
 # Define custom units for density as n_19 or n_20 (used in several formulas)
 # Format is "canonical_name = definition = unit_symbol = alias1 = alias2" where unit_symbol and aliases are optional
@@ -64,7 +60,7 @@ def convert_units(array: xr.DataArray | pint.Quantity, units: Any) -> xr.DataArr
         if not hasattr(array.pint, "units") or array.pint.units is None:
             array = array.pint.quantify(ureg.dimensionless)
 
-        return array.pint.to(units)  # type: ignore[no-any-return]
+        return array.pint.to(units)
     elif isinstance(array, Quantity):
         return array.to(units)  # type:ignore[no-any-return]
     elif isinstance(array, float) and Quantity(1.0, units).check("[]"):
@@ -85,9 +81,9 @@ def magnitude(array: pint.Quantity) -> npt.NDArray[np.float32] | float: ...
 def magnitude(array: xr.DataArray | pint.Quantity) -> xr.DataArray | npt.NDArray[np.float32] | float:
     """Return the magnitude of an array, handling both Quantities and xr.DataArrays."""
     if isinstance(array, xr.DataArray):
-        return array.pint.dequantify()  # type: ignore[no-any-return]
+        return array.pint.dequantify()
     elif isinstance(array, Quantity):
-        return array.magnitude  # type: ignore[no-any-return]
+        return array.magnitude
     else:
         raise NotImplementedError(f"No implementation for 'magnitude' with an array of type {type(array)} ({array})")
 

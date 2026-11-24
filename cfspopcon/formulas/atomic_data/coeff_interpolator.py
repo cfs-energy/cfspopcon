@@ -67,8 +67,8 @@ class CoeffInterpolator(RectBivariateSpline):
 
         if self.coeff_is_zero:
             super().__init__(
-                self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]
-                self.log10_with_floor(electron_density_coord),  # type: ignore[arg-type]
+                self.log10_with_floor(electron_temp_coord),
+                self.log10_with_floor(electron_density_coord),
                 np.zeros_like(coeff_magnitude),
             )
         else:
@@ -76,9 +76,9 @@ class CoeffInterpolator(RectBivariateSpline):
                 raise ValueError("Encountered mix of null and positive values in coeff for CoeffInterpolator")
 
             super().__init__(
-                self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]
-                self.log10_with_floor(electron_density_coord),  # type: ignore[arg-type]
-                self.log10_with_floor(coeff_magnitude),  # type: ignore[arg-type]
+                self.log10_with_floor(electron_temp_coord),
+                self.log10_with_floor(electron_density_coord),
+                self.log10_with_floor(coeff_magnitude),
             )
 
         self.electron_temp_coord = electron_temp_coord

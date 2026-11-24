@@ -50,9 +50,6 @@ def wraps_ufunc(  # noqa: PLR0915
 
     input_keys = list(input_units.keys())
 
-    if not isinstance(pass_as_kwargs, tuple):
-        raise ValueError(f"pass_as_kwargs must be passed as a tuple of keys, not {str(type(pass_as_kwargs))[1:-1]}")
-
     pass_as_positional_args = _check_pass_as_kwargs(input_keys, pass_as_kwargs)
     input_core_dims, output_core_dims = _resolve_core_dims(input_core_dims, output_core_dims, pass_as_positional_args, return_units)
 
@@ -142,7 +139,7 @@ def wraps_ufunc(  # noqa: PLR0915
                 # if anything goes wrong in our frame inspection or we find that we aren't in a chained
                 # call we raise the previous exception
                 try:
-                    err = _describe_chained_call(func_name)
+                    err = _describe_chained_call(getattr(func, "__name__", None))
                 except Exception:
                     # error while determining if we are withing a chained FunctionWrapper so re-raise original error
                     raise e from None
@@ -201,13 +198,18 @@ def _resolve_core_dims(
     return input_core_dims, output_core_dims
 
 
-def _describe_chained_call(func_name: str) -> str:
-    """Describe the problem if a wraps_ufunc function was called from within another one, or return an empty string."""
+def _describe_chained_call(func_name: str | None) -> str:
+    """Describe the problem if a wraps_ufunc function was called from within another one, or return an empty string.
+
+    Functions without a ``__name__`` (e.g. a ``functools.partial``) cannot be described, so an empty string is returned.
+    """
     import inspect
 
-    # the first entry is the frame of the wrapped call, which we are being called from.
+    if func_name is None:
+        return ""
+
+    # frames[0] is the wrapped call we are being called from; check whether any of its callers is also a wrapped call.
     frames = inspect.getouterframes(inspect.currentframe())[1:]
-    # the first entry is the current call so check if any of the earlier callees are a __call__ from a FunctionWrapper
     for frame in frames[1:]:
         if frame.function == "popcon_ufunc_wrapped_call":
             f = frames[1]

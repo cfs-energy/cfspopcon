@@ -1,5 +1,5 @@
-# per default we only run over the files in the python package
 default_install_hook_types: [pre-commit, commit-msg]  # one `pre-commit install` sets up both
+default_stages: [pre-commit]  # hooks that do not name a stage must not also run on the commit message
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks

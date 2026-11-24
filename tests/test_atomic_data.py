@@ -126,7 +126,7 @@ def test_mixed_zero_and_positive_coefficients_raise():
 
 
 @pytest.mark.parametrize("species", ["helium", AtomicSpecies.Nitrogen], ids=["str", "AtomicSpecies"])
-@pytest.mark.parametrize("ne_tau", [0.5e17, Quantity(0.5, ureg.ms * ureg.n20)], ids=["float", "Quantity"])
+@pytest.mark.parametrize("ne_tau", [0.5e17, int(0.5e17), Quantity(0.5, ureg.ms * ureg.n20)], ids=["float", "int", "Quantity"])
 def test_get_functions(atomic_data, species, ne_tau):
     atomic_data.get_coronal_Lz_interpolator(species)
     atomic_data.get_coronal_Z_interpolator(species)
@@ -157,3 +157,11 @@ def test_get_radas_version(atomic_data):
         atomic_data._check_radas_version("versions won't have spaces in them.")
 
     assert atomic_data.radas_version == atomic_data["hydrogen"].radas_version == atomic_data["helium"].radas_version
+
+
+@pytest.mark.parametrize("tolerance", [1e-2, Quantity(1e-2, ureg.dimensionless)], ids=["float", "dimensionless_Quantity"])
+def test_ne_tau_rel_tolerance_accepts_dimensionless_quantity(atomic_data, tolerance):
+    atomic_data.get_noncoronal_Lz_interpolator("helium", 0.5e17, ne_tau_rel_tolerance=tolerance)
+
+    with pytest.raises(KeyError):
+        atomic_data.get_noncoronal_Lz_interpolator("helium", 0.75e17, ne_tau_rel_tolerance=tolerance)

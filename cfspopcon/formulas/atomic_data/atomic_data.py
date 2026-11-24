@@ -263,7 +263,12 @@ class AtomicData:
         tolerance_specified = ne_tau_rel_tolerance is not None
         default_ne_tau_rel_tolerance = 1e-2
 
-        rel_tolerance = default_ne_tau_rel_tolerance if ne_tau_rel_tolerance is None else self._ne_tau_as_float(ne_tau_rel_tolerance)
+        if ne_tau_rel_tolerance is None:
+            rel_tolerance = default_ne_tau_rel_tolerance
+        elif isinstance(ne_tau_rel_tolerance, int | float):
+            rel_tolerance = float(ne_tau_rel_tolerance)
+        else:
+            rel_tolerance = float(magnitude_in_units(ne_tau_rel_tolerance, ureg.dimensionless))
 
         if np.abs((nearest_ne_tau - ne_tau_value) / ne_tau_value) > rel_tolerance:
             message = f"Requested ne_tau = {ne_tau_value}. Nearest value {nearest_ne_tau} was further than {rel_tolerance} * {ne_tau_value} from the requested value."

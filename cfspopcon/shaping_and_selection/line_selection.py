@@ -53,7 +53,7 @@ def interpolate_onto_line(
     x_coord, y_coord = line_x.name, line_y.name
     array = array.transpose(x_coord, y_coord)
 
-    interpolator = RegularGridInterpolator(  # type: ignore[call-overload]
+    interpolator = RegularGridInterpolator(
         points=((array.coords[x_coord], array.coords[y_coord])),
         values=magnitude(array).to_numpy(),
         method=interpolation_method,

@@ -71,3 +71,12 @@ def test_variable_consistency_checker_normalize_description():
     assert VariableConsistencyChecker.normalize_description("single line") == ["single line"]
     assert VariableConsistencyChecker.normalize_description("first line\nsecond line") == ["first line", "second line"]
     assert VariableConsistencyChecker.normalize_description(["first line", "second line"]) == ["first line", "second line"]
+
+
+def test_impurity_array_helpers_accept_integer_concentrations():
+    from_int = make_impurity_concentration_array("tungsten", 1)
+    assert from_int.dtype.kind == "f"
+
+    extended = extend_impurity_concentration_array(from_int, "xenon", 1)
+    extended = extend_impurity_concentration_array(extended, "xenon", 0.5)
+    assert float(extended.sel(dim_species=AtomicSpecies.Xenon)) == 0.5

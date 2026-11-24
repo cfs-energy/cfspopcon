@@ -64,7 +64,7 @@ def extend_impurity_concentration_array(
         species = AtomicSpecies[species.capitalize()]
 
     if not isinstance(concentration, xr.DataArray):
-        concentration = xr.DataArray(concentration)
+        concentration = xr.DataArray(float(concentration))
 
     if array.ndim == 0:
         # If the input array is empty, then just return the concentration instead of the input array
