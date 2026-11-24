@@ -102,14 +102,14 @@
             "attrs": {
                 "units": "megawatt * tesla / meter"
             },
-            "data": 168.676,
+            "data": 168.677,
             "dims": []
         },
         "PBpRnSq": {
             "attrs": {
                 "units": "megawatt * tesla / _1e20_per_cubic_metre ** 2 / meter"
             },
-            "data": 8.20242,
+            "data": 8.20243,
             "dims": []
         },
         "P_LH_thresh": {
@@ -130,28 +130,28 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 7.09794,
+            "data": 7.09793,
             "dims": []
         },
         "P_auxiliary_launched": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 7.88660,
+            "data": 7.88659,
             "dims": []
         },
         "P_external": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 8.29956,
+            "data": 8.29954,
             "dims": []
         },
         "P_fusion": {
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 115.816,
+            "data": 115.817,
             "dims": []
         },
         "P_in": {
@@ -165,7 +165,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 92.6531,
+            "data": 92.6532,
             "dims": []
         },
         "P_ohmic": {
@@ -179,7 +179,7 @@
             "attrs": {
                 "units": "megawatt"
             },
-            "data": 5.88486,
+            "data": 5.88485,
             "dims": []
         },
         "P_radiation_from_core_seeded_impurity": {
@@ -282,7 +282,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.0851512,
+            "data": 0.0851511,
             "dims": []
         },
         "breakdown_flux_consumption": {
@@ -301,7 +301,7 @@
                 0.0247983,
                 NaN,
                 0.00000,
-                0.000875672
+                0.000875604
             ],
             "dims": [
                 "dim_species"
@@ -316,7 +316,7 @@
                 0.173575,
                 NaN,
                 0.00000,
-                0.0502444
+                0.0502366
             ],
             "dims": [
                 "dim_species"
@@ -352,7 +352,7 @@
             "attrs": {
                 "units": "second"
             },
-            "data": 16.3615,
+            "data": 16.3616,
             "dims": []
         },
         "cylindrical_safety_factor": {
@@ -373,7 +373,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.0746028,
+            "data": 0.0746032,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
@@ -399,7 +399,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.0744315,
+            "data": 0.0744311,
             "dims": []
         },
         "ejima_coefficient": {
@@ -428,12 +428,12 @@
                 "units": "_1e19_per_cubic_metre"
             },
             "data": [
-                37.5397,
+                37.5398,
                 37.5253,
-                37.4818,
+                37.4819,
                 37.4096,
                 37.3087,
-                37.1793,
+                37.1794,
                 37.0219,
                 36.8366,
                 36.6240,
@@ -444,7 +444,7 @@
                 35.1698,
                 34.8053,
                 34.4180,
-                34.0087,
+                34.0088,
                 33.5784,
                 33.1280,
                 32.6584,
@@ -453,7 +453,7 @@
                 31.1446,
                 30.6084,
                 30.0583,
-                29.4967,
+                29.4968,
                 28.9252,
                 28.3648,
                 27.8152,
@@ -473,7 +473,7 @@
                 21.1506,
                 20.7408,
                 20.3389,
-                19.9449,
+                19.9448,
                 19.5584,
                 19.3131,
                 13.4157,
@@ -642,7 +642,7 @@
                 29.1863,
                 29.0145,
                 28.8258,
-                28.6205,
+                28.6206,
                 28.3991,
                 28.1619,
                 27.9093,
@@ -726,8 +726,8 @@
                 2.00000,
                 7.99945,
                 17.8937,
-                45.7750,
-                58.3781
+                45.7777,
+                58.3736
             ],
             "dims": [
                 "dim_species"
@@ -752,7 +752,7 @@
             "attrs": {
                 "units": "ampere"
             },
-            "data": 7.95918e+06,
+            "data": 7.95919e+06,
             "dims": []
         },
         "internal_flux": {
@@ -923,7 +923,7 @@
             "attrs": {
                 "units": "volt"
             },
-            "data": 0.150972,
+            "data": 0.150971,
             "dims": []
         },
         "magnetic_field_on_axis": {
@@ -944,7 +944,7 @@
             "attrs": {
                 "units": "second"
             },
-            "data": 2.35375,
+            "data": 2.35377,
             "dims": []
         },
         "min_P_radiation": {
@@ -972,7 +972,7 @@
             "attrs": {
                 "units": "meter * ohm"
             },
-            "data": 2.91468e-09,
+            "data": 2.91466e-09,
             "dims": []
         },
         "nesep_over_nebar": {
@@ -993,7 +993,7 @@
             "attrs": {
                 "units": "1 / second"
             },
-            "data": 4.10721e+19,
+            "data": 4.10722e+19,
             "dims": []
         },
         "normalized_beta": {
@@ -1014,7 +1014,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.0237492,
+            "data": 0.0237490,
             "dims": []
         },
         "parallel_connection_length": {
@@ -1117,7 +1117,7 @@
         },
         "radas_version": {
             "attrs": {},
-            "data": "1!1.0.1",
+            "data": "1!2.0.0",
             "dims": []
         },
         "radiated_power_method": {
@@ -1388,7 +1388,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 1.34382,
+            "data": 1.34381,
             "dims": []
         }
     },
