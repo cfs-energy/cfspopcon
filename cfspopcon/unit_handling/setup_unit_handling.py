@@ -73,8 +73,16 @@ def convert_units(array: xr.DataArray | pint.Quantity, units: Any) -> xr.DataArr
         raise NotImplementedError(f"No implementation for 'convert_units' with an array of type {type(array)} ({array})")
 
 
+@overload
+def magnitude(array: xr.DataArray) -> xr.DataArray: ...
+
+
+@overload
+def magnitude(array: pint.Quantity) -> npt.NDArray[np.float32] | float: ...
+
+
 @suppress_downcast_warning
-def magnitude(array: xr.DataArray | pint.Quantity) -> npt.NDArray[np.float32] | float:
+def magnitude(array: xr.DataArray | pint.Quantity) -> xr.DataArray | npt.NDArray[np.float32] | float:
     """Return the magnitude of an array, handling both Quantities and xr.DataArrays."""
     if isinstance(array, xr.DataArray):
         return array.pint.dequantify()  # type: ignore[no-any-return]
@@ -94,11 +102,27 @@ def get_units(array: xr.DataArray | pint.Quantity) -> Any:
         raise NotImplementedError(f"No implementation for 'get_units' with an array of type {type(array)} ({array})")
 
 
-def magnitude_in_units(array: xr.DataArray | pint.Quantity, units: Any) -> npt.NDArray[np.float32] | float:
+@overload
+def magnitude_in_units(array: xr.DataArray, units: Any) -> xr.DataArray: ...
+
+
+@overload
+def magnitude_in_units(array: pint.Quantity, units: Any) -> npt.NDArray[np.float32] | float: ...
+
+
+def magnitude_in_units(array: xr.DataArray | pint.Quantity, units: Any) -> xr.DataArray | npt.NDArray[np.float32] | float:
     """Convert the array to the specified units and then return the magnitude."""
     return magnitude(convert_units(array, units))
 
 
-def dimensionless_magnitude(array: xr.DataArray | pint.Quantity) -> npt.NDArray[np.float32] | float:
+@overload
+def dimensionless_magnitude(array: xr.DataArray) -> xr.DataArray: ...
+
+
+@overload
+def dimensionless_magnitude(array: pint.Quantity) -> npt.NDArray[np.float32] | float: ...
+
+
+def dimensionless_magnitude(array: xr.DataArray | pint.Quantity) -> xr.DataArray | npt.NDArray[np.float32] | float:
     """Converts the array to dimensionless and returns the magnitude."""
     return magnitude_in_units(array, ureg.dimensionless)

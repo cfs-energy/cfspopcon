@@ -154,8 +154,10 @@ def wraps_ufunc(  # noqa: PLR0915
                     raise e
 
         # more meaningfull alias to the scalar non-unit version of the function
-        popcon_ufunc_wrapped_call.unitless_func = popcon_ufunc_wrapped_call.__wrapped__  # ty: ignore[missing-attribute]
-        popcon_ufunc_wrapped_call.__signature__ = _make_new_sig(func_signature, input_units, return_units)  # ty: ignore[missing-attribute]
+        # type checkers do not allow setting attributes on functions
+        wrapped_call: Any = popcon_ufunc_wrapped_call
+        wrapped_call.unitless_func = wrapped_call.__wrapped__
+        wrapped_call.__signature__ = _make_new_sig(func_signature, input_units, return_units)
         return popcon_ufunc_wrapped_call
 
     return _wraps_ufunc

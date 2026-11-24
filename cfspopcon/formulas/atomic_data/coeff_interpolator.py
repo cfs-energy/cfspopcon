@@ -110,6 +110,8 @@ class CoeffInterpolator(RectBivariateSpline):
             output_core_dims=(("dim_electron_temp", "dim_electron_density"),),
         )(partial(self.__call__, grid_from_inputs=True))
 
+    # The override takes (electron_density, electron_temp) where RectBivariateSpline takes (x, y) = (temp, density), so it is not a
+    # drop-in replacement. Fixing this means composing a spline rather than subclassing it, which changes the public class.
     def __call__(  # ty: ignore[incompatible-method-override]
         self,
         electron_density: float | np.ndarray,

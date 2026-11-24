@@ -24,7 +24,7 @@ from difflib import get_close_matches
 from functools import wraps
 from importlib.resources import files
 from pathlib import Path  # noqa: TC003
-from typing import Any, ClassVar, TypeVar
+from typing import Any, ClassVar, TypeVar, cast
 from warnings import warn
 
 import xarray as xr
@@ -46,6 +46,12 @@ GenericFunctionType = Callable[..., Any]
 
 # Preserves a decorated function's exact type.
 _F = TypeVar("_F", bound=Callable[..., Any])
+
+
+def _callable_name(function: Callable[..., Any]) -> str:
+    """Return the name of a function (type checkers do not know that callables have a __name__)."""
+    return str(cast("Any", function).__name__)
+
 
 #: The bundled plugin: the package holding cfspopcon's own algorithms.
 _BUNDLED_PLUGIN = "cfspopcon.formulas"
@@ -105,7 +111,7 @@ class Algorithm:
             ValueError: if the function takes positional-only or variable positional arguments.
         """
         self._function = function
-        self._name = self._function.__name__ if name is None else name  # ty: ignore[missing-attribute]
+        self._name = _callable_name(self._function) if name is None else name
         self._override = override
 
         self._signature = inspect.signature(function)
@@ -282,7 +288,7 @@ class Algorithm:
         return cls(
             wrapped_function,
             return_keys,
-            name=name if name is not None else func.__name__,  # ty: ignore[missing-attribute]
+            name=name if name is not None else _callable_name(func),
             override=override,
         )
 
@@ -344,10 +350,10 @@ def declare_algorithm(
     """
 
     def function_wrapper(func: _F) -> _F:
-        func.__popcon_algorithm__ = Algorithm.from_single_function(  # ty: ignore[missing-attribute]
+        cast("Any", func).__popcon_algorithm__ = Algorithm.from_single_function(
             func,
             return_keys=return_keys,
-            name=name if name is not None else func.__name__,  # ty: ignore[missing-attribute]
+            name=name if name is not None else _callable_name(func),
             skip_unit_conversion=skip_unit_conversion,
             override=override,
         )
@@ -440,10 +446,8 @@ class CompositeAlgorithm:
             return wrapper
 
         self.run = _wrap(self._run)
-        # ignore due to a type checker limitation: attributes cannot be set on functions
-        self.run.__signature__ = inspect.Signature(  # ty: ignore[missing-attribute]
-            non_def_pars + def_pars, return_annotation=xr.Dataset
-        )
+        # type checkers do not allow setting attributes on functions
+        cast("Any", self.run).__signature__ = inspect.Signature(non_def_pars + def_pars, return_annotation=xr.Dataset)
         self._name = name
         self.__doc__ = self._make_docstring()
 
@@ -526,7 +530,7 @@ class CompositeAlgorithm:
             alg_kwargs = {key: result[key] for key in result.keys() if key in alg.input_keys}
 
             alg_result = alg.run(**alg_kwargs)
-            result.update(alg_result)  # ty: ignore[no-matching-overload]  # dict.update() doesn't like KeysView[Hashable]
+            result.update({str(key): value for key, value in alg_result.items()})
 
         return xr.Dataset(result)
 

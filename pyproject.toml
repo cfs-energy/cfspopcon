@@ -84,18 +84,6 @@ python-version = "3.12"
 include = ["cfspopcon"]
 exclude = ["cfspopcon/plotting"]
 
-# calc_jch_profiles and calc_jch_pedestal_peaking annotate their quantity inputs as `float` (the convention
-# for algorithms) but call magnitude_in_units on them directly, and pass DataArrays to helpers annotated
-# with ndarray. Fixing the annotations is follow-on work; until then, only these rules are relaxed, and only
-# for this file.
-[[tool.ty.overrides]]
-include = ["cfspopcon/formulas/plasma_profiles/jch_profiles.py"]
-
-[tool.ty.overrides.rules]
-invalid-argument-type = "ignore"
-invalid-assignment = "ignore"
-invalid-explicit-return = "ignore"
-
 [tool.ruff]
 target-version = "py312"
 line-length = 140

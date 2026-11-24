@@ -45,7 +45,7 @@ def sanitize_variable(val: xr.DataArray, key: str, coord: bool = False) -> xr.Da
         try:
             if val.size == 1:
                 if not coord:
-                    val = get_name(val.item())  # ty: ignore[invalid-assignment]
+                    return get_name(val.item())
                 else:
                     val = xr.DataArray([get_name(val.item())])
             else:
@@ -139,7 +139,17 @@ class _RoundingFloat(float):
     From: https://stackoverflow.com/questions/54370322/how-to-limit-the-number-of-float-digits-jsonencoder-produces
     """
 
-    __repr__ = staticmethod(_rounded_float_repr)  # ty: ignore[incompatible-attribute-override]
+    def __repr__(self) -> str:
+        """Represent the float to a fixed number of significant figures.
+
+        json calls this as `float.__repr__(value)` on plain floats (via the patched `json.encoder.float`),
+        so `self` is the float to format.
+        """
+        return _rounded_float_repr(float(self))
+
+
+# json.encoder has private attributes (c_make_encoder, float) which typeshed does not declare.
+_json_encoder: Any = json.encoder
 
 
 class _ModifyJSONFloatRepr:
@@ -147,15 +157,15 @@ class _ModifyJSONFloatRepr:
 
     def __enter__(self) -> Self:
         """Change the float representation to fixed precision on entry."""
-        self.c_make_encoder = json.encoder.c_make_encoder  # ty: ignore[missing-attribute]
-        json.encoder.c_make_encoder = None  # ty: ignore[missing-attribute]
-        json.encoder.float = _RoundingFloat  # ty: ignore[missing-attribute]
+        self.c_make_encoder = _json_encoder.c_make_encoder
+        _json_encoder.c_make_encoder = None
+        _json_encoder.float = _RoundingFloat
         return self
 
     def __exit__(self, *args: Any) -> None:
         """Change the float representation back to the default."""
-        json.encoder.c_make_encoder = self.c_make_encoder  # ty: ignore[missing-attribute]
-        json.encoder.float = float  # ty: ignore[missing-attribute]
+        _json_encoder.c_make_encoder = self.c_make_encoder
+        _json_encoder.float = float
 
 
 def write_point_to_file(dataset: xr.Dataset, point_key: str, point_params: dict, output_dir: Path) -> None:

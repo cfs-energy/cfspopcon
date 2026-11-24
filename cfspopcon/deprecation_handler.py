@@ -39,7 +39,9 @@ def handle_deprecated_arguments(
         else:
             raise NotImplementedError(f"Cannot handle a profile type of {profile_type}")
 
-        updated_alg_list = [new_alg if alg.name == "calc_peaked_profiles" else alg for alg in algorithm.algorithms]  # ty: ignore[missing-union-attribute]
+        if not isinstance(algorithm, CompositeAlgorithm):
+            raise TypeError(f"Deprecated profile form inputs can only be handled for a CompositeAlgorithm, not {type(algorithm).__name__}.")
+        updated_alg_list = [new_alg if alg.name == "calc_peaked_profiles" else alg for alg in algorithm.algorithms]
         algorithm = CompositeAlgorithm(
             algorithms=updated_alg_list,
         )
