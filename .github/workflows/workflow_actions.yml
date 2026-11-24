@@ -24,13 +24,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # --- JOB 1: GENERATE RADAS DATA ---
-  # The radas calculation runs on every CI run, so the tests always see output
-  # from the radas version in poetry.lock. Only the downloaded OpenADAS files
-  # (radas_dir/data_files) are cached, keyed on radas_config.yaml, since they
-  # depend only on which species and years the config requests.
+  # --- JOB 1: RUN RADAS AND CACHE THE OPENADAS DATA FILES ---
+  # The radas calculation runs on every CI run. Only the downloaded OpenADAS
+  # files (radas_dir/data_files) are cached, keyed on radas_config.yaml, since
+  # they depend only on which species and years the config requests. The radas
+  # output is never stored: each test job regenerates it from the cached files.
+  # This job downloads the files once and saves the cache, so the test jobs
+  # below can restore it.
   radas:
-    name: Generate Radas Data
+    name: Run Radas
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -48,7 +50,7 @@ jobs:
         run: poetry install
 
       # Scheduled runs re-resolve within the pyproject ranges instead of using poetry.lock
-      # (the test job does the same), so the radas output matches the tests' environment.
+      # (the test job does the same), so we find out if a new release breaks radas.
       - name: Re-resolve dependencies
         if: github.event_name == 'schedule'
         run: poetry --no-interaction update
@@ -59,19 +61,12 @@ jobs:
           path: ./radas_dir/data_files
           key: radas-data-files-${{ hashFiles('radas_config.yaml') }}
 
-      - name: Make radas data
+      - name: Run radas
         run: poetry run radas -c radas_config.yaml
-
-      - name: Upload radas output
-        uses: actions/upload-artifact@v7
-        with:
-          name: radas_output
-          path: ./radas_dir/output
-          retention-days: 30
 
   # --- JOB 2: TEST ---
   # The heavy work: unit tests, regression tests and the packaged smoke test,
-  # run across the supported Python versions. Needs the radas data.
+  # run across the supported Python versions. Needs the cached OpenADAS files.
   test:
     name: Test (Python ${{ matrix.python-version }})
     needs: radas
@@ -96,12 +91,6 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - name: Download radas output
-        uses: actions/download-artifact@v8
-        with:
-          name: radas_output
-          path: ./radas_dir/output
-
       # Scheduled runs re-resolve within the pyproject ranges instead of using poetry.lock,
       # so we find out when a new release of a dependency breaks the tests.
       - name: Re-resolve dependencies
@@ -109,6 +98,21 @@ jobs:
         run: |
           poetry --no-interaction update
           poetry show --top-level --no-truncate
+
+      - name: Restore OpenADAS data files
+        uses: actions/cache/restore@v5
+        id: radas-restore
+        with:
+          path: ./radas_dir/data_files
+          key: radas-data-files-${{ hashFiles('radas_config.yaml') }}
+
+      - name: Verify cache
+        if: steps.radas-restore.outputs.cache-hit != 'true'
+        run: exit 1
+
+      # Regenerated in every job, so the output always matches this job's Python and dependencies.
+      - name: Run radas
+        run: poetry run radas -c radas_config.yaml
 
       - name: Run Tests
         env:
