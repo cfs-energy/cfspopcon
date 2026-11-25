@@ -2920,14 +2920,14 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "radas"
-version = "1!1.0.1"
+version = "1!2.0.1"
 description = "Plasma radiated power calculated using OpenADAS"
 optional = false
 python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "radas-1!1.0.1-py3-none-any.whl", hash = "sha256:f6db8cbda4bf58ee6ec309d6aee931943ec423e3e2664ca6b55311ebbac24e85"},
-    {file = "radas-1!1.0.1.tar.gz", hash = "sha256:aae323959736d69f8c0276e2ac860fba2d8435f73bc04632cb12ee0cbb54813e"},
+    {file = "radas-1!2.0.1-py3-none-any.whl", hash = "sha256:99bb9e7ad104d354678dbab0ae2fe67190f7a55eb4787a3149eaeef0663968f0"},
+    {file = "radas-1!2.0.1.tar.gz", hash = "sha256:da31e67a3586f0f03bbbb542ecf2ae329124daa115ddb5dce4971b25147e3d69"},
 ]
 
 [package.dependencies]
@@ -2938,7 +2938,7 @@ meson = ">=1.10.2,<2.0.0"
 ninja = ">=1.13.0,<2.0.0"
 numpy = ">=2.4.4,<3.0.0"
 pandas = ">=3.0.2,<4.0.0"
-pint = ">=0.25.3,<0.26.0"
+pint = ">=0.25.3"
 pint-xarray = ">=0.6.1,<0.7.0"
 pyyaml = ">=6.0.3,<7.0.0"
 scipy = ">=1.17.1,<2.0.0"
@@ -3705,4 +3705,4 @@ viz = ["cartopy (>=0.24)", "matplotlib (>=3.10)", "nc-time-axis", "seaborn"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "ba5e915c90f0b9d2b2d903129a5b9654f38797c32b72bfb903da9b400cb70683"
+content-hash = "64c5db8a94bafe1717b0b9d8bb215b383aa7c4bc7eac7921bfd80fcb5dfcdd59"
