@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 9.0.2 - 2026-11-24
+
+### Changed
+
+- **radas `1!2.0.1`**: require the current radas release. Equilibrium charge-state fractions are solved directly, and truncated OpenADAS downloads are detected and fetched again.
+
 ## 9.0.1 - 2026-10-13
 
 ### Fixed
