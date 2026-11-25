@@ -56,7 +56,7 @@ def calc_zeff_and_dilution_due_to_impurities(
     return impurity_charge_state, change_in_zeff, change_in_dilution, z_effective, dilution, summed_impurity_density, average_ion_density
 
 
-def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
+def calc_change_in_zeff(impurity_charge_state: xr.DataArray, impurity_concentration: xr.DataArray) -> xr.DataArray:
     """Calculate the change in the effective charge due to the specified impurities.
 
     Args:
@@ -69,7 +69,7 @@ def calc_change_in_zeff(impurity_charge_state: float, impurity_concentration: xr
     return impurity_charge_state * (impurity_charge_state - 1.0) * impurity_concentration
 
 
-def calc_change_in_dilution(impurity_charge_state: float, impurity_concentration: xr.DataArray) -> xr.DataArray:
+def calc_change_in_dilution(impurity_charge_state: xr.DataArray, impurity_concentration: xr.DataArray) -> xr.DataArray:
     """Calculate the change in n_fuel/n_e due to the specified impurities.
 
     Args:

@@ -105,11 +105,11 @@ def build_L_int_integrator(
     Lz_curve = atomic_data.get_noncoronal_Lz_interpolator(get_item(impurity_species), ne_tau=reference_ne_tau)
 
     _electron_temp = Lz_curve.electron_temp_coord
-    _electron_density = magnitude_in_units(reference_electron_density, Lz_curve.electron_density_units)
+    _electron_density = np.asarray(magnitude_in_units(reference_electron_density, Lz_curve.electron_density_units))
     assert np.size(_electron_density) == 1
 
     Lz_sqrt_Te = Lz_curve(electron_density=_electron_density, electron_temp=_electron_temp) * np.sqrt(_electron_temp)
-    interpolator = InterpolatedUnivariateSpline(_electron_temp, magnitude(Lz_sqrt_Te))  # type: ignore[arg-type]
+    interpolator = InterpolatedUnivariateSpline(_electron_temp, magnitude(Lz_sqrt_Te))
 
     def L_int(start_temp: float, stop_temp: float) -> float:
         integrated_Lz: float = interpolator.integral(start_temp, stop_temp)

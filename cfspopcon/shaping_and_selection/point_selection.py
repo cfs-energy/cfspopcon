@@ -1,11 +1,11 @@
 """Routines to find the coordinates of the minimum or maximum value of a field."""
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Hashable, Sequence
+from typing import cast
 
 import numpy as np
 import xarray as xr
-from xarray.core.coordinates import DataArrayCoordinates
 
 from ..unit_handling import Quantity, dimensionless_magnitude, magnitude_in_default_units
 
@@ -49,7 +49,7 @@ def find_values_at_nearest_point(dataset: xr.Dataset, point_params: dict) -> xr.
         raise NotImplementedError(f"{method[0]} not recognized.")
 
 
-def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> DataArrayCoordinates:
+def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> dict[Hashable, xr.DataArray]:
     """Find the coordinates of a point which best fulfills the conditions defined by point params.
 
     The point parameters must have a 'minimize', 'maximize' or 'nearest_to' key.
@@ -118,7 +118,7 @@ def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> Dat
             normalization = Quantity(float(request.get("norm", request["value"])), request.get("units", ""))
             normalized_distance_squared.append(dimensionless_magnitude(((dataset[variable_name] - value) / normalization) ** 2))
 
-        euclidean_distance = np.sqrt(xr.concat(xr.broadcast(*normalized_distance_squared), dim="dim_distance").sum(dim="dim_distance"))  # type:ignore[call-overload]
+        euclidean_distance = np.sqrt(xr.concat(xr.broadcast(*normalized_distance_squared), dim="dim_distance").sum(dim="dim_distance"))
         coords_of_point = find_coords_of_minimum(euclidean_distance, keep_dims=point_params.get("keep_dims", []), mask=mask)
 
         if "tolerance" in point_params:
@@ -131,7 +131,9 @@ def find_coords_of_nearest_point(dataset: xr.Dataset, point_params: dict) -> Dat
     return coords_of_point
 
 
-def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: xr.DataArray | None = None) -> DataArrayCoordinates:
+def find_coords_of_minimum(
+    array: xr.DataArray, keep_dims: Sequence[str] = [], mask: xr.DataArray | None = None
+) -> dict[Hashable, xr.DataArray]:
     """Find the coordinates the minimum value of array.
 
     These coordinates can be used to find the value of other arrays at the same point.
@@ -153,12 +155,13 @@ def find_coords_of_minimum(array: xr.DataArray, keep_dims: Sequence[str] = [], m
         masked_array = array.where(mask).fillna(large)
 
     along_dims = [dim for dim in masked_array.dims if dim not in keep_dims]
-    point_coords = masked_array.argmin(dim=along_dims)
+    # With a sequence of dims, argmin returns a dict of DataArrays which can be passed to isel (ty picks the wrong overload).
+    return cast("dict[Hashable, xr.DataArray]", masked_array.argmin(dim=along_dims))
 
-    return point_coords  # type:ignore[return-value]
 
-
-def find_coords_of_maximum(array: xr.DataArray, keep_dims: Sequence[str] = [], mask: xr.DataArray | None = None) -> DataArrayCoordinates:
+def find_coords_of_maximum(
+    array: xr.DataArray, keep_dims: Sequence[str] = [], mask: xr.DataArray | None = None
+) -> dict[Hashable, xr.DataArray]:
     """Find the coordinates of the maximum value of array."""
     return find_coords_of_minimum(-array, keep_dims=keep_dims, mask=mask)
 

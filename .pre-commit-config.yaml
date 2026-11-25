@@ -1,4 +1,6 @@
-# per default we only run over the files in the python package
+default_install_hook_types: [pre-commit, commit-msg]  # one `pre-commit install` sets up both
+default_stages: [pre-commit]  # hooks that do not name a stage must not also run on the commit message
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -24,13 +26,20 @@ repos:
         files: '^cfspopcon/'
 -   repo: local
     hooks:
-      - id: mypy
-        name: mypy
-        entry: bash -c 'mypy "$@" || true' --
+      # ty is pinned in pyproject.toml, since its diagnostics change between releases.
+      - id: ty
+        name: ty check
+        entry: poetry run ty check
         language: system
         types: [python]
-        files: '^cfspopcon/'
-        exclude: ^cfspopcon/plotting
+        pass_filenames: false
+-   repo: local
+    hooks:
+      - id: no-ai-attribution
+        name: no AI attribution trailers in commit messages
+        entry: '(?i)(^co-authored-by: claude .*<noreply@anthropic\.com>|generated with \[claude code\])'
+        language: pygrep
+        stages: [commit-msg]
 -   repo: local
     hooks:
       - id: check_variables

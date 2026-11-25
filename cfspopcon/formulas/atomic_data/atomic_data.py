@@ -242,6 +242,12 @@ class AtomicData:
         """Returns a coronal_Z_interpolator for the specified species and ne_tau value."""
         return self.coronal_Z_interpolators[self.key_to_enum(species)]
 
+    def _ne_tau_as_float(self, value: float | Quantity) -> float:
+        """Return a plain number, or a quantity converted to the ne_tau units, as a float."""
+        if isinstance(value, int | float):
+            return float(value)
+        return float(magnitude_in_units(value, self.ne_tau_units))
+
     def _get_nearest_ne_tau(
         self, species: str | AtomicSpecies, ne_tau: float | Quantity, ne_tau_rel_tolerance: float | Quantity | None = None
     ) -> float:
@@ -250,21 +256,22 @@ class AtomicData:
         If a tolerance is specified, raise an error if the nearest ne_tau value is outside the specified tolerance.
         If a tolerance is not specified, raise a warning if the nearest ne_tau value is outside the specified tolerance.
         """
-        if not isinstance(ne_tau, float):
-            ne_tau = float(magnitude_in_units(ne_tau, self.ne_tau_units))
+        ne_tau_value = self._ne_tau_as_float(ne_tau)
 
-        nearest_ne_tau = float(self.species_ne_tau[self.key_to_enum(species)].sel(dim_ne_tau=ne_tau, method="nearest"))
+        nearest_ne_tau = float(self.species_ne_tau[self.key_to_enum(species)].sel(dim_ne_tau=ne_tau_value, method="nearest"))
 
         tolerance_specified = ne_tau_rel_tolerance is not None
         default_ne_tau_rel_tolerance = 1e-2
 
-        if tolerance_specified and not isinstance(ne_tau_rel_tolerance, float):
-            ne_tau_rel_tolerance = float(magnitude_in_units(ne_tau_rel_tolerance, self.ne_tau_units))  # type: ignore [arg-type]
-        elif not tolerance_specified:
-            ne_tau_rel_tolerance = default_ne_tau_rel_tolerance
+        if ne_tau_rel_tolerance is None:
+            rel_tolerance = default_ne_tau_rel_tolerance
+        elif isinstance(ne_tau_rel_tolerance, int | float):
+            rel_tolerance = float(ne_tau_rel_tolerance)
+        else:
+            rel_tolerance = float(magnitude_in_units(ne_tau_rel_tolerance, ureg.dimensionless))
 
-        if np.abs((nearest_ne_tau - ne_tau) / ne_tau) > ne_tau_rel_tolerance:
-            message = f"Requested ne_tau = {ne_tau}. Nearest value {nearest_ne_tau} was further than {ne_tau_rel_tolerance} * {ne_tau} from the requested value."
+        if np.abs((nearest_ne_tau - ne_tau_value) / ne_tau_value) > rel_tolerance:
+            message = f"Requested ne_tau = {ne_tau_value}. Nearest value {nearest_ne_tau} was further than {rel_tolerance} * {ne_tau_value} from the requested value."
 
             if tolerance_specified:
                 raise KeyError(message)

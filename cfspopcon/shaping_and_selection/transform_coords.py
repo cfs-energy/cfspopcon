@@ -79,8 +79,8 @@ def interpolate_array_onto_new_coords(
     """
     coords, coord_spacing = dict(), dict()
     for key, coord_array in new_coords.items():
-        coord_array_min = magnitude(coord_array.min()).item()  # type:ignore[union-attr]
-        coord_array_max = magnitude(coord_array.max()).item()  # type:ignore[union-attr]
+        coord_array_min = magnitude(coord_array.min()).item()
+        coord_array_max = magnitude(coord_array.max()).item()
 
         coords[key], coord_spacing[key] = np.linspace(
             start=coord_min.get(key, coord_array_min) if coord_min else coord_array_min,
@@ -96,7 +96,7 @@ def interpolate_array_onto_new_coords(
     array = broadcast_arrays[-1]
 
     interpolated_array = xr.DataArray(
-        griddata(  # type: ignore[call-overload]
+        griddata(
             sample_points,
             np.ravel(magnitude(array)),
             mesh_coords,

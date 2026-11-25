@@ -2,8 +2,8 @@
 
 from importlib.metadata import metadata
 
-__version__ = metadata(__package__)["Version"]
-__author__ = metadata(__package__)["Author"]
+__version__ = metadata("cfspopcon")["Version"]
+__author__ = metadata("cfspopcon")["Author"]
 
 from . import file_io, formulas, named_options, shaping_and_selection
 from .algorithm_class import (

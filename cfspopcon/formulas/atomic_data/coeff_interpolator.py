@@ -1,12 +1,16 @@
 """Class definition for CoeffInterpolator which is used to interpolate atomic data."""
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 import xarray as xr
 from scipy.interpolate import RectBivariateSpline
 
 from cfspopcon.unit_handling import Quantity, get_units, magnitude_in_units, ureg, wraps_ufunc
+
+if TYPE_CHECKING:
+    from pint import Unit
 
 
 class CoeffInterpolator(RectBivariateSpline):
@@ -63,8 +67,8 @@ class CoeffInterpolator(RectBivariateSpline):
 
         if self.coeff_is_zero:
             super().__init__(
-                self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]
-                self.log10_with_floor(electron_density_coord),  # type: ignore[arg-type]
+                self.log10_with_floor(electron_temp_coord),
+                self.log10_with_floor(electron_density_coord),
                 np.zeros_like(coeff_magnitude),
             )
         else:
@@ -72,9 +76,9 @@ class CoeffInterpolator(RectBivariateSpline):
                 raise ValueError("Encountered mix of null and positive values in coeff for CoeffInterpolator")
 
             super().__init__(
-                self.log10_with_floor(electron_temp_coord),  # type: ignore[arg-type]
-                self.log10_with_floor(electron_density_coord),  # type: ignore[arg-type]
-                self.log10_with_floor(coeff_magnitude),  # type: ignore[arg-type]
+                self.log10_with_floor(electron_temp_coord),
+                self.log10_with_floor(electron_density_coord),
+                self.log10_with_floor(coeff_magnitude),
             )
 
         self.electron_temp_coord = electron_temp_coord
@@ -85,26 +89,30 @@ class CoeffInterpolator(RectBivariateSpline):
         self.max_density = np.max(electron_density_coord).item()
         self.min_density = np.min(electron_density_coord).item()
 
-        call_config = dict(
-            input_units=dict(
-                electron_density=self.electron_density_units,
-                electron_temp=self.electron_temp_units,
-                allow_extrap=None,
-                grid_from_inputs=None,
-            ),
-            return_units=dict(coeff=self.units),
-            pass_as_kwargs=("allow_extrap", "grid_from_inputs"),
+        input_units: dict[str, str | Unit | None] = dict(
+            electron_density=self.electron_density_units,
+            electron_temp=self.electron_temp_units,
+            allow_extrap=None,
+            grid_from_inputs=None,
         )
+        return_units: dict[str, str | Unit | None] = dict(coeff=self.units)
+        pass_as_kwargs = ("allow_extrap", "grid_from_inputs")
 
-        self.eval = wraps_ufunc(**call_config)(self.__call__)  # type: ignore[arg-type]
-        self.vector_eval = wraps_ufunc(**call_config)(partial(self.__call__, grid_from_inputs=False))  # type: ignore[arg-type]
+        self.eval = wraps_ufunc(input_units=input_units, return_units=return_units, pass_as_kwargs=pass_as_kwargs)(self.__call__)
+        self.vector_eval = wraps_ufunc(input_units=input_units, return_units=return_units, pass_as_kwargs=pass_as_kwargs)(
+            partial(self.__call__, grid_from_inputs=False)
+        )
         self.grid_eval = wraps_ufunc(
-            **call_config,  # type: ignore[arg-type]
+            input_units=input_units,
+            return_units=return_units,
+            pass_as_kwargs=pass_as_kwargs,
             input_core_dims=(("dim_electron_density",), ("dim_electron_temp",)),
             output_core_dims=(("dim_electron_temp", "dim_electron_density"),),
         )(partial(self.__call__, grid_from_inputs=True))
 
-    def __call__(  # type: ignore[override]
+    # The override takes (electron_density, electron_temp) where RectBivariateSpline takes (x, y) = (temp, density), so it is not a
+    # drop-in replacement. Fixing this means composing a spline rather than subclassing it, which changes the public class.
+    def __call__(  # ty: ignore[incompatible-method-override]
         self,
         electron_density: float | np.ndarray,
         electron_temp: float | np.ndarray,

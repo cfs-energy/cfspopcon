@@ -20,8 +20,8 @@ def _calc_beta_general(
         >>> T = Quantity(1, "keV")
         >>> B = Quantity(1, "T")
         >>> mu_0 = Quantity(1, "mu_0")
-        >>> (2*mu_0 * n * T / (B**2)).to('').units
-        <Unit('dimensionless')>
+        >>> str((2*mu_0 * n * T / (B**2)).to('').units)
+        'dimensionless'
 
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`
@@ -82,8 +82,8 @@ def calc_beta_poloidal(
         >>> mu_0 = Quantity(1, "mu_0")
         >>> I = Quantity(1, "MA")
         >>> minor_radius = Quantity(1, "m")
-        >>> (mu_0 * I / (2 * pi * minor_radius)).to("T").units
-        <Unit('tesla')>
+        >>> str((mu_0 * I / (2 * pi * minor_radius)).to("T").units)
+        'tesla'
 
     Args:
         average_electron_density: [1e19 m^-3] :term:`glossary link<average_electron_density>`

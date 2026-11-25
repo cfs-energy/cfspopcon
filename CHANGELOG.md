@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Changed
+
+- **radas config**: `radas_config.yaml` matches radas's default `config.yaml` (three `ne_tau` values: `0.5e16`, `0.5e17`, `0.5e18`; time evolution off by default) except that it keeps the finer 50 x 100 density and temperature grid. The package requirement stays `radas ^1!2.0.1` from 9.0.2. The SPARC_PRD regression reference changes only in the last printed digit of `edge_impurity_concentration` (relative change 4e-6) and in `radas_version`; AUG_SepOS is unchanged.
+- **CI**: the radas calculation runs on every CI run. Only the downloaded OpenADAS files (`radas_dir/data_files`) are cached, keyed on `radas_config.yaml`; the radas output is never stored, and each test job regenerates it. The `force_radas_rebuild` workflow input is removed.
+- **CI**: workflows run with read-only token permissions by default, a dependency-review job runs on pull requests, and a weekly scheduled run re-resolves dependencies within the `pyproject.toml` ranges before testing.
+- **Type checking**: `ty` (pinned) replaces `mypy` as a blocking pre-commit and CI check. ruff now also enforces a complexity limit (`C901`, `max-complexity = 15`).
+- **Coverage floor**: enforced in CI only (`--cov-fail-under=84`), rather than in `pyproject.toml`.
+- `pint` is declared as `>=0.25.3`, matching radas.
+- `magnitude`, `magnitude_in_units` and `dimensionless_magnitude` are typed with overloads (DataArray in, DataArray out), so they type-check without suppressions. Behaviour is unchanged.
+- `handle_deprecated_arguments` raises a `TypeError` (previously an `AttributeError`) when deprecated profile-form inputs are combined with a plain `Algorithm`.
+
+### Fixed
+
+- Integer values are accepted for `ne_tau` and for impurity concentrations, and `ne_tau_rel_tolerance` may be a dimensionless quantity (it was previously converted to `ne_tau` units).
+
+### Added
+
+- Pull request template, `CODEOWNERS` and Dependabot configuration.
+- A pre-commit hook rejecting AI-attribution trailers in commit messages.
+
 ## 9.0.2 - 2026-11-24
 
 ### Changed

@@ -128,6 +128,20 @@ Running the entire test suit can be done via:
 
   >>> poetry run pytest
 
+CI additionally enforces a minimum test coverage (:code:`pytest --cov-fail-under=84`, see :code:`.github/workflows/workflow_actions.yml`).
+The floor is set in CI only, so that running a subset of the tests locally does not fail on coverage.
+
+Type Checking
+---------------
+
+We use `ty <https://docs.astral.sh/ty/>`_ for static type checking, configured in :code:`pyproject.toml`.
+It is pinned to a specific version, since its diagnostics change between releases.
+It also runs as a pre-commit hook, or you can run it directly:
+
+.. code::
+
+  >>> poetry run ty check
+
 Adding a new Test
 -------------------
 

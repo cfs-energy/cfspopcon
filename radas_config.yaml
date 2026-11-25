@@ -1,5 +1,5 @@
 globals:
-  # How long to run the time-integrator for (in s)
+  # How long to run the time-integrator for (in s), used only with --time-evolution
   evolution_start:
     value: 1.0E-8
     units: "s"
@@ -10,12 +10,11 @@ globals:
 
   # electron density (ne) * residence time (tau) (in m^-3 s)
   ne_tau:
-    value: [0.5e+17]
+    value: [0.5e+16, 0.5e+17, 0.5e+18]
     units: "m^-3 s"
   
   # Number of log-spaced points to use for electron density and electron temp.
   # Interpolation is used to map from raw data to points.
-  # To disable interpolation, do not provide these inputs.
   electron_density_resolution: 50
   electron_temp_resolution: 100
 

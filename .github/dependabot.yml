@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: pip  # also covers poetry (pyproject.toml and poetry.lock)
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # One PR per week for all minor and patch bumps. Major bumps still get their own PR,
+      # since they are the ones likely to need code changes.
+      python-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Actions are only pinned to a major version, so one weekly PR covers all of them.
+      github-actions:
+        patterns:
+          - "*"

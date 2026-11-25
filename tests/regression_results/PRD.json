@@ -373,7 +373,7 @@
             "attrs": {
                 "units": "dimensionless"
             },
-            "data": 0.0746028,
+            "data": 0.0746029,
             "dims": []
         },
         "edge_impurity_concentration_in_core": {
@@ -1117,7 +1117,7 @@
         },
         "radas_version": {
             "attrs": {},
-            "data": "1!1.0.1",
+            "data": "1!2.0.0",
             "dims": []
         },
         "radiated_power_method": {

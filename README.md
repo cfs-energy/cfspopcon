@@ -2,7 +2,6 @@ cfspopcon: 0D Plasma Calculations & Plasma OPerating CONtours
 --------------------------------------------------------------
 
 [![Build Status](https://github.com/cfs-energy/cfspopcon/actions/workflows/workflow_actions.yml/badge.svg)](https://github.com/cfs-energy/cfspopcon/actions)
-[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Documentation Status](https://readthedocs.org/projects/cfspopcon/badge/?version=latest)](https://cfspopcon.readthedocs.io/en/latest/?badge=latest)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cfs-energy/cfspopcon/HEAD)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10054879.svg)](https://doi.org/10.5281/zenodo.10054879)
@@ -16,3 +15,13 @@ To re-generate the saved regression reference outputs in `tests/regression_resul
 ```bash
 poetry run python tests/utils/regression_results.py
 ```
+
+### Checks before opening a PR
+
+```bash
+poetry run pytest tests --nbmake example_cases -m "not docs" --cov-fail-under=84  # the CI test command; CI enforces the 84% coverage floor, so a plain `pytest` or a partial run does not fail on it
+poetry run ty check                          # type check (ty is pinned, since its diagnostics change between releases)
+poetry run pre-commit run --all-files        # ruff check, ruff format and ty; `pre-commit install` (once) also rejects AI-attribution trailers in commit messages
+```
+
+CI runs the same checks.
